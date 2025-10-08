@@ -111,7 +111,7 @@
             });
         });
     </script>
-@endif
+
 </div>
 
 <script>

@@ -22,8 +22,71 @@ class StudyLeaveController extends Controller
      */
     public function create()
     {
+        $user = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.employee_no', session('empno'))
+            ->select(
+                'employees.employee_no as empno',
+                'employees.nic',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile'
+            )
+            ->first();
+
+        if (!$user)
+            abort(404, 'User not found');
+
+        $leaveTypes = DB::table('leave_types')->get();
+        $statuses = DB::table('statuses')->pluck('status', 'stat_id');
+
+        // Check if we're editing an existing record
+        $leave = null;
+        $otherLeave = null;
+        $remark = null;
+        $academicYear = null;
+
+        
+            // Get the otherleavesdetails record for this reference
+            //$otherLeave = OtherLeavesDetail::where('reference_no', $leave->reference_no)->first();
+
+            // If it's a returned form, get the remark
+            
+        // Note: For new applications, $leave and $otherLeave will be null and the form will work without a database record
+
+        // Only fetch previous leaves with status_id = 1 (approved) for the current academic year
+        $previousLeaves = DB::table('leave_details')
+            ->join('otherleavesdetails', 'leave_details.reference_no', '=', 'otherleavesdetails.reference_no')
+            ->join('leave_types', 'otherleavesdetails.leave_type_id', '=', 'leave_types.id')
+            ->join('statuses', 'leave_details.status_id', '=', 'statuses.stat_id')
+            ->where('leave_details.nic', $user->nic)
+            ->where('leave_details.status_id', 1)
+            ->whereYear('leave_details.applied_date', now()->year)
+            ->orderByDesc('leave_details.applied_date')
+            ->select(
+                'leave_types.name as leave_type',
+                'otherleavesdetails.from_date',
+                'otherleavesdetails.end_date as to_date',
+                'otherleavesdetails.duration',
+                'statuses.status',
+                'leave_details.applied_date'
+            )
+            ->get();
+
+        // Load existing travel details if editing
+        $travelDetails = [];
+        if ($leave) {
+            $travelDetails = LeaveRequestDetail::where('reference_no', $leave->reference_no)->get();
+        }
+
+        return view('create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
        
-       return view('StudyLeave.create');
+       //return view('StudyLeave.create');
     }
 
     /**
