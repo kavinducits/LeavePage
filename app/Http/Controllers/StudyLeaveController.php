@@ -84,7 +84,7 @@ class StudyLeaveController extends Controller
             $travelDetails = LeaveRequestDetail::where('reference_no', $leave->reference_no)->get();
         }
 
-        return view('create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
+        return view('StudyLeave.create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
        
        //return view('StudyLeave.create');
     }

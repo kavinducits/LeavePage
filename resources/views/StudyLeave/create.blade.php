@@ -22,11 +22,7 @@
         <div>
             <h2 class="mb-0 fw-bold text-maroon dashboard-header">
                 <i class="fas fa-file-alt me-2 icon-gold"></i>
-                @if(isset($leave))
-                    Application for Conference/ Seminar/ Training and Workshop
-                @else
-                    Application for Conference/ Seminar/ Training and Workshop
-                @endif
+                Application for Study Leave
                 
             </h2>
         </div>
