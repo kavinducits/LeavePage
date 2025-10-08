@@ -8,6 +8,7 @@ use App\Http\Controllers\HODController;
 use App\Http\Controllers\DeanController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use App\Http\Controllers\VCController;
+use App\Http\Controllers\StudyLeaveController;
 
 // Login routes
 // Set the default login page to MA page
@@ -40,6 +41,16 @@ Route::post('/Deanpage/{id}/recommend', [DeanController::class, 'recommend'])->n
 Route::get('/VCpage', [VCController::class, 'index'])->name('vc.index');
 Route::get('/VCpage/{id}', [VCController::class, 'show'])->name('vc.show');
 Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name('vc.recommend');
+
+//Study Leave routes (no authentication required)
+Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
+
+
+
+
+
+
+
 
 // Protected routes (user must be logged in)
 Route::middleware('checklogin')->group(function () {
