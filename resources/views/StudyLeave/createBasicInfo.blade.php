@@ -31,7 +31,7 @@
         </a>
     </div>
 
-    <form  method="POST" enctype="multipart/form-data" id="leave-form">
+    <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
 
         @if(isset($leave))
@@ -53,37 +53,38 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Employee No</label>
-                        <input type="text" class="form-control" value="{{ $user->empno }}" readonly>
+                        <input type="text" name="empno" class="form-control" value="{{ $user->empno }}" readonly>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Name with Initials</label>
-                        <input type="text" class="form-control" value="{{ $user->name_with_initials }}" readonly>
+                        <input type="text" name="name_with_initials" class="form-control" value="{{ $user->name_with_initials }}" readonly>
                     </div>
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Designation</label>
-                        <input type="text" class="form-control" value="{{ $user->designation }}" readonly>
+                        <input type="text" name="designation" class="form-control" value="{{ $user->designation }}" readonly>
                     </div>
                    
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Department</label>
-                        <input type="text" class="form-control" value="{{ $user->department }}" readonly>
+                        <input type="text" name="department" class="form-control" value="{{ $user->department }}" readonly>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Faculty</label>
-                        <input type="text" class="form-control" value="{{ $user->faculty }}" readonly>
+                        <input type="text" name="faculty" class="form-control" value="{{ $user->faculty }}" readonly>
                     </div>
                   <div class="col-md-6">
                         <label class="form-label fw-semibold">Email Address</label>
-                        <input type="text" class="form-control" value="{{ $user->email }}" readonly>
+                        <input type="text" name="email" class="form-control" value="{{ $user->email }}" readonly>
                     </div>
                     
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Passport No:</label>
-                        <input type="text" class="form-control" value="" >
+                        <input type="text" name="passport_no" class="form-control" >
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold"> Validity date up to:</label>
-                        <input type="text" class="form-control" value="" >
+                        <input type="text" na
+                        me="passport_validity" class="form-control" >
                     </div>
             </div>
         </div>

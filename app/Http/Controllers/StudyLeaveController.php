@@ -170,5 +170,61 @@ class StudyLeaveController extends Controller
       
     
     }
+    /**
+     * Store a basic information in storage.
+     */
+    public function storeBasicInfo(Request $request)
+    {
+        
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'empno' => 'required|string|max:20',
+            'name_with_initials' => 'required|string|max:100',
+            'email' => 'required|email|max:100',
+            'department' => 'required|string|max:100',
+            'faculty' => 'required|string|max:100',
+            'designation' => 'required|string|max:100',
+            'passport_no' => 'string|max:50',
+            'passport_validity' => 'string|max:50'
+            
+        ]);
+
+        // Here you can handle the validated data, e.g., save it to the database or session
+        // For demonstration, we'll just redirect back with a success message
+
+        return redirect()->route('StudyLeave.Details.create')->with('success', 'Basic information saved successfully!');
+    }
+
+    public function createDetails()
+    {
+       
+        $user = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.employee_no', session('empno'))
+            ->select(
+                'employees.employee_no as empno',
+                'employees.nic',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'employees.email as email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile'
+            )
+            ->first();
+
+        if (!$user)
+            abort(404, 'User not found');
+       
+
+       return view('StudyLeave.createDetails', compact('user'));
+       
+       
+      
+    
+    }
 
 }
