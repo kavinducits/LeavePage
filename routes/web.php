@@ -10,6 +10,7 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use App\Http\Controllers\VCController;
 use App\Http\Controllers\StudyLeaveController;
 
+
 // Login routes
 // Set the default login page to MA page
 Route::get('/', [MAController::class, 'index'])->name('login');
@@ -43,8 +44,11 @@ Route::get('/VCpage/{id}', [VCController::class, 'show'])->name('vc.show');
 Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name('vc.recommend');
 
 //Study Leave routes (no authentication required)
+//Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
 Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
 
+Route::get('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'createBasicInfo'])->name('StudyLeave.BasicInfo.create');
+Route::post('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'storeBasicInfo'])->name('StudyLeave.BasicInfo.store');
 
 
 
