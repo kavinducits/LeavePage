@@ -88,7 +88,18 @@
             </div>
         </div>
 
+<div class="d-flex justify-content-end mt-4">
+    <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm">
+        Next: Leave Details <i class="fas fa-arrow-right ms-2"></i>
+    </button>
+</div>
     </form>
-
+    <!--
+    <div class="d-flex justify-content-end mt-4">
+        <a class="btn btn-outline-maroon">
+            <i class="fas fa-arrow-right me-2"></i>Next: Leave Details
+        </a>
+    </div>
+-->
 
 @endsection
