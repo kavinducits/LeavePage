@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\OtherLeavesDetail;
 use App\Models\LeaveRequestDetail;
 
+
 class StudyLeaveController extends Controller
 {
     /**
@@ -22,6 +23,7 @@ class StudyLeaveController extends Controller
      */
     public function create()
     {
+       
         $user = DB::table('employees')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -32,6 +34,7 @@ class StudyLeaveController extends Controller
                 'employees.nic',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'employees.email as email',
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'designations.designation_name as designation',
@@ -41,6 +44,7 @@ class StudyLeaveController extends Controller
 
         if (!$user)
             abort(404, 'User not found');
+       
 
         $leaveTypes = DB::table('leave_types')->get();
         $statuses = DB::table('statuses')->pluck('status', 'stat_id');
@@ -84,9 +88,12 @@ class StudyLeaveController extends Controller
             $travelDetails = LeaveRequestDetail::where('reference_no', $leave->reference_no)->get();
         }
 
-        return view('StudyLeave.create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
+       //return view('StudyLeave.create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
        
-       //return view('StudyLeave.create');
+       
+       //return view('create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
+       return redirect()->route('StudyLeave.BasicInfo.create');
+    
     }
 
     /**
@@ -128,4 +135,40 @@ class StudyLeaveController extends Controller
     {
         //
     }
+
+    /**
+     * Show the form for creating a basic information .
+     */
+    public function createBasicInfo()
+    {
+       
+        $user = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.employee_no', session('empno'))
+            ->select(
+                'employees.employee_no as empno',
+                'employees.nic',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'employees.email as email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile'
+            )
+            ->first();
+
+        if (!$user)
+            abort(404, 'User not found');
+       
+
+       return view('StudyLeave.createBasicInfo', compact('user'));
+       
+       
+      
+    
+    }
+
 }
