@@ -46,9 +46,16 @@ Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name(
 //Study Leave routes (no authentication required)
 //Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
 Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
-
+//Basic Info
 Route::get('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'createBasicInfo'])->name('StudyLeave.BasicInfo.create');
 Route::post('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'storeBasicInfo'])->name('StudyLeave.BasicInfo.store');
+
+//Details of the Study Leave
+Route::get('/StudyLeave/Details', [StudyLeaveController::class, 'createDetails'])->name('StudyLeave.Details.create');
+Route::post('/StudyLeave/Details', [StudyLeaveController::class, 'storeDetails'])->name('StudyLeave.Details.store');
+
+
+
 
 
 
