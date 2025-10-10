@@ -54,9 +54,21 @@ Route::post('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'storeBasicIn
 Route::get('/StudyLeave/Details', [StudyLeaveController::class, 'createDetails'])->name('StudyLeave.Details.create');
 Route::post('/StudyLeave/Details', [StudyLeaveController::class, 'storeDetails'])->name('StudyLeave.Details.store');
 
+//Details of the Previous Study Leave
+Route::get('/StudyLeave/PreviousStudyLeaves', [StudyLeaveController::class, 'createPreviousStudyLeaves'])->name('StudyLeave.PreviousStudyLeaves.create');
+Route::post('/StudyLeave/PreviousStudyLeaves', [StudyLeaveController::class, 'storePreviousStudyLeaves'])->name('StudyLeave.PreviousStudyLeaves.store');
 
+//Nominate Work covering Persons
+Route::get('/StudyLeave/WorkCoveringPersons', [StudyLeaveController::class, 'createWorkCoveringPersons'])->name('StudyLeave.WorkCoveringPersons.create');
+Route::post('/StudyLeave/WorkCoveringPersons', [StudyLeaveController::class, 'storeWorkCoveringPersons'])->name('StudyLeave.WorkCoveringPersons.store');
 
+//Handling of
+Route::get('/StudyLeave/Handeling', [StudyLeaveController::class, 'createHandeling'])->name('StudyLeave.Handeling.create');
+Route::post('/StudyLeave/Handeling', [StudyLeaveController::class, 'storeHandeling'])->name('StudyLeave.Handeling.store');
 
+// Summary and Submit
+Route::get('/StudyLeave/Summary', [StudyLeaveController::class, 'showSummary'])->name('StudyLeave.Summary.show');
+Route::post('/StudyLeave/Submit', [StudyLeaveController::class, 'submitApplication'])->name('StudyLeave.Submit');
 
 
 

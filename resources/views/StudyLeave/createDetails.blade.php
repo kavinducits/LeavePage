@@ -18,7 +18,10 @@
         <pre class="mb-0">{{ $remark }}</pre>
     </div>
     @endisset
+
+    <!-- Header and Back Button -->
     <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Header -->
         <div>
             <h2 class="mb-0 fw-bold text-maroon dashboard-header">
                 <i class="fas fa-file-alt me-2 icon-gold"></i>
@@ -26,10 +29,18 @@
                 
             </h2>
         </div>
+
+        <!-- Back Button -->
         <a class="btn btn-outline-maroon">
             <i class="fas fa-arrow-left me-2"></i>Back to List
         </a>
     </div>
+
+
+
+
+
+     <!-- Form Start -->
 
     <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
@@ -44,15 +55,18 @@
             @endif
         @endif
         
-
-        <!-- Personal Details (readonly) -->
+        <!-- Form Card -->
+    
         <div class="card mb-4">
+
+            <!-- Card Header -->
             <div class="card-header card-header-maroon fw-semibold">
                 <i class="fas fa-user me-2"></i>Details of the Study Leave
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     
+                    <!-- Leave Type -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Leave Type</label>
                         <select name="leave_type" class="form-select" required>
@@ -61,6 +75,8 @@
                             <option value="extension">Extension</option>
                         </select>
                     </div>
+
+                    <!-- Type of Study Leave Requested -->
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type Of Study Leave Requested</label>
                         <select name="leave_type" class="form-select" required>
@@ -69,14 +85,21 @@
                             <option value="extension">Without Pay</option>
                         </select>
                     </div>
+
+                    <!-- Period of Study Leave Requested (From) -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Period of Study Leave Requested (From)</label>
                         <input type="date" name="study_leave_from" class="form-control" required>
                     </div>
+
+                    <!-- Period of Study Leave Requested (To) -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Period of Study Leave Requested (To)</label>
                         <input type="date" name="study_leave_to" class="form-control" required>
                     </div>
+
+
+                    <!-- Details of the Study Program -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Title of the Degree (e.g. M.A., M.Sc, MBA, M.Phil., M.D., PhD)</label>
                         <select name="degree_title" class="form-select" required>
@@ -90,23 +113,33 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
+
+                    <!-- University or the Institute -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">University or the Institute</label>
                     <input type="text" name="university_institute" class="form-control" required>
                 </div>
+
+                <!-- Country and Field of Study -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Country</label>
                     <input type="text" name="country" class="form-control" required>
                 </div>
+
                  <div class="col-md-6">
                     <label class="form-label fw-semibold">Field of study</label>
                     <input type="text" name="field_of_study" class="form-control" required>
                 </div>
 
+
+                <!-- Relevancy and Details of the Study Program -->
+
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
                     <textarea name="study_program_details" class="form-control" rows="4" required></textarea>
                 </div>
+
+                <!-- Funding Type -->
                 <div class="col-md-6">
                         <label class="form-label fw-semibold"> Funding type</label>
                         <select name="funding_type" class="form-select" required>
@@ -115,6 +148,8 @@
                             <option value="Partial">Scholarship</option>
                         </select>
                     </div>
+
+                    <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
                         <label class="form-label fw-semibold">Scholarship Source</label>
                         <select name="scholarship_source" class="form-select">
@@ -123,20 +158,115 @@
                             <option value="project">Funds from a project</option>
                         </select>
                     </div>
+
+                    <!-- Additional fields based on Scholarship Source -->
                     <div class="col-md-6" id="scholarship-extra-details" style="display: none;">
+
+                        <!-- Scholarship Amount (conditional) - If Scholarship offering agency is selected -->
                         <div id="scholarship-amount-group" style="display: none;">
                             <label class="form-label fw-semibold">Scholarship Amount</label>
                             <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount">
                         </div>
+
+                        <!-- Project Name (conditional) - If Funds from a project is selected -->
                         <div id="project-name-group" style="display: none;">
                             <label class="form-label fw-semibold">Project Name</label>
                             <input type="text" name="project_name" class="form-control" placeholder="Enter project name">
                         </div>
                     </div>
+
+                    <!-- Any Other Details -->
                     <div class="col-md-12">
                     <label class="form-label fw-semibold">Any Other Details</label>
-                    <textarea name="any_other_details" class="form-control" rows="4" required></textarea>
+                    <textarea name="any_other_details
+                    
+                    " class="form-control" rows="4" required></textarea>
                 </div>
+
+
+                <!-- Additional fields (conditional) - If Self-Funding is selected -->
+
+                <!-- Air Passage Request -->
+                <div class="col-md-6" id="self-funding-extra" style="display: none;">
+                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Air Passage from this University?</label>
+                    <div class="d-inline-block">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes">
+                            <label class="form-check-label" for="air_passage_yes">YES</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no">
+                            <label class="form-check-label" for="air_passage_no">NO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warm Cloth Allowance Request -->
+                <div class="col-md-6" id="self-funding-extra2" style="display: none;">
+                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Warm Cloth Allowance from this University?</label>
+                    <div class="d-inline-block">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes">
+                            <label class="form-check-label" for="warm_cloth_yes">YES</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no">
+                            <label class="form-check-label" for="warm_cloth_no">NO</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Self-Funding Declaration (conditional) -->
+                <div class="col-md-12" id="self-funding-declaration" style="display: none;">
+                    <div class="alert alert-warning mt-3">
+                        <strong>Note:</strong> If you are not receiving any scholarship, airfare or warm cloth allowance from any University, Institute, agency or project, please attach a separate document certifying that you will not be receiving any funds mentioned above from the placement offering University, Institute or any other agency.
+                    </div>
+                    <label class="form-label fw-semibold mt-2">Attach Declaration PDF</label>
+                    <input type="file" name="self_funding_declaration" class="form-control" accept="application/pdf">
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const fundingType = document.querySelector('select[name="funding_type"]');
+                        const selfFundingDeclaration = document.getElementById('self-funding-declaration');
+                        fundingType.addEventListener('change', function () {
+                            if (this.value === 'Full') {
+                                selfFundingDeclaration.style.display = 'block';
+                            } else {
+                                selfFundingDeclaration.style.display = 'none';
+                                selfFundingDeclaration.querySelector('input[type="file"]').value = '';
+                            }
+                        });
+                    });
+                </script>
+
+                <!-- Attachment Instructions -->
+                <div class="col-md-12">
+                    <div class="alert alert-info mt-3">
+                        <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
+                    </div>
+                    <label class="form-label fw-semibold mt-2">Attach PDF Documents</label>
+                    <input type="file" name="attachments[]" class="form-control" accept="application/pdf" multiple required>
+                </div>
+
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const fundingType = document.querySelector('select[name="funding_type"]');
+                        const selfFundingExtra = document.getElementById('self-funding-extra');
+                        const selfFundingExtra2 = document.getElementById('self-funding-extra2');
+                        fundingType.addEventListener('change', function () {
+                            if (this.value === 'Full') {
+                                selfFundingExtra.style.display = 'block';
+                                selfFundingExtra2.style.display = 'block';
+                            } else {
+                                selfFundingExtra.style.display = 'none';
+                                selfFundingExtra2.style.display = 'none';
+                                document.querySelectorAll('input[name="air_passage_request"]').forEach(el => el.checked = false);
+                                document.querySelectorAll('input[name="warm_cloth_allowance_request"]').forEach(el => el.checked = false);
+                            }
+                        });
+                    });
+                </script>
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
                             const fundingType = document.querySelector('select[name="funding_type"]');
@@ -193,6 +323,7 @@
             </div>
         </div>
 
+        <!-- Submit Button -->
 <div class="d-flex justify-content-end mt-4">
     <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm">
         Next: Leave Details <i class="fas fa-arrow-right ms-2"></i>
@@ -207,4 +338,15 @@
     </div>
 -->
 
+<style>
+    .custom-radio {
+        border: 2px solid #6c757d !important;
+        box-shadow: 0 0 2px #6c757d;
+        background-color: #fff;
+    }
+    .custom-radio:checked {
+        border-color: #800000 !important;
+        box-shadow: 0 0 4px #800000;
+    }
+</style>
 @endsection
