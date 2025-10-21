@@ -42,7 +42,7 @@
 
      <!-- Form Start -->
 
-    <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+    <form  action="{{ route('StudyLeave.Details.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
 
         @if(isset($leave))
@@ -178,9 +178,7 @@
                     <!-- Any Other Details -->
                     <div class="col-md-12">
                     <label class="form-label fw-semibold">Any Other Details</label>
-                    <textarea name="any_other_details
-                    
-                    " class="form-control" rows="4" required></textarea>
+                    <textarea name="any_other_details" class="form-control" rows="4" required></textarea>
                 </div>
 
 

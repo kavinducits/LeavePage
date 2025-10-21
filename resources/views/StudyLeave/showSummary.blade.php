@@ -31,7 +31,9 @@
         </a>
     </div>
 
-    <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+    <!-- Form for Summary and Submit -->
+
+    <form  action="{{ route('StudyLeave.Submit') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
 
         @if(isset($leave))

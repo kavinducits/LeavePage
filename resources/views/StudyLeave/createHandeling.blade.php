@@ -31,7 +31,9 @@
         </a>
     </div>
 
-    <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+    <!-- Form for Handling -->
+
+    <form  action="{{ route('StudyLeave.Handeling.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
 
         @if(isset($leave))
@@ -49,6 +51,7 @@
             <div class="card-header card-header-maroon fw-semibold">
                 <i class="fas fa-user me-2"></i>Handling of
             </div>
+            <!-- Card Body -->
             <div class="card-body">
             <div class="row g-3">
                 <div class="col-12 mb-3">

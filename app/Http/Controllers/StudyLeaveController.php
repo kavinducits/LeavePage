@@ -88,6 +88,8 @@ class StudyLeaveController extends Controller
             $travelDetails = LeaveRequestDetail::where('reference_no', $leave->reference_no)->get();
         }
 
+       
+
        //return view('StudyLeave.create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
        
        
@@ -189,15 +191,19 @@ class StudyLeaveController extends Controller
             
         ]);
 
-        // Here you can handle the validated data, e.g., save it to the database or session
-        // For demonstration, we'll just redirect back with a success message
+        // Store basic info in session for later steps
+
+         session(['study_leave' => ['employee_no' => session('empno'),'passport_no' => $validatedData['passport_no'], 'passport_validity' => $validatedData['passport_validity']]]); 
+
+      
+        // redirect Details of the Study Leave
 
         return redirect()->route('StudyLeave.Details.create')->with('success', 'Basic information saved successfully!');
     }
 
     public function createDetails()
     {
-       
+      
         $user = DB::table('employees')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -230,21 +236,24 @@ class StudyLeaveController extends Controller
     {
         
         // Validate the incoming request data
+        /*
         $validatedData = $request->validate([
-            'leave_type' => 'required|string|max:100',
-            'from_date' => 'required|date',
-            'to_date' => 'required|date|after_or_equal:from_date',
-            'duration' => 'required|string|max:50',
-            'address_during_study_leave' => 'required|string|max:255',
-            'contact_no' => 'required|string|max:20',
-            'email_during_study_leave' => 'required|email|max:100',
+            'leave_type' => 'nullable|required|string|max:100',
+            'from_date' => 'nullable|required|date',
+            'to_date' => 'nullable|required|date|after_or_equal:from_date',
+            'duration' => 'nullable|required|string|max:50',
+            'address_during_study_leave' => 'nullable|required|string|max:255',
+            'contact_no' => 'nullable|required|string|max:20',
+            'email_during_study_leave' => 'nullable|required|email|max:100',
             'details_of_sponsorship' => 'nullable|string|max:255',
             'details_of_previous_study_leaves' => 'nullable|string|max:255'
             
         ]);
+        */
 
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
+       
 
         return redirect()->route('StudyLeave.PreviousStudyLeaves.create')->with('success', 'Study leave details saved successfully!');
     }
@@ -264,6 +273,7 @@ class StudyLeaveController extends Controller
     {
         
         // Validate the incoming request data
+        /*
         $validatedData = $request->validate([
             'prev_leave_type.*' => 'nullable|string|max:100',
             'prev_university.*' => 'nullable|string|max:255',
@@ -273,7 +283,7 @@ class StudyLeaveController extends Controller
             'prev_completed.*' => 'nullable|string|in:Completed,Not Completed'
             
         ]);
-
+*/
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
 
@@ -313,8 +323,10 @@ class StudyLeaveController extends Controller
 
     public function storeWorkCoveringPersons(Request $request)
     {
+       
         
         // Validate the incoming request data
+        /*
         $validatedData = $request->validate([
             'teaching_cover' => 'required|string|max:255',
             'research_supervision_cover' => 'required|string|max:255',
@@ -322,7 +334,7 @@ class StudyLeaveController extends Controller
             'other_cover' => 'nullable|string|max:255'
             
         ]);
-
+*/
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
 
@@ -339,24 +351,27 @@ class StudyLeaveController extends Controller
     
     }
     public function storeHandeling(Request $request)
-    {   
+    { 
+        
         
         // Validate the incoming request data
+        /*
         $validatedData = $request->validate([
             'head_of_department' => 'required|string|max:100',
             'dean' => 'required|string|max:100',
             'vice_chancellor' => 'required|string|max:100'
             
         ]);
-
+*/
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
 
-        return redirect()->route('firstPage')->with('success', 'Handling of details saved successfully!');
+        return redirect()->route('StudyLeave.Summary.show')->with('success', 'Handling of details saved successfully!');
     }
     public function showSummary()
     {
        
+       // Retrieve all relevant data for the summary view
 
        return view('StudyLeave.showSummary');
        

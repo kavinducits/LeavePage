@@ -31,7 +31,9 @@
         </a>
     </div>
 
-    <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+    <!-- Form for Previous Study Leaves -->
+
+    <form  action="{{ route('StudyLeave.PreviousStudyLeaves.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
 
         @if(isset($leave))
@@ -49,11 +51,12 @@
             <div class="card-header card-header-maroon fw-semibold">
                 <i class="fas fa-user me-2"></i>Previous Study Leave Records
             </div>
+            <!-- Card Body -->
             <div class="card-body">
                 <div class="row g-3">
                     
                     <div class="col-12">
-                        
+                        <!-- Table for Previous Study Leave Records -->
                         <table class="table table-bordered align-middle">
                             <thead class="table-light">
                                 <tr>

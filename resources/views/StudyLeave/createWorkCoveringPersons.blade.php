@@ -31,7 +31,9 @@
         </a>
     </div>
 
-    <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+    <!-- Form for Work Covering Persons -->
+
+    <form  action="{{ route('StudyLeave.WorkCoveringPersons.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
 
         @if(isset($leave))
@@ -49,14 +51,14 @@
             <div class="card-header card-header-maroon fw-semibold">
                 <i class="fas fa-user me-2"></i>Arrangements made to cover applicants’ work during the period of leave
             </div>
+            <!-- Card Body -->
             <div class="card-body">
                 <div class="row g-3">
                     
+                    <!-- Work Covering Persons Inputs -->
                     <div class="col-12">
-                        
-                      
-                            
-                            
+
+                        <!-- Nominee Person For Teaching -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nominate Person For Teaching (Emp No. & Name)</label>
                                 <div class="row g-2">
@@ -79,6 +81,8 @@
                                 </div>
                             </div>
 
+                            <!-- Nominee Person For Administrative Work -->
+
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nominate Person For Administrative Work (Emp No. & Name)</label>
                                 <div class="row g-2">
@@ -100,6 +104,8 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!--  Nominee Person For Other Work -->
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Nominate Person For Other Work (Emp No. & Name)</label>
