@@ -79,10 +79,10 @@
                     <!-- Type of Study Leave Requested -->
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type Of Study Leave Requested</label>
-                        <select name="leave_type" class="form-select" required>
+                        <select name="leave_payment_type" class="form-select" required>
                             <option value="" disabled selected>Select an option</option>
-                            <option value="fresh">With Pay</option>
-                            <option value="extension">Without Pay</option>
+                            <option value="with Pay">With Pay</option>
+                            <option value="without Pay">Without Pay</option>
                         </select>
                     </div>
 

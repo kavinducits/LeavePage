@@ -58,6 +58,8 @@
                         <p class="mb-0">Once you submit the application, you will not be able to make any further changes.</p>
                         <p class="mb-0">Click the "Submit Application" button below to finalize your study leave request.</p>
                     </div>
+                </div>
+                <!-- Declaration Checkbox -->
                     <div class="col-12">
                         <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" id="declaration" name="declaration" required>

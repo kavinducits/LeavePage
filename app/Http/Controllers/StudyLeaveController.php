@@ -204,29 +204,10 @@ class StudyLeaveController extends Controller
     public function createDetails()
     {
       
-        $user = DB::table('employees')
-            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
-            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->where('employees.employee_no', session('empno'))
-            ->select(
-                'employees.employee_no as empno',
-                'employees.nic',
-                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
-                'employees.name_denoted_by_initials as names_denoted_by_initials',
-                'employees.email as email',
-                'departments.department_name as department',
-                'faculties.faculty_name as faculty',
-                'designations.designation_name as designation',
-                'employees.mobile_no as mobile'
-            )
-            ->first();
-
-        if (!$user)
-            abort(404, 'User not found');
+        
        
 
-       return view('StudyLeave.createDetails', compact('user'));
+       return view('StudyLeave.createDetails');
        
        
       
@@ -236,24 +217,34 @@ class StudyLeaveController extends Controller
     {
         
         // Validate the incoming request data
-        /*
-        $validatedData = $request->validate([
-            'leave_type' => 'nullable|required|string|max:100',
-            'from_date' => 'nullable|required|date',
-            'to_date' => 'nullable|required|date|after_or_equal:from_date',
-            'duration' => 'nullable|required|string|max:50',
-            'address_during_study_leave' => 'nullable|required|string|max:255',
-            'contact_no' => 'nullable|required|string|max:20',
-            'email_during_study_leave' => 'nullable|required|email|max:100',
-            'details_of_sponsorship' => 'nullable|string|max:255',
-            'details_of_previous_study_leaves' => 'nullable|string|max:255'
-            
-        ]);
-        */
+       
+        // Validation rules for Study Leave details - adjust fields to match your createDetails.blade.php
+        $rules = [
+            'leave_type' => 'required|string|max:100',
+            'leave_payment_type' => 'required|string|max:100',
+           'study_leave_from' => 'required|date',
+           'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
+            'degree_title' => 'required|string|max:255',
+            'university_institute' => 'required|string|max:255',
+            'country' => 'required|string|max:100',
+            'field_of_study' => 'required|string|max:255',
+            'study_program_details' => 'required|string|max:1000',
+            'funding_type' => 'required|string|max:255',
+            'scholarship_source' => 'nullable|string|max:1000',
+            'scholarship_amount' => 'nullable|numeric|min:0',
+           'project_name' => 'nullable|string|max:255',
+            'any_other_details' => 'nullable|string|max:1000',
+            'air_passage_request' => 'required|in:yes,no',
+            'warm_cloth_allowance_request' => 'required|in:yes,no',
+        ];
+
+        $validatedData = $request->validate($rules);
+        
+        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
 
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
-       
+      
 
         return redirect()->route('StudyLeave.PreviousStudyLeaves.create')->with('success', 'Study leave details saved successfully!');
     }
@@ -264,6 +255,7 @@ class StudyLeaveController extends Controller
 
     public function createPreviousStudyLeaves(){
 
+       
     
          return view('StudyLeave.createPreviousStudyLeaves');
 
@@ -273,7 +265,7 @@ class StudyLeaveController extends Controller
     {
         
         // Validate the incoming request data
-        /*
+        
         $validatedData = $request->validate([
             'prev_leave_type.*' => 'nullable|string|max:100',
             'prev_university.*' => 'nullable|string|max:255',
@@ -283,10 +275,10 @@ class StudyLeaveController extends Controller
             'prev_completed.*' => 'nullable|string|in:Completed,Not Completed'
             
         ]);
-*/
+        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
-
+dd(session('study_leave'));
         return redirect()->route('StudyLeave.WorkCoveringPersons.create')->with('success', 'Previous study leave details saved successfully!');
     }
     public function createWorkCoveringPersons()
@@ -326,15 +318,14 @@ class StudyLeaveController extends Controller
        
         
         // Validate the incoming request data
-        /*
+        
         $validatedData = $request->validate([
-            'teaching_cover' => 'required|string|max:255',
-            'research_supervision_cover' => 'required|string|max:255',
-            'admin_cover' => 'required|string|max:255',
-            'other_cover' => 'nullable|string|max:255'
+            'teaching_nominee_emp_no' => 'required|string|max:255',
+            'admin_nominee_emp_no' => 'required|string|max:255',
+            'other_nominee_emp_no' => 'required|string|max:255',
             
         ]);
-*/
+        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
 
@@ -386,5 +377,27 @@ class StudyLeaveController extends Controller
         // For demonstration, we'll just redirect back with a success message
         return redirect()->route('firstPage')->with('success', 'Study leave application submitted successfully!');
     }
+
+    public function getEmployeeInfo($emp_no)
+    {                               
+        dd($emp_no);
+        // Fetch employee info from the database
+        $employee = DB::table('employees')
+            ->where('employee_no', $emp_no)
+            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"))
+            ->first();
+
+        if ($employee) {
+            return response()->json([
+                'success' => true,
+                'data' => $employee
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found'
+            ], 404);
+        }
+    }                                                                                                     
 
 }

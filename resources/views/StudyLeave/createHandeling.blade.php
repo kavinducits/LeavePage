@@ -46,7 +46,7 @@
             @endif
         @endif
 
-        <!-- Personal Details (readonly) -->
+        
         <div class="card mb-4">
             <div class="card-header card-header-maroon fw-semibold">
                 <i class="fas fa-user me-2"></i>Handling of
@@ -54,6 +54,9 @@
             <!-- Card Body -->
             <div class="card-body">
             <div class="row g-3">
+
+                <!-- Handling of Library Books and Other Properties -->
+                
                 <div class="col-12 mb-3">
                     <label for="arrangement_made" class="form-label fw-semibold d-block">
                          Library book, Computer or any other properties?
@@ -64,6 +67,8 @@
                         <option value="Not Make Arrangements">Not Make Arrangements</option>
                     </select>
                 </div>
+
+                <!-- Handling of Paying Loans   -->
 
                 <div class="col-12 mb-3">
                     <label for="loan_arrangement" class="form-label fw-semibold d-block">

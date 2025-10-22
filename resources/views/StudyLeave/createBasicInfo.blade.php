@@ -95,6 +95,7 @@
                         <input type="text" name="passport_no" class="form-control" >
                     </div>
                     <!-- Passport Validity -->
+                    
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Validity date up to:</label>
                         <input type="date" name="passport_validity" class="form-control">
