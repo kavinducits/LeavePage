@@ -60,19 +60,21 @@
 
                         <!-- Nominee Person For Teaching -->
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Nominate Person For Teaching (Emp No. & Name)</label>
+                                <label class="form-label fw-semibold">Nominate Person For Teaching </label>
                                 <div class="row g-2">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control @error('nominee_emp_no') is-invalid @enderror" id="nominee_emp_no" name="nominee_emp_no" value="{{ old('nominee_emp_no', $leave->nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
-                                        @error('nominee_emp_no')
+                                        <label class="form-label fw-semibold">Employee No</label>
+                                        <input type="text" class="form-control @error('nominee_teaching_empno') is-invalid @enderror" id="nominee_teaching_empno" name="nominee_teaching_empno" value="{{ old('nominee_teaching_empno', $leave->teaching_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
+                                        @error('nominee_teaching_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                         @enderror
                                     </div>
                                     <div class="col-md-8">
-                                        <input type="text" class="form-control @error('nominee_name') is-invalid @enderror" id="nominee_name" name="nominee_name" value="{{ old('nominee_name', $leave->nominee_name ?? '') }}" placeholder="Employee Name" required>
-                                        @error('nominee_name')
+                                        <label class="form-label fw-semibold">Employee Name</label>
+                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $leave->teaching_nominee_name ?? '') }}" placeholder="Employee Name" readonly required>
+                                        @error('nominee_teaching_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
@@ -84,19 +86,21 @@
                             <!-- Nominee Person For Administrative Work -->
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Nominate Person For Administrative Work (Emp No. & Name)</label>
+                                <label class="form-label fw-semibold">Nominate Person For Administrative Work </label>
                                 <div class="row g-2">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control @error('admin_nominee_emp_no') is-invalid @enderror" id="admin_nominee_emp_no" name="admin_nominee_emp_no" value="{{ old('admin_nominee_emp_no', $leave->admin_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
-                                        @error('admin_nominee_emp_no')
+                                        <label class="form-label fw-semibold">Employee No</label>
+                                        <input type="text" class="form-control @error('nominee_admin_empno') is-invalid @enderror" id="nominee_admin_empno" name="nominee_admin_empno" value="{{ old('nominee_admin_empno', $leave->admin_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
+                                        @error('nominee_admin_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                         @enderror
                                     </div>
                                     <div class="col-md-8">
-                                        <input type="text" class="form-control @error('nominee_name') is-invalid @enderror" id="nominee_name" name="nominee_name" value="{{ old('nominee_name', $leave->nominee_name ?? '') }}" placeholder="Employee Name" required>
-                                        @error('nominee_name')
+                                        <label class="form-label fw-semibold">Employee Name</label>
+                                        <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $leave->admin_nominee_name ?? '') }}" placeholder="Employee Name" required readonly>
+                                        @error('nominee_admin_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
@@ -108,19 +112,21 @@
                             <!--  Nominee Person For Other Work -->
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Nominate Person For Other Work (Emp No. & Name)</label>
+                                <label class="form-label fw-semibold">Nominate Person For Other Work</label>
                                 <div class="row g-2">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control @error('other_nominee_emp_no') is-invalid @enderror" id="other_nominee_emp_no" name="other_nominee_emp_no" value="{{ old('other_nominee_emp_no', $leave->other_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
-                                        @error('other_nominee_emp_no')
+                                        <label class="form-label fw-semibold">Employee No</label>
+                                        <input type="text" class="form-control @error('nominee_other_empno') is-invalid @enderror" id="nominee_other_empno" name="nominee_other_empno" value="{{ old('nominee_other_empno', $leave->other_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
+                                        @error('nominee_other_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                         @enderror
                                     </div>
                                     <div class="col-md-8">
-                                        <input type="text" class="form-control @error('nominee_name') is-invalid @enderror" id="nominee_name" name="nominee_name" value="{{ old('nominee_name', $leave->nominee_name ?? '') }}" placeholder="Employee Name" required>
-                                        @error('nominee_name')
+                                        <label class="form-label fw-semibold">Employee Name</label>
+                                        <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $leave->other_nominee_name ?? '') }}" placeholder="Employee Name" required readonly>
+                                        @error('nominee_other_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
@@ -140,7 +146,59 @@
         Next: Leave Details <i class="fas fa-arrow-right ms-2"></i>
     </button>
 </div>
-    </form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+    // Prevent Enter key from submitting the form when focused in single-line text inputs
+    // This avoids accidental submits when a user presses Enter after filling the last field.
+    $('#leave-form').on('keydown', 'input[type="text"]', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    function lookupEmployee(empInputSelector, nameOutputSelector) {
+        var empno = $(empInputSelector).val() ? $(empInputSelector).val().trim() : '';
+        if (!empno) {
+            $(nameOutputSelector).val('');
+            return;
+        }
+
+        $.ajax({
+            url: '{{ url("StudyLeave/get-employee-info") }}/' + encodeURIComponent(empno),
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                if (response && response.success && response.data && response.data.name) {
+                    $(nameOutputSelector).val(response.data.name);
+                } else {
+                    $(nameOutputSelector).val('Not found');
+                    console.warn('Lookup returned no name for', empno, response);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Employee lookup error for', empno, status, error, xhr.responseText);
+                $(nameOutputSelector).val('Lookup failed');
+            }
+        });
+    }
+
+    $('#nominee_teaching_empno').on('change', function () {
+        lookupEmployee('#nominee_teaching_empno', '#nominee_teaching_name');
+    });
+
+    $('#nominee_admin_empno').on('change', function () {
+        lookupEmployee('#nominee_admin_empno', '#nominee_admin_name');
+    });
+    $('#nominee_other_empno').on('change', function () {
+        lookupEmployee('#nominee_other_empno', '#nominee_other_name');
+    });
+});
+</script>
+
+</form>
     <!--
     <div class="d-flex justify-content-end mt-4">
         <a class="btn btn-outline-maroon">

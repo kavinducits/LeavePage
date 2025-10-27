@@ -58,10 +58,10 @@
                 <!-- Handling of Library Books and Other Properties -->
                 
                 <div class="col-12 mb-3">
-                    <label for="arrangement_made" class="form-label fw-semibold d-block">
+                    <label for="library_and_property_handling" class="form-label fw-semibold d-block">
                          Library book, Computer or any other properties?
                     </label>
-                    <select class="form-select w-auto d-inline-block align-middle ms-2" id="arrangement_made" name="arrangement_made" required>
+                    <select class="form-select w-auto d-inline-block align-middle ms-2" id="library_and_property_handling" name="library_and_property_handling" required>
                         <option value="" selected disabled>Select an option</option>
                         <option value="Make Arrangements">Make Arrangements</option>
                         <option value="Not Make Arrangements">Not Make Arrangements</option>
@@ -71,12 +71,12 @@
                 <!-- Handling of Paying Loans   -->
 
                 <div class="col-12 mb-3">
-                    <label for="loan_arrangement" class="form-label fw-semibold d-block">
+                    <label for="loan_handling" class="form-label fw-semibold d-block">
                        Paying of Loans taken from University of UPF?
                         <br>
                         <small class="text-muted">(Applicable only when taking no pay leave)</small>
                     </label>
-                    <select class="form-select w-auto d-inline-block align-middle ms-2" id="loan_arrangement" name="loan_arrangement" required>
+                    <select class="form-select w-auto d-inline-block align-middle ms-2" id="loan_handling" name="loan_handling" required>
                         <option value="" selected disabled>Select an option</option>
                         <option value="Make Arrangements">Make Arrangements</option>
                         <option value="Not Make Arrangements">Not Make Arrangements</option>

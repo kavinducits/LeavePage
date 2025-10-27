@@ -266,46 +266,55 @@ class StudyLeaveController extends Controller
         
         // Validate the incoming request data
         
+        // Normalize fields that may arrive as arrays (use the first non-empty element)
+        $fields = [
+            'prev_leave_type',
+            'prev_university',
+            'prev_duration_from',
+            'prev_duration_to',
+            'prev_with_pay',
+            'prev_completed',
+        ];
+
+        $input = $request->all();
+
+        foreach ($fields as $field) {
+            if (array_key_exists($field, $input) && is_array($input[$field])) {
+                $first = null;
+                foreach ($input[$field] as $val) {
+                    if ($val !== null && $val !== '') {
+                        $first = $val;
+                        break;
+                    }
+                }
+                if ($first === null) {
+                    $first = $input[$field][0] ?? null;
+                }
+                $input[$field] = $first;
+            }
+        }
+
+        // Put normalized values back into the request so the validator gets scalars
+        $request->merge($input);
         $validatedData = $request->validate([
-            'prev_leave_type.*' => 'nullable|string|max:100',
-            'prev_university.*' => 'nullable|string|max:255',
-            'prev_duration_from.*' => 'nullable|date',
-            'prev_duration_to.*' => 'nullable|date|after_or_equal:prev_duration_from.*',
-            'prev_with_pay.*' => 'nullable|string|max:50',
-            'prev_completed.*' => 'nullable|string|in:Completed,Not Completed'
+            'prev_leave_type' => 'nullable|string|max:100',
+            'prev_university' => 'nullable|string|max:255',
+            'prev_duration_from' => 'nullable|date',
+            'prev_duration_to' => 'nullable|date|after_or_equal:prev_duration_from',
+            'prev_with_pay' => 'nullable|string|max:50',
+            'prev_completed' => 'nullable|string|in:Completed,Not Completed'
             
         ]);
+       
         session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
-dd(session('study_leave'));
+
         return redirect()->route('StudyLeave.WorkCoveringPersons.create')->with('success', 'Previous study leave details saved successfully!');
     }
     public function createWorkCoveringPersons()
     {
-       /*
-        $user = DB::table('employees')
-            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
-            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->where('employees.employee_no', session('empno'))
-            ->select(
-                'employees.employee_no as empno',
-                'employees.nic',
-                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
-                'employees.name_denoted_by_initials as names_denoted_by_initials',
-                'employees.email as email',
-                'departments.department_name as department',
-                'faculties.faculty_name as faculty',
-                'designations.designation_name as designation',
-                'employees.mobile_no as mobile'
-            )
-            ->first();
-
-        if (!$user)
-            abort(404, 'User not found');
-      */ 
-
+      
        return view('StudyLeave.createWorkCoveringPersons');
        
        
@@ -320,11 +329,12 @@ dd(session('study_leave'));
         // Validate the incoming request data
         
         $validatedData = $request->validate([
-            'teaching_nominee_emp_no' => 'required|string|max:255',
-            'admin_nominee_emp_no' => 'required|string|max:255',
-            'other_nominee_emp_no' => 'required|string|max:255',
+            'nominee_teaching_empno' => 'required|string|max:255',
+            'nominee_admin_empno' => 'required|string|max:255',
+            'nominee_other_empno' => 'required|string|max:255',
             
         ]);
+        
         session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
@@ -333,7 +343,8 @@ dd(session('study_leave'));
     }
     public function createHandeling()
     {
-       
+        
+      
 
        return view('StudyLeave.createHandeling');
        
@@ -346,14 +357,15 @@ dd(session('study_leave'));
         
         
         // Validate the incoming request data
-        /*
+        
         $validatedData = $request->validate([
-            'head_of_department' => 'required|string|max:100',
-            'dean' => 'required|string|max:100',
-            'vice_chancellor' => 'required|string|max:100'
+            'library_and_property_handling' => 'required|string|max:100',
+            'loan_handling' => 'required|string|max:100',
+            
             
         ]);
-*/
+        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
+
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
 
@@ -361,7 +373,8 @@ dd(session('study_leave'));
     }
     public function showSummary()
     {
-       
+        
+      
        // Retrieve all relevant data for the summary view
 
        return view('StudyLeave.showSummary');
@@ -373,6 +386,34 @@ dd(session('study_leave'));
     public function submitApplication(Request $request)
     {
         // Here you can handle the submission logic, e.g., save all data to the database
+        $data = session('study_leave', []);
+        dd($data);
+
+        if (empty($data)) {
+            return redirect()->back()->with('error', 'No study leave data found in session.');
+        }
+
+        // Ensure employee no is present
+        $data['employee_no'] = $data['employee_no'] ?? session('empno');
+
+        // Add timestamps (assuming table uses them)
+        $data['created_at'] = now();
+        $data['updated_at'] = now();
+
+        try {
+            // Insert into study_leave_record and get inserted id
+            $insertId = DB::table('study_leave_record')->insertGetId($data);
+        } catch (\Exception $e) {
+            // Log or return error
+            return redirect()->back()->with('error', 'Failed to save study leave: ' . $e->getMessage());
+        }
+
+        // Clear session data for study leave after successful save
+        session()->forget('study_leave');
+
+        // Optionally flash the inserted id to the session
+        session()->flash('study_leave_record_id', $insertId);
+
 
         // For demonstration, we'll just redirect back with a success message
         return redirect()->route('firstPage')->with('success', 'Study leave application submitted successfully!');
@@ -380,7 +421,7 @@ dd(session('study_leave'));
 
     public function getEmployeeInfo($emp_no)
     {                               
-        dd($emp_no);
+       //dd($emp_no);
         // Fetch employee info from the database
         $employee = DB::table('employees')
             ->where('employee_no', $emp_no)
