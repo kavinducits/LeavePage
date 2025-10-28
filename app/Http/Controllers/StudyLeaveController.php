@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\OtherLeavesDetail;
 use App\Models\LeaveRequestDetail;
-
+use App\Models\StudyLeave;
 
 class StudyLeaveController extends Controller
 {
@@ -219,6 +219,7 @@ class StudyLeaveController extends Controller
         // Validate the incoming request data
        
         // Validation rules for Study Leave details - adjust fields to match your createDetails.blade.php
+       
         $rules = [
             'leave_type' => 'required|string|max:100',
             'leave_payment_type' => 'required|string|max:100',
@@ -234,8 +235,8 @@ class StudyLeaveController extends Controller
             'scholarship_amount' => 'nullable|numeric|min:0',
            'project_name' => 'nullable|string|max:255',
             'any_other_details' => 'nullable|string|max:1000',
-            'air_passage_request' => 'required|in:yes,no',
-            'warm_cloth_allowance_request' => 'required|in:yes,no',
+            'air_passage_request' => 'nullable|in:yes,no',
+            'warm_cloth_allowance_request' => 'nullable|in:yes,no',
         ];
 
         $validatedData = $request->validate($rules);
@@ -255,9 +256,10 @@ class StudyLeaveController extends Controller
 
     public function createPreviousStudyLeaves(){
 
-       
-    
-         return view('StudyLeave.createPreviousStudyLeaves');
+         $previousLeaves = $this->getStudyLeaves(session('empno'));
+         
+
+         return view('StudyLeave.createPreviousStudyLeaves', compact('previousLeaves'));
 
     }
 
@@ -385,36 +387,50 @@ class StudyLeaveController extends Controller
     }
     public function submitApplication(Request $request)
     {
-        // Here you can handle the submission logic, e.g., save all data to the database
-        $data = session('study_leave', []);
-        dd($data);
+        // Here you would typically save the complete study leave application to the database
+        $studyLeaveData = session('study_leave', []);
+       
 
-        if (empty($data)) {
-            return redirect()->back()->with('error', 'No study leave data found in session.');
-        }
-
-        // Ensure employee no is present
-        $data['employee_no'] = $data['employee_no'] ?? session('empno');
-
-        // Add timestamps (assuming table uses them)
-        $data['created_at'] = now();
-        $data['updated_at'] = now();
-
-        try {
-            // Insert into study_leave_record and get inserted id
-            $insertId = DB::table('study_leave_record')->insertGetId($data);
-        } catch (\Exception $e) {
-            // Log or return error
-            return redirect()->back()->with('error', 'Failed to save study leave: ' . $e->getMessage());
-        }
-
-        // Clear session data for study leave after successful save
-        session()->forget('study_leave');
-
-        // Optionally flash the inserted id to the session
-        session()->flash('study_leave_record_id', $insertId);
-
-
+        // Save $studyLeaveData to the database as needed
+        StudyLeave::create([
+            'empno' => $studyLeaveData['employee_no'] ?? null,
+            'passport_no' => $studyLeaveData['passport_no'] ?? null,
+            'passport_validity' => $studyLeaveData['passport_validity'] ?? null,
+            'leave_type' => $studyLeaveData['leave_type'] ?? null,
+            'leave_payment_type' => $studyLeaveData['leave_payment_type'] ?? null,
+            'study_leave_from' => $studyLeaveData['study_leave_from'] ?? null,
+            'study_leave_to' => $studyLeaveData['study_leave_to'] ?? null,
+            'degree_title' => $studyLeaveData['degree_title'] ?? null,
+            'university_institute' => $studyLeaveData['university_institute'] ?? null,
+            'country' => $studyLeaveData['country'] ?? null,
+            'field_of_study' => $studyLeaveData['field_of_study'] ?? null,
+            'study_program_details' => $studyLeaveData['study_program_details'] ?? null,
+            'funding_type' => $studyLeaveData['funding_type'] ?? null,
+            'any_other_details' => $studyLeaveData['any_other_details'] ?? null,
+            'air_passage_request' => $studyLeaveData['air_passage_request'] ?? null,
+            'warm_cloth_allowance_request' => $studyLeaveData['warm_cloth_allowance_request'] ?? null,
+            'scholarship_source' => $studyLeaveData['scholarship_source'] ?? null,
+            'scholarship_amount' => $studyLeaveData['scholarship_amount'] ?? null,
+            'project_name' => $studyLeaveData['project_name'] ?? null,
+            'nominee_teaching_empno' => $studyLeaveData['nominee_teaching_empno'] ?? null,
+            'nominee_admin_empno' => $studyLeaveData['nominee_admin_empno'] ?? null,
+            'nominee_other_empno' => $studyLeaveData['nominee_other_empno'] ?? null,
+            'library_and_property_handling' => $studyLeaveData['library_and_property_handling'] ?? null,
+            'loan_handling' => $studyLeaveData['loan_handling'] ?? null,
+            'hod_empno' => $studyLeaveData['hod_empno'] ?? null,
+            'hod_staff_adequacy_recommendation' => $studyLeaveData['hod_staff_adequacy_recommendation'] ?? null,
+            'hod_teaching_coverage_recommendation' => $studyLeaveData['hod_teaching_coverage_recommendation'] ?? null,
+            'hod_one_year_service_verification' => $studyLeaveData['hod_one_year_service_verification'] ?? null,
+            'hod_leave_recommendation_status' => $studyLeaveData['hod_leave_recommendation_status'] ?? null,
+            'hod_not_recommended_reason' => $studyLeaveData['hod_not_recommended_reason'] ?? null,
+            'dean_leave_recommendation_status' => $studyLeaveData['dean_leave_recommendation_status'] ?? null,
+            'dean_not_recommended_reason' => $studyLeaveData['dean_not_recommended_reason'] ?? null,
+            'vc_empno' => $studyLeaveData['vc_empno'] ?? null,
+            'vc_recommend_submit_to_committee' => $studyLeaveData['vc_recommend_submit_to_committee'] ?? null,
+            'vc_council_covering_approval_status' => $studyLeaveData['vc_council_covering_approval_status'] ?? null,
+        ]);
+        // Clear the session data after submission
+        $request->session()->forget('study_leave');
         // For demonstration, we'll just redirect back with a success message
         return redirect()->route('firstPage')->with('success', 'Study leave application submitted successfully!');
     }
@@ -439,6 +455,17 @@ class StudyLeaveController extends Controller
                 'message' => 'Employee not found'
             ], 404);
         }
-    }                                                                                                     
+    }   
+    public function getStudyLeaves($emp_no)
+    {                               
+       //dd($emp_no);
+        // Fetch employee info from the database
+        $previousLeaves = DB::table('study_leaves')
+            ->where('empno', $emp_no)
+            ->select('id','degree_title','university_institute','study_leave_from','study_leave_to','leave_payment_type')
+            ->get();
+
+        return $previousLeaves;
+    }                                                                                                           
 
 }

@@ -46,6 +46,8 @@
             @endif
         @endif
 
+
+
         <!-- Personal Details (readonly) -->
         <div class="card mb-4">
             <div class="card-header card-header-maroon fw-semibold">
@@ -69,46 +71,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <select name="prev_degree[]" class="form-select">
-                                            <option value="">Select Degree</option>
-                                            <option value="M.A.">M.A.</option>
-                                            <option value="M.Sc">M.Sc</option>
-                                            <option value="MBA">MBA</option>
-                                            <option value="M.Phil.">M.Phil.</option>
-                                            <option value="M.D.">M.D.</option>
-                                            <option value="PhD">PhD</option>
-                                        </select>
-                                    </td>
-                                    <td><input type="text" name="prev_university[]" class="form-control"></td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <span class="align-self-center">from</span>
-                                            <input type="date" name="prev_duration_from[]" class="form-control" placeholder="From">
-                                            <span class="align-self-center">to</span>
-                                            <input type="date" name="prev_duration_to[]" class="form-control" placeholder="To">
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <select name="prev_with_pay[]" class="form-select">
-                                            <option value="">Select</option>
-                                            <option value="With Pay">With Pay</option>
-                                            <option value="No Pay">No Pay</option>
-                                        </select>
-                                    </td>
-                                    <td class="text-center">
-                                        <select name="prev_completed[]" class="form-select">
-                                            <option value="">Select</option>
-                                            <option value="Completed">Completed</option>
-                                            <option value="Not Completed">Not Completed</option>
-                                        </select>
-                                    </td>
-                                   
-                                </tr>
+                                @forelse($previousLeaves as $leave)
+                                    @include('StudyLeave.studyLeaveCard', ['leave' => $leave])
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">No previous study leave records found.</td>
+                                    </tr>
+                                @endforelse
+                                
                             </tbody>
                         </table>
-                        <small class="text-muted">Add details of previous study leave records, if any.</small>
+                        
                     </div>
                     
             </div>

@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
         Schema::create('study_leaves', function (Blueprint $table) {
-            $table->id();
+        $table->increments('id'); // auto-incrementing unsigned integer primary key
             $table->string('empno')->index();
-            $table->string('name_with_initials');
-            $table->string('designation')->nullable();
-            $table->string('department')->nullable();
-            $table->string('faculty')->nullable();
-            $table->string('email')->nullable();
+
             $table->string('passport_no')->nullable();
             $table->date('passport_validity')->nullable();
             $table->string('leave_type')->nullable();
@@ -33,8 +28,8 @@ return new class extends Migration
             $table->text('study_program_details')->nullable();
             $table->string('funding_type')->nullable();
             $table->text('any_other_details')->nullable();
-            $table->boolean('air_passage_request')->default(false);
-            $table->boolean('warm_cloth_allowance_request')->default(false);
+            $table->string('air_passage_request')->nullable();
+            $table->string('warm_cloth_allowance_request')->nullable();
             $table->string('scholarship_source')->nullable();
             $table->decimal('scholarship_amount', 12, 2)->nullable();
             $table->string('project_name')->nullable();
@@ -52,7 +47,7 @@ return new class extends Migration
             $table->boolean('dean_leave_recommendation_status')->nullable();
             $table->text('dean_not_recommended_reason')->nullable();
             $table->string('vc_empno')->nullable();
-            $table->boolean('vc_recommend_submit_to_committee')->default(false);
+            $table->boolean('vc_recommend_submit_to_committee')->nullable();
             $table->boolean('vc_council_covering_approval_status')->nullable();
             $table->timestamps();
         });
@@ -63,7 +58,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
         Schema::dropIfExists('study_leaves');
     }
 };
