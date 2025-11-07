@@ -1,6 +1,46 @@
-<div class="container py-4">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MA Dashboard - Leave Management</title>
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <!-- Navbar -->
+        @include('ma.partials.navbar')
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="{{ route('ma.dashboard') }}" class="brand-link">
+                <span class="brand-text font-weight-light">MA Dashboard HI  </span>
+            </a>
+            <!-- Sidebar -->
+            @php($pageName = 'Study Leave')
+            @include('ma.partials.sidebar')	
+        </aside>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            @include('ma.partials.header')
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                   
+        <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold">Pending Applications</h2>
+        <h2 class="mb-0 fw-bold">Pending Study Leave Applications</h2>
         <div class="text-muted">Applications Pending Review </div>
     </div>
 
@@ -23,7 +63,7 @@
             <i class="fas fa-list me-2"></i>Submitted Applications
         </div>
         <div class="card-body p-0">
-            @if($applications->count() > 0)
+            @if($studyLeaveApplications->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
@@ -33,14 +73,13 @@
                                 <th>Name with Initials</th>
                                 <th>Department</th>
                                 <th>Faculty</th>
-                                <th>Leave Type</th>
                                 <th>Applied Date</th>
                                 <th>Status</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($applications as $application)
+                            @foreach($studyLeaveApplications as $application)
                                 <tr>
                                     <td class="px-3">
                                         <span class="fw-semibold text-primary">{{ $application->reference_no }}</span>
@@ -53,9 +92,7 @@
                                     </td>
                                     <td>{{ $application->department }}</td>
                                     <td>{{ $application->faculty }}</td>
-                                    <td>
-                                        <span class="badge bg-info">{{ $application->leave_type }}</span>
-                                    </td>
+                                    
                                     <td>
                                         <div class="text-muted">
                                             {{ \Carbon\Carbon::parse($application->applied_date)->format('M d, Y') }}
@@ -65,7 +102,7 @@
                                         <span class="badge bg-warning">{{ $application->status }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('ma.show', $application->id) }}" 
+                                        <a href="{{ route('StudyLeave.show.studyLeaveApplication', $application->reference_no) }}" 
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
@@ -87,9 +124,9 @@
         </div>
     </div>
 
-    @if($applications->count() > 0)
+    @if($studyLeaveApplications->count() > 0)
         <div class="mt-3 text-muted text-center">
-            <small>Total Applications: {{ $applications->count() }}</small>
+            <small>Total Applications: {{ $studyLeaveApplications->count() }}</small>
         </div>
     @endif
 </div>
@@ -114,3 +151,18 @@
     font-size: 0.875rem;
 }
 </style> 
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        @include('ma.partials.footer')
+    </div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html> 

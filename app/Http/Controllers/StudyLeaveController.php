@@ -24,76 +24,7 @@ class StudyLeaveController extends Controller
     public function create()
     {
        
-        $user = DB::table('employees')
-            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
-            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->where('employees.employee_no', session('empno'))
-            ->select(
-                'employees.employee_no as empno',
-                'employees.nic',
-                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
-                'employees.name_denoted_by_initials as names_denoted_by_initials',
-                'employees.email as email',
-                'departments.department_name as department',
-                'faculties.faculty_name as faculty',
-                'designations.designation_name as designation',
-                'employees.mobile_no as mobile'
-            )
-            ->first();
-
-        if (!$user)
-            abort(404, 'User not found');
        
-
-        $leaveTypes = DB::table('leave_types')->get();
-        $statuses = DB::table('statuses')->pluck('status', 'stat_id');
-
-        // Check if we're editing an existing record
-        $leave = null;
-        $otherLeave = null;
-        $remark = null;
-        $academicYear = null;
-
-        
-            // Get the otherleavesdetails record for this reference
-            //$otherLeave = OtherLeavesDetail::where('reference_no', $leave->reference_no)->first();
-
-            // If it's a returned form, get the remark
-            
-        // Note: For new applications, $leave and $otherLeave will be null and the form will work without a database record
-
-        // Only fetch previous leaves with status_id = 1 (approved) for the current academic year
-        $previousLeaves = DB::table('leave_details')
-            ->join('otherleavesdetails', 'leave_details.reference_no', '=', 'otherleavesdetails.reference_no')
-            ->join('leave_types', 'otherleavesdetails.leave_type_id', '=', 'leave_types.id')
-            ->join('statuses', 'leave_details.status_id', '=', 'statuses.stat_id')
-            ->where('leave_details.nic', $user->nic)
-            ->where('leave_details.status_id', 1)
-            ->whereYear('leave_details.applied_date', now()->year)
-            ->orderByDesc('leave_details.applied_date')
-            ->select(
-                'leave_types.name as leave_type',
-                'otherleavesdetails.from_date',
-                'otherleavesdetails.end_date as to_date',
-                'otherleavesdetails.duration',
-                'statuses.status',
-                'leave_details.applied_date'
-            )
-            ->get();
-
-        // Load existing travel details if editing
-        $travelDetails = [];
-        if ($leave) {
-            $travelDetails = LeaveRequestDetail::where('reference_no', $leave->reference_no)->get();
-        }
-
-       
-
-       //return view('StudyLeave.create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
-       
-       
-       //return view('create', compact('user', 'leaveTypes', 'previousLeaves', 'leave', 'otherLeave', 'remark', 'travelDetails', 'academicYear'));
        return redirect()->route('StudyLeave.BasicInfo.create');
     
     }
@@ -141,6 +72,30 @@ class StudyLeaveController extends Controller
     /**
      * Show the form for creating a basic information .
      */
+    public function createStudyLeave()
+    {
+        
+        $user=null;
+        $drafts=null;
+        $previousLeaves=null;
+        $hasActiveDraft=false;
+        $previousLeaves = $this->getStudyLeaves(session('empno'));
+        
+        
+       
+       
+       return view('StudyLeave.createStudyLeave',compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft'));
+    
+    }
+    public function storeStudyLeave(Request $request)
+    {
+        //dd('here');
+        //
+        $academicYear = $request->input('academic_year');
+        // Store the academic year in session or pass it to the next step as needed
+        session(['study_leave' => ['academic_year' => $academicYear]]);
+        return redirect()->route('StudyLeave.BasicInfo.create')->with('success', 'Academic year saved successfully!');
+    }
     public function createBasicInfo()
     {
        
@@ -158,13 +113,16 @@ class StudyLeaveController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'designations.designation_name as designation',
-                'employees.mobile_no as mobile'
+                'employees.mobile_no as mobile',
+                'employees.assign_ma_user_id'
             )
             ->first();
 
         if (!$user)
             abort(404, 'User not found');
-       
+
+        
+        session(['ma_user_id' => $user->assign_ma_user_id]);
 
        return view('StudyLeave.createBasicInfo', compact('user'));
        
@@ -193,7 +151,14 @@ class StudyLeaveController extends Controller
 
         // Store basic info in session for later steps
 
-         session(['study_leave' => ['employee_no' => session('empno'),'passport_no' => $validatedData['passport_no'], 'passport_validity' => $validatedData['passport_validity']]]); 
+        // Merge basic info into existing study_leave session data
+        $studyLeave = session('study_leave', []);
+        $studyLeave = array_merge($studyLeave, [
+            'employee_no' => session('empno'),
+            'passport_no' => $validatedData['passport_no'] ?? null,
+            'passport_validity' => $validatedData['passport_validity'] ?? null,
+        ]);
+        session(['study_leave' => $studyLeave]);
 
       
         // redirect Details of the Study Leave
@@ -389,6 +354,8 @@ class StudyLeaveController extends Controller
     {
         // Here you would typically save the complete study leave application to the database
         $studyLeaveData = session('study_leave', []);
+        $employee=$this->getEmployee(session('empno'));
+        $ma_id=$employee->assign_ma_user_id;
        
 
         // Save $studyLeaveData to the database as needed
@@ -417,6 +384,7 @@ class StudyLeaveController extends Controller
             'nominee_other_empno' => $studyLeaveData['nominee_other_empno'] ?? null,
             'library_and_property_handling' => $studyLeaveData['library_and_property_handling'] ?? null,
             'loan_handling' => $studyLeaveData['loan_handling'] ?? null,
+            'ma_empno' => $ma_id ?? null,
             'hod_empno' => $studyLeaveData['hod_empno'] ?? null,
             'hod_staff_adequacy_recommendation' => $studyLeaveData['hod_staff_adequacy_recommendation'] ?? null,
             'hod_teaching_coverage_recommendation' => $studyLeaveData['hod_teaching_coverage_recommendation'] ?? null,
@@ -428,21 +396,91 @@ class StudyLeaveController extends Controller
             'vc_empno' => $studyLeaveData['vc_empno'] ?? null,
             'vc_recommend_submit_to_committee' => $studyLeaveData['vc_recommend_submit_to_committee'] ?? null,
             'vc_council_covering_approval_status' => $studyLeaveData['vc_council_covering_approval_status'] ?? null,
+            'status_id' => 4 ?? null, // Assuming '4' indicates a newly submitted application to Management Assistant(MA)
+           
         ]);
         // Clear the session data after submission
         $request->session()->forget('study_leave');
         // For demonstration, we'll just redirect back with a success message
-        return redirect()->route('firstPage')->with('success', 'Study leave application submitted successfully!');
+        return redirect()->route('StudyLeave.create')->with('success', 'Study leave application submitted successfully!');
+    }
+    
+    /**
+     * Display a specific study leave application for viewing/approval
+     * 
+     * @param string $id - Can be either reference_no or database id
+     * @return \Illuminate\View\View
+     */
+    public function showStudyLeaveApplication($id)
+    {
+       
+       
+        // Try to find by reference_no first, then by id
+        $application = DB::table('study_leaves')
+            ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
+            ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
+            ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
+            
+            ->where('study_leaves.id', $id)
+            ->select(
+                'study_leaves.*',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status',
+                'study_leaves.nominee_teaching_empno as teaching_nominee_emp_no',
+                DB::raw("CONCAT(teaching_nominee_t.initials, ' ', teaching_nominee_t.last_name) as teaching_nominee_name"),
+                'study_leaves.nominee_admin_empno as admin_nominee_emp_no',
+                DB::raw("CONCAT(admin_nominee_t.initials, ' ', admin_nominee_t.last_name) as admin_nominee_name"),
+                'study_leaves.nominee_other_empno as other_nominee_emp_no',
+                DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
+                'departments.id as department_id'
+                
+            )
+            ->first();
+
+       
+        if (!$application) {
+            abort(404, 'Study leave application not found');
+        }
+
+        $departmentHead = null;
+        if ($application && isset($application->department_id)) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $application->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+//dd($departmentHead);
+
+        return view('ma.showStudyLeave', compact('application', 'departmentHead'));
     }
 
     public function getEmployeeInfo($emp_no)
     {                               
        //dd($emp_no);
         // Fetch employee info from the database
-        $employee = DB::table('employees')
-            ->where('employee_no', $emp_no)
-            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"))
-            ->first();
+        $employee = $this->getEmployee($emp_no);
 
         if ($employee) {
             return response()->json([
@@ -455,14 +493,26 @@ class StudyLeaveController extends Controller
                 'message' => 'Employee not found'
             ], 404);
         }
-    }   
+    } 
+    public function getEmployee($emp_no)
+    {                               
+       //dd($emp_no);
+        // Fetch employee info from the database
+        $employee = DB::table('employees')
+            ->where('employee_no', $emp_no)
+            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"), 'assign_ma_user_id')
+            ->first();
+
+        return $employee;
+    }  
     public function getStudyLeaves($emp_no)
     {                               
        //dd($emp_no);
         // Fetch employee info from the database
         $previousLeaves = DB::table('study_leaves')
             ->where('empno', $emp_no)
-            ->select('id','degree_title','university_institute','study_leave_from','study_leave_to','leave_payment_type')
+            ->select('id','degree_title','university_institute','study_leave_from','study_leave_to','leave_payment_type','study_leaves.created_at','status_id','status')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id' )
             ->get();
 
         return $previousLeaves;

@@ -41,6 +41,8 @@ class MAController extends Controller
             )
             ->get();
 
+          
+
         return view('ma.index', compact('applications'));
     }
 
@@ -476,5 +478,150 @@ class MAController extends Controller
     {
         return $this->show($id);
     }
-}
 
+    public function studyLeavePage()
+    {
+        $maUserId = self::MA_USER_ID;
+
+         $studyLeaveApplications = DB::table('study_leaves')
+
+
+            ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
+            ->join('statuses', 'statuses.stat_id', '=', 'study_leaves.status_id') // adjusted to status_id
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('statuses.status', 'Processing MA') // filter for MA Processing status
+            ->select(
+                'study_leaves.id as reference_no',
+                'employees.id as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'employees.created_at as applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+           
+
+        
+
+        return view('ma.studyLeave', compact('studyLeaveApplications'));
+    }
+    public function studyLeaveStatusPage()
+    {
+         $maUserId = self::MA_USER_ID;
+
+         $statusApplications = DB::table('study_leaves')
+            ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
+            ->join('statuses', 'statuses.stat_id', '=', 'study_leaves.status_id') // adjusted to status_id
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->whereBetween('study_leaves.status_id', [4, 8])
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->orderByDesc('study_leaves.created_at')
+            ->select(
+                'study_leaves.id as reference_no',
+                'employees.id as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'employees.created_at as applied_date',
+                'study_leaves.status_id as status_id'
+            )
+            ->get();
+
+         
+
+        
+
+        return view('ma.studyleavestatus', compact('statusApplications'));
+    }
+    public function showStudyLeave($id)
+    {
+        $maUserId = self::MA_USER_ID;
+
+        // Get the specific study leave application with all details
+        // Only show if the employee is assigned to this specific MA
+        $application = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.id', $id)
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->select(
+                'study_leaves.*',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.department_id as department_id',
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile',
+                'employees.nic',
+                'statuses.status'
+            )
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
+        }
+
+        // Decide which blade to use and readonly status
+        $readonly = false;
+        $view = 'ma.showStudyLeave';
+       
+
+        return view("ma.showStudyLeave", compact('application', 'readonly'));
+    }
+
+    public function approveStudyLeave(Request $request, $id)
+    {
+       
+        $request->validate([
+            'remark' => 'nullable|string|max:1000',
+        ]);
+
+        $maUserId = self::MA_USER_ID;
+/*
+        $application = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leaves.id', $id)
+            ->where('study_leaves.status_id', 4) // Processing MA
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->select('study_leaves.*')
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
+        }
+
+        // Prepare new remark by appending to existing remarks
+        
+        $newRemark = '';
+        if ($request->remark) {
+            $timestamp = now()->format('Y-m-d');
+            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
+        }
+*/
+        // Update status to Processing HOD (status_id = 5)
+        DB::table('study_leaves')
+            ->where('id', $id)
+            ->update([
+                'status_id' => 5, // Processing HOD
+                'ma_empno' => self::MA_USER_ID, // Record which MA processed this
+                //'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave')->with('success', 'Study Leave Application forwarded to HOD successfully.');
+    }
+
+   
+    
+}

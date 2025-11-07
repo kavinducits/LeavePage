@@ -28,7 +28,7 @@
             </a>
 
             <!-- Sidebar -->
-            @php $pageName = 'Status' @endphp
+            @php $pageName = 'Study Leave Status' @endphp
             @include('ma.partials.sidebar')
         </aside>
 
@@ -68,7 +68,7 @@
                                                     <th>Ref No.</th>
                                                     <th>Employee No</th>
                                                     <th>Name</th>
-                                                    <th>Leave Type</th>
+                                                   
                                                     <th class="text-center">MA</th>
                                                     <th class="text-center">HOD</th>
                                                     <th class="text-center">Dean</th>
@@ -92,7 +92,7 @@
                                                         <td><span class="badge">{{ $app->reference_no }}</span></td>
                                                         <td><span class="badge">{{ $app->empno }}</span></td>
                                                         <td>{{ $app->name_with_initials }}</td>
-                                                        <td><span class="badge badge-info">{{ $app->leave_type }}</span></td>
+                                                       
                                                         @foreach($stages as $stage => $sid)
                                                             <td class="text-center">
                                                                 @if($current > $sid)

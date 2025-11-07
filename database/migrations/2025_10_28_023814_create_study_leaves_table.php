@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('study_leaves', function (Blueprint $table) {
         $table->increments('id'); // auto-incrementing unsigned integer primary key
             $table->string('empno')->index();
-
+            $table->string('academic_year')->nullable();
             $table->string('passport_no')->nullable();
             $table->date('passport_validity')->nullable();
             $table->string('leave_type')->nullable();
@@ -38,6 +38,7 @@ return new class extends Migration
             $table->string('nominee_other_empno')->nullable();
             $table->text('library_and_property_handling')->nullable();
             $table->text('loan_handling')->nullable();
+             $table->string('ma_empno')->nullable();
             $table->string('hod_empno')->nullable();
             $table->boolean('hod_staff_adequacy_recommendation')->nullable();
             $table->boolean('hod_teaching_coverage_recommendation')->nullable();
@@ -49,6 +50,7 @@ return new class extends Migration
             $table->string('vc_empno')->nullable();
             $table->boolean('vc_recommend_submit_to_committee')->nullable();
             $table->boolean('vc_council_covering_approval_status')->nullable();
+            $table->unsignedInteger('status_id')->nullable();
             $table->timestamps();
         });
     }

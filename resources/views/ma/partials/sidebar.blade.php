@@ -26,6 +26,18 @@
                                 <p>Status</p>
                             </a>
                         </li>
+                         <li class="nav-item">
+                            <a href="{{ route('ma.studyleave') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave') ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-stream"></i>
+                                <p>Study Leave</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('ma.studyleavestatus') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Status') ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-stream"></i>
+                                <p>Study Leave Status</p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>

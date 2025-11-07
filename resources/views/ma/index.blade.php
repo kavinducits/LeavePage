@@ -22,7 +22,7 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="{{ route('ma.dashboard') }}" class="brand-link">
-                <span class="brand-text font-weight-light">MA Dashboard</span>
+                <span class="brand-text font-weight-light">MA Dashboard HI  </span>
             </a>
             <!-- Sidebar -->
             @php($pageName = 'Applications')
@@ -37,7 +37,7 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                    @include('ma.partials.index-body')
+                   @include('ma.partials.index-body')
                 </div>
             </section>
         </div>

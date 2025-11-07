@@ -9,6 +9,7 @@ class StudyLeave extends Model
     //
    protected $fillable = [
         'empno',
+        'academic_year',
         'passport_no',
         'passport_validity',
         'leave_type',
@@ -32,6 +33,7 @@ class StudyLeave extends Model
         'nominee_other_empno',
         'library_and_property_handling',
         'loan_handling',
+        'ma_empno',
         'hod_empno',
         'hod_staff_adequacy_recommendation',
         'hod_teaching_coverage_recommendation',
@@ -43,5 +45,6 @@ class StudyLeave extends Model
         'vc_empno',
         'vc_recommend_submit_to_committee',
         'vc_council_covering_approval_status',
+        'status_id'
     ];
 }

@@ -45,7 +45,8 @@ Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name(
 
 //Study Leave routes (no authentication required)
 //Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
-Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
+Route::get('/StudyLeave', [StudyLeaveController::class, 'createStudyLeave'])->name('StudyLeave.create');
+Route::post('/StudyLeave', [StudyLeaveController::class, 'storeStudyLeave'])->name('StudyLeave.store');
 //Basic Info
 Route::get('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'createBasicInfo'])->name('StudyLeave.BasicInfo.create');
 Route::post('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'storeBasicInfo'])->name('StudyLeave.BasicInfo.store');
@@ -72,6 +73,13 @@ Route::post('/StudyLeave/Submit', [StudyLeaveController::class, 'submitApplicati
 
 //Get the emp no and name by ajax
 Route::get('/StudyLeave/get-employee-info/{emp_no}', [StudyLeaveController::class, 'getEmployeeInfo'])->name('StudyLeave.getEmployeeInfo');
+
+Route::get('/StudyLeave/view/{id}', [StudyLeaveController::class, 'showStudyLeaveApplication'])->name('StudyLeave.show.studyLeaveApplication');
+
+Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudyLeave'])->name('StudyLeave.approve');
+
+Route::get('/HODDashboard', [HODController::class, 'showStudyLeaves'])->name('hod.show.studyleaves');
+Route::get('/HODDashboard/view/{id}', [HODController::class, 'showStudyLeaveApplication'])->name('hod.view.studyLeave');
 
 
 
@@ -129,6 +137,9 @@ Route::middleware('checklogin')->group(function () {
 Route::get('/dashboard', [MAController::class, 'dashboard'])->name('ma.dashboard');
 Route::get('/dashboard/vc-approved', [MAController::class, 'dashboardVcApproved'])->name('ma.dashboard.vcapproved');
 Route::get('/dashboard/status', [MAController::class, 'statusPage'])->name('ma.status');
+Route::get('/dashboard/study-leave', [MAController::class, 'studyLeavePage'])->name('ma.studyleave');
+Route::get('/dashboard/study-leave-status', [MAController::class, 'studyLeaveStatusPage'])->name('ma.studyleavestatus');
+Route::get('/dashboard/study-leave/{id}', [MAController::class, 'showStudyLeave'])->name('ma.show.studyleave');
 Route::get('/MApage/{id}/hod', [MAController::class, 'showHod'])->name('ma.show.hod');
 Route::get('/MApage/{id}/dean', [MAController::class, 'showDean'])->name('ma.show.dean');
 Route::get('/MApage/{id}/vc', [MAController::class, 'showVc'])->name('ma.show.vc');
