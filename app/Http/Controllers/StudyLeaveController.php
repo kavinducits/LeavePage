@@ -10,13 +10,7 @@ use App\Models\StudyLeave;
 
 class StudyLeaveController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+  
 
     /**
      * Show the form for creating a new resource.
@@ -29,46 +23,7 @@ class StudyLeaveController extends Controller
     
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
+    
     /**
      * Show the form for creating a basic information .
      */
@@ -170,9 +125,8 @@ class StudyLeaveController extends Controller
             'department' => 'required|string|max:100',
             'faculty' => 'required|string|max:100',
             'designation' => 'required|string|max:100',
-            'passport_no' => 'string|max:50',
-            'passport_validity' => 'string|max:50'
-            
+            'passport_no' => 'nullable|string|max:50',
+            'passport_validity' => 'nullable|date'
         ]);
 
         // Store basic info in session for later steps
@@ -370,25 +324,28 @@ class StudyLeaveController extends Controller
                 ->first();
 
             if ($draft) {
+                // Prepare update data
+                $updateData = [
+                    'leave_type' => $validatedData['leave_type'],
+                    'leave_payment_type' => $validatedData['leave_payment_type'],
+                    'study_leave_from' => $validatedData['study_leave_from'],
+                    'study_leave_to' => $validatedData['study_leave_to'],
+                    'degree_title' => $validatedData['degree_title'],
+                    'university_institute' => $validatedData['university_institute'],
+                    'country' => $validatedData['country'],
+                    'field_of_study' => $validatedData['field_of_study'],
+                    'study_program_details' => $validatedData['study_program_details'] ?? null,
+                    'funding_type' => $validatedData['funding_type'],
+                    'scholarship_source' => $validatedData['scholarship_source'] ?? null,
+                    'scholarship_amount' => $validatedData['scholarship_amount'] ?? null,
+                    'project_name' => $validatedData['project_name'] ?? null,
+                    'any_other_details' => $validatedData['any_other_details'] ?? null,
+                    'air_passage_request' => $validatedData['air_passage_request'] ?? null,
+                    'warm_cloth_allowance_request' => $validatedData['warm_cloth_allowance_request'] ?? null,
+                ];
+                
                 // Update existing draft
-                $draft->update([
-                'leave_type' => $validatedData['leave_type'],
-                'leave_payment_type' => $validatedData['leave_payment_type'],
-                'study_leave_from' => $validatedData['study_leave_from'],
-                'study_leave_to' => $validatedData['study_leave_to'],
-                'degree_title' => $validatedData['degree_title'],
-                'university_institute' => $validatedData['university_institute'],
-                'country' => $validatedData['country'],
-                'field_of_study' => $validatedData['field_of_study'],
-                'study_program_details' => $validatedData['study_program_details'] ?? null,
-                'funding_type' => $validatedData['funding_type'],
-                'scholarship_source' => $validatedData['scholarship_source'] ?? null,
-                'scholarship_amount' => $validatedData['scholarship_amount'] ?? null,
-                'project_name' => $validatedData['project_name'] ?? null,
-                'any_other_details' => $validatedData['any_other_details'] ?? null,
-                'air_passage_request' => $validatedData['air_passage_request'] ?? null,
-                'warm_cloth_allowance_request' => $validatedData['warm_cloth_allowance_request'] ?? null,
-                ]);
+                $draft->update($updateData);
             }
 
       
@@ -403,6 +360,8 @@ class StudyLeaveController extends Controller
     public function createPreviousStudyLeaves(){
 
          $previousLeaves = $this->getStudyLeaves(session('empno'));
+
+
          
 
          return view('StudyLeave.createPreviousStudyLeaves', compact('previousLeaves'));

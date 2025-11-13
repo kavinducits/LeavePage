@@ -30,12 +30,11 @@
                                         </select>
                                         
                                     <td class="text-center">
-                                        <select name="prev_completed[]" class="form-select">
+                                        <select name="prev_completed[]" class="form-select" disabled>
                                             <option value="">Select</option>
-                                            <option value="Completed">Completed</option>
-                                            <option value="Not Completed">Not Completed</option>
+                                            <option value="Completed" @selected(optional($leave)->study_leave_to && now()->isAfter($leave->study_leave_to))>Completed</option>
+                                            <option value="Not Completed" @selected(optional($leave)->study_leave_to && now()->isBefore($leave->study_leave_to))>Not Completed</option>
                                         </select>
-                                    </td>
-                                   
+                                    </td>      
                                 </tr>
                             

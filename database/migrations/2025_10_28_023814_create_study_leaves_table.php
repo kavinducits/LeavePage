@@ -55,6 +55,7 @@ return new class extends Migration
             $table->boolean('is_draft')->default(false);
             $table->string('self_funding_declaration')->nullable();
             $table->string('placement_letter')->nullable();
+            $table->boolean('is_completed')->nullable();
             
             //$table->foreign('status_id')->references('id')->on('study_leave_statuses')->onDelete('set null');
         });

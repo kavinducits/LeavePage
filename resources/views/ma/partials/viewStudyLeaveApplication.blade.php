@@ -196,11 +196,11 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Employee No</label>
-                    <input type="text" class="form-control" value="{{ $application->teaching_nominee_emp_no ?? '' }}" readonly>
+                    <input type="text" class="form-control" value="{{ $application->nominee_teaching_empno ?? '' }}" readonly>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Employee Name</label>
-                    <input type="text" class="form-control" value="{{ $application->teaching_nominee_name ?? '' }}" readonly>
+                    <input type="text" class="form-control" value="{{ $application->nominee_teaching_name ?? '' }}" readonly>
                 </div>
 
                 <!-- Administrative Work Nominee -->
@@ -209,11 +209,11 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Employee No</label>
-                    <input type="text" class="form-control" value="{{ $application->admin_nominee_emp_no ?? '' }}" readonly>
+                    <input type="text" class="form-control" value="{{ $application->nominee_admin_empno ?? '' }}" readonly>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Employee Name</label>
-                    <input type="text" class="form-control" value="{{ $application->admin_nominee_name ?? '' }}" readonly>
+                    <input type="text" class="form-control" value="{{ $application->nominee_admin_name ?? '' }}" readonly>
                 </div>
 
                 <!-- Other Work Nominee -->
@@ -222,11 +222,11 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Employee No</label>
-                    <input type="text" class="form-control" value="{{ $application->other_nominee_emp_no ?? '' }}" readonly>
+                    <input type="text" class="form-control" value="{{ $application->nominee_other_empno ?? '' }}" readonly>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Employee Name</label>
-                    <input type="text" class="form-control" value="{{ $application->other_nominee_name ?? '' }}" readonly>
+                    <input type="text" class="form-control" value="{{ $application->nominee_other_name ?? '' }}" readonly>
                 </div>
             </div>
         </div>

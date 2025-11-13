@@ -555,7 +555,7 @@ class MAController extends Controller
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
                 'study_leaves.*',
-                'employees.employee_no as empno',
+                'employees.employee_no as employee_no',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'employees.department_id as department_id',
                 'employees.name_denoted_by_initials as names_denoted_by_initials',
@@ -565,6 +565,14 @@ class MAController extends Controller
                 'employees.mobile_no as mobile',
                 'employees.nic',
                 'statuses.status',
+                'employees.email as email',
+                'study_leaves.scholarship_source as scholarship_source',
+                'study_leaves.scholarship_amount as scholarship_amount',
+                'study_leaves.project_name as project_name',
+                'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
+                'study_leaves.nominee_admin_empno as nominee_admin_empno',
+                'study_leaves.nominee_other_empno as nominee_other_empno'
+
             )
             ->first();
 
