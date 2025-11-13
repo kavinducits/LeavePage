@@ -220,8 +220,17 @@
                                         <td>{{ $leave->leave_payment_type ?? 'Study Leave' }}</td>
                                         <td>
                                             @php
-                                                $status = $leave->status ?? 'Pending'; // Default status
-                                                $badgeClass = $status === 'Approved' ? 'bg-success' : ($status === 'Pending' ? 'bg-warning text-dark' : ($status === 'Rejected' ? 'bg-danger' : 'bg-secondary'));
+                                                $statusValue = $leave->status ?? 0;
+                                                if ($statusValue == 1) {
+                                                    $status = 'Approved';
+                                                    $badgeClass = 'bg-success';
+                                                } elseif ($statusValue == 2) {
+                                                    $status = 'Rejected';
+                                                    $badgeClass = 'bg-danger';
+                                                } else {
+                                                    $status = 'Pending';
+                                                    $badgeClass = 'bg-warning text-dark';
+                                                }
                                             @endphp
                                             <span class="badge {{ $badgeClass }}">{{ $status }}</span>
                                         </td>

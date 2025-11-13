@@ -297,6 +297,7 @@ class HODController extends Controller
             $departmentHead = DB::table('department_heads')
                 ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
                 ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+       
                 ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
                 ->where('department_heads.department_id', $application->department_id)
                 ->where('department_heads.active_status', 1)

@@ -26,7 +26,7 @@
                 
             </h2>
         </div>
-        <a class="btn btn-outline-maroon">
+        <a class="btn btn-outline-maroon" href="{{route('StudyLeave.WorkCoveringPersons.create')}}">
             <i class="fas fa-arrow-left me-2"></i>Back to List
         </a>
     </div>
@@ -62,9 +62,9 @@
                          Library book, Computer or any other properties?
                     </label>
                     <select class="form-select w-auto d-inline-block align-middle ms-2" id="library_and_property_handling" name="library_and_property_handling" required>
-                        <option value="" selected disabled>Select an option</option>
-                        <option value="Make Arrangements">Make Arrangements</option>
-                        <option value="Not Make Arrangements">Not Make Arrangements</option>
+                        <option value="" {{ empty(old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
+                        <option value="Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
+                        <option value="Not Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
                 </div>
 
@@ -77,9 +77,9 @@
                         <small class="text-muted">(Applicable only when taking no pay leave)</small>
                     </label>
                     <select class="form-select w-auto d-inline-block align-middle ms-2" id="loan_handling" name="loan_handling" required>
-                        <option value="" selected disabled>Select an option</option>
-                        <option value="Make Arrangements">Make Arrangements</option>
-                        <option value="Not Make Arrangements">Not Make Arrangements</option>
+                        <option value="" {{ empty(old('loan_handling', $draft_study_leave->loan_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
+                        <option value="Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
+                        <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
                 </div>
             </div>

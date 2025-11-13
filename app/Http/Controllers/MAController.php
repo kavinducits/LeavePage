@@ -564,7 +564,7 @@ class MAController extends Controller
                 'designations.designation_name as designation',
                 'employees.mobile_no as mobile',
                 'employees.nic',
-                'statuses.status'
+                'statuses.status',
             )
             ->first();
 

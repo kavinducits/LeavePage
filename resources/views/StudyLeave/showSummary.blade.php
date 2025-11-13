@@ -26,7 +26,7 @@
                 
             </h2>
         </div>
-        <a class="btn btn-outline-maroon">
+        <a class="btn btn-outline-maroon" href="{{ route('StudyLeave.Handeling.create') }}">
             <i class="fas fa-arrow-left me-2"></i>Back to List
         </a>
     </div>

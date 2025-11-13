@@ -92,13 +92,13 @@
                     <!-- Passport No -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Passport No:</label>
-                        <input type="text" name="passport_no" class="form-control" >
+                        <input type="text" name="passport_no" class="form-control" value="{{ $draft_study_leave->passport_no ?? '' }}" >
                     </div>
                     <!-- Passport Validity -->
                     
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Validity date up to:</label>
-                        <input type="date" name="passport_validity" class="form-control">
+                        <input type="date" name="passport_validity" class="form-control" value="{{ $draft_study_leave->passport_validity ?? '' }}" >
                     </div>
             </div>
         </div>

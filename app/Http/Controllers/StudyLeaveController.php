@@ -94,6 +94,27 @@ class StudyLeaveController extends Controller
         $academicYear = $request->input('academic_year');
         // Store the academic year in session or pass it to the next step as needed
         session(['study_leave' => ['academic_year' => $academicYear]]);
+         $empno = session('study_leave.employee_no') ?? session('empno');
+
+         $draft = StudyLeave::where('empno', $empno)
+                ->where('is_draft', true)
+                ->first();
+
+            if ($draft) {
+                // Update existing draft
+                $draft->update([
+                'academic_year' => $academicYear,
+                'is_draft' => true
+                ]);
+            } else {
+                // Create new draft record
+                StudyLeave::create([
+                'empno' => session('empno'),
+                'academic_year' => $academicYear,
+                'is_draft' => true
+                ]);
+            }
+
         return redirect()->route('StudyLeave.BasicInfo.create')->with('success', 'Academic year saved successfully!');
     }
     public function createBasicInfo()
@@ -124,10 +145,15 @@ class StudyLeaveController extends Controller
         
         session(['ma_user_id' => $user->assign_ma_user_id]);
 
-       return view('StudyLeave.createBasicInfo', compact('user'));
+        $draft_study_leave = StudyLeave::where('empno', $user->empno)
+            ->where('is_draft', true)
+            ->select("passport_no",
+            "passport_validity")
+            ->first();
+
+       return view('StudyLeave.createBasicInfo', compact('user', 'draft_study_leave'));
        
-       
-      
+         
     
     }
     /**
@@ -159,6 +185,26 @@ class StudyLeaveController extends Controller
             'passport_validity' => $validatedData['passport_validity'] ?? null,
         ]);
         session(['study_leave' => $studyLeave]);
+        // Check if there's an existing draft for this employee
+            $draft = StudyLeave::where('empno', session('empno'))
+                ->where('is_draft', true)
+                ->first();
+
+            if ($draft) {
+                // Update existing draft
+                $draft->update([
+                'passport_no' => $validatedData['passport_no'] ?? null,
+                'passport_validity' => $validatedData['passport_validity'] ?? null,
+                ]);
+            } else {
+                // Create new draft record
+                StudyLeave::create([
+                'empno' => session('empno'),
+                'passport_no' => $validatedData['passport_no'] ?? null,
+                'passport_validity' => $validatedData['passport_validity'] ?? null,
+                'is_draft' => true
+                ]);
+            }
 
       
         // redirect Details of the Study Leave
@@ -168,11 +214,33 @@ class StudyLeaveController extends Controller
 
     public function createDetails()
     {
+
+    $empno = session('study_leave.employee_no') ?? session('empno');
       
-        
+         $draft_study_leave = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->select("leave_type",
+            "leave_payment_type",
+            "study_leave_from",
+            "study_leave_to",
+            "degree_title",
+            "university_institute",
+            "country",
+            "field_of_study",
+            "study_program_details",
+            "funding_type",
+            "scholarship_source",
+            "scholarship_amount",
+            "project_name",
+            "any_other_details",
+            "air_passage_request",
+            "warm_cloth_allowance_request",
+            "self_funding_declaration",
+            "placement_letter")
+            ->first();
        
 
-       return view('StudyLeave.createDetails');
+       return view('StudyLeave.createDetails',compact('draft_study_leave'));
        
        
       
@@ -185,31 +253,144 @@ class StudyLeaveController extends Controller
        
         // Validation rules for Study Leave details - adjust fields to match your createDetails.blade.php
        
-        $rules = [
+        $rules = array(
             'leave_type' => 'required|string|max:100',
             'leave_payment_type' => 'required|string|max:100',
-           'study_leave_from' => 'required|date',
-           'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
+            'study_leave_from' => 'required|date',
+            'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
             'university_institute' => 'required|string|max:255',
             'country' => 'required|string|max:100',
             'field_of_study' => 'required|string|max:255',
-            'study_program_details' => 'required|string|max:1000',
-            'funding_type' => 'required|string|max:255',
+            'study_program_details' => 'nullable|string|max:1000',
+            'funding_type' => 'required|string|max:100',
             'scholarship_source' => 'nullable|string|max:1000',
             'scholarship_amount' => 'nullable|numeric|min:0',
-           'project_name' => 'nullable|string|max:255',
+            'project_name' => 'nullable|string|max:255',
             'any_other_details' => 'nullable|string|max:1000',
             'air_passage_request' => 'nullable|in:yes,no',
             'warm_cloth_allowance_request' => 'nullable|in:yes,no',
-        ];
+            'self_funding_declaration' => 'nullable|file|mimes:pdf|max:10240',
+            'placement_letter' => 'nullable|file|mimes:pdf|max:10240'
+        );
 
         $validatedData = $request->validate($rules);
         
+        // Handle file upload BEFORE storing in session
+        if ($request->hasFile('self_funding_declaration')) {
+            
+            $file = $request->file('self_funding_declaration');
+            $empno = session('study_leave.employee_no') ?? session('empno');
+            
+            // Get or create draft to get the study leave ID
+            $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+            
+            if (!$draft) {
+                // Create draft if it doesn't exist yet
+                $draft = StudyLeave::create([
+                    'empno' => $empno,
+                    'is_draft' => true
+                ]);
+            }
+            
+            $studyLeaveId = $draft->id;
+            
+            // Generate filename: empno_studyleaveid_self_funding_declaration.pdf
+            $filename = $empno . '_' . $studyLeaveId . '_self_funding_declaration.pdf';
+            
+            // Store the file in storage/app/private/self_funding_declaration (private folder)
+           
+            $path = $file->storeAs('self_funding_declaration', $filename);
+         
+            // Store the path directly for database storage
+            $validatedData['self_funding_declaration'] = $path;
+
+            // Update the existing draft with the file path
+           if($draft) {
+                $draft->update([
+                    'self_funding_declaration' => $path,
+                    'is_draft' => true
+                ]);
+            }
+
+        } else {
+            // Remove file field from validated data if no file uploaded
+            unset($validatedData['self_funding_declaration']);
+        }
+        if ($request->hasFile('placement_letter')) {
+            
+            $file = $request->file('placement_letter');
+            $empno = session('study_leave.employee_no') ?? session('empno');
+            
+            // Get or create draft to get the study leave ID
+            $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+            
+            if (!$draft) {
+                // Create draft if it doesn't exist yet
+                $draft = StudyLeave::create([
+                    'empno' => $empno,
+                    'is_draft' => true
+                ]);
+            }
+            
+            $studyLeaveId = $draft->id;
+            
+            // Generate filename: empno_studyleaveid_placement_letter.pdf
+            $filename = $empno . '_' . $studyLeaveId . '_placement_letter.pdf';
+            
+            // Store the file in storage/app/private/placement_letter (private folder)
+            $path = $file->storeAs('placement_letter', $filename);
+            
+            // Store the path directly for database storage
+            $validatedData['placement_letter'] = $path;
+
+             if($draft) {
+                $draft->update([
+                    'placement_letter' => $path,
+                    'is_draft' => true
+                ]);
+            }
+        } else {
+            // Remove file field from validated data if no file uploaded
+            unset($validatedData['placement_letter']);
+        }
+
+        // Now store in session (file is already processed and stored as path)
         session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
 
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
+        $empno = session('study_leave.employee_no') ?? session('empno');
+         $draft = StudyLeave::where('empno', $empno)
+                ->where('is_draft', true)
+                ->first();
+
+            if ($draft) {
+                // Update existing draft
+                $draft->update([
+                'leave_type' => $validatedData['leave_type'],
+                'leave_payment_type' => $validatedData['leave_payment_type'],
+                'study_leave_from' => $validatedData['study_leave_from'],
+                'study_leave_to' => $validatedData['study_leave_to'],
+                'degree_title' => $validatedData['degree_title'],
+                'university_institute' => $validatedData['university_institute'],
+                'country' => $validatedData['country'],
+                'field_of_study' => $validatedData['field_of_study'],
+                'study_program_details' => $validatedData['study_program_details'] ?? null,
+                'funding_type' => $validatedData['funding_type'],
+                'scholarship_source' => $validatedData['scholarship_source'] ?? null,
+                'scholarship_amount' => $validatedData['scholarship_amount'] ?? null,
+                'project_name' => $validatedData['project_name'] ?? null,
+                'any_other_details' => $validatedData['any_other_details'] ?? null,
+                'air_passage_request' => $validatedData['air_passage_request'] ?? null,
+                'warm_cloth_allowance_request' => $validatedData['warm_cloth_allowance_request'] ?? null,
+                ]);
+            }
+
       
 
         return redirect()->route('StudyLeave.PreviousStudyLeaves.create')->with('success', 'Study leave details saved successfully!');
@@ -230,9 +411,6 @@ class StudyLeaveController extends Controller
 
     public function storePreviousStudyLeaves(Request $request)
     {
-        
-        // Validate the incoming request data
-        
         // Normalize fields that may arrive as arrays (use the first non-empty element)
         $fields = [
             'prev_leave_type',
@@ -263,26 +441,33 @@ class StudyLeaveController extends Controller
 
         // Put normalized values back into the request so the validator gets scalars
         $request->merge($input);
+
         $validatedData = $request->validate([
             'prev_leave_type' => 'nullable|string|max:100',
             'prev_university' => 'nullable|string|max:255',
             'prev_duration_from' => 'nullable|date',
-            'prev_duration_to' => 'nullable|date|after_or_equal:prev_duration_from',
-            'prev_with_pay' => 'nullable|string|max:50',
+            'prev_duration_to' => 'nullable|date',
+            'prev_with_pay' => 'nullable|in:yes,no',
             'prev_completed' => 'nullable|string|in:Completed,Not Completed'
-            
         ]);
-       
+
+        // Merge validated previous-leave data into the study_leave session
         session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
-        // Here you can handle the validated data, e.g., save it to the database or session
-        // For demonstration, we'll just redirect back with a success message
 
         return redirect()->route('StudyLeave.WorkCoveringPersons.create')->with('success', 'Previous study leave details saved successfully!');
     }
     public function createWorkCoveringPersons()
     {
+        $empno = session('study_leave.employee_no') ?? session('empno');
       
-       return view('StudyLeave.createWorkCoveringPersons');
+         $draft_study_leave = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->select("nominee_teaching_empno",
+            "nominee_admin_empno",
+            "nominee_other_empno")
+            ->first();
+      
+       return view('StudyLeave.createWorkCoveringPersons', compact('draft_study_leave'));
        
        
       
@@ -294,7 +479,6 @@ class StudyLeaveController extends Controller
        
         
         // Validate the incoming request data
-        
         $validatedData = $request->validate([
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
@@ -305,15 +489,34 @@ class StudyLeaveController extends Controller
         session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
+         $empno = session('study_leave.employee_no') ?? session('empno');
+         $draft = StudyLeave::where('empno', $empno)
+                ->where('is_draft', true)
+                ->first();
+
+            if ($draft) {
+                // Update existing draft
+                $draft->update([
+                'nominee_teaching_empno' => $validatedData['nominee_teaching_empno'],
+                'nominee_admin_empno' => $validatedData['nominee_admin_empno'],
+                'nominee_other_empno' => $validatedData['nominee_other_empno'],
+                ]);
+            }
 
         return redirect()->route('StudyLeave.Handeling.create')->with('success', 'Work covering persons details saved successfully!');
     }
     public function createHandeling()
     {
         
+       $empno = session('study_leave.employee_no') ?? session('empno');
       
+         $draft_study_leave = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->select("library_and_property_handling",
+            "loan_handling")
+            ->first();
 
-       return view('StudyLeave.createHandeling');
+       return view('StudyLeave.createHandeling', compact('draft_study_leave'));
        
        
       
@@ -335,14 +538,24 @@ class StudyLeaveController extends Controller
 
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
+         $empno = session('study_leave.employee_no') ?? session('empno');
+         $draft = StudyLeave::where('empno', $empno)
+                ->where('is_draft', true)
+                ->first();
+
+            if ($draft) {
+                // Update existing draft
+                $draft->update([
+                'library_and_property_handling' => $validatedData['library_and_property_handling'],
+                'loan_handling' => $validatedData['loan_handling'],
+                ]);
+            }
 
         return redirect()->route('StudyLeave.Summary.show')->with('success', 'Handling of details saved successfully!');
     }
-    public function showSummary()
-    {
-        
+    public function showSummary(){
       
-       // Retrieve all relevant data for the summary view
+       // Retriev, compact('draft_study_leave')e all relefor the summary view
 
        return view('StudyLeave.showSummary');
        
@@ -353,127 +566,27 @@ class StudyLeaveController extends Controller
     public function submitApplication(Request $request)
     {
         // Here you would typically save the complete study leave application to the database
-        $studyLeaveData = session('study_leave', []);
-        $employee=$this->getEmployee(session('empno'));
-        $ma_id=$employee->assign_ma_user_id;
-       
+        $empno = session('study_leave.employee_no') ?? session('empno');
 
-        // Save $studyLeaveData to the database as needed
-        StudyLeave::create([
-            'empno' => $studyLeaveData['employee_no'] ?? null,
-            'passport_no' => $studyLeaveData['passport_no'] ?? null,
-            'passport_validity' => $studyLeaveData['passport_validity'] ?? null,
-            'leave_type' => $studyLeaveData['leave_type'] ?? null,
-            'leave_payment_type' => $studyLeaveData['leave_payment_type'] ?? null,
-            'study_leave_from' => $studyLeaveData['study_leave_from'] ?? null,
-            'study_leave_to' => $studyLeaveData['study_leave_to'] ?? null,
-            'degree_title' => $studyLeaveData['degree_title'] ?? null,
-            'university_institute' => $studyLeaveData['university_institute'] ?? null,
-            'country' => $studyLeaveData['country'] ?? null,
-            'field_of_study' => $studyLeaveData['field_of_study'] ?? null,
-            'study_program_details' => $studyLeaveData['study_program_details'] ?? null,
-            'funding_type' => $studyLeaveData['funding_type'] ?? null,
-            'any_other_details' => $studyLeaveData['any_other_details'] ?? null,
-            'air_passage_request' => $studyLeaveData['air_passage_request'] ?? null,
-            'warm_cloth_allowance_request' => $studyLeaveData['warm_cloth_allowance_request'] ?? null,
-            'scholarship_source' => $studyLeaveData['scholarship_source'] ?? null,
-            'scholarship_amount' => $studyLeaveData['scholarship_amount'] ?? null,
-            'project_name' => $studyLeaveData['project_name'] ?? null,
-            'nominee_teaching_empno' => $studyLeaveData['nominee_teaching_empno'] ?? null,
-            'nominee_admin_empno' => $studyLeaveData['nominee_admin_empno'] ?? null,
-            'nominee_other_empno' => $studyLeaveData['nominee_other_empno'] ?? null,
-            'library_and_property_handling' => $studyLeaveData['library_and_property_handling'] ?? null,
-            'loan_handling' => $studyLeaveData['loan_handling'] ?? null,
-            'ma_empno' => $ma_id ?? null,
-            'hod_empno' => $studyLeaveData['hod_empno'] ?? null,
-            'hod_staff_adequacy_recommendation' => $studyLeaveData['hod_staff_adequacy_recommendation'] ?? null,
-            'hod_teaching_coverage_recommendation' => $studyLeaveData['hod_teaching_coverage_recommendation'] ?? null,
-            'hod_one_year_service_verification' => $studyLeaveData['hod_one_year_service_verification'] ?? null,
-            'hod_leave_recommendation_status' => $studyLeaveData['hod_leave_recommendation_status'] ?? null,
-            'hod_not_recommended_reason' => $studyLeaveData['hod_not_recommended_reason'] ?? null,
-            'dean_leave_recommendation_status' => $studyLeaveData['dean_leave_recommendation_status'] ?? null,
-            'dean_not_recommended_reason' => $studyLeaveData['dean_not_recommended_reason'] ?? null,
-            'vc_empno' => $studyLeaveData['vc_empno'] ?? null,
-            'vc_recommend_submit_to_committee' => $studyLeaveData['vc_recommend_submit_to_committee'] ?? null,
-            'vc_council_covering_approval_status' => $studyLeaveData['vc_council_covering_approval_status'] ?? null,
-            'status_id' => 4 ?? null, // Assuming '4' indicates a newly submitted application to Management Assistant(MA)
-           
-        ]);
-        // Clear the session data after submission
-        $request->session()->forget('study_leave');
-        // For demonstration, we'll just redirect back with a success message
-        return redirect()->route('StudyLeave.create')->with('success', 'Study leave application submitted successfully!');
-    }
-    
-    /**
-     * Display a specific study leave application for viewing/approval
-     * 
-     * @param string $id - Can be either reference_no or database id
-     * @return \Illuminate\View\View
-     */
-    public function showStudyLeaveApplication($id)
-    {
-       
-       
-        // Try to find by reference_no first, then by id
-        $application = DB::table('study_leaves')
-            ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
-            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
-            ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
-            ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
-            ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
-            
-            ->where('study_leaves.id', $id)
-            ->select(
-                'study_leaves.*',
-                'employees.employee_no as employee_no',
-                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
-                'employees.email',
-                'departments.department_name as department',
-                'faculties.faculty_name as faculty',
-                'designations.designation_name as designation',
-                'statuses.status',
-                'study_leaves.nominee_teaching_empno as teaching_nominee_emp_no',
-                DB::raw("CONCAT(teaching_nominee_t.initials, ' ', teaching_nominee_t.last_name) as teaching_nominee_name"),
-                'study_leaves.nominee_admin_empno as admin_nominee_emp_no',
-                DB::raw("CONCAT(admin_nominee_t.initials, ' ', admin_nominee_t.last_name) as admin_nominee_name"),
-                'study_leaves.nominee_other_empno as other_nominee_emp_no',
-                DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
-                'departments.id as department_id'
-                
-            )
+        // Find and update the draft to mark it as submitted
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
             ->first();
 
+        if ($draft) {
+            $draft->update([
+                'is_draft' => false,
+                'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
+                
+            ]);
+        }
+            
+            // Clear the session data after successful submission
+            $request->session()->forget('study_leave');
+            
+            return redirect()->route('StudyLeave.create')->with('success', 'Study leave application submitted successfully! Your application is now under review.');
+        
        
-        if (!$application) {
-            abort(404, 'Study leave application not found');
-        }
-
-        $departmentHead = null;
-        if ($application && isset($application->department_id)) {
-            $departmentHead = DB::table('department_heads')
-                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
-                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
-                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
-                ->where('department_heads.department_id', $application->department_id)
-                ->where('department_heads.active_status', 1)
-                ->select(
-                    'department_heads.emp_no as head_emp_no',
-                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
-                    'categories.category_name as head_title',
-                    'categories.id as head_title_id',
-                    'head_positions.category_name as head_position',
-                    'head_positions.id as head_position_id'
-                )
-                ->first();
-        }
-
-//dd($departmentHead);
-
-        return view('ma.showStudyLeave', compact('application', 'departmentHead'));
     }
 
     public function getEmployeeInfo($emp_no)
@@ -516,6 +629,60 @@ class StudyLeaveController extends Controller
             ->get();
 
         return $previousLeaves;
-    }                                                                                                           
+    } 
+    
+    /**
+     * Securely serve private study leave files
+     * Only allows access if user is authorized (employee who owns it, or approvers)
+     */
+    public function serveFile($type, $filename)
+    {
+        //dd('here');
+        // Validate file type
+        $allowedTypes = ['self_funding_declaration', 'placement_letter'];
+        if (!in_array($type, $allowedTypes)) {
+            abort(404, 'Invalid file type');
+        }
 
+        // Construct the file path
+        $filePath = storage_path('app/private/' . $type . '/' . $filename);
+
+        // Check if file exists
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found');
+        }
+
+        // Extract employee number from filename (format: empno_studyleaveid_type.pdf)
+        $parts = explode('_', $filename);
+        $fileEmpNo = $parts[0] ?? null;
+// dd($fileEmpNo);
+
+        // Authorization check: Allow if:
+        // 1. User is the employee who owns the file
+        // 2. User is an approver (MA, HOD, Dean, VC) - you can add more checks here
+        $currentEmpNo = (string) session('empno');
+     //  dd($currentEmpNo);
+        $isOwner = ($currentEmpNo === $fileEmpNo);
+     //  dd($isOwner);
+        // Check if user is an approver by checking if they have ma_user_id, hod role, etc.
+        // For now, we'll allow access if they're the owner or if they have a session
+        // You can add more sophisticated role checks here
+        $isApprover = !empty(session('ma_user_id')) || !empty(session('hod_id')) || !empty(session('dean_id'));
+//dd($isApprover);
+/*
+        if (!$isOwner && !$isApprover) {
+            abort(403, 'Unauthorized access to this file');
+        }
+*/
+        if (!$isOwner) {
+            abort(403, 'Unauthorized access to this file');
+        }
+
+        // Serve the file
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . basename($filename) . '"'
+        ]);
+    }
+    
 }

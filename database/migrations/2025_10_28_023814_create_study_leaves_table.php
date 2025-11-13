@@ -52,7 +52,13 @@ return new class extends Migration
             $table->boolean('vc_council_covering_approval_status')->nullable();
             $table->unsignedInteger('status_id')->nullable();
             $table->timestamps();
+            $table->boolean('is_draft')->default(false);
+            $table->string('self_funding_declaration')->nullable();
+            $table->string('placement_letter')->nullable();
+            
+            //$table->foreign('status_id')->references('id')->on('study_leave_statuses')->onDelete('set null');
         });
+        
     }
 
     /**

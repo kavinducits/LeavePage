@@ -45,6 +45,9 @@ class StudyLeave extends Model
         'vc_empno',
         'vc_recommend_submit_to_committee',
         'vc_council_covering_approval_status',
-        'status_id'
+        'status_id',
+        'is_draft',
+        'self_funding_declaration',
+        'placement_letter',
     ];
 }

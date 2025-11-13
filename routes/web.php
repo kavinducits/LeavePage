@@ -74,7 +74,11 @@ Route::post('/StudyLeave/Submit', [StudyLeaveController::class, 'submitApplicati
 //Get the emp no and name by ajax
 Route::get('/StudyLeave/get-employee-info/{emp_no}', [StudyLeaveController::class, 'getEmployeeInfo'])->name('StudyLeave.getEmployeeInfo');
 
-Route::get('/StudyLeave/view/{id}', [StudyLeaveController::class, 'showStudyLeaveApplication'])->name('StudyLeave.show.studyLeaveApplication');
+// Secure file serving route
+Route::get('/StudyLeave/files/{type}/{filename}', [StudyLeaveController::class, 'serveFile'])->name('StudyLeave.serveFile');
+
+//Route::get('/StudyLeave/view/{id}', [MAController::class, 'showStudyLeaveApplication'])->name('StudyLeave.show.studyLeaveApplication');
+Route::get('/StudyLeave/view/{id}', [MAController::class, 'showStudyLeave'])->name('StudyLeave.show.studyLeaveApplication');
 
 Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudyLeave'])->name('StudyLeave.approve');
 

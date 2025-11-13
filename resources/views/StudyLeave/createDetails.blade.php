@@ -31,7 +31,7 @@
         </div>
 
         <!-- Back Button -->
-        <a class="btn btn-outline-maroon">
+        <a class="btn btn-outline-maroon" href="{{ route('StudyLeave.BasicInfo.create') }}">
             <i class="fas fa-arrow-left me-2"></i>Back to List
         </a>
     </div>
@@ -69,10 +69,11 @@
                     <!-- Leave Type -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Leave Type</label>
+                        
                         <select name="leave_type" class="form-select" required>
-                            <option value="" disabled selected>Select an option</option>
-                            <option value="fresh">Fresh Study Leave</option>
-                            <option value="extension">Extension</option>
+                            <option value=""  {{ $draft_study_leave->leave_type === '' ? 'selected' : '' }}>Select an option</option>
+                            <option value="fresh" {{ $draft_study_leave->leave_type === 'fresh' ? 'selected' : '' }}>Fresh Study Leave</option>
+                            <option value="extension" {{ $draft_study_leave->leave_type === 'extension' ? 'selected' : '' }}>Extension</option>
                         </select>
                     </div>
 
@@ -80,22 +81,22 @@
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type Of Study Leave Requested</label>
                         <select name="leave_payment_type" class="form-select" required>
-                            <option value="" disabled selected>Select an option</option>
-                            <option value="with Pay">With Pay</option>
-                            <option value="without Pay">Without Pay</option>
+                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
+                            <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
+                            <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
                         </select>
                     </div>
 
                     <!-- Period of Study Leave Requested (From) -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Period of Study Leave Requested (From)</label>
-                        <input type="date" name="study_leave_from" class="form-control" required>
+                        <input type="date" name="study_leave_from" class="form-control" value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" required>
                     </div>
 
                     <!-- Period of Study Leave Requested (To) -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Period of Study Leave Requested (To)</label>
-                        <input type="date" name="study_leave_to" class="form-control" required>
+                        <input type="date" name="study_leave_to" class="form-control" value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" required>
                     </div>
 
 
@@ -103,13 +104,13 @@
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Title of the Degree (e.g. M.A., M.Sc, MBA, M.Phil., M.D., PhD)</label>
                         <select name="degree_title" class="form-select" required>
-                            <option value="" disabled selected>Select degree title</option>
-                            <option value="MA">M.A.</option>
-                            <option value="MSc">M.Sc</option>
-                            <option value="MBA">MBA</option>
-                            <option value="MPhil">M.Phil.</option>
-                            <option value="MD">M.D.</option>
-                            <option value="PhD">PhD</option>
+                            <option value="" value="" {{ $draft_study_leave->degree_title === '' ? 'selected' : '' }}>Select degree title</option>
+                            <option value="MA" {{ $draft_study_leave->degree_title === 'MA' ? 'selected' : '' }}>M.A.</option>
+                            <option value="MSc" {{ $draft_study_leave->degree_title === 'MSc' ? 'selected' : '' }}>M.Sc</option>
+                            <option value="MBA" {{ $draft_study_leave->degree_title === 'MBA' ? 'selected' : '' }}>MBA</option>
+                            <option value="MPhil" {{ $draft_study_leave->degree_title === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
+                            <option value="MD" {{ $draft_study_leave->degree_title === 'MD' ? 'selected' : '' }}>M.D.</option>
+                            <option value="PhD" {{ $draft_study_leave->degree_title === 'PhD' ? 'selected' : '' }}>PhD</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
@@ -117,18 +118,18 @@
                     <!-- University or the Institute -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">University or the Institute</label>
-                    <input type="text" name="university_institute" class="form-control" required>
+                    <input type="text" name="university_institute" class="form-control" value="{{ $draft_study_leave->university_institute ?? '' }}"  required>
                 </div>
 
                 <!-- Country and Field of Study -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Country</label>
-                    <input type="text" name="country" class="form-control" required>
+                    <input type="text" name="country" class="form-control"  value="{{ $draft_study_leave->country ?? '' }}" required>
                 </div>
 
                  <div class="col-md-6">
                     <label class="form-label fw-semibold">Field of study</label>
-                    <input type="text" name="field_of_study" class="form-control" required>
+                    <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required>
                 </div>
 
 
@@ -136,16 +137,16 @@
 
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
-                    <textarea name="study_program_details" class="form-control" rows="4" ></textarea>
+                    <textarea name="study_program_details" class="form-control" rows="4" >{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
                 </div>
 
                 <!-- Funding Type -->
                 <div class="col-md-6">
                         <label class="form-label fw-semibold"> Funding type</label>
                         <select name="funding_type" class="form-select" >
-                            <option value="" disabled selected>Select funding type</option>
-                            <option value="Full">Self-Funding</option>
-                            <option value="Partial">Scholarship</option>
+                            <option value="" {{ $draft_study_leave->funding_type ?? '' ? '' : 'selected' }}>Select funding type</option>
+                            <option value="Full" {{ $draft_study_leave->funding_type === 'Full' ? 'selected' : '' }}>Self-Funding</option>
+                            <option value="Partial" {{ $draft_study_leave->funding_type === 'Partial' ? 'selected' : '' }}>Scholarship</option>
                         </select>
                     </div>
 
@@ -153,9 +154,9 @@
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
                         <label class="form-label fw-semibold">Scholarship Source</label>
                         <select name="scholarship_source" class="form-select" >
-                            <option value="" disabled selected>Select source</option>
-                            <option value="agency">Scholarship offering agency</option>
-                            <option value="project">Funds from a project</option>
+                            <option value="" {{ empty($draft_study_leave->scholarship_source) ? 'selected' : '' }}>Select source</option>
+                            <option value="agency" {{ ($draft_study_leave->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
+                            <option value="project" {{ ($draft_study_leave->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
                         </select>
                     </div>
 
@@ -165,20 +166,20 @@
                         <!-- Scholarship Amount (conditional) - If Scholarship offering agency is selected -->
                         <div id="scholarship-amount-group" style="display: none;">
                             <label class="form-label fw-semibold">Scholarship Amount</label>
-                            <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount" >
+                            <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ $draft_study_leave->scholarship_amount ?? '' }}" >
                         </div>
 
                         <!-- Project Name (conditional) - If Funds from a project is selected -->
                         <div id="project-name-group" style="display: none;">
                             <label class="form-label fw-semibold">Project Name</label>
-                            <input type="text" name="project_name" class="form-control" placeholder="Enter project name" >
+                            <input type="text" name="project_name" class="form-control" placeholder="Enter project name" value="{{ $draft_study_leave->project_name ?? '' }}" >
                         </div>
                     </div>
 
                     <!-- Any Other Details -->
                     <div class="col-md-12">
                     <label class="form-label fw-semibold">Any Other Details</label>
-                    <textarea name="any_other_details" class="form-control" rows="4" ></textarea>
+                    <textarea name="any_other_details" class="form-control" rows="4" >{{ $draft_study_leave->any_other_details ?? '' }} </textarea>
                 </div>
 
 
@@ -189,11 +190,12 @@
                     <label class="form-label fw-semibold d-inline-block me-3">Requesting Air Passage from this University?</label>
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes">
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
+                                @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'yes')>
                             <label class="form-check-label" for="air_passage_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no">
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'no')>
                             <label class="form-check-label" for="air_passage_no">NO</label>
                         </div>
                     </div>
@@ -204,11 +206,13 @@
                     <label class="form-label fw-semibold d-inline-block me-3">Requesting Warm Cloth Allowance from this University?</label>
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes">
+                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
+                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'yes')>
                             <label class="form-check-label" for="warm_cloth_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no">
+                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no"
+                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no')>
                             <label class="form-check-label" for="warm_cloth_no">NO</label>
                         </div>
                     </div>
@@ -223,20 +227,18 @@
                     <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf">
 
                     <!-- Show previously uploaded file (when editing) -->
-                    @isset($leave)
-                        @if(!empty($leave->self_funding_declaration))
-                            <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
-                                <div>
-                                    <strong>Existing file:</strong>
-                                    <span class="ms-2">{{ basename($leave->self_funding_declaration) }}</span>
-                                </div>
-                                <div>
-                                    <a href="{{ asset('storage/' . $leave->self_funding_declaration) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                    <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary">Preview</button>
-                                </div>
+                    @if(!empty($draft_study_leave->self_funding_declaration))
+                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
+                            <div>
+                                <strong>Existing file:</strong>
+                                <span class="ms-2">{{ basename($draft_study_leave->self_funding_declaration) }}</span>
                             </div>
-                        @endif
-                    @endisset
+                            <div>
+                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
+                                <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary">Preview</button>
+                            </div>
+                        </div>
+                    @endif
 
                     <div id="self-declaration-preview-embed" class="mt-3" style="display:none;">
                         <label class="form-label fw-semibold">Preview</label>
@@ -253,6 +255,13 @@
                         const previewBtn = document.getElementById('preview-self-declaration-btn');
                         let currentUrl = null;
 
+                        // Preview existing stored file on page load (if present)
+                        @if(!empty($draft_study_leave->self_funding_declaration))
+                            const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}";
+                            embed.src = existingFileUrl;
+                            previewWrap.style.display = 'block';
+                        @endif
+
                         // Preview newly selected file
                         input.addEventListener('change', function () {
                             if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
@@ -267,17 +276,14 @@
                             previewWrap.style.display = 'block';
                         });
 
-                        // Preview existing stored file (if present)
+                        // Preview existing stored file when clicking Preview button
                         if (previewBtn) {
                             previewBtn.addEventListener('click', function () {
-                                // clear any object url first
                                 if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                                // use the storage URL from the anchor (Open button)
                                 const openLink = document.querySelector('#existing-self-declaration a[target="_blank"]');
                                 if (openLink) {
                                     embed.src = openLink.href;
                                     previewWrap.style.display = 'block';
-                                    // scroll into view if desired
                                     previewWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }
                             });
@@ -293,19 +299,27 @@
                     });
                     </script>
                 </div>
+                </div>
 
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const fundingType = document.querySelector('select[name="funding_type"]');
                         const selfFundingDeclaration = document.getElementById('self-funding-declaration');
-                        fundingType.addEventListener('change', function () {
-                            if (this.value === 'Full') {
+                        
+                        function updateSelfFundingDeclarationVisibility() {
+                            if (fundingType.value === 'Full') {
                                 selfFundingDeclaration.style.display = 'block';
                             } else {
                                 selfFundingDeclaration.style.display = 'none';
                                 selfFundingDeclaration.querySelector('input[type="file"]').value = '';
                             }
-                        });
+                        }
+                        
+                        // Show on page load if funding type is already 'Full'
+                        updateSelfFundingDeclarationVisibility();
+                        
+                        // Update when user changes funding type
+                        fundingType.addEventListener('change', updateSelfFundingDeclarationVisibility);
                     });
                 </script>
 
@@ -315,7 +329,21 @@
                         <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
                     </div>
                     <label class="form-label fw-semibold mt-2">Attach PDF Documents</label>
-                    <input type="file" name="attachments[]" id="attachments-input" class="form-control" accept="application/pdf" multiple >
+                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" accept="application/pdf" multiple >
+
+                    <!-- Show previously uploaded file (when editing) -->
+                    @if(!empty($draft_study_leave->placement_letter))
+                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-placement-letter">
+                            <div>
+                                <strong>Existing file:</strong>
+                                <span class="ms-2">{{ basename($draft_study_leave->placement_letter) }}</span>
+                            </div>
+                            <div>
+                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
+                                <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary">Preview</button>
+                            </div>
+                        </div>
+                    @endif
 
                     <div id="pdf-preview-list" class="mt-3"></div>
 
@@ -333,7 +361,28 @@
                     const list = document.getElementById('pdf-preview-list');
                     const embedWrap = document.getElementById('pdf-preview-embed');
                     const embed = document.getElementById('pdf-embed');
+                    const previewExistingBtn = document.getElementById('preview-existing-btn');
                     let currentUrl = null;
+
+                    // Preview existing stored file on page load (if present)
+                    @if(!empty($draft_study_leave->placement_letter))
+                        const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}";
+                        embed.src = existingFileUrl;
+                        embedWrap.style.display = 'block';
+                    @endif
+
+                    // Preview existing file when clicking Preview button
+                    if (previewExistingBtn) {
+                        previewExistingBtn.addEventListener('click', function () {
+                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
+                            const openLink = document.querySelector('#existing-placement-letter a[target="_blank"]');
+                            if (openLink) {
+                                embed.src = openLink.href;
+                                embedWrap.style.display = 'block';
+                                embedWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        });
+                    }
 
                     input.addEventListener('change', function () {
                         // cleanup previous
@@ -395,17 +444,27 @@
                         const fundingType = document.querySelector('select[name="funding_type"]');
                         const selfFundingExtra = document.getElementById('self-funding-extra');
                         const selfFundingExtra2 = document.getElementById('self-funding-extra2');
-                        fundingType.addEventListener('change', function () {
-                            if (this.value === 'Full') {
+                        
+                        function updateSelfFundingVisibility() {
+                            if (fundingType.value === 'Full') {
                                 selfFundingExtra.style.display = 'block';
                                 selfFundingExtra2.style.display = 'block';
                             } else {
                                 selfFundingExtra.style.display = 'none';
                                 selfFundingExtra2.style.display = 'none';
-                                document.querySelectorAll('input[name="air_passage_request"]').forEach(el => el.checked = false);
-                                document.querySelectorAll('input[name="warm_cloth_allowance_request"]').forEach(el => el.checked = false);
+                                // Only clear radio buttons when changing away from Full funding
+                                if (fundingType.value !== '') {
+                                    document.querySelectorAll('input[name="air_passage_request"]').forEach(el => el.checked = false);
+                                    document.querySelectorAll('input[name="warm_cloth_allowance_request"]').forEach(el => el.checked = false);
+                                }
                             }
-                        });
+                        }
+                        
+                        // Show fields on page load if funding type is already set to 'Full'
+                        updateSelfFundingVisibility();
+                        
+                        // Update visibility when funding type changes
+                        fundingType.addEventListener('change', updateSelfFundingVisibility);
                     });
                 </script>
                     <script>
@@ -417,32 +476,47 @@
                             const scholarshipAmountGroup = document.getElementById('scholarship-amount-group');
                             const projectNameGroup = document.getElementById('project-name-group');
 
-                            fundingType.addEventListener('change', function () {
-                                if (this.value === 'Partial') {
+                            function updateScholarshipVisibility() {
+                                if (fundingType.value === 'Partial') {
                                     scholarshipDetails.style.display = 'block';
+                                    // Also trigger scholarship source visibility on page load
+                                    updateScholarshipSourceVisibility();
                                 } else {
                                     scholarshipDetails.style.display = 'none';
-                                    scholarshipDetails.querySelector('select').value = '';
+                                    if (fundingType.value !== '') {
+                                        scholarshipDetails.querySelector('select').value = '';
+                                    }
                                     scholarshipExtraDetails.style.display = 'none';
                                     scholarshipAmountGroup.style.display = 'none';
                                     projectNameGroup.style.display = 'none';
                                 }
-                            });
+                            }
 
-                            scholarshipSource.addEventListener('change', function () {
-                                scholarshipExtraDetails.style.display = 'block';
-                                if (this.value === 'agency') {
-                                    scholarshipAmountGroup.style.display = 'block';
-                                    projectNameGroup.style.display = 'none';
-                                } else if (this.value === 'project') {
-                                    scholarshipAmountGroup.style.display = 'none';
-                                    projectNameGroup.style.display = 'block';
-                                } else {
-                                    scholarshipAmountGroup.style.display = 'none';
-                                    projectNameGroup.style.display = 'none';
-                                    scholarshipExtraDetails.style.display = 'none';
+                            function updateScholarshipSourceVisibility() {
+                                if (scholarshipSource.value) {
+                                    scholarshipExtraDetails.style.display = 'block';
+                                    if (scholarshipSource.value === 'agency') {
+                                        scholarshipAmountGroup.style.display = 'block';
+                                        projectNameGroup.style.display = 'none';
+                                    } else if (scholarshipSource.value === 'project') {
+                                        scholarshipAmountGroup.style.display = 'none';
+                                        projectNameGroup.style.display = 'block';
+                                    } else {
+                                        scholarshipAmountGroup.style.display = 'none';
+                                        projectNameGroup.style.display = 'none';
+                                        scholarshipExtraDetails.style.display = 'none';
+                                    }
                                 }
-                            });
+                            }
+
+                            // Show fields on page load based on current values
+                            updateScholarshipVisibility();
+
+                            // Update when user changes funding type
+                            fundingType.addEventListener('change', updateScholarshipVisibility);
+
+                            // Update when user changes scholarship source
+                            scholarshipSource.addEventListener('change', updateScholarshipSourceVisibility);
                         });
                     </script>
                     <script>

@@ -26,7 +26,7 @@
                 
             </h2>
         </div>
-        <a class="btn btn-outline-maroon">
+        <a class="btn btn-outline-maroon" href="{{route('StudyLeave.PreviousStudyLeaves.create')}}">
             <i class="fas fa-arrow-left me-2"></i>Back to List
         </a>
     </div>
@@ -64,7 +64,7 @@
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No</label>
-                                        <input type="text" class="form-control @error('nominee_teaching_empno') is-invalid @enderror" id="nominee_teaching_empno" name="nominee_teaching_empno" value="{{ old('nominee_teaching_empno', $leave->teaching_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
+                                        <input type="text" class="form-control @error('nominee_teaching_empno') is-invalid @enderror" id="nominee_teaching_empno" name="nominee_teaching_empno" value="{{ old('nominee_teaching_empno', $draft_study_leave->nominee_teaching_empno ?? '') }}" placeholder="Employee Number" required>
                                         @error('nominee_teaching_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -73,7 +73,7 @@
                                     </div>
                                     <div class="col-md-8">
                                         <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $leave->teaching_nominee_name ?? '') }}" placeholder="Employee Name" readonly required>
+                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Employee Name" readonly required>
                                         @error('nominee_teaching_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -90,7 +90,7 @@
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No</label>
-                                        <input type="text" class="form-control @error('nominee_admin_empno') is-invalid @enderror" id="nominee_admin_empno" name="nominee_admin_empno" value="{{ old('nominee_admin_empno', $leave->admin_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
+                                        <input type="text" class="form-control @error('nominee_admin_empno') is-invalid @enderror" id="nominee_admin_empno" name="nominee_admin_empno" value="{{ old('nominee_admin_empno', $draft_study_leave->nominee_admin_empno ?? '') }}" placeholder="Employee Number" required>
                                         @error('nominee_admin_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -99,7 +99,7 @@
                                     </div>
                                     <div class="col-md-8">
                                         <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $leave->admin_nominee_name ?? '') }}" placeholder="Employee Name" required readonly>
+                                        <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $draft_study_leave->nominee_admin_name ?? '') }}" placeholder="Employee Name" required readonly>
                                         @error('nominee_admin_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -116,7 +116,7 @@
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No</label>
-                                        <input type="text" class="form-control @error('nominee_other_empno') is-invalid @enderror" id="nominee_other_empno" name="nominee_other_empno" value="{{ old('nominee_other_empno', $leave->other_nominee_emp_no ?? '') }}" placeholder="Employee Number" required>
+                                        <input type="text" class="form-control @error('nominee_other_empno') is-invalid @enderror" id="nominee_other_empno" name="nominee_other_empno" value="{{ old('nominee_other_empno', $draft_study_leave->nominee_other_empno ?? '') }}" placeholder="Employee Number" required>
                                         @error('nominee_other_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -125,7 +125,7 @@
                                     </div>
                                     <div class="col-md-8">
                                         <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $leave->other_nominee_name ?? '') }}" placeholder="Employee Name" required readonly>
+                                        <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $draft_study_leave->nominee_other_name ?? '') }}" placeholder="Employee Name" required readonly>
                                         @error('nominee_other_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -194,6 +194,15 @@ $(document).ready(function () {
     });
     $('#nominee_other_empno').on('change', function () {
         lookupEmployee('#nominee_other_empno', '#nominee_other_name');
+    });
+
+    // Auto-lookup employee names on page load if employee numbers exist
+    ['#nominee_teaching_empno', '#nominee_admin_empno', '#nominee_other_empno'].forEach(function(selector) {
+        var empInput = $(selector);
+        if (empInput.val() && empInput.val().trim() !== '') {
+            var nameSelector = selector.replace('_empno', '_name');
+            lookupEmployee(selector, nameSelector);
+        }
     });
 });
 </script>
