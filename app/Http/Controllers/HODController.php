@@ -317,6 +317,60 @@ class HODController extends Controller
         return view('hod.showStudyLeave', compact('application', 'departmentHead'));
     }
 
+    public function approveStudyLeave(Request $request, $id)
+    {
+      
+        $request->validate([
+            'hod_adequate_staff_available' => 'required|string|nullable',
+            'hod_teaching_covered' => 'required|string|nullable',
+            'hod_service_period' => 'required|string|nullable',
+            'hod_recommend' => 'required|string|nullable',
+            'hod_not_recommend_reason' => 'required_if:hod_recommend,0|string|nullable',
+            'hod_remarks' => 'nullable|string|nullable',
+        ]);
+
+        $hodEmpNo = self::HOD_EMP_NO;
+/*
+        $application = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leaves.id', $id)
+            ->where('study_leaves.status_id', 4) // Processing MA
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->select('study_leaves.*')
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
+        }
+
+        // Prepare new remark by appending to existing remarks
+        
+        $newRemark = '';
+        if ($request->remark) {
+            $timestamp = now()->format('Y-m-d');
+            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
+        }
+*/
+        // Update status to Processing HOD (status_id = 5)
+        DB::table('study_leaves')
+            ->where('id', $id)
+            ->update([
+                'status_id' => 6, // Processing HOD
+                'hod_empno' => self::HOD_EMP_NO, // Record which HOD processed this
+                //'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
+                'hod_adequate_staff_available' => $request->hod_adequate_staff_available,
+                'hod_teaching_covered' => $request->hod_teaching_covered,
+                'hod_service_period' => $request->hod_service_period,
+                'hod_recommend' => $request->hod_recommend,
+                'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
+                'hod_remarks' => $request->hod_remarks,
+                'updated_at' => now()
+            ]);
+          
+        return redirect()->route('hod.show.studyleaves')->with('success', 'Study Leave Application forwarded to Dean successfully.');
+    }
+
+
 
 
 

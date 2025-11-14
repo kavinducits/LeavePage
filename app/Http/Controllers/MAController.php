@@ -580,12 +580,32 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
         }
 
+        // Fetch Department Head details for the application's department
+        $departmentHead = null;
+        if ($application && isset($application->department_id)) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $application->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
         // Decide which blade to use and readonly status
         $readonly = false;
         $view = 'ma.showStudyLeave';
        
 
-        return view("ma.showStudyLeave", compact('application', 'readonly'));
+        return view("ma.showStudyLeave", compact('application', 'readonly','departmentHead'));
     }
 
     public function approveStudyLeave(Request $request, $id)

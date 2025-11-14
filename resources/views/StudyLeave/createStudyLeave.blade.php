@@ -109,7 +109,7 @@
             @if($hasActiveDraft)
                 <!-- Show draft continuation options when user has an active draft -->
                 @php
-                    $activeDraft = $drafts->where('form_status', 1)->first();
+                    $activeDraft = $drafts;
                 @endphp
                 @if($activeDraft)
                     <div class="text-center mb-3">
@@ -119,13 +119,13 @@
                         </p>
                     </div>
                     <div class="d-flex justify-content-center gap-4 draft-action-buttons flex-wrap">
-                        <a href="{{ route('leaves.create', ['id' => $activeDraft->id]) }}" class="d-inline-block text-decoration-none draft-action-item">
+                        <a href="{{ route('StudyLeave.BasicInfo.create') }}" class="d-inline-block text-decoration-none draft-action-item">
                             <div class="draft-action-icon d-flex align-items-center justify-content-center mx-auto mb-2">
                                 <i class="bi bi-pencil-square"></i>
                             </div>
                             <div class="text-center">
                                 <span class="fw-semibold text-maroon">Continue Draft</span><br>
-                                <small class="text-muted">{{ $activeDraft->reference_no ?? 'N/A' }}</small>
+                                <small class="text-muted">{{ $activeDraft->id ?? 'N/A' }}</small>
                             </div>
                         </a>
 

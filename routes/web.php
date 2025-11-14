@@ -47,6 +47,7 @@ Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name(
 //Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
 Route::get('/StudyLeave', [StudyLeaveController::class, 'createStudyLeave'])->name('StudyLeave.create');
 Route::post('/StudyLeave', [StudyLeaveController::class, 'storeStudyLeave'])->name('StudyLeave.store');
+Route::get('/StudyLeave/Delete', [StudyLeaveController::class, 'deleteStudyLeaveDraft'])->name('StudyLeave.DeleteDraft');
 //Basic Info
 Route::get('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'createBasicInfo'])->name('StudyLeave.BasicInfo.create');
 Route::post('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'storeBasicInfo'])->name('StudyLeave.BasicInfo.store');
@@ -84,6 +85,7 @@ Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudy
 
 Route::get('/HODDashboard', [HODController::class, 'showStudyLeaves'])->name('hod.show.studyleaves');
 Route::get('/HODDashboard/view/{id}', [HODController::class, 'showStudyLeaveApplication'])->name('hod.view.studyLeave');
+Route::POST('/HODDashboard/view/{id}/approve', [HODController::class, 'approveStudyLeave'])->name('hod.view.studyLeave.approve');
 
 
 

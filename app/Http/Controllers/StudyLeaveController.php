@@ -31,13 +31,17 @@ class StudyLeaveController extends Controller
     {
         
         $user=null;
-        $drafts=null;
+       
         $previousLeaves=null;
         $hasActiveDraft=false;
         $previousLeaves = $this->getStudyLeaves(session('empno'));
+        $drafts = StudyLeave::where('empno', session('empno'))
+            ->where('is_draft', true)
+            ->first();
         
-        
-       
+       if($drafts){
+        $hasActiveDraft=true;
+       }
        
        return view('StudyLeave.createStudyLeave',compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft'));
     
@@ -642,6 +646,24 @@ class StudyLeaveController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . basename($filename) . '"'
         ]);
+    }
+    public function deleteStudyLeaveDraft(Request $request)
+    {
+        $empno = session('empno');
+
+        // Find the draft study leave for the current employee
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+
+        if ($draft) {
+            // Delete the draft
+            $draft->delete();
+
+            return redirect()->route('StudyLeave.create')->with('success', 'Draft study leave application deleted successfully.');
+        } else {
+            return redirect()->route('StudyLeave.create')->with('error', 'No draft study leave application found to delete.');
+        }
     }
     
 }

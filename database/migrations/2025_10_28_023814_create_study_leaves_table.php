@@ -40,11 +40,12 @@ return new class extends Migration
             $table->text('loan_handling')->nullable();
              $table->string('ma_empno')->nullable();
             $table->string('hod_empno')->nullable();
-            $table->boolean('hod_staff_adequacy_recommendation')->nullable();
-            $table->boolean('hod_teaching_coverage_recommendation')->nullable();
-            $table->boolean('hod_one_year_service_verification')->nullable();
-            $table->boolean('hod_leave_recommendation_status')->nullable();
-            $table->text('hod_not_recommended_reason')->nullable();
+            $table->string('hod_adequate_staff_available')->nullable();
+            $table->string('hod_teaching_covered')->nullable();
+            $table->string('hod_service_period')->nullable();
+            $table->string('hod_recommend')->nullable();
+            $table->text('hod_not_recommend_reason')->nullable();
+             $table->text('hod_remarks')->nullable();
             $table->boolean('dean_leave_recommendation_status')->nullable();
             $table->text('dean_not_recommended_reason')->nullable();
             $table->string('vc_empno')->nullable();

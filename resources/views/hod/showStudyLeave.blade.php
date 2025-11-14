@@ -63,63 +63,207 @@
                     @if(empty($readonly) || !$readonly)
                     <div class="card">
                         <div class="card-header bg-dark text-white fw-semibold">
-                            <i class="fas fa-tasks me-2"></i>Review Actions
+                            <i class="fas fa-tasks me-2"></i>HOD Review & Recommendation
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <label for="actionRemark" class="form-label fw-semibold">Remarks</label>
-                                <textarea class="form-control" id="actionRemark" name="remark" rows="3"
-                                          placeholder="Add any comments or remarks"></textarea>
-                                <div id="remarkError" class="form-text text-danger" style="display: none;">
-                                    Remarks are required when returning an application.
+                            <form id="hodReviewForm" action="{{ route('hod.view.studyLeave.approve', $application->id) }}" method="POST">
+                                @csrf
+                                
+                                <!-- Staff Availability Question -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        Whether adequate staff available for the continuation of academic programs during the period of applicant's leave?
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="staff_yes" value="yes" required>
+                                        <label class="form-check-label" for="staff_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="staff_no" value="no" required>
+                                        <label class="form-check-label" for="staff_no">No</label>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="d-flex justify-content-between align-items-start">
-                                <form id="returnForm" action="{{ route('ma.return', $application->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <input type="hidden" id="returnRemarkInput" name="remark" value="">
-                                    <button type="submit" class="btn btn-danger">
+                                <!-- Teaching Coverage Question -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        Whether satisfactory agreements can be made to cover applicant's teaching activities and other commitments?
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_teaching_covered" id="coverage_yes" value="yes" required>
+                                        <label class="form-check-label" for="coverage_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_teaching_covered" id="coverage_no" value="no" required>
+                                        <label class="form-check-label" for="coverage_no">No</label>
+                                    </div>
+                                </div>
+
+                                <!-- Service Period Question -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        Whether the applicant has served at least one (01) year in the Department?
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_service_period" id="service_yes" value="yes" required>
+                                        <label class="form-check-label" for="service_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_service_period" id="service_no" value="no" required>
+                                        <label class="form-check-label" for="service_no">No</label>
+                                    </div>
+                                </div>
+
+                                <!-- Recommendation -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        Recommendation <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_recommend" id="recommend_yes" value="recommended" required>
+                                        <label class="form-check-label text-success fw-semibold" for="recommend_yes">
+                                            <i class="fas fa-check-circle me-1"></i>Leave is Recommended
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_recommend" id="recommend_no" value="not_recommended" required>
+                                        <label class="form-check-label text-danger fw-semibold" for="recommend_no">
+                                            <i class="fas fa-times-circle me-1"></i>Leave is Not Recommended
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Reasons if Not Recommended -->
+                                <div class="mb-4" id="reasonsSection" style="display: none;">
+                                    <label for="not_recommended_reasons" class="form-label fw-semibold text-danger">
+                                        If not recommended, please give reasons <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea class="form-control" id="hod_not_recommend_reason" name="hod_not_recommend_reason" rows="4"
+                                              placeholder="Please provide detailed reasons for not recommending this leave application..."></textarea>
+                                    <div class="invalid-feedback">
+                                        Please provide reasons when leave is not recommended.
+                                    </div>
+                                </div>
+
+                                <!-- Additional Remarks -->
+                                <div class="mb-4">
+                                    <label for="hod_remarks" class="form-label fw-semibold">Any other remarks</label>
+                                    <textarea class="form-control" id="hod_remarks" name="hod_remarks" rows="3"
+                                              placeholder="Add any additional comments or observations..."></textarea>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                    <button type="button" class="btn btn-danger" id="returnBtn">
                                         <i class="fas fa-undo me-2"></i>Return to User
                                     </button>
-                                </form>
 
-                                <div class="text-right">
-                                    <form id="approveForm" action="{{ route('StudyLeave.approve', $application->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <input type="hidden" id="approveRemarkInput" name="remark" value="">
-                                        <button type="submit" class="btn btn-success" {{ empty($departmentHead
-                                        ) ? 'disabled' : '' }}>
-                                            <i class="fas fa-check me-2"></i>Forward
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-success btn-lg" {{ empty($departmentHead) ? 'disabled' : '' }}>
+                                            <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward
                                         </button>
-                                    </form>
 
-                                    @if(isset($departmentHead))
-                                    <div class="card mt-2" style="min-width: 260px;">
-                                        <div class="card-body py-2">
-                                            <div class="d-flex align-items-center">
-                                                <strong>Forward to,&nbsp;</strong>
-                                                <div>
-                                                    <div class="fw-semibold">{{ $departmentHead->head_title ?? 'Head' }}&nbsp;{{ $departmentHead->head_name ?? ''}}</div>
-                                                    <div class="text-muted small">{{ $departmentHead->head_position ?? '' }}</div>
+                                        @if(isset($departmentHead))
+                                        <div class="card mt-2" style="min-width: 260px;">
+                                            <div class="card-body py-2">
+                                                <div class="d-flex align-items-center">
+                                                    <strong>Forward to,&nbsp;</strong>
+                                                    <div>
+                                                        <div class="fw-semibold">{{ $departmentHead->head_title ?? 'Head' }}&nbsp;{{ $departmentHead->head_name ?? ''}}</div>
+                                                        <div class="text-muted small">{{ $departmentHead->head_position ?? '' }}</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    @else
-                                    <div class="card mt-2 border-warning" style="min-width: 260px;">
-                                        <div class="card-body py-2">
-                                            <div class="text-danger">
-                                                <strong>No active Department Head</strong>
-                                                <div class="text-muted small">Forwarding is disabled until a head is active.</div>
+                                        @else
+                                        <div class="card mt-2 border-warning" style="min-width: 260px;">
+                                            <div class="card-body py-2">
+                                                <div class="text-danger">
+                                                    <strong>No active Department Head</strong>
+                                                    <div class="text-muted small">Forwarding is disabled until a head is active.</div>
+                                                </div>
                                             </div>
                                         </div>
+                                        @endif
                                     </div>
-                                    @endif
                                 </div>
-                            </div>
+                            </form>
+
+                            <!-- Return Form (Hidden) -->
+                            <form id="returnForm" action="{{ route('ma.return', $application->id) }}" method="POST" style="display: none;">
+                                @csrf
+                                <input type="hidden" id="returnRemarkInput" name="remark" value="">
+                            </form>
                         </div>
                     </div>
+
+                    <script>
+                    // Show/hide reasons section based on recommendation
+                    document.querySelectorAll('input[name="recommendation"]').forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            const reasonsSection = document.getElementById('reasonsSection');
+                            const reasonsTextarea = document.getElementById('not_recommended_reasons');
+                            
+                            if (this.value === 'not_recommended') {
+                                reasonsSection.style.display = 'block';
+                                reasonsTextarea.required = true;
+                            } else {
+                                reasonsSection.style.display = 'none';
+                                reasonsTextarea.required = false;
+                                reasonsTextarea.value = '';
+                                reasonsTextarea.classList.remove('is-invalid');
+                            }
+                        });
+                    });
+
+                    // Form validation and submission
+                    document.getElementById('hodReviewForm').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const recommendation = document.querySelector('input[name="recommendation"]:checked');
+                        const reasonsTextarea = document.getElementById('not_recommended_reasons');
+                        
+                        // Validate reasons if not recommended
+                        if (recommendation && recommendation.value === 'not_recommended') {
+                            if (!reasonsTextarea.value.trim()) {
+                                reasonsTextarea.classList.add('is-invalid');
+                                reasonsTextarea.focus();
+                                alert('Please provide reasons for not recommending this leave application.');
+                                return;
+                            }
+                        }
+                        
+                        // Confirm submission
+                        if (confirm('Are you sure you want to submit your review and forward this application?')) {
+                            this.submit();
+                        }
+                    });
+
+                    // Return button handler
+                    document.getElementById('returnBtn').addEventListener('click', function() {
+                        const remark = prompt('Please provide remarks for returning this application:');
+                        
+                        if (remark && remark.trim()) {
+                            document.getElementById('returnRemarkInput').value = remark.trim();
+                            
+                            if (confirm('Are you sure you want to return this application to the user?')) {
+                                document.getElementById('returnForm').submit();
+                            }
+                        } else if (remark !== null) {
+                            alert('Remarks are required when returning an application.');
+                        }
+                    });
+
+                    // Clear invalid state on input
+                    document.getElementById('not_recommended_reasons').addEventListener('input', function() {
+                        if (this.value.trim()) {
+                            this.classList.remove('is-invalid');
+                        }
+                    });
+                    </script>
                     @else
                     <div class="alert alert-info mt-4">
                         <i class="fas fa-eye"></i> This application is in a different workflow stage. You have read-only access.
