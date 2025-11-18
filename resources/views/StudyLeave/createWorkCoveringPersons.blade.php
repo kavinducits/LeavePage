@@ -71,10 +71,19 @@
                                             </div>
                                         @enderror
                                     </div>
-                                    <div class="col-md-8">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
                                         <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Employee Name" readonly required>
                                         @error('nominee_teaching_name')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Destination</label>
+                                        <input type="text" class="form-control @error('nominee_teaching_destination') is-invalid @enderror" id="nominee_teaching_destination" name="nominee_teaching_destination" value="{{ old('nominee_teaching_destination', $draft_study_leave->nominee_teaching_destination ?? '') }}" placeholder="Destination" readonly required>
+                                        @error('nominee_teaching_destination')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
@@ -97,7 +106,7 @@
                                             </div>
                                         @enderror
                                     </div>
-                                    <div class="col-md-8">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
                                         <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $draft_study_leave->nominee_admin_name ?? '') }}" placeholder="Employee Name" required readonly>
                                         @error('nominee_admin_name')
@@ -106,6 +115,17 @@
                                             </div>
                                         @enderror
                                     </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Destination</label>
+                                        <input type="text" class="form-control @error('nominee_admin_destination') is-invalid @enderror" id="nominee_admin_destination" name="nominee_admin_destination" value="{{ old('nominee_admin_destination', $draft_study_leave->nominee_admin_destination ?? '') }}" placeholder="Destination" readonly>
+                                        @error('nominee_admin_destination')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                    
                                 </div>
                             </div>
 
@@ -123,7 +143,7 @@
                                             </div>
                                         @enderror
                                     </div>
-                                    <div class="col-md-8">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
                                         <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $draft_study_leave->nominee_other_name ?? '') }}" placeholder="Employee Name" required readonly>
                                         @error('nominee_other_name')
@@ -132,6 +152,16 @@
                                             </div>
                                         @enderror
                                     </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Destination</label>
+                                        <input type="text" class="form-control @error('nominee_other_destination') is-invalid @enderror" id="nominee_other_destination" name="nominee_other_destination" value="{{ old('nominee_other_destination', $draft_study_leave->nominee_other_destination ?? '') }}" placeholder="Destination" readonly>
+                                        @error('nominee_other_destination')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
                                 </div>
                             </div>
                         
@@ -159,10 +189,11 @@ $(document).ready(function () {
         }
     });
 
-    function lookupEmployee(empInputSelector, nameOutputSelector) {
+    function lookupEmployee(empInputSelector, nameOutputSelector,destinationOutputSelector) {
         var empno = $(empInputSelector).val() ? $(empInputSelector).val().trim() : '';
         if (!empno) {
             $(nameOutputSelector).val('');
+            $(destinationOutputSelector).val('');
             return;
         }
 
@@ -173,27 +204,30 @@ $(document).ready(function () {
             success: function (response) {
                 if (response && response.success && response.data && response.data.name) {
                     $(nameOutputSelector).val(response.data.name);
+                    $(destinationOutputSelector).val(response.data.designation);
                 } else {
                     $(nameOutputSelector).val('Not found');
+                    $(destinationOutputSelector).val('Not found');
                     console.warn('Lookup returned no name for', empno, response);
                 }
             },
             error: function (xhr, status, error) {
                 console.error('Employee lookup error for', empno, status, error, xhr.responseText);
                 $(nameOutputSelector).val('Lookup failed');
+                $(destinationOutputSelector).val('Lookup failed');
             }
         });
     }
 
     $('#nominee_teaching_empno').on('change', function () {
-        lookupEmployee('#nominee_teaching_empno', '#nominee_teaching_name');
+        lookupEmployee('#nominee_teaching_empno', '#nominee_teaching_name','#nominee_teaching_destination');
     });
 
     $('#nominee_admin_empno').on('change', function () {
-        lookupEmployee('#nominee_admin_empno', '#nominee_admin_name');
+        lookupEmployee('#nominee_admin_empno', '#nominee_admin_name','#nominee_admin_destination');
     });
     $('#nominee_other_empno').on('change', function () {
-        lookupEmployee('#nominee_other_empno', '#nominee_other_name');
+        lookupEmployee('#nominee_other_empno', '#nominee_other_name','#nominee_other_destination');
     });
 
     // Auto-lookup employee names on page load if employee numbers exist
@@ -201,7 +235,8 @@ $(document).ready(function () {
         var empInput = $(selector);
         if (empInput.val() && empInput.val().trim() !== '') {
             var nameSelector = selector.replace('_empno', '_name');
-            lookupEmployee(selector, nameSelector);
+            var destinationSelector = selector.replace('_empno', '_destination');
+            lookupEmployee(selector, nameSelector, destinationSelector);
         }
     });
 });
