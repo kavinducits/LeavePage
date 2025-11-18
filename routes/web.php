@@ -56,6 +56,7 @@ Route::post('/StudyLeave/BasicInfo/exit', [StudyLeaveController::class, 'exiteBa
 //Details of the Study Leave
 Route::get('/StudyLeave/Details', [StudyLeaveController::class, 'createDetails'])->name('StudyLeave.Details.create');
 Route::post('/StudyLeave/Details', [StudyLeaveController::class, 'storeDetails'])->name('StudyLeave.Details.store');
+Route::post('/StudyLeave/Details/exit', [StudyLeaveController::class, 'exiteDetails'])->name('StudyLeave.Details.exit');
 
 //Details of the Previous Study Leave
 Route::get('/StudyLeave/PreviousStudyLeaves', [StudyLeaveController::class, 'createPreviousStudyLeaves'])->name('StudyLeave.PreviousStudyLeaves.create');
