@@ -117,7 +117,7 @@ class StudyLeaveController extends Controller
      */
     public function storeBasicInfo(Request $request)
     {
-
+/*
         // Validate the incoming request data
         $validatedData = $request->validate([
             'empno' => 'required|string|max:20',
@@ -160,11 +160,65 @@ class StudyLeaveController extends Controller
                 'is_draft' => true
             ]);
         }
-
+*/
+        $this->updateBasicInfo($request);
 
         // redirect Details of the Study Leave
 
         return redirect()->route('StudyLeave.Details.create')->with('success', 'Basic information saved successfully!');
+    }
+    public function exiteBasicInfo(Request $request)
+    {
+        
+        $this->updateBasicInfo($request);
+        
+        return redirect()->route('StudyLeave.create')->with('success', 'Basic information saved successfully!');
+    }
+    public function updateBasicInfo($request)
+    {
+         // Validate the incoming request data
+        $validatedData = $request->validate([
+            'empno' => 'required|string|max:20',
+            'name_with_initials' => 'required|string|max:100',
+            'email' => 'required|email|max:100',
+            'department' => 'required|string|max:100',
+            'faculty' => 'required|string|max:100',
+            'designation' => 'required|string|max:100',
+            'passport_no' => 'nullable|string|max:50',
+            'passport_validity' => 'nullable|date'
+        ]);
+
+        // Store basic info in session for later steps
+
+        // Merge basic info into existing study_leave session data
+        $studyLeave = session('study_leave', []);
+        $studyLeave = array_merge($studyLeave, [
+            'employee_no' => session('empno'),
+            'passport_no' => $validatedData['passport_no'] ?? null,
+            'passport_validity' => $validatedData['passport_validity'] ?? null,
+        ]);
+        session(['study_leave' => $studyLeave]);
+        // Check if there's an existing draft for this employee
+        $draft = StudyLeave::where('empno', session('empno'))
+            ->where('is_draft', true)
+            ->first();
+
+        if ($draft) {
+            // Update existing draft
+            $draft->update([
+                'passport_no' => $validatedData['passport_no'] ?? null,
+                'passport_validity' => $validatedData['passport_validity'] ?? null,
+            ]);
+        } else {
+            // Create new draft record
+            StudyLeave::create([
+                'empno' => session('empno'),
+                'passport_no' => $validatedData['passport_no'] ?? null,
+                'passport_validity' => $validatedData['passport_validity'] ?? null,
+                'is_draft' => true
+            ]);
+        }
+        return;
     }
 
     public function createDetails()

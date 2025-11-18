@@ -103,12 +103,31 @@
             </div>
         </div>
 
-<div class="d-flex justify-content-end mt-4">
+<div class="d-flex justify-content-between mt-4">
+    <button type="button" class="btn btn-outline-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm" onclick="saveAndExit()">
+        <i class="fas fa-save me-2"></i>Save and Exit
+    </button>
     <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm">
         Next: Leave Details <i class="fas fa-arrow-right ms-2"></i>
     </button>
 </div>
     </form>
+
+    <script>
+    function saveAndExit() {
+        const form = document.getElementById('leave-form');
+        const originalAction = form.action;
+        
+        // Change form action to save and exit route
+        
+        form.action = "{{ route('StudyLeave.BasicInfo.exit') }}";
+        form.submit();
+        
+        // Restore original action (optional, for safety)
+        form.action = originalAction;
+    }
+    </script>
+-
     <!--
     <div class="d-flex justify-content-end mt-4">
         <a class="btn btn-outline-maroon">
