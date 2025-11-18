@@ -458,7 +458,7 @@ class StudyLeaveController extends Controller
             ]);
         }
 
-        return redirect()->route('StudyLeave.Handeling.create')->with('success', 'Work covering persons details saved successfully!');
+        return redirect()->route('StudyLeave.Summary.show')->with('success', 'Work covering persons details saved successfully!');
     }
     public function createHandeling()
     {
@@ -511,11 +511,32 @@ class StudyLeaveController extends Controller
 
         // Retriev, compact('draft_study_leave')e all relefor the summary view
 
-        return view('StudyLeave.showSummary');
+        $empno = session('study_leave.employee_no') ?? session('empno');
+
+        $draft_study_leave = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->select(
+                "library_and_property_handling",
+                "loan_handling"
+            )
+            ->first();
+
+        return view('StudyLeave.showSummary', compact('draft_study_leave'));
     }
     public function submitApplication(Request $request)
     {
-        // Here you would typically save the complete study leave application to the database
+
+        // Validate the incoming request data
+
+        $validatedData = $request->validate([
+            'library_and_property_handling' => 'required|string|max:100',
+            'loan_handling' => 'required|string|max:100',
+
+
+        ]);
+        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
+        // Here you can handle the validated data, e.g., save it to the database or session
+        // For demonstration, we'll just redirect back with a success message
         $empno = session('study_leave.employee_no') ?? session('empno');
 
         // Find and update the draft to mark it as submitted
