@@ -645,6 +645,46 @@ class StudyLeaveController extends Controller
 
 
         // Validate the incoming request data
+        /*
+        $validatedData = $request->validate([
+            'nominee_teaching_empno' => 'required|string|max:255',
+            'nominee_admin_empno' => 'required|string|max:255',
+            'nominee_other_empno' => 'required|string|max:255',
+
+        ]);
+
+        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
+        // Here you can handle the validated data, e.g., save it to the database or session
+        // For demonstration, we'll just redirect back with a success message
+        $empno = session('study_leave.employee_no') ?? session('empno');
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+
+        if ($draft) {
+            // Update existing draft
+            $draft->update([
+                'nominee_teaching_empno' => $validatedData['nominee_teaching_empno'],
+                'nominee_admin_empno' => $validatedData['nominee_admin_empno'],
+                'nominee_other_empno' => $validatedData['nominee_other_empno'],
+            ]);
+        }
+*/        $this->updateWorkCoveringPersons($request);
+        return redirect()->route('StudyLeave.Summary.show')->with('success', 'Work covering persons details saved successfully!');
+    }
+
+    public function exiteWorkCoveringPersons(Request $request)
+    {
+       
+        
+        $this->updateWorkCoveringPersons($request);
+        
+        return redirect()->route('StudyLeave.create')->with('success', 'Work covering persons details saved successfully!');
+    }
+    public function updateWorkCoveringPersons($request)
+    {
+        
+        // Validate the incoming request data
         $validatedData = $request->validate([
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
@@ -669,7 +709,6 @@ class StudyLeaveController extends Controller
             ]);
         }
 
-        return redirect()->route('StudyLeave.Summary.show')->with('success', 'Work covering persons details saved successfully!');
     }
     public function createHandeling()
     {

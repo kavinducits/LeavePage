@@ -65,6 +65,7 @@ Route::post('/StudyLeave/PreviousStudyLeaves', [StudyLeaveController::class, 'st
 //Nominate Work covering Persons
 Route::get('/StudyLeave/WorkCoveringPersons', [StudyLeaveController::class, 'createWorkCoveringPersons'])->name('StudyLeave.WorkCoveringPersons.create');
 Route::post('/StudyLeave/WorkCoveringPersons', [StudyLeaveController::class, 'storeWorkCoveringPersons'])->name('StudyLeave.WorkCoveringPersons.store');
+Route::post('/StudyLeave/WorkCoveringPersons/exit', [StudyLeaveController::class, 'exiteWorkCoveringPersons'])->name('StudyLeave.WorkCoveringPersons.exit');
 
 //Handling of
 Route::get('/StudyLeave/Handeling', [StudyLeaveController::class, 'createHandeling'])->name('StudyLeave.Handeling.create');
