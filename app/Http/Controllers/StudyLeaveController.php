@@ -212,7 +212,7 @@ class StudyLeaveController extends Controller
         // Validation rules for Study Leave details - adjust fields to match your createDetails.blade.php
        
         $rules = array(
-            'leave_type' => 'required|string|max:100',
+           // 'leave_type' => 'required|string|max:100',
             'leave_payment_type' => 'required|string|max:100',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
@@ -330,7 +330,7 @@ class StudyLeaveController extends Controller
             if ($draft) {
                 // Prepare update data
                 $updateData = [
-                    'leave_type' => $validatedData['leave_type'],
+                   // 'leave_type' => $validatedData['leave_type'],
                     'leave_payment_type' => $validatedData['leave_payment_type'],
                     'study_leave_from' => $validatedData['study_leave_from'],
                     'study_leave_to' => $validatedData['study_leave_to'],
