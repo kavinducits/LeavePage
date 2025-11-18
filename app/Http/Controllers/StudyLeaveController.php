@@ -777,7 +777,7 @@ class StudyLeaveController extends Controller
     {
 
         // Validate the incoming request data
-
+/*
         $validatedData = $request->validate([
             'library_and_property_handling' => 'required|string|max:100',
             'loan_handling' => 'required|string|max:100',
@@ -801,11 +801,67 @@ class StudyLeaveController extends Controller
 
             ]);
         }
+*/
+
+     
+$this->updateSummary($request);
+ $empno = session('study_leave.employee_no') ?? session('empno');
+ // Find and update the draft to mark it as submitted
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+
+        if ($draft) {
+            $draft->update([
+                'is_draft' => false,
+                'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
+
+            ]);
+        }
 
         // Clear the session data after successful submission
         $request->session()->forget('study_leave');
 
         return redirect()->route('StudyLeave.create')->with('success', 'Study leave application submitted successfully! Your application is now under review.');
+    }
+    public function exitSummary(Request $request)
+    {
+       
+        
+        $this->updateSummary($request);
+        
+        return redirect()->route('StudyLeave.create')->with('success', 'Handling of details saved successfully!');
+    }
+    public function updateSummary($request)
+    {
+         // Validate the incoming request data
+           // Validate the incoming request data
+
+        $validatedData = $request->validate([
+            'library_and_property_handling' => 'required|string|max:100',
+            'loan_handling' => 'required|string|max:100',
+
+
+        ]);
+        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
+        // Here you can handle the validated data, e.g., save it to the database or session
+        // For demonstration, we'll just redirect back with a success message
+        $empno = session('study_leave.employee_no') ?? session('empno');
+
+        // Find and update the draft to mark it as submitted
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+
+        if ($draft) {
+            $draft->update([
+                'is_draft' => true
+                //'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
+
+            ]);
+        }
+
+        
     }
 
     public function getEmployeeInfo($emp_no)

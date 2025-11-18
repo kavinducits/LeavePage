@@ -74,6 +74,8 @@ Route::post('/StudyLeave/Handeling', [StudyLeaveController::class, 'storeHandeli
 // Summary and Submit
 Route::get('/StudyLeave/Summary', [StudyLeaveController::class, 'showSummary'])->name('StudyLeave.Summary.show');
 Route::post('/StudyLeave/Submit', [StudyLeaveController::class, 'submitApplication'])->name('StudyLeave.Submit');
+Route::post('/StudyLeave/Summary/exit', [StudyLeaveController::class, 'exitSummary'])->name('StudyLeave.Summary.exit');
+
 
 //Get the emp no and name by ajax
 Route::get('/StudyLeave/get-employee-info/{emp_no}', [StudyLeaveController::class, 'getEmployeeInfo'])->name('StudyLeave.getEmployeeInfo');
