@@ -220,7 +220,7 @@
                                         <td>{{ $leave->leave_payment_type ?? 'Study Leave' }}</td>
                                         <td>
                                             @php
-                                                $statusValue = $leave->status ?? 0;
+                                                $statusValue = $leave->status_id ?? 0;
                                                 if ($statusValue == 1) {
                                                     $status = 'Approved';
                                                     $badgeClass = 'bg-success';

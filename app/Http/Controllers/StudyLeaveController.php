@@ -34,7 +34,7 @@ class StudyLeaveController extends Controller
        
         $previousLeaves=null;
         $hasActiveDraft=false;
-        $previousLeaves = $this->getStudyLeaves(session('empno'));
+        $previousLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 1);
         $drafts = StudyLeave::where('empno', session('empno'))
             ->where('is_draft', true)
             ->first();
@@ -575,8 +575,9 @@ class StudyLeaveController extends Controller
        //dd($emp_no);
         // Fetch employee info from the database
         $employee = DB::table('employees')
+            ->join('designations', 'employees.designation_id', '=', 'designations.id')
             ->where('employee_no', $emp_no)
-            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"), 'assign_ma_user_id')
+            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"), 'assign_ma_user_id', 'designation_name as designation')
             ->first();
 
         return $employee;
