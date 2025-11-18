@@ -65,42 +65,23 @@
             </div>
             <div class="card-body">
                 <div class="row g-3">
-                    
-                    <!-- Leave Type -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Leave Type</label>
-                        
-                        <select name="leave_type" class="form-select" required>
-                            <option value=""  {{ $draft_study_leave->leave_type === '' ? 'selected' : '' }}>Select an option</option>
-                            <option value="fresh" {{ $draft_study_leave->leave_type === 'fresh' ? 'selected' : '' }}>Fresh Study Leave</option>
-                            <option value="extension" {{ $draft_study_leave->leave_type === 'extension' ? 'selected' : '' }}>Extension</option>
-                        </select>
-                    </div>
+                          <!-- University or the Institute -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">University or the Institute</label>
+                    <input type="text" name="university_institute" class="form-control" value="{{ $draft_study_leave->university_institute ?? '' }}"  required>
+                </div>
+                
+                <!-- Country and Field of Study -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Country</label>
+                    <input type="text" name="country" class="form-control"  value="{{ $draft_study_leave->country ?? '' }}" required>
+                </div>
 
-                    <!-- Type of Study Leave Requested -->
-                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Type Of Study Leave Requested</label>
-                        <select name="leave_payment_type" class="form-select" required>
-                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
-                            <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
-                            <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
-                        </select>
-                    </div>
-
-                    <!-- Period of Study Leave Requested (From) -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Period of Study Leave Requested (From)</label>
-                        <input type="date" name="study_leave_from" class="form-control" value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" required>
-                    </div>
-
-                    <!-- Period of Study Leave Requested (To) -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Period of Study Leave Requested (To)</label>
-                        <input type="date" name="study_leave_to" class="form-control" value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" required>
-                    </div>
-
-
-                    <!-- Details of the Study Program -->
+                 <div class="col-md-6">
+                    <label class="form-label fw-semibold">Field of study</label>
+                    <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required>
+                </div>
+                     <!-- Details of the Study Program -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Title of the Degree (e.g. M.A., M.Sc, MBA, M.Phil., M.D., PhD)</label>
                         <select name="degree_title" class="form-select" required>
@@ -114,23 +95,34 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
+                    <!-- Leave Type -->
+                    <!--
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Leave Type</label>
+                        
+                        <select name="leave_type" class="form-select" required>
+                            <option value=""  {{ $draft_study_leave->leave_type === '' ? 'selected' : '' }}>Select an option</option>
+                            <option value="fresh" {{ $draft_study_leave->leave_type === 'fresh' ? 'selected' : '' }}>Fresh Study Leave</option>
+                            <option value="extension" {{ $draft_study_leave->leave_type === 'extension' ? 'selected' : '' }}>Extension</option>
+                        </select>
+                    </div>
+                -->
+                   
 
-                    <!-- University or the Institute -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">University or the Institute</label>
-                    <input type="text" name="university_institute" class="form-control" value="{{ $draft_study_leave->university_institute ?? '' }}"  required>
-                </div>
+                    <!-- Period of Study Leave Requested (From) -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">From</label>
+                        <input type="date" name="study_leave_from" class="form-control" value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" required>
+                    </div>
 
-                <!-- Country and Field of Study -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Country</label>
-                    <input type="text" name="country" class="form-control"  value="{{ $draft_study_leave->country ?? '' }}" required>
-                </div>
+                    <!-- Period of Study Leave Requested (To) -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">To</label>
+                        <input type="date" name="study_leave_to" class="form-control" value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" required>
+                    </div>
+                  
 
-                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Field of study</label>
-                    <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required>
-                </div>
+
 
 
                 <!-- Relevancy and Details of the Study Program -->
@@ -139,6 +131,49 @@
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
                     <textarea name="study_program_details" class="form-control" rows="4" >{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
                 </div>
+
+                 <!-- Attachment Instructions -->
+                <div class="col-md-12">
+                    <div class="alert alert-info mt-3">
+                        <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
+                    </div>
+                    <label class="form-label fw-semibold mt-2">Attach PDF Documents</label>
+                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" accept="application/pdf" multiple >
+
+                    <!-- Show previously uploaded file (when editing) -->
+                    @if(!empty($draft_study_leave->placement_letter))
+                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-placement-letter">
+                            <div>
+                                <strong>Existing file:</strong>
+                                <span class="ms-2">{{ basename($draft_study_leave->placement_letter) }}</span>
+                            </div>
+                            <div>
+                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
+                                <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary">Preview</button>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div id="pdf-preview-list" class="mt-3"></div>
+
+                    <div id="pdf-preview-embed" class="mt-3" style="display:none;">
+                        <label class="form-label fw-semibold">Preview</label>
+                        <div style="border:1px solid #dee2e6;">
+                            <embed id="pdf-embed" src="" type="application/pdf" width="100%" height="600px">
+                        </div>
+                    </div>
+                </div>
+
+
+                 <!-- Type of Study Leave Requested -->
+                     <div class="col-md-6">
+                        <label class="form-label fw-semibold">Type of Study Leave Requested</label>
+                        <select name="leave_payment_type" class="form-select" required>
+                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
+                            <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
+                            <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
+                        </select>
+                    </div>
 
                 <!-- Funding Type -->
                 <div class="col-md-6">
@@ -175,15 +210,7 @@
                             <input type="text" name="project_name" class="form-control" placeholder="Enter project name" value="{{ $draft_study_leave->project_name ?? '' }}" >
                         </div>
                     </div>
-
-                    <!-- Any Other Details -->
-                    <div class="col-md-12">
-                    <label class="form-label fw-semibold">Any Other Details</label>
-                    <textarea name="any_other_details" class="form-control" rows="4" >{{ $draft_study_leave->any_other_details ?? '' }} </textarea>
-                </div>
-
-
-                <!-- Additional fields (conditional) - If Self-Funding is selected -->
+                    <!-- Additional fields (conditional) - If Self-Funding is selected -->
 
                 <!-- Air Passage Request -->
                 <div class="col-md-6" id="self-funding-extra" style="display: none;">
@@ -217,6 +244,15 @@
                         </div>
                     </div>
                 </div>
+
+                    <!-- Any Other Details -->
+                    <div class="col-md-12">
+                    <label class="form-label fw-semibold">Any Other Details of Funding</label>
+                    <textarea name="any_other_details" class="form-control" rows="4" >{{ $draft_study_leave->any_other_details ?? '' }} </textarea>
+                </div>
+
+
+                
                 <!-- Self-Funding Declaration (conditional) -->
                 <div class="col-md-12" id="self-funding-declaration" style="display: none;">
                     <div class="alert alert-warning mt-3">
@@ -324,36 +360,10 @@
                 </script>
 
                 <!-- Attachment Instructions -->
-                <div class="col-md-12">
-                    <div class="alert alert-info mt-3">
-                        <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
-                    </div>
-                    <label class="form-label fw-semibold mt-2">Attach PDF Documents</label>
-                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" accept="application/pdf" multiple >
+              
 
                     <!-- Show previously uploaded file (when editing) -->
-                    @if(!empty($draft_study_leave->placement_letter))
-                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-placement-letter">
-                            <div>
-                                <strong>Existing file:</strong>
-                                <span class="ms-2">{{ basename($draft_study_leave->placement_letter) }}</span>
-                            </div>
-                            <div>
-                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary">Preview</button>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div id="pdf-preview-list" class="mt-3"></div>
-
-                    <div id="pdf-preview-embed" class="mt-3" style="display:none;">
-                        <label class="form-label fw-semibold">Preview</label>
-                        <div style="border:1px solid #dee2e6;">
-                            <embed id="pdf-embed" src="" type="application/pdf" width="100%" height="600px">
-                        </div>
-                    </div>
-                </div>
+                   
 
                 <script>
                 document.addEventListener('DOMContentLoaded', function () {
