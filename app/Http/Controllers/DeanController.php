@@ -192,4 +192,70 @@ class DeanController extends Controller
         $msg = $request->dean_recommend ? 'Application forwarded to VC with recommendation.' : 'Application forwarded to VC without recommendation.';
         return redirect()->route('dean.index')->with('success', $msg);
     }
+
+     public function showStudyLeaveApplication($id)
+    {
+       
+       
+        // Try to find by reference_no first, then by id
+        $application = DB::table('study_leaves')
+            ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
+            ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
+            ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
+            
+            ->where('study_leaves.id', $id)
+            ->select(
+                'study_leaves.*',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status',
+                'study_leaves.nominee_teaching_empno as teaching_nominee_emp_no',
+                DB::raw("CONCAT(teaching_nominee_t.initials, ' ', teaching_nominee_t.last_name) as teaching_nominee_name"),
+                'study_leaves.nominee_admin_empno as admin_nominee_emp_no',
+                DB::raw("CONCAT(admin_nominee_t.initials, ' ', admin_nominee_t.last_name) as admin_nominee_name"),
+                'study_leaves.nominee_other_empno as other_nominee_emp_no',
+                DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
+                'departments.id as department_id'
+                
+            )
+            ->first();
+
+       
+        if (!$application) {
+            abort(404, 'Study leave application not found');
+        }
+
+        $departmentHead = null;
+        if ($application && isset($application->department_id)) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+       
+                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $application->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+//dd($departmentHead);
+
+        return view('hod.showStudyLeave', compact('application', 'departmentHead'));
+    }
 } 
