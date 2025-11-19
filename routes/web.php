@@ -26,6 +26,7 @@ Route::get('/MAPage', [MAController::class, 'index'])->name('ma.index.alt'); // 
 Route::get('/MApage/{id}', [MAController::class, 'show'])->name('ma.show');
 Route::post('/MApage/{id}/approve', [MAController::class, 'approve'])->name('ma.approve');
 Route::post('/MApage/{id}/return', [MAController::class, 'return'])->name('ma.return');
+Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'returnStudyLeave'])->name('ma.studyleave.return');
 
 // HOD routes (no authentication required)
 Route::get('/HODpage', [HODController::class, 'index'])->name('hod.index');
@@ -87,6 +88,8 @@ Route::get('/StudyLeave/files/{type}/{filename}', [StudyLeaveController::class, 
 Route::get('/StudyLeave/view/{id}', [MAController::class, 'showStudyLeave'])->name('StudyLeave.show.studyLeaveApplication');
 
 Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudyLeave'])->name('StudyLeave.approve');
+
+Route::get('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'showEditeStudyLeaveForm'])->name('StudyLeave.show.editeForm');
 
 Route::get('/HODDashboard', [HODController::class, 'showStudyLeaves'])->name('hod.show.studyleaves');
 Route::get('/HODDashboard/view/{id}', [HODController::class, 'showStudyLeaveApplication'])->name('hod.view.studyLeave');

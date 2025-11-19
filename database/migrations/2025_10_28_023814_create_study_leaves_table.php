@@ -39,6 +39,7 @@ return new class extends Migration
             $table->text('library_and_property_handling')->nullable();
             $table->text('loan_handling')->nullable();
              $table->string('ma_empno')->nullable();
+             $table->string('ma_remarks')->nullable();
             $table->string('hod_empno')->nullable();
             $table->string('hod_adequate_staff_available')->nullable();
             $table->string('hod_teaching_covered')->nullable();

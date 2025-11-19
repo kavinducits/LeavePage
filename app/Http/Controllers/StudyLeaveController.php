@@ -33,7 +33,11 @@ class StudyLeaveController extends Controller
 
         $previousLeaves = null;
         $hasActiveDraft = false;
-        $previousLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 1);
+        $approvedLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 1);
+        $returnLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 3);
+        $rejectLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 2);
+
+        $previousLeaves = $approvedLeaves->merge($returnLeaves)->merge($rejectLeaves);
         $drafts = StudyLeave::where('empno', session('empno'))
             ->where('is_draft', true)
             ->first();
@@ -977,5 +981,72 @@ $this->updateSummary($request);
         } else {
             return redirect()->route('StudyLeave.create')->with('error', 'No draft study leave application found to delete.');
         }
+    }
+    public function showEditeStudyLeaveForm($id)
+    {
+       
+
+        // Get the specific study leave application with all details
+        // Only show if the employee is assigned to this specific MA
+        $application = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.id', $id)
+            ->select(
+                'study_leaves.*',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.department_id as department_id',
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile',
+                'employees.nic',
+                'statuses.status',
+                'employees.email as email',
+                'study_leaves.scholarship_source as scholarship_source',
+                'study_leaves.scholarship_amount as scholarship_amount',
+                'study_leaves.project_name as project_name',
+                'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
+                'study_leaves.nominee_admin_empno as nominee_admin_empno',
+                'study_leaves.nominee_other_empno as nominee_other_empno'
+
+            )
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
+        }
+
+        // Fetch Department Head details for the application's department
+        $departmentHead = null;
+        if ($application && isset($application->department_id)) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $application->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+        // Decide which blade to use and readonly status
+        $readonly = false;
+        $view = 'ma.showStudyLeave';
+       
+
+        return view('StudyLeave.returnStudyLeaveForm', compact('application', 'departmentHead', 'readonly'));
     }
 }

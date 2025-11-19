@@ -84,7 +84,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-start">
-                                <form id="returnForm" action="{{ route('ma.return', $application->id) }}" method="POST" class="d-inline">
+                                <form id="returnForm" action="{{ route('ma.studyleave.return', $application->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" id="returnRemarkInput" name="remark" value="">
                                     <button type="submit" class="btn btn-danger">

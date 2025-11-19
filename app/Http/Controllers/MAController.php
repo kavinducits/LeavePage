@@ -650,6 +650,47 @@ class MAController extends Controller
         return redirect()->route('ma.studyleave')->with('success', 'Study Leave Application forwarded to HOD successfully.');
     }
 
+    public function returnStudyLeave(Request $request, $id)
+    {
+        
+        $request->validate([
+            'remark' => 'required|string|max:1000',
+        ], [
+            'remark.required' => 'Remarks are required when returning an application.'
+        ]);
+
+        $maUserId = self::MA_USER_ID;
+
+        $application = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leaves.id', $id)
+            ->where('study_leaves.status_id', 4) // Processing MA
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->select('study_leaves.*')
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
+        }
+
+        // Prepare new remark by appending to existing remarks
+        $timestamp = now()->format('Y-m-d');
+        $newRemark = "\n\n[MA Return - " . $timestamp . "]\n" . $request->remark;
+
+        // Update status to Returned (status_id = 2 for Rejected)
+        DB::table('study_leaves')
+            ->where('id', $id)
+            ->update([
+                'status_id' => 3, // Edited to Returned
+               'ma_empno' => self::MA_USER_ID, // Record which MA processed this
+                'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
+                //'remark' => DB::raw("CONCAT(COALESCE(remark, ' '), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave')->with('success', 'Study Leave Application returned to user successfully.');
+    }
+
    
     
 }

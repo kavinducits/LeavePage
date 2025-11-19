@@ -189,6 +189,7 @@
                 </div>
             </div>
         </div>
+        
 
         <!-- Previous Leaves -->
         <div class="mb-4">
@@ -211,6 +212,8 @@
                         </thead>
                         <tbody>
                             
+                                   
+                            
                                 @forelse(($previusLeaves ?? $previousLeaves ?? []) as $leave)
                                     <tr class="hoverable-row">
                                         <td>
@@ -227,15 +230,42 @@
                                                 } elseif ($statusValue == 2) {
                                                     $status = 'Rejected';
                                                     $badgeClass = 'bg-danger';
+                                                } elseif ($statusValue == 3) {
+                                                    $status = 'Return';
+                                                    $badgeClass = 'bg-warning text-dark';
+                                                    
                                                 } else {
                                                     $status = 'Pending';
-                                                    $badgeClass = 'bg-warning text-dark';
+                                                    $badgeClass = 'bg-secondary';
                                                 }
                                             @endphp
                                             <span class="badge {{ $badgeClass }}">{{ $status }}</span>
+                                            
                                         </td>
                                         <td>
-                                            <a href="{{ route('leaves.show', $leave->id) }}" class="btn btn-sm btn-primary">View</a>
+                                           
+                                            @php
+                                                $statusValue = $leave->status_id ?? 0;
+                                                if ($statusValue == 1) {
+                                                    $route = 'Approved';
+                                                    $btnName = 'View';
+                                                    $badgeClass = 'bg-success';
+                                                } elseif ($statusValue == 2) {
+                                                    $route = 'Rejected';
+                                                     $btnName = 'View';
+                                                    $badgeClass = 'bg-danger';
+                                                } elseif ($statusValue == 3) {
+                                                    $route = 'Return';
+                                                     $btnName = 'Edite';
+                                                    $badgeClass = 'bg-warning text-dark';
+                                                    
+                                                } else {
+                                                     $route = 'Pending';
+                                                     $btnName = 'Pending';
+                                                    $badgeClass = 'bg-secondary';
+                                                }
+                                            @endphp
+                                            <a href="{{ route('StudyLeave.show.editeForm', $leave->id) }}" class="btn btn-sm btn-primary">{{ $btnName }}</a>
                                         </td>
                                     </tr>
                                 @empty
