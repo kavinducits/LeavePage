@@ -50,5 +50,6 @@ class StudyLeave extends Model
         'self_funding_declaration',
         'placement_letter',
         'is_completed',
+        'ma_remarks',
     ];
 }

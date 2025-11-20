@@ -859,7 +859,9 @@ $this->updateSummary($request);
 
         if ($draft) {
             $draft->update([
-                'is_draft' => true
+                'is_draft' => true,
+                'library_and_property_handling' => $validatedData['library_and_property_handling'],
+                'loan_handling' => $validatedData['loan_handling'],
                 //'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
 
             ]);
@@ -984,11 +986,28 @@ $this->updateSummary($request);
     }
     public function showEditeStudyLeaveForm($id)
     {
-       
+        $user = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.employee_no', session('empno'))
+            ->select(
+                'employees.employee_no as empno',
+                'employees.nic',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'employees.email as email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile',
+                'employees.assign_ma_user_id'
+            )
+            ->first();
 
         // Get the specific study leave application with all details
         // Only show if the employee is assigned to this specific MA
-        $application = DB::table('study_leaves')
+        $draft_study_leave = DB::table('study_leaves')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -1013,23 +1032,24 @@ $this->updateSummary($request);
                 'study_leaves.project_name as project_name',
                 'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
                 'study_leaves.nominee_admin_empno as nominee_admin_empno',
-                'study_leaves.nominee_other_empno as nominee_other_empno'
+                'study_leaves.nominee_other_empno as nominee_other_empno',
+                'study_leaves.ma_remarks as ma_remarks',
 
             )
             ->first();
 
-        if (!$application) {
+        if (!$draft_study_leave) {
             return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
         }
 
         // Fetch Department Head details for the application's department
         $departmentHead = null;
-        if ($application && isset($application->department_id)) {
+        if ($draft_study_leave && isset($draft_study_leave->department_id)) {
             $departmentHead = DB::table('department_heads')
                 ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
                 ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
                 ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
-                ->where('department_heads.department_id', $application->department_id)
+                ->where('department_heads.department_id', $draft_study_leave->department_id)
                 ->where('department_heads.active_status', 1)
                 ->select(
                     'department_heads.emp_no as head_emp_no',
@@ -1047,6 +1067,54 @@ $this->updateSummary($request);
         $view = 'ma.showStudyLeave';
        
 
-        return view('StudyLeave.returnStudyLeaveForm', compact('application', 'departmentHead', 'readonly'));
+        return view('StudyLeave.returnStudyLeaveForm', compact('user', 'draft_study_leave', 'departmentHead', 'readonly'));
+    }
+
+    public function updateEditeStudyLeave(Request $request, $id)
+    {
+        // Validate the incoming request data
+
+        $rules = array(
+   'empno' => 'required|string|max:20',
+    'name_with_initials' => 'required|string|max:100',
+    'email' => 'required|email|max:100',
+    'department' => 'required|string|max:100',
+    'faculty' => 'required|string|max:100',
+    'designation' => 'required|string|max:100',
+    'passport_no' => 'nullable|string|max:50',
+    'passport_validity' => 'nullable|date',
+    'leave_payment_type' => 'required|string|max:100',
+            'study_leave_from' => 'required|date',
+            'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
+            'degree_title' => 'required|string|max:255',
+            'university_institute' => 'required|string|max:255',
+            'country' => 'required|string|max:100',
+            'field_of_study' => 'required|string|max:255',
+            'study_program_details' => 'nullable|string|max:1000',
+            'funding_type' => 'required|string|max:100',
+            'scholarship_source' => 'nullable|string|max:1000',
+            'scholarship_amount' => 'nullable|numeric|min:0',
+            'project_name' => 'nullable|string|max:255',
+            'any_other_details' => 'nullable|string|max:1000',
+            'air_passage_request' => 'nullable|in:yes,no',
+            'warm_cloth_allowance_request' => 'nullable|in:yes,no',
+'self_funding_declaration' => 'nullable|file|mimes:pdf|max:10240',
+'placement_letter' => 'nullable|file|mimes:pdf|max:10240',
+'nominee_teaching_empno' => 'required|string|max:255',
+            'nominee_admin_empno' => 'required|string|max:255',
+            'nominee_other_empno' => 'required|string|max:255',
+'library_and_property_handling' => 'required|string|max:100',
+            'loan_handling' => 'required|string|max:100',
+        );
+
+        $validatedData = $request->validate($rules);
+        $studyLeave = StudyLeave::find($id);
+        if ($studyLeave) {
+            $studyLeave->update( $validatedData + ['status_id' => 4, 'is_draft' => false]);
+            
+            return redirect()->route('StudyLeave.create')->with('success', 'Study leave application updated successfully.');
+        } else {
+            return redirect()->route('StudyLeave.create')->with('error', 'Study leave application not found.');
+        }
     }
 }
