@@ -1,141 +1,201 @@
+@extends('layouts.app')
 
+@section('content')
+<div class="container py-4">
 
-    <!-- Section 1: Personal Details -->
-    <div class="card mb-4">
-        <div class="card-header card-header-maroon fw-semibold">
-            <i class="fas fa-user me-2"></i>Personal Details
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
+    <!-- Show remark if returned -->
+    @isset($remark)
+    <div class="alert alert-warning fw-semibold">
+        Returned with remark:
+        <pre class="mb-0">{{ $remark }}</pre>
+    </div>
+    @endisset
+
+    <!-- Header and Back Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Header -->
+        <div>
+            <h2 class="mb-0 fw-bold text-maroon dashboard-header">
+                <i class="fas fa-file-alt me-2 icon-gold"></i>
+                Application for Study Leave
+                
+            </h2>
         </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <!-- Employee Number -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Employee No</label>
-                    <input type="text" class="form-control" value="{{ $application->employee_no ?? '' }}" readonly>
-                </div>
-                <!-- Name with Initials -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Name with Initials</label>
-                    <input type="text" class="form-control" value="{{ $application->name_with_initials ?? '' }}" readonly>
-                </div>
-                <!-- Designation -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Designation</label>
-                    <input type="text" class="form-control" value="{{ $application->designation ?? '' }}" readonly>
-                </div>
-                <!-- Department -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Department</label>
-                    <input type="text" class="form-control" value="{{ $application->department ?? '' }}" readonly>
-                </div>
-                <!-- Faculty -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Faculty</label>
-                    <input type="text" class="form-control" value="{{ $application->faculty ?? '' }}" readonly>
-                </div>
-                <!-- Email Address -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Email Address</label>
-                    <input type="text" class="form-control" value="{{ $application->email ?? '' }}" readonly>
-                </div>
-                <!-- Passport No -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Passport No</label>
-                    <input type="text" class="form-control" value="{{ $application->passport_no ?? '' }}" >
-                </div>
-                <!-- Passport Validity -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Passport Validity Date</label>
-                    <input type="date" class="form-control" value="{{ $application->passport_validity ?? '' }}" >
-                </div>
-            </div>
-        </div>
+
+        <!-- Back Button -->
+        <a class="btn btn-outline-maroon" href="{{ route('StudyLeave.BasicInfo.create') }}">
+            <i class="fas fa-arrow-left me-2"></i>Back to List
+        </a>
     </div>
 
-    <!-- Section 2: Details of the Study Leave -->
-    <div class="card mb-4">
-        <div class="card-header card-header-maroon fw-semibold">
-            <i class="fas fa-graduation-cap me-2"></i>Details of the Study Leave
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                 <!-- University/Institute -->
+
+
+
+
+     <!-- Form Start -->
+
+    <form  action="{{ route('StudyLeave.Details.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+        @csrf
+
+        @if(isset($leave))
+            <input type="hidden" name="leave_id" value="{{ $leave->id }}">
+            <input type="hidden" name="reference_no" value="{{ $leave->reference_no }}">
+        @else
+            <input type="hidden" name="reference_no" value="">
+            @if(isset($academicYear))
+                <input type="hidden" name="academic_year" value="{{ $academicYear }}">
+            @endif
+        @endif
+
+        @include('StudyLeave.details_form')
+
+        
+        
+        <!-- Form Card -->
+    
+        <div class="card mb-4">
+
+            <!-- Card Header -->
+            <div class="card-header card-header-maroon fw-semibold">
+                <i class="fas fa-user me-2"></i>Details of the Study Leave
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                          <!-- University or the Institute -->
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">University or Institute</label>
-                    <input type="text" class="form-control" value="{{ $application->university_institute ?? '' }}" >
+                    <label class="form-label fw-semibold">University or the Institute</label>
+                    <input type="text" name="university_institute" class="form-control" value="{{ $draft_study_leave->university_institute ?? '' }}"  required>
                 </div>
-                <!-- Country -->
+                
+                <!-- Country and Field of Study -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Country</label>
-                    <input type="text" class="form-control" value="{{ $application->country ?? '' }}" r>
+                    <input type="text" name="country" class="form-control"  value="{{ $draft_study_leave->country ?? '' }}" required>
                 </div>
-                  <!-- Field of Study -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Field of Study</label>
-                    <input type="text" class="form-control" value="{{ $application->field_of_study ?? '' }}" >
+
+                 <div class="col-md-6">
+                    <label class="form-label fw-semibold">Field of study</label>
+                    <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required>
                 </div>
-               
-                                     <!-- Details of the Study Program -->
+                     <!-- Details of the Study Program -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Title of the Degree (e.g. M.A., M.Sc, MBA, M.Phil., M.D., PhD)</label>
                         <select name="degree_title" class="form-select" required>
-                            <option value="" {{ $application->degree_title === '' ? 'selected' : '' }}>Select degree title</option>
-                            <option value="MA" {{ $application->degree_title === 'MA' ? 'selected' : '' }}>M.A.</option>
-                            <option value="MSc" {{ $application->degree_title === 'MSc' ? 'selected' : '' }}>M.Sc</option>
-                            <option value="MBA" {{ $application->degree_title === 'MBA' ? 'selected' : '' }}>MBA</option>
-                            <option value="MPhil" {{ $application->degree_title === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
-                            <option value="MD" {{ $application->degree_title === 'MD' ? 'selected' : '' }}>M.D.</option>
-                            <option value="PhD" {{ $application->degree_title === 'PhD' ? 'selected' : '' }}>PhD</option>
+                            <option value="" value="" {{ $draft_study_leave->degree_title === '' ? 'selected' : '' }}>Select degree title</option>
+                            <option value="MA" {{ $draft_study_leave->degree_title === 'MA' ? 'selected' : '' }}>M.A.</option>
+                            <option value="MSc" {{ $draft_study_leave->degree_title === 'MSc' ? 'selected' : '' }}>M.Sc</option>
+                            <option value="MBA" {{ $draft_study_leave->degree_title === 'MBA' ? 'selected' : '' }}>MBA</option>
+                            <option value="MPhil" {{ $draft_study_leave->degree_title === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
+                            <option value="MD" {{ $draft_study_leave->degree_title === 'MD' ? 'selected' : '' }}>M.D.</option>
+                            <option value="PhD" {{ $draft_study_leave->degree_title === 'PhD' ? 'selected' : '' }}>PhD</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                 <!-- Period From -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">From</label>
-                    <input type="date" class="form-control" value="{{ $application->study_leave_from ?? '' }}" >
-                </div>
-                <!-- Period To -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">To</label>
-                    <input type="date" class="form-control" value="{{ $application->study_leave_to ?? '' }}" >
-                </div>
-                
-                <!-- Study Program Details -->
+                    <!-- Leave Type -->
+                    <!--
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Leave Type</label>
+                        
+                        <select name="leave_type" class="form-select" required>
+                            <option value=""  {{ $draft_study_leave->leave_type === '' ? 'selected' : '' }}>Select an option</option>
+                            <option value="fresh" {{ $draft_study_leave->leave_type === 'fresh' ? 'selected' : '' }}>Fresh Study Leave</option>
+                            <option value="extension" {{ $draft_study_leave->leave_type === 'extension' ? 'selected' : '' }}>Extension</option>
+                        </select>
+                    </div>
+                -->
+                   
+
+                    <!-- Period of Study Leave Requested (From) -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">From</label>
+                        <input type="date" name="study_leave_from" class="form-control" value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" required>
+                    </div>
+
+                    <!-- Period of Study Leave Requested (To) -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">To</label>
+                        <input type="date" name="study_leave_to" class="form-control" value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" required>
+                    </div>
+                  
+
+
+
+
+                <!-- Relevancy and Details of the Study Program -->
+
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
-                    <textarea class="form-control" rows="4" readonly>{{ $application->study_program_details ?? '' }}</textarea>
+                    <textarea name="study_program_details" class="form-control" rows="4" >{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
                 </div>
-               
-                
+
+                 <!-- Attachment Instructions -->
+                <div class="col-md-12">
+                    <div class="alert alert-info mt-3">
+                        <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
+                    </div>
+                    <label class="form-label fw-semibold mt-2">Attach PDF Documents</label>
+                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" accept="application/pdf" multiple >
+
+                    <!-- Show previously uploaded file (when editing) -->
+                    @if(!empty($draft_study_leave->placement_letter))
+                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-placement-letter">
+                            <div>
+                                <strong>Existing file:</strong>
+                                <span class="ms-2">{{ basename($draft_study_leave->placement_letter) }}</span>
+                            </div>
+                            <div>
+                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
+                                <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary">Preview</button>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div id="pdf-preview-list" class="mt-3"></div>
+
+                    <div id="pdf-preview-embed" class="mt-3" style="display:none;">
+                        <label class="form-label fw-semibold">Preview</label>
+                        <div style="border:1px solid #dee2e6;">
+                            <embed id="pdf-embed" src="" type="application/pdf" width="100%" height="600px">
+                        </div>
+                    </div>
+                </div>
+
 
                  <!-- Type of Study Leave Requested -->
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type of Study Leave Requested</label>
                         <select name="leave_payment_type" class="form-select" required>
-                            <option value="" {{ $application->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
-                            <option value="with Pay" {{ $application->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
-                            <option value="without Pay" {{ $application->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
+                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
+                            <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
+                            <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
                         </select>
                     </div>
-               
 
-                 <!-- Funding Type -->
+                <!-- Funding Type -->
                 <div class="col-md-6">
                         <label class="form-label fw-semibold"> Funding type</label>
                         <select name="funding_type" class="form-select" >
-                            <option value="" {{ $application->funding_type ?? '' ? '' : 'selected' }}>Select funding type</option>
-                            <option value="Full" {{ $application->funding_type === 'Full' ? 'selected' : '' }}>Self-Funding</option>
-                            <option value="Partial" {{ $application->funding_type === 'Partial' ? 'selected' : '' }}>Scholarship</option>
+                            <option value="" {{ $draft_study_leave->funding_type ?? '' ? '' : 'selected' }}>Select funding type</option>
+                            <option value="Full" {{ $draft_study_leave->funding_type === 'Full' ? 'selected' : '' }}>Self-Funding</option>
+                            <option value="Partial" {{ $draft_study_leave->funding_type === 'Partial' ? 'selected' : '' }}>Scholarship</option>
                         </select>
                     </div>
-               
 
- <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
+                    <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
                         <label class="form-label fw-semibold">Scholarship Source</label>
                         <select name="scholarship_source" class="form-select" >
-                            <option value="" {{ empty($application->scholarship_source) ? 'selected' : '' }}>Select source</option>
-                            <option value="agency" {{ ($application->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
-                            <option value="project" {{ ($application->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
+                            <option value="" {{ empty($draft_study_leave->scholarship_source) ? 'selected' : '' }}>Select source</option>
+                            <option value="agency" {{ ($draft_study_leave->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
+                            <option value="project" {{ ($draft_study_leave->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
                         </select>
                     </div>
 
@@ -145,13 +205,13 @@
                         <!-- Scholarship Amount (conditional) - If Scholarship offering agency is selected -->
                         <div id="scholarship-amount-group" style="display: none;">
                             <label class="form-label fw-semibold">Scholarship Amount</label>
-                            <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ $application->scholarship_amount ?? '' }}" >
+                            <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ $draft_study_leave->scholarship_amount ?? '' }}" >
                         </div>
 
                         <!-- Project Name (conditional) - If Funds from a project is selected -->
                         <div id="project-name-group" style="display: none;">
                             <label class="form-label fw-semibold">Project Name</label>
-                            <input type="text" name="project_name" class="form-control" placeholder="Enter project name" value="{{ $application->project_name ?? '' }}" >
+                            <input type="text" name="project_name" class="form-control" placeholder="Enter project name" value="{{ $draft_study_leave->project_name ?? '' }}" >
                         </div>
                     </div>
                     <!-- Additional fields (conditional) - If Self-Funding is selected -->
@@ -162,11 +222,11 @@
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
-                                @checked(old('air_passage_request', $application->air_passage_request ?? '') === 'yes')>
+                                @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'yes')>
                             <label class="form-check-label" for="air_passage_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $application->air_passage_request ?? '') === 'no')>
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'no')>
                             <label class="form-check-label" for="air_passage_no">NO</label>
                         </div>
                     </div>
@@ -178,12 +238,12 @@
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
-                                @checked(old('warm_cloth_allowance_request', $application->warm_cloth_allowance_request ?? '') === 'yes')>
+                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'yes')>
                             <label class="form-check-label" for="warm_cloth_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no"
-                                @checked(old('warm_cloth_allowance_request', $application->warm_cloth_allowance_request ?? '') === 'no')>
+                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no')>
                             <label class="form-check-label" for="warm_cloth_no">NO</label>
                         </div>
                     </div>
@@ -192,7 +252,7 @@
                     <!-- Any Other Details -->
                     <div class="col-md-12">
                     <label class="form-label fw-semibold">Any Other Details of Funding</label>
-                    <textarea name="any_other_details" class="form-control" rows="4" >{{ $application->any_other_details ?? '' }} </textarea>
+                    <textarea name="any_other_details" class="form-control" rows="4" >{{ $draft_study_leave->any_other_details ?? '' }} </textarea>
                 </div>
 
 
@@ -207,14 +267,14 @@
                     <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf">
 
                     <!-- Show previously uploaded file (when editing) -->
-                    @if(!empty($application->self_funding_declaration))
+                    @if(!empty($draft_study_leave->self_funding_declaration))
                         <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
                             <div>
                                 <strong>Existing file:</strong>
-                                <span class="ms-2">{{ basename($application->self_funding_declaration) }}</span>
+                                <span class="ms-2">{{ basename($draft_study_leave->self_funding_declaration) }}</span>
                             </div>
                             <div>
-                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($application->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
+                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
                                 <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary">Preview</button>
                             </div>
                         </div>
@@ -227,133 +287,7 @@
                         </div>
                     </div>
 
-                    
-                       
-            </div>
-        </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Section 3: Previous Study Leave Records -->
-    <div class="card mb-4">
-        <div class="card-header card-header-maroon fw-semibold">
-            <i class="fas fa-history me-2"></i>Previous Study Leave Records
-        </div>
-        <div class="card-body">
-            @if(isset($previousLeaves) && count($previousLeaves) > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Degree</th>
-                                <th>University/Institute</th>
-                                <th>Duration (From - To)</th>
-                                <th>With Pay/No Pay</th>
-                                <th>Completion Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($previousLeaves as $leave)
-                                <tr>
-                                    <td>{{ $leave->prev_leave_type ?? '' }}</td>
-                                    <td>{{ $leave->prev_university ?? '' }}</td>
-                                    <td>{{ $leave->prev_duration_from ?? '' }} - {{ $leave->prev_duration_to ?? '' }}</td>
-                                    <td>{{ $leave->prev_with_pay ?? '' }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $leave->prev_completed == 'Completed' ? 'success' : 'warning' }}">
-                                            {{ $leave->prev_completed ?? '' }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <p class="text-muted text-center py-3">No previous study leave records found.</p>
-            @endif
-        </div>
-    </div>
-
-    <!-- Section 4: Work Covering Arrangements -->
-    <div class="card mb-4">
-        <div class="card-header card-header-maroon fw-semibold">
-            <i class="fas fa-users me-2"></i>Arrangements Made to Cover Applicant's Work During Leave
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <!-- Teaching Work Nominee -->
-                <div class="col-md-12">
-                    <h6 class="fw-bold text-secondary mb-3">Nominee for Teaching Work</h6>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Employee No</label>
-                    <input type="text" class="form-control" value="{{ $application->nominee_teaching_empno ?? '' }}" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Employee Name</label>
-                    <input type="text" class="form-control" value="{{ $application->nominee_teaching_name ?? '' }}" readonly>
-                </div>
-
-                <!-- Administrative Work Nominee -->
-                <div class="col-md-12 mt-4">
-                    <h6 class="fw-bold text-secondary mb-3">Nominee for Administrative Work</h6>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Employee No</label>
-                    <input type="text" class="form-control" value="{{ $application->nominee_admin_empno ?? '' }}" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Employee Name</label>
-                    <input type="text" class="form-control" value="{{ $application->nominee_admin_name ?? '' }}" readonly>
-                </div>
-
-                <!-- Other Work Nominee -->
-                <div class="col-md-12 mt-4">
-                    <h6 class="fw-bold text-secondary mb-3">Nominee for Other Work</h6>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Employee No</label>
-                    <input type="text" class="form-control" value="{{ $application->nominee_other_empno ?? '' }}" readonly>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Employee Name</label>
-                    <input type="text" class="form-control" value="{{ $application->nominee_other_name ?? '' }}" readonly>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Section 5: Handling of Properties and Loans -->
-    <div class="card mb-4">
-        <div class="card-header card-header-maroon fw-semibold">
-            <i class="fas fa-clipboard-check me-2"></i>Handling of Library Books, Properties, and Loans
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <!-- Library and Property Handling -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Library Books, Computer or Other Properties</label>
-                    <input type="text" class="form-control" value="{{ $application->library_and_property_handling ?? '' }}" readonly>
-                </div>
-                <!-- Loan Handling -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Paying of Loans from University/UPF</label>
-                    <input type="text" class="form-control" value="{{ $application->loan_handling ?? '' }}" readonly>
-                </div>
-            </div>
-        </div>
-    </div>
-
-   
-   
-
-   
-
-</div>
-<script>
+                    <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const input = document.getElementById('self-funding-declaration-input');
                         const previewWrap = document.getElementById('self-declaration-preview-embed');
@@ -614,18 +548,53 @@
                             });
                         });
                     </script>
+                       
+            </div>
+        </div>
 
-<!-- Print Styles -->
+        <!-- Submit Button -->
+<div class="d-flex justify-content-between mt-4">
+    
+ <button type="button" class="btn btn-outline-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm" onclick="saveAndExit()">
+        <i class="fas fa-save me-2"></i>Save and Exit
+    </button>
+     <script>
+    function saveAndExit() {
+        const form = document.getElementById('leave-form');
+        const originalAction = form.action;
+        
+        // Change form action to save and exit route
+        
+        form.action = "{{ route('StudyLeave.Details.exit') }}";
+        form.submit();
+        
+        // Restore original action (optional, for safety)
+        form.action = originalAction;
+    }
+    </script>
+    <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm">
+        Next: Leave Details <i class="fas fa-arrow-right ms-2"></i>
+    </button>
+</div>
+    </form>
+     
+    <!--
+    <div class="d-flex justify-content-end mt-4">
+        <a class="btn btn-outline-maroon">
+            <i class="fas fa-arrow-right me-2"></i>Next: Leave Details
+        </a>
+    </div>
+-->
+
 <style>
-    @media print {
-        .btn, .card-header, .alert {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        .btn {
-            display: none;
-        }
+    .custom-radio {
+        border: 2px solid #6c757d !important;
+        box-shadow: 0 0 2px #6c757d;
+        background-color: #fff;
+    }
+    .custom-radio:checked {
+        border-color: #800000 !important;
+        box-shadow: 0 0 4px #800000;
     }
 </style>
-
-
+@endsection
