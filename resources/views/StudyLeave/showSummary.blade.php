@@ -48,8 +48,7 @@
 
         <div class="card mb-4">
             
-            
-
+       
         <!-- Personal Details (readonly) -->
         <div class="card mb-4">
             <div class="card-header card-header-maroon fw-semibold">
