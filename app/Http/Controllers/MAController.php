@@ -545,7 +545,7 @@ class MAController extends Controller
 
         // Get the specific study leave application with all details
         // Only show if the employee is assigned to this specific MA
-        $application = DB::table('study_leaves')
+       $draft_study_leave = DB::table('study_leaves')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -571,23 +571,44 @@ class MAController extends Controller
                 'study_leaves.project_name as project_name',
                 'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
                 'study_leaves.nominee_admin_empno as nominee_admin_empno',
-                'study_leaves.nominee_other_empno as nominee_other_empno'
+                'study_leaves.nominee_other_empno as nominee_other_empno',
+                'study_leaves.self_funding_declaration as self_funding_declaration',
+                'study_leaves.placement_letter as placement_letter'
+            )
+            ->first();
+           
 
+        $user = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.employee_no', $draft_study_leave->employee_no)
+            ->select(
+                'employees.employee_no as empno',
+                'employees.nic',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'employees.email as email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile',
+                'employees.assign_ma_user_id'
             )
             ->first();
 
-        if (!$application) {
+        if (!$draft_study_leave) {
             return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
         }
 
         // Fetch Department Head details for the application's department
         $departmentHead = null;
-        if ($application && isset($application->department_id)) {
-            $departmentHead = DB::table('department_heads')
+                    if ($draft_study_leave && isset($draft_study_leave->department_id)) {
+                        $departmentHead = DB::table('department_heads')
                 ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
                 ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
                 ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
-                ->where('department_heads.department_id', $application->department_id)
+                ->where('department_heads.department_id', $draft_study_leave->department_id)
                 ->where('department_heads.active_status', 1)
                 ->select(
                     'department_heads.emp_no as head_emp_no',
@@ -605,7 +626,7 @@ class MAController extends Controller
         $view = 'ma.showStudyLeave';
        
 
-        return view("ma.showStudyLeave", compact('application', 'readonly','departmentHead'));
+        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user'));
     }
 
     public function approveStudyLeave(Request $request, $id)

@@ -40,7 +40,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h2 class="mb-0 fw-bold">Application Review</h2>
-                            <p class="text-muted mb-0">Reference: {{ $application->id }}</p>
+                            <p class="text-muted mb-0">Reference: {{ $draft_study_leave->id }}</p>
                         </div>
                         <a href="{{ route('ma.dashboard') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
@@ -62,11 +62,17 @@
                     @endif
 
 
+                        <!-- Personal Details (readonly) -->
+                @include('StudyLeave.basic_info_form')
+                @include('StudyLeave.details_form')
+                @include('StudyLeave.working_covering_persons_form')
+                @include('StudyLeave.summary_form')
 
 
 
-                    @include('ma.partials.viewStudyLeaveApplication')
 
+
+                  
 
 
                     <!-- Action Section -->
@@ -86,7 +92,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-start">
-                                <form id="returnForm" action="{{ route('ma.studyleave.return', $application->id) }}" method="POST" class="d-inline">
+                                <form id="returnForm" action="{{ route('ma.studyleave.return', $draft_study_leave->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" id="returnRemarkInput" name="remark" value="">
                                     <button type="submit" class="btn btn-danger">
@@ -95,7 +101,7 @@
                                 </form>
 
                                 <div class="text-right">
-                                    <form id="approveForm" action="{{ route('StudyLeave.approve', $application->id) }}" method="POST" class="d-inline">
+                                    <form id="approveForm" action="{{ route('StudyLeave.approve', $draft_study_leave->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         <input type="hidden" id="approveRemarkInput" name="remark" value="">
                                         <button type="submit" class="btn btn-success" {{ empty($departmentHead
