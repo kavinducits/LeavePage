@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\OtherLeavesDetail;
 use App\Models\LeaveRequestDetail;
 use App\Models\StudyLeave;
+use PHPUnit\Framework\Constraint\Count;
 
 class StudyLeaveController extends Controller
 {
@@ -30,6 +31,7 @@ class StudyLeaveController extends Controller
     {
 
         $user = null;
+        $isEnableStudyLeaveRequiste = false;
 
         $previousLeaves = null;
         $hasActiveDraft = false;
@@ -46,7 +48,26 @@ class StudyLeaveController extends Controller
             $hasActiveDraft = true;
         }
 
-        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft'));
+        $approvedLeavesCount = StudyLeave::where('empno', session('empno'))
+            ->where('status_id', 1)
+            ->where('is_draft', false)
+            ->select(
+                DB::raw('COUNT("id") as approved_count')
+                
+            )
+            ->first();
+        $allStudyLeavesCount = StudyLeave::where('empno', session('empno'))
+            ->select(
+                DB::raw('COUNT("id") as total_count')  
+            )
+            ->first();
+
+        if (($allStudyLeavesCount->total_count - $approvedLeavesCount->approved_count) == 0) {
+            $isEnableStudyLeaveRequiste = true;
+        }
+
+
+        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft','isEnableStudyLeaveRequiste'));
     }
     public function storeStudyLeave(Request $request)
     {

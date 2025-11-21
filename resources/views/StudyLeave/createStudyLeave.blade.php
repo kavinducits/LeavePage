@@ -145,27 +145,29 @@
                 @endif
             @else
                 <!-- Show new application section when no active draft -->
-                <div class="new-application-section">
-                    <div class="mb-3">
-                        <label for="academic-year" class="form-label fw-semibold text-maroon">
-                            <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
-                        </label>
-                        <select class="form-select" id="academic-year" name="academic_year">
-                            <option value="">Choose Academic Year...</option>
-                            <option value="20/21">20/21</option>
-                            <option value="21/22">21/22</option>
-                            <option value="22/23">22/23</option>
-                            <option value="23/24">23/24</option>
-                            <option value="24/25">24/25</option>
-                        </select>
-                    </div>
-                    <a href="#" class="d-inline-block text-decoration-none" id="new-application-button" onclick="startNewApplication(event)">
-                        <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
-                            <i class="bi bi-journal-plus"></i>
+                @if(isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste)
+                    <div class="new-application-section">
+                        <div class="mb-3">
+                            <label for="academic-year" class="form-label fw-semibold text-maroon">
+                                <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
+                            </label>
+                            <select class="form-select" id="academic-year" name="academic_year">
+                                <option value="">Choose Academic Year...</option>
+                                <option value="20/21">20/21</option>
+                                <option value="21/22">21/22</option>
+                                <option value="22/23">22/23</option>
+                                <option value="23/24">23/24</option>
+                                <option value="24/25">24/25</option>
+                            </select>
                         </div>
-                        <div><span class="fw-semibold text-maroon">Start a New Application</span></div>
-                    </a>
-                </div>
+                        <a href="#" class="d-inline-block text-decoration-none" id="new-application-button" onclick="startNewApplication(event)">
+                            <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
+                                <i class="bi bi-journal-plus"></i>
+                            </div>
+                            <div><span class="fw-semibold text-maroon">Start a New Application</span></div>
+                        </a>
+                    </div>
+                @endif
             @endif
         </div>
 
