@@ -30,6 +30,8 @@ class StudyLeaveController extends Controller
     public function createStudyLeave()
     {
 
+        $currentDate = date('Y-m-d');
+
         $user = null;
         $isEnableStudyLeaveRequiste = false;
 
@@ -67,7 +69,7 @@ class StudyLeaveController extends Controller
         }
 
 
-        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft','isEnableStudyLeaveRequiste'));
+        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft','isEnableStudyLeaveRequiste', 'currentDate'));
     }
     public function storeStudyLeave(Request $request)
     {
@@ -1162,4 +1164,6 @@ $this->updateSummary($request);
             return redirect()->route('StudyLeave.create')->with('error', 'Study leave application not found.');
         }
     }
+
+   
 }

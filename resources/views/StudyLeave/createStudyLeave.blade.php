@@ -216,7 +216,7 @@
                             
                                    
                             
-                                @forelse(($previusLeaves ?? $previousLeaves ?? []) as $leave)
+                                @forelse(($previousLeaves ?? [])->sortByDesc('id') as $leave)
                                     <tr class="hoverable-row">
                                         <td>
                                             {{ optional($leave->created_at) ? \Carbon\Carbon::parse($leave->created_at)->format('Y-m-d') : '' }}
@@ -249,12 +249,17 @@
                                             @php
                                                 $statusValue = $leave->status_id ?? 0;
                                                 if ($statusValue == 1) {
-                                                    $route = 'Approved';
-                                                    $btnName = 'View';
+                                                   // $route = 'Approved';
+                                                  //  $btnName = 'View';
                                                     $badgeClass = 'bg-success';
+                                                    if($leave->study_leave_to >= $currentDate){
+                                                        $btnName = 'View';
+                                                    }else{
+                                                        $btnName = 'Extend';
+                                                    }
                                                 } elseif ($statusValue == 2) {
                                                     $route = 'Rejected';
-                                                     $btnName = 'View';
+                                                     $btnName = 'Close';
                                                     $badgeClass = 'bg-danger';
                                                 } elseif ($statusValue == 3) {
                                                     $route = 'Return';

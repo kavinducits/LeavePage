@@ -92,6 +92,7 @@ Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudy
 Route::get('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'showEditeStudyLeaveForm'])->name('StudyLeave.show.editeForm');
 Route::post('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'editeStudyLeaveApplication'])->name('StudyLeave.edite.application');
 Route::post('/StudyLeave/view/{id}/edite/update', [StudyLeaveController::class, 'updateEditeStudyLeave'])->name('StudyLeave.update.edite.application');
+Route::get('/StudyLeave/get-action/{id}', [StudyLeaveController::class, 'getAction'])->name('StudyLeave.get.action');
 
 Route::get('/HODDashboard', [HODController::class, 'showStudyLeaves'])->name('hod.show.studyleaves');
 Route::get('/HODDashboard/view/{id}', [HODController::class, 'showStudyLeaveApplication'])->name('hod.view.studyLeave');
