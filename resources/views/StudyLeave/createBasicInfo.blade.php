@@ -3,14 +3,7 @@
 @section('content')
 <div class="container py-4">
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
+    
     <!-- Show remark if returned -->
     @isset($remark)
     <div class="alert alert-warning fw-semibold">

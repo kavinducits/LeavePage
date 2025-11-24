@@ -76,6 +76,7 @@ class StudyLeaveController extends Controller
         $academicYear = $request->input('academic_year');
         // Store the academic year in session or pass it to the next step as needed
         session(['study_leave' => ['academic_year' => $academicYear]]);
+        /*
         $empno = session('study_leave.employee_no') ?? session('empno');
 
         $draft = StudyLeave::where('empno', $empno)
@@ -96,8 +97,8 @@ class StudyLeaveController extends Controller
                 'is_draft' => true
             ]);
         }
-
-        return redirect()->route('StudyLeave.BasicInfo.create')->with('success', 'Academic year saved successfully!');
+        */
+        return redirect()->route('StudyLeave.BasicInfo.create');
     }
     public function createBasicInfo()
     {
@@ -185,7 +186,30 @@ class StudyLeaveController extends Controller
                 'is_draft' => true
             ]);
         }
+
 */
+        $academicYear = session('study_leave.academic_year');
+
+         $empno = session('study_leave.employee_no') ?? session('empno');
+
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+
+        if ($draft) {
+            // Update existing draft
+            $draft->update([
+                'academic_year' => $academicYear,
+                'is_draft' => true
+            ]);
+        } else {
+            // Create new draft record
+            StudyLeave::create([
+                'empno' => session('empno'),
+                'academic_year' => $academicYear,
+                'is_draft' => true
+            ]);
+        }
         $this->updateBasicInfo($request);
 
         // redirect Details of the Study Leave
