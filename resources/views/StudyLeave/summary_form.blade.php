@@ -13,13 +13,12 @@
                 
                 <div class="col-12 mb-3">
                     <label for="library_and_property_handling" class="form-label fw-semibold d-block">
-                         Library book, Computer or any other properties?
-                    </label>
-                    <select class="form-select w-auto d-inline-block align-middle ms-2" id="library_and_property_handling" name="library_and_property_handling" required>
-                        <option value="" {{ empty(old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
-                        <option value="Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
-                        <option value="Not Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
-                    </select>
+
+                                            <select class="form-select w-auto d-inline-block align-middle ms-2" id="library_and_property_handling" name="library_and_property_handling" required {{ $readonly ?? true ? 'disabled' : '' }}>
+                                                <option value="" {{ empty(old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
+                                                <option value="Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
+                                                <option value="Not Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
+                                            </select>
                 </div>
 
                 <!-- Handling of Paying Loans   -->
@@ -30,7 +29,7 @@
                         <br>
                         <small class="text-muted">(Applicable only when taking no pay leave)</small>
                     </label>
-                    <select class="form-select w-auto d-inline-block align-middle ms-2" id="loan_handling" name="loan_handling" required>
+                    <select class="form-select w-auto d-inline-block align-middle ms-2" id="loan_handling" name="loan_handling" required {{ $readonly ?? true ? 'disabled' : '' }}>
                         <option value="" {{ empty(old('loan_handling', $draft_study_leave->loan_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
                         <option value="Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
                         <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>

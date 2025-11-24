@@ -11,31 +11,30 @@
                           <!-- University or the Institute -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">University or the Institute</label>
-                    <input type="text" name="university_institute" class="form-control" value="{{ $draft_study_leave->university_institute ?? '' }}"  required>
+                    <input type="text" name="university_institute" class="form-control" value="{{ $draft_study_leave->university_institute ?? '' }}"  required {{ $readonly ?? true ? 'readonly' : '' }}>
                 </div>
                 
                 <!-- Country and Field of Study -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Country</label>
-                    <input type="text" name="country" class="form-control"  value="{{ $draft_study_leave->country ?? '' }}" required>
+                    <input type="text" name="country" class="form-control"  value="{{ $draft_study_leave->country ?? '' }}" required {{ $readonly ?? true ? 'readonly' : '' }}>
                 </div>
 
                  <div class="col-md-6">
                     <label class="form-label fw-semibold">Field of study</label>
-                    <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required>
+                    <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required {{ $readonly ?? true ? 'readonly' : '' }}>
                 </div>
                      <!-- Details of the Study Program -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Title of the Degree (e.g. M.A., M.Sc, MBA, M.Phil., M.D., PhD)</label>
-                        <select name="degree_title" class="form-select" required>
-                            <option value="" value="" {{ $draft_study_leave->degree_title === '' ? 'selected' : '' }}>Select degree title</option>
-                            <option value="MA" {{ $draft_study_leave->degree_title === 'MA' ? 'selected' : '' }}>M.A.</option>
-                            <option value="MSc" {{ $draft_study_leave->degree_title === 'MSc' ? 'selected' : '' }}>M.Sc</option>
-                            <option value="MBA" {{ $draft_study_leave->degree_title === 'MBA' ? 'selected' : '' }}>MBA</option>
-                            <option value="MPhil" {{ $draft_study_leave->degree_title === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
-                            <option value="MD" {{ $draft_study_leave->degree_title === 'MD' ? 'selected' : '' }}>M.D.</option>
-                            <option value="PhD" {{ $draft_study_leave->degree_title === 'PhD' ? 'selected' : '' }}>PhD</option>
-                            <option value="Other">Other</option>
+                        <select name="degree_title" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
+                            <option value="" {{ ($draft_study_leave->degree_title ?? '') === '' ? 'selected' : '' }}>Select degree title</option>
+                            <option value="MA" {{ ($draft_study_leave->degree_title ?? '') === 'MA' ? 'selected' : '' }}>M.A.</option>
+                            <option value="MSc" {{ ($draft_study_leave->degree_title ?? '') === 'MSc' ? 'selected' : '' }}>M.Sc</option>
+                            <option value="MBA" {{ ($draft_study_leave->degree_title ?? '') === 'MBA' ? 'selected' : '' }}>MBA</option>
+                            <option value="MPhil" {{ ($draft_study_leave->degree_title ?? '') === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
+                            <option value="MD" {{ ($draft_study_leave->degree_title ?? '') === 'MD' ? 'selected' : '' }}>M.D.</option>
+                            <option value="PhD" {{ ($draft_study_leave->degree_title ?? '') === 'PhD' ? 'selected' : '' }}>PhD</option>
+                            <option value="Other" {{ ($draft_study_leave->degree_title ?? '') === 'Other' ? 'selected' : '' }}>Other</option>
                         </select>
                     </div>
                     <!-- Leave Type -->
@@ -55,13 +54,13 @@
                     <!-- Period of Study Leave Requested (From) -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">From</label>
-                        <input type="date" name="study_leave_from" class="form-control" value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" required>
+                        <input type="date" name="study_leave_from" class="form-control" value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" required {{ $readonly ?? true ? 'readonly' : '' }}>
                     </div>
 
                     <!-- Period of Study Leave Requested (To) -->
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">To</label>
-                        <input type="date" name="study_leave_to" class="form-control" value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" required>
+                        <input type="date" name="study_leave_to" class="form-control" value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" required {{ $readonly ?? true ? 'readonly' : '' }}>
                     </div>
                   
 
@@ -72,7 +71,7 @@
 
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
-                    <textarea name="study_program_details" class="form-control" rows="4" >{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
+                    <textarea name="study_program_details" class="form-control" rows="4" {{ $readonly ?? true ? 'readonly' : '' }} >{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
                 </div>
 
                  <!-- Attachment Instructions -->
@@ -81,7 +80,7 @@
                         <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
                     </div>
                     <label class="form-label fw-semibold mt-2">Attach PDF Documents</label>
-                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" accept="application/pdf" multiple >
+                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" accept="application/pdf" multiple  {{ $readonly ?? true ? 'readonly' : '' }}>
 
                     <!-- Show previously uploaded file (when editing) -->
                     @if(!empty($draft_study_leave->placement_letter))
@@ -111,7 +110,7 @@
                  <!-- Type of Study Leave Requested -->
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type of Study Leave Requested</label>
-                        <select name="leave_payment_type" class="form-select" required>
+                        <select name="leave_payment_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
                             <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
                             <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
                             <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
@@ -121,7 +120,7 @@
                 <!-- Funding Type -->
                 <div class="col-md-6">
                         <label class="form-label fw-semibold"> Funding type</label>
-                        <select name="funding_type" class="form-select" >
+                        <select name="funding_type" class="form-select" {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ $draft_study_leave->funding_type ?? '' ? '' : 'selected' }}>Select funding type</option>
                             <option value="Full" {{ $draft_study_leave->funding_type === 'Full' ? 'selected' : '' }}>Self-Funding</option>
                             <option value="Partial" {{ $draft_study_leave->funding_type === 'Partial' ? 'selected' : '' }}>Scholarship</option>
@@ -131,7 +130,7 @@
                     <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
                         <label class="form-label fw-semibold">Scholarship Source</label>
-                        <select name="scholarship_source" class="form-select" >
+                        <select name="scholarship_source" class="form-select" {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ empty($draft_study_leave->scholarship_source) ? 'selected' : '' }}>Select source</option>
                             <option value="agency" {{ ($draft_study_leave->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
                             <option value="project" {{ ($draft_study_leave->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
@@ -144,13 +143,13 @@
                         <!-- Scholarship Amount (conditional) - If Scholarship offering agency is selected -->
                         <div id="scholarship-amount-group" style="display: none;">
                             <label class="form-label fw-semibold">Scholarship Amount</label>
-                            <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ $draft_study_leave->scholarship_amount ?? '' }}" >
+                            <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ $draft_study_leave->scholarship_amount ?? '' }}" {{ $readonly ?? true ? 'readonly' : '' }} >
                         </div>
 
                         <!-- Project Name (conditional) - If Funds from a project is selected -->
                         <div id="project-name-group" style="display: none;">
                             <label class="form-label fw-semibold">Project Name</label>
-                            <input type="text" name="project_name" class="form-control" placeholder="Enter project name" value="{{ $draft_study_leave->project_name ?? '' }}" >
+                            <input type="text" name="project_name" class="form-control" placeholder="Enter project name" value="{{ $draft_study_leave->project_name ?? '' }}"  {{ $readonly ?? true ? 'readonly' : '' }}>
                         </div>
                     </div>
                     <!-- Additional fields (conditional) - If Self-Funding is selected -->
@@ -161,11 +160,11 @@
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
-                                @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'yes')>
+                                @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'yes') {{ $readonly ?? true ? 'readonly' : '' }}>
                             <label class="form-check-label" for="air_passage_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'no')>
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
                             <label class="form-check-label" for="air_passage_no">NO</label>
                         </div>
                     </div>
@@ -177,12 +176,12 @@
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
-                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'yes')>
+                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'yes')  {{ $readonly ?? true ? 'readonly' : '' }}>
                             <label class="form-check-label" for="warm_cloth_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no"
-                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no')>
+                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
                             <label class="form-check-label" for="warm_cloth_no">NO</label>
                         </div>
                     </div>
@@ -191,7 +190,7 @@
                     <!-- Any Other Details -->
                     <div class="col-md-12">
                     <label class="form-label fw-semibold">Any Other Details of Funding</label>
-                    <textarea name="any_other_details" class="form-control" rows="4" >{{ $draft_study_leave->any_other_details ?? '' }} </textarea>
+                    <textarea name="any_other_details" class="form-control" rows="4"  {{ $readonly ?? true ? 'readonly' : '' }}>{{ $draft_study_leave->any_other_details ?? '' }} </textarea>
                 </div>
 
 
@@ -202,8 +201,7 @@
                         <strong>Note:</strong> If you are not receiving any scholarship, airfare or warm cloth allowance from any University, Institute, agency or project, please attach a separate document certifying that you will not be receiving any funds mentioned above from the placement offering University, Institute or any other agency.
                     </div>
 
-                    <label class="form-label fw-semibold mt-2">Attach Declaration PDF</label>
-                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf">
+                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ $readonly ?? true ? 'disabled' : '' }}>
 
                     <!-- Show previously uploaded file (when editing) -->
                     @if(!empty($draft_study_leave->self_funding_declaration))

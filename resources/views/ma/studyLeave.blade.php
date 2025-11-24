@@ -102,7 +102,7 @@
                                         <span class="badge bg-warning">{{ $application->status }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('StudyLeave.show.studyLeaveApplication', $application->reference_no) }}" 
+                                        <a href="{{ route('ma.show.studyleave', $application->reference_no) }}" 
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>

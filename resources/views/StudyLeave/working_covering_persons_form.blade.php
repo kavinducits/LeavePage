@@ -16,7 +16,7 @@
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No</label>
-                                        <input type="text" class="form-control @error('nominee_teaching_empno') is-invalid @enderror" id="nominee_teaching_empno" name="nominee_teaching_empno" value="{{ old('nominee_teaching_empno', $draft_study_leave->nominee_teaching_empno ?? '') }}" placeholder="Employee Number" required>
+                                        <input type="text" class="form-control @error('nominee_teaching_empno') is-invalid @enderror" id="nominee_teaching_empno" name="nominee_teaching_empno" value="{{ old('nominee_teaching_empno', $draft_study_leave->nominee_teaching_empno ?? '') }}" placeholder="Employee Number" required  {{ $readonly ?? true ? 'readonly' : '' }}>
                                         @error('nominee_teaching_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -25,7 +25,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Employee Name" readonly required>
+                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Employee Name" readonly required >
                                         @error('nominee_teaching_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -51,7 +51,7 @@
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No</label>
-                                        <input type="text" class="form-control @error('nominee_admin_empno') is-invalid @enderror" id="nominee_admin_empno" name="nominee_admin_empno" value="{{ old('nominee_admin_empno', $draft_study_leave->nominee_admin_empno ?? '') }}" placeholder="Employee Number" required>
+                                        <input type="text" class="form-control @error('nominee_admin_empno') is-invalid @enderror" id="nominee_admin_empno" name="nominee_admin_empno" value="{{ old('nominee_admin_empno', $draft_study_leave->nominee_admin_empno ?? '') }}" placeholder="Employee Number" required  {{ $readonly ?? true ? 'readonly' : '' }}>
                                         @error('nominee_admin_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -88,7 +88,7 @@
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No</label>
-                                        <input type="text" class="form-control @error('nominee_other_empno') is-invalid @enderror" id="nominee_other_empno" name="nominee_other_empno" value="{{ old('nominee_other_empno', $draft_study_leave->nominee_other_empno ?? '') }}" placeholder="Employee Number" required>
+                                        <input type="text" class="form-control @error('nominee_other_empno') is-invalid @enderror" id="nominee_other_empno" name="nominee_other_empno" value="{{ old('nominee_other_empno', $draft_study_leave->nominee_other_empno ?? '') }}" placeholder="Employee Number" required  {{ $readonly ?? true ? 'readonly' : '' }}>
                                         @error('nominee_other_empno')
                                             <div class="invalid-feedback">
                                                 {{ $message }}

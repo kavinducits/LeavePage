@@ -74,6 +74,8 @@ class StudyLeaveController extends Controller
             $isEnableStudyLeaveRequiste = true;
         }
 
+       
+
 
         return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft','isEnableStudyLeaveRequiste', 'currentDate'));
     }
@@ -110,6 +112,7 @@ class StudyLeaveController extends Controller
     }
     public function createBasicInfo()
     {
+        $readonly = false;
 
         $user = DB::table('employees')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
@@ -144,7 +147,7 @@ class StudyLeaveController extends Controller
             )
             ->first();
 
-        return view('StudyLeave.createBasicInfo', compact('user', 'draft_study_leave'));
+        return view('StudyLeave.createBasicInfo', compact('user', 'draft_study_leave', 'readonly'));
     }
     /**
      * Store a basic information in storage.
@@ -281,6 +284,7 @@ class StudyLeaveController extends Controller
 
     public function createDetails()
     {
+        $readonly = false;
 
         $empno = session('study_leave.employee_no') ?? session('empno');
 
@@ -309,7 +313,7 @@ class StudyLeaveController extends Controller
             ->first();
 
 
-        return view('StudyLeave.createDetails', compact('draft_study_leave'));
+        return view('StudyLeave.createDetails', compact('draft_study_leave','readonly'));
     }
     public function storeDetails(Request $request)
     {
@@ -683,6 +687,7 @@ class StudyLeaveController extends Controller
     }
     public function createWorkCoveringPersons()
     {
+        $readonly = false;
         $empno = session('study_leave.employee_no') ?? session('empno');
 
         $draft_study_leave = StudyLeave::where('empno', $empno)
@@ -694,7 +699,7 @@ class StudyLeaveController extends Controller
             )
             ->first();
 
-        return view('StudyLeave.createWorkCoveringPersons', compact('draft_study_leave'));
+        return view('StudyLeave.createWorkCoveringPersons', compact('draft_study_leave','readonly'));
     }
 
     public function storeWorkCoveringPersons(Request $request)
@@ -815,6 +820,7 @@ class StudyLeaveController extends Controller
     }
     public function showSummary()
     {
+        $readonly = true;
 
         // Retriev, compact('draft_study_leave')e all relefor the summary view
 
@@ -828,7 +834,7 @@ class StudyLeaveController extends Controller
             )
             ->first();
 
-        return view('StudyLeave.showSummary', compact('draft_study_leave'));
+        return view('StudyLeave.showSummary', compact('draft_study_leave','readonly'));
     }
     public function submitApplication(Request $request)
     {
@@ -1185,6 +1191,91 @@ $this->updateSummary($request);
 
         // Format: <empNo><year><04><No>
         return "{$currentYear}04{$newNo}";
+    }
+
+    public function showStudyLeave($id){
+       $user = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.employee_no', session('empno'))
+            ->select(
+                'employees.employee_no as empno',
+                'employees.nic',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'employees.email as email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile',
+                'employees.assign_ma_user_id'
+            )
+            ->first();
+
+        // Get the specific study leave application with all details
+        // Only show if the employee is assigned to this specific MA
+        $draft_study_leave = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.id', $id)
+            ->select(
+                'study_leaves.*',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.department_id as department_id',
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile',
+                'employees.nic',
+                'statuses.status',
+                'employees.email as email',
+                'study_leaves.scholarship_source as scholarship_source',
+                'study_leaves.scholarship_amount as scholarship_amount',
+                'study_leaves.project_name as project_name',
+                'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
+                'study_leaves.nominee_admin_empno as nominee_admin_empno',
+                'study_leaves.nominee_other_empno as nominee_other_empno',
+                'study_leaves.ma_remarks as ma_remarks',
+
+            )
+            ->first();
+
+        if (!$draft_study_leave) {
+            return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
+        }
+
+        // Fetch Department Head details for the application's department
+        $departmentHead = null;
+        if ($draft_study_leave && isset($draft_study_leave->department_id)) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $draft_study_leave->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+        // Decide which blade to use and readonly status
+        $readonly = true;
+       // $view = 'ma.showStudyLeave';
+       
+
+        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly'));
     }
 
    

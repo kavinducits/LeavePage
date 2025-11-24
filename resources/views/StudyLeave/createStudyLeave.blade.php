@@ -259,11 +259,14 @@
                                                   //  $btnName = 'View';
                                                     $badgeClass = 'bg-success';
                                                     if($leave->study_leave_to >= $currentDate){
+                                                        $route = 'StudyLeave.show.studyLeave';
                                                         $btnName = 'View';
                                                     }else{
                                                         if($iteration ==1 && $isEnableStudyLeaveRequiste && !$hasActiveDraft){
+                                                             $route = 'StudyLeave.show.editeForm';
                                                             $btnName = 'Extend';
                                                         }else{
+                                                             $route = 'StudyLeave.show.studyLeave';
                                                             $btnName = 'View';
                                                         }
                                                        // $btnName = 'Extend';
@@ -273,7 +276,7 @@
                                                      $btnName = 'Close';
                                                     $badgeClass = 'bg-danger';
                                                 } elseif ($statusValue == 3) {
-                                                    $route = 'Return';
+                                                    $route = 'StudyLeave.show.editeForm';
                                                      $btnName = 'Edite';
                                                     $badgeClass = 'bg-warning text-dark';
                                                     
@@ -283,7 +286,7 @@
                                                     $badgeClass = 'bg-secondary';
                                                 }
                                             @endphp
-                                            <a href="{{ route('StudyLeave.show.editeForm', $leave->id) }}" class="btn btn-sm btn-primary">{{ $btnName }}</a>
+                                            <a href="{{ route($route, $leave->id) }}" class="btn btn-sm btn-primary">{{ $btnName }}</a>
                                         </td>
                                     </tr>
                                 @empty
