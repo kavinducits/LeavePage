@@ -214,9 +214,15 @@
                         </thead>
                         <tbody>
                             
-                                   
+                                   @php
+                                $iteration=0;
+                            @endphp
                             
                                 @forelse(($previousLeaves ?? [])->sortByDesc('id') as $leave)
+                                @php
+                               
+                                $iteration=$iteration+1;
+                            @endphp
                                     <tr class="hoverable-row">
                                         <td>
                                             {{ optional($leave->created_at) ? \Carbon\Carbon::parse($leave->created_at)->format('Y-m-d') : '' }}
@@ -255,7 +261,12 @@
                                                     if($leave->study_leave_to >= $currentDate){
                                                         $btnName = 'View';
                                                     }else{
-                                                        $btnName = 'Extend';
+                                                        if($iteration ==1 && $isEnableStudyLeaveRequiste){
+                                                            $btnName = 'Extend';
+                                                        }else{
+                                                            $btnName = 'View';
+                                                        }
+                                                       // $btnName = 'Extend';
                                                     }
                                                 } elseif ($statusValue == 2) {
                                                     $route = 'Rejected';
