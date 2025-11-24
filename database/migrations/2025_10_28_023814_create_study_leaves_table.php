@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('study_leaves', function (Blueprint $table) {
         $table->increments('id'); // auto-incrementing unsigned integer primary key
+        $table->string('reference_no')->unique()->nullable();
             $table->string('empno')->index();
             $table->string('academic_year')->nullable();
             $table->string('passport_no')->nullable();

@@ -58,13 +58,19 @@ class StudyLeaveController extends Controller
                 
             )
             ->first();
+        $approvedLeavesInProgress = StudyLeave::where('empno', session('empno'))
+            ->where('status_id', 1)
+            ->where('is_draft', false)
+           // ->whereDate('study_leave_from', '<=', $currentDate)
+            ->whereDate('study_leave_to', '>=', $currentDate)
+            ->count();
         $allStudyLeavesCount = StudyLeave::where('empno', session('empno'))
             ->select(
                 DB::raw('COUNT("id") as total_count')  
             )
             ->first();
 
-        if (($allStudyLeavesCount->total_count - $approvedLeavesCount->approved_count) == 0) {
+        if (($allStudyLeavesCount->total_count - $approvedLeavesCount->approved_count) == 0  && $approvedLeavesInProgress == 0) {
             $isEnableStudyLeaveRequiste = true;
         }
 
@@ -866,6 +872,7 @@ $this->updateSummary($request);
             $draft->update([
                 'is_draft' => false,
                 'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
+                'reference_no' => $this->generateReferenceNumber(),
 
             ]);
         }
@@ -953,7 +960,7 @@ $this->updateSummary($request);
         // Fetch employee info from the database
         $previousLeaves = DB::table('study_leaves')
             ->where('empno', $emp_no)
-            ->select('id', 'degree_title', 'university_institute', 'study_leave_from', 'study_leave_to', 'leave_payment_type', 'study_leaves.created_at', 'status_id', 'status')
+            ->select('id', 'degree_title', 'university_institute', 'study_leave_from', 'study_leave_to', 'leave_payment_type', 'study_leaves.created_at', 'status_id', 'status','reference_no')
             ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
             ->get();
 
@@ -1163,6 +1170,21 @@ $this->updateSummary($request);
         } else {
             return redirect()->route('StudyLeave.create')->with('error', 'Study leave application not found.');
         }
+    }
+    
+    /**
+     * Generate a new reference number following the pattern: <empNo><year><04><No>
+     */
+    private function generateReferenceNumber()
+    {
+        $currentYear = date('Y');
+        
+        // Get the highest ID from leave_details table and add 1
+        $lastId = DB::table('study_leaves')->max('id') ?? 0;
+        $newNo = $lastId + 1;
+
+        // Format: <empNo><year><04><No>
+        return "{$currentYear}04{$newNo}";
     }
 
    

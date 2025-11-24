@@ -227,7 +227,7 @@
                                         <td>
                                             {{ optional($leave->created_at) ? \Carbon\Carbon::parse($leave->created_at)->format('Y-m-d') : '' }}
                                         </td>
-                                        <td>{{ $leave->id ?? 'N/A' }}</td>
+                                        <td>{{ $leave->reference_no ?? 'N/A' }}</td>
                                         <td>{{ $leave->leave_payment_type ?? 'Study Leave' }}</td>
                                         <td>
                                             @php
@@ -261,7 +261,7 @@
                                                     if($leave->study_leave_to >= $currentDate){
                                                         $btnName = 'View';
                                                     }else{
-                                                        if($iteration ==1 && $isEnableStudyLeaveRequiste){
+                                                        if($iteration ==1 && $isEnableStudyLeaveRequiste && !$hasActiveDraft){
                                                             $btnName = 'Extend';
                                                         }else{
                                                             $btnName = 'View';

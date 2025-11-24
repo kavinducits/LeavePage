@@ -8,6 +8,7 @@ class StudyLeave extends Model
 {
     //
    protected $fillable = [
+    'reference_no',
         'empno',
         'academic_year',
         'passport_no',
