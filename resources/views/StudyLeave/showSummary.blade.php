@@ -93,6 +93,22 @@
                 </div>
             </div>
         </div>
+        <!-- Page Title -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-maroon">
+            <i class="fas fa-clipboard-check me-2"></i>Application Summary
+        </h2>
+        <p class="text-muted">Review your study leave application before submission</p>
+    </div>
+
+    <!-- Form for Summary and Submit -->
+    <form action="{{ route('StudyLeave.Submit') }}" method="POST" id="summary-form">
+        @csrf
+
+        <!-- Include Summary Layout Component -->
+        @include('StudyLeave.partials.summary_layout')
+
+    </form>
 
             <div class="card-body">
                 <div class="row g-3">
@@ -102,15 +118,19 @@
                         <p class="mb-0">Click the "Submit Application" button below to finalize your study leave request.</p>
                     </div>
                 </div>
-                <!-- Declaration Checkbox -->
-                    <div class="col-12">
-                        <div class="form-check mt-3">
-                            <input class="form-check-input" type="checkbox" id="declaration" name="declaration" required>
-                            <label class="form-check-label fw-semibold" for="declaration">
+                
+
+                    <!-- Declaration -->
+    <div class="card mb-4 border-warning">
+        <div class="card-body">
+            <div class="form-check">
+               <input class="form-check-input" type="checkbox" id="declaration" name="declaration" required>
+                <label class="form-check-label fw-semibold" for="declaration">
                                 I, undersigned, certify that the details provided in this form are accurate. Details of the programme and other relevant documents are attached.
                             </label>
-                        </div>
-                    </div>
+            </div>
+        </div>
+    </div>
             </div>
         </div>
         <div class="d-flex justify-content-between mt-4">
