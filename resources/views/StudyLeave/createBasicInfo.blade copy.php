@@ -1,20 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-
-<!-- Progress Bar - Step 3 -->
-@include('StudyLeave.partials.progress_bar', ['currentStep' => 3])
-
 <div class="container py-4">
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
+    
     <!-- Show remark if returned -->
     @isset($remark)
     <div class="alert alert-warning fw-semibold">
@@ -30,14 +19,18 @@
                 
             </h2>
         </div>
-        <a class="btn btn-outline-maroon" href="{{route('StudyLeave.Details.create')}}">
+        <a class="btn btn-outline-maroon" href="{{ route('StudyLeave.create') }}">
             <i class="fas fa-arrow-left me-2"></i>Back to List
         </a>
     </div>
 
-    <!-- Form for Work Covering Persons -->
 
-    <form  action="{{ route('StudyLeave.WorkCoveringPersons.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+
+
+
+    <!-- Form for Basic Information -->
+
+    <form  action="{{ route('StudyLeave.BasicInfo.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
         @csrf
 
         @if(isset($leave))
@@ -49,42 +42,42 @@
                 <input type="hidden" name="academic_year" value="{{ $academicYear }}">
             @endif
         @endif
-         <!-- Personal Details (readonly) -->
-        @include('StudyLeave.working_covering_persons_form')
 
-        
-            <div class="d-flex justify-content-between align-items-center mb-4">
+        @include('StudyLeave.basic_info_form')
+
+       
+
+<div class="d-flex justify-content-between mt-4">
     <button type="button" class="btn btn-outline-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm" onclick="saveAndExit()">
         <i class="fas fa-save me-2"></i>Save and Exit
     </button>
-     <script>
+    <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm">
+        Next: Leave Details <i class="fas fa-arrow-right ms-2"></i>
+    </button>
+</div>
+    </form>
+
+    <script>
     function saveAndExit() {
         const form = document.getElementById('leave-form');
         const originalAction = form.action;
         
         // Change form action to save and exit route
         
-        form.action = "{{ route('StudyLeave.WorkCoveringPersons.exit') }}";
+        form.action = "{{ route('StudyLeave.BasicInfo.exit') }}";
         form.submit();
         
         // Restore original action (optional, for safety)
         form.action = originalAction;
     }
     </script>
-    <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm">
-        Next: Leave Details <i class="fas fa-arrow-right ms-2"></i>
-    </button>
-</div>
-
-        </div>
-
-
-</form>
-</div>
-
-
-
-
-    
+-
+    <!--
+    <div class="d-flex justify-content-end mt-4">
+        <a class="btn btn-outline-maroon">
+            <i class="fas fa-arrow-right me-2"></i>Next: Leave Details
+        </a>
+    </div>
+-->
 
 @endsection

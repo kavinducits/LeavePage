@@ -25,7 +25,9 @@
                     <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required {{ $readonly ?? true ? 'readonly' : '' }}>
                 </div>
                      <!-- Details of the Study Program -->
+                    
                     <div class="col-md-6">
+                        <label class="form-label fw-semibold">Degree Title</label>
                         <select name="degree_title" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
                             <option value="" {{ ($draft_study_leave->degree_title ?? '') === '' ? 'selected' : '' }}>Select degree title</option>
                             <option value="MA" {{ ($draft_study_leave->degree_title ?? '') === 'MA' ? 'selected' : '' }}>M.A.</option>

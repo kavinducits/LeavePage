@@ -48,7 +48,7 @@ Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name(
 //Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
 Route::get('/StudyLeave', [StudyLeaveController::class, 'createStudyLeave'])->name('StudyLeave.create');
 Route::post('/StudyLeave', [StudyLeaveController::class, 'storeStudyLeave'])->name('StudyLeave.store');
-Route::get('/StudyLeave/Delete', [StudyLeaveController::class, 'deleteStudyLeaveDraft'])->name('StudyLeave.DeleteDraft');
+Route::delete('/StudyLeave/Delete/{id}', [StudyLeaveController::class, 'deleteStudyLeaveDraft'])->name('StudyLeave.DeleteDraft');
 //Basic Info
 Route::get('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'createBasicInfo'])->name('StudyLeave.BasicInfo.create');
 Route::post('/StudyLeave/BasicInfo', [StudyLeaveController::class, 'storeBasicInfo'])->name('StudyLeave.BasicInfo.store');

@@ -125,11 +125,11 @@
                             </div>
                             <div class="text-center">
                                 <span class="fw-semibold text-maroon">Continue Draft</span><br>
-                                <small class="text-muted">{{ $activeDraft->id ?? 'N/A' }}</small>
+                                <small class="text-muted">{{ $activeDraft-> reference_no?? 'N/A' }}</small>
                             </div>
                         </a>
 
-                        <form action="{{ route('leaves.destroy', $activeDraft->id) }}" method="POST" class="d-inline-block">
+                        <form action="{{ route('StudyLeave.DeleteDraft', $activeDraft->id) }}" method="POST" class="d-inline-block">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn p-0 border-0 bg-transparent draft-action-item" onclick="return confirm('Are you sure you want to delete this draft and start a new application?')">

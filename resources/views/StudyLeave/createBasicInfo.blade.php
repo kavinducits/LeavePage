@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
+<!-- Progress Bar - Step 1 -->
+@include('StudyLeave.partials.progress_bar', ['currentStep' => 1])
+
 <div class="container py-4">
 
     

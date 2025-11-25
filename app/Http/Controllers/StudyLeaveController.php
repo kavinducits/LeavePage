@@ -888,6 +888,10 @@ $this->updateSummary($request);
 
         return redirect()->route('StudyLeave.create')->with('success', 'Study leave application submitted successfully! Your application is now under review.');
     }
+
+
+
+    
     public function exitSummary(Request $request)
     {
        
@@ -1026,19 +1030,21 @@ $this->updateSummary($request);
             'Content-Disposition' => 'inline; filename="' . basename($filename) . '"'
         ]);
     }
-    public function deleteStudyLeaveDraft(Request $request)
+    public function deleteStudyLeaveDraft($id,Request $request)
     {
+       // dd('here');
         $empno = session('empno');
+        //dd($empno);
 
         // Find the draft study leave for the current employee
         $draft = StudyLeave::where('empno', $empno)
             ->where('is_draft', true)
             ->first();
-
+//dd($draft);
         if ($draft) {
             // Delete the draft
             $draft->delete();
-
+//dd('here2');
             return redirect()->route('StudyLeave.create')->with('success', 'Draft study leave application deleted successfully.');
         } else {
             return redirect()->route('StudyLeave.create')->with('error', 'No draft study leave application found to delete.');

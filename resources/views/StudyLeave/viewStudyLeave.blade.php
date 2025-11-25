@@ -7,7 +7,7 @@
             
             
 
-            <form method="POST" action="{{ route('StudyLeave.create') }}" class="my-4">
+            <form method="POST" class="my-4">
                 @csrf
                     <!-- Personal Details (readonly) -->
                 @include('StudyLeave.basic_info_form')
@@ -16,7 +16,7 @@
                 @include('StudyLeave.summary_form')
                 
                 <div class="form-group mt-4 mb-3 d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary btn-lg">Back</button>
+                    <a href="{{ route('StudyLeave.create') }}" class="btn btn-primary btn-lg">Back</a>
                 </div>
             </form>
         </div>
