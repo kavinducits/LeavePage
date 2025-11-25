@@ -218,7 +218,8 @@ class StudyLeaveController extends Controller
             StudyLeave::create([
                 'empno' => session('empno'),
                 'academic_year' => $academicYear,
-                'is_draft' => true
+                'is_draft' => true,
+                
             ]);
         }
         $this->updateBasicInfo($request);
@@ -269,6 +270,7 @@ class StudyLeaveController extends Controller
             $draft->update([
                 'passport_no' => $validatedData['passport_no'] ?? null,
                 'passport_validity' => $validatedData['passport_validity'] ?? null,
+                'current_step' => 1
             ]);
         } else {
             // Create new draft record
@@ -276,7 +278,8 @@ class StudyLeaveController extends Controller
                 'empno' => session('empno'),
                 'passport_no' => $validatedData['passport_no'] ?? null,
                 'passport_validity' => $validatedData['passport_validity'] ?? null,
-                'is_draft' => true
+                'is_draft' => true,
+                'current_step' => 1
             ]);
         }
         return;
@@ -462,7 +465,9 @@ class StudyLeaveController extends Controller
             $draft->update($updateData);
         }
 
-*/        $this->updateDetails($request);
+*/       
+ $this->updateDetails($request);
+  
 
         return redirect()->route('StudyLeave.WorkCoveringPersons.create')->with('success', 'Study leave details saved successfully!');
     }
@@ -571,7 +576,8 @@ class StudyLeaveController extends Controller
             if ($draft) {
                 $draft->update([
                     'placement_letter' => $path,
-                    'is_draft' => true
+                    'is_draft' => true,
+                    'current_step' => 2,
                 ]);
             }
         } else {
@@ -768,6 +774,8 @@ class StudyLeaveController extends Controller
                 'nominee_teaching_empno' => $validatedData['nominee_teaching_empno'],
                 'nominee_admin_empno' => $validatedData['nominee_admin_empno'],
                 'nominee_other_empno' => $validatedData['nominee_other_empno'],
+                'current_step' => 3,
+                'is_draft' => true,
             ]);
         }
 
@@ -926,6 +934,7 @@ $this->updateSummary($request);
                 'is_draft' => true,
                 'library_and_property_handling' => $validatedData['library_and_property_handling'],
                 'loan_handling' => $validatedData['loan_handling'],
+                'current_step' => 4,
                 //'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
 
             ]);
@@ -1282,6 +1291,21 @@ $this->updateSummary($request);
        
 
         return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly'));
+    }
+
+    public function continueDraft($id){
+        $empno = session('empno');
+        // Find the draft study leave for the current employee
+        $current_step = StudyLeave::where('id', $id)
+           
+            ->first();
+dd($current_step->current_step);
+
+        if ($current_step->current_step !== null) {
+            return redirect()->route('StudyLeave.create')->with('success', 'Continuing your draft study leave application.');
+        } else {
+            return redirect()->route('StudyLeave.create')->with('error', 'No draft study leave application found to continue.');
+        }
     }
 
    

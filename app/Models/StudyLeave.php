@@ -52,5 +52,6 @@ class StudyLeave extends Model
         'placement_letter',
         'is_completed',
         'ma_remarks',
+        'current_step',
     ];
 }

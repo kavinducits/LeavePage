@@ -119,7 +119,7 @@
                         </p>
                     </div>
                     <div class="d-flex justify-content-center gap-4 draft-action-buttons flex-wrap">
-                        <a href="{{ route('StudyLeave.BasicInfo.create') }}" class="d-inline-block text-decoration-none draft-action-item">
+                        <a href="{{ route('StudyLeave.continue.draft', $activeDraft->id) }}" class="d-inline-block text-decoration-none draft-action-item">
                             <div class="draft-action-icon d-flex align-items-center justify-content-center mx-auto mb-2">
                                 <i class="bi bi-pencil-square"></i>
                             </div>
