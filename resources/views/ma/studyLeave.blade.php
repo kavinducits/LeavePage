@@ -60,7 +60,7 @@
 
     <div class="card">
         <div class="card-header bg-primary text-white fw-semibold">
-            <i class="fas fa-list me-2"></i>Submitted Applications
+            <i class="fas fa-list me-2"></i> Submitted Applications
         </div>
         <div class="card-body p-0">
             @if($studyLeaveApplications->count() > 0)
@@ -102,7 +102,7 @@
                                         <span class="badge bg-warning">{{ $application->status }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('ma.show.studyleave', $application->reference_no) }}" 
+                                        <a href="{{ route('ma.show.studyleave', $application->id) }}" 
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>

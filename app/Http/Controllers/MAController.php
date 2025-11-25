@@ -493,7 +493,8 @@ class MAController extends Controller
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->where('statuses.status', 'Processing MA') // filter for MA Processing status
             ->select(
-                'study_leaves.id as reference_no',
+                'study_leaves.id as id',
+                'study_leaves.reference_no as reference_no',
                 'employees.id as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'departments.department_name as department',
