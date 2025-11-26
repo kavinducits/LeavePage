@@ -1299,10 +1299,30 @@ $this->updateSummary($request);
         $current_step = StudyLeave::where('id', $id)
            
             ->first();
-dd($current_step->current_step);
+            switch ($current_step->current_step) {
+                case 1:
+                    $route = 'StudyLeave.BasicInfo.create';
+                    break;
+                case 2:
+                    $route = 'StudyLeave.Details.create';
+                    break;
+                case 3:
+                    $route = 'StudyLeave.WorkCoveringPersons.create';
+                    break;
+                case 4:
+                    $route = 'StudyLeave.Summary.show';
+                    break;
+                default:
+                    $route = 'StudyLeave.create';
+                    break;
+            }
+
+
+
+
 
         if ($current_step->current_step !== null) {
-            return redirect()->route('StudyLeave.create')->with('success', 'Continuing your draft study leave application.');
+            return redirect()->route($route)->with('success', 'Continuing your draft study leave application.');
         } else {
             return redirect()->route('StudyLeave.create')->with('error', 'No draft study leave application found to continue.');
         }
