@@ -13,7 +13,7 @@
                 </div>
                 <div class="step-label">Personal Details</div>
             </div>
-            
+            <!-- Connector Line -->
             <!-- Connector Line -->
             <div class="progress-line {{ $currentStep > 1 ? 'completed' : '' }}"></div>
             
@@ -140,9 +140,9 @@
 }
 
 .progress-step.completed .step-circle {
-    background: #28a745;
-    border-color: #28a745;
-    color: white;
+    background: #f0f404;
+    border-color: #f0f404;
+    color: #800000;
 }
 
 .step-label {
@@ -172,7 +172,7 @@
 }
 
 .progress-line.completed {
-    background: #28a745;
+    background: #cadb0a;
 }
 
 .progress-bar-track {
@@ -186,7 +186,7 @@
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(90deg, #d2d816 0%, #dbcd0d 100%);
     border-radius: 10px;
     transition: width 0.5s ease;
     box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);

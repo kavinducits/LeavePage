@@ -37,7 +37,7 @@
 
     <!-- Form for Summary and Submit -->
 
-    <form  action="{{ route('StudyLeave.Submit') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+    <form  action="{{ route('StudyLeave.Submit') }}" method="POST" enctype="multipart/form-data" id="leave-form" class="needs-validation" novalidate>
         @csrf
 
         @if(isset($leave))
@@ -68,20 +68,23 @@
                 
                 <div class="col-12 mb-3">
                     <label for="library_and_property_handling" class="form-label fw-semibold d-block">
-                         Library book, Computer or any other properties?
+                         Library book, Computer or any other properties? <span class="text-danger">*</span>
                     </label>
                     <select class="form-select w-auto d-inline-block align-middle ms-2" id="library_and_property_handling" name="library_and_property_handling" required>
                         <option value="" {{ empty(old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
                         <option value="Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
                         <option value="Not Make Arrangements" {{ old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
+                    <div class="invalid-feedback d-block">
+                        Please select an option for library and property handling.
+                    </div>
                 </div>
 
                 <!-- Handling of Paying Loans   -->
 
                 <div class="col-12 mb-3">
                     <label for="loan_handling" class="form-label fw-semibold d-block">
-                       Paying of Loans taken from University of UPF?
+                       Paying of Loans taken from University of UPF? <span class="text-danger">*</span>
                         <br>
                         <small class="text-muted">(Applicable only when taking no pay leave)</small>
                     </label>
@@ -90,6 +93,9 @@
                         <option value="Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
                         <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
+                    <div class="invalid-feedback d-block">
+                        Please select an option for loan handling.
+                    </div>
                 </div>
             </div>
         </div>
@@ -164,5 +170,88 @@
         </a>
     </div>
 -->
+
+<style>
+.form-select:invalid {
+    border-color: #dc3545 !important;
+}
+.was-validated .form-select:invalid {
+    border-color: #dc3545 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+}
+.invalid-feedback {
+    display: none;
+    font-size: 0.875em;
+    color: #dc3545;
+    margin-top: 0.25rem;
+}
+.was-validated .form-select:invalid ~ .invalid-feedback {
+    display: block !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('leave-form');
+    const libraryHandling = document.getElementById('library_and_property_handling');
+    const loanHandling = document.getElementById('loan_handling');
+    
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            
+            // Check library and property handling
+            if (!libraryHandling.value) {
+                libraryHandling.setCustomValidity('Please select an option');
+                isValid = false;
+            } else {
+                libraryHandling.setCustomValidity('');
+            }
+            
+            // Check loan handling
+            if (!loanHandling.value) {
+                loanHandling.setCustomValidity('Please select an option');
+                isValid = false;
+            } else {
+                loanHandling.setCustomValidity('');
+            }
+            
+            // Validate form
+            if (!form.checkValidity() || !isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Scroll to first invalid field
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalid.focus();
+                }
+            }
+            
+            form.classList.add('was-validated');
+        });
+        
+        // Clear validation on selection
+        libraryHandling.addEventListener('change', function() {
+            this.setCustomValidity('');
+            if (form.classList.contains('was-validated')) {
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        loanHandling.addEventListener('change', function() {
+            this.setCustomValidity('');
+            if (form.classList.contains('was-validated')) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+});
+</script>
 
 @endsection

@@ -10,19 +10,45 @@
                 <div class="row g-3">
                           <!-- University or the Institute -->
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">University or the Institute</label>
-                    <input type="text" name="university_institute" class="form-control" value="{{ $draft_study_leave->university_institute ?? '' }}"  required {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <label class="form-label fw-semibold">University or the Institute <span class="text-danger">*</span></label>
+                    <input type="text" name="university_institute" class="form-control" 
+                           value="{{ $draft_study_leave->university_institute ?? '' }}" 
+                           minlength="3" 
+                           maxlength="200" 
+                           required 
+                           {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <div class="invalid-feedback">
+                        Please enter the university or institute name (3-200 characters).
+                    </div>
                 </div>
                 
                 <!-- Country and Field of Study -->
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Country</label>
-                    <input type="text" name="country" class="form-control"  value="{{ $draft_study_leave->country ?? '' }}" required {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <label class="form-label fw-semibold">Country <span class="text-danger">*</span></label>
+                    <input type="text" name="country" class="form-control" 
+                           value="{{ $draft_study_leave->country ?? '' }}" 
+                           minlength="2" 
+                           maxlength="100" 
+                           pattern="[A-Za-z\s\-]+" 
+                           title="Country name should contain only letters, spaces, and hyphens"
+                           required 
+                           {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <div class="invalid-feedback">
+                        Please enter a valid country name (letters only, 2-100 characters).
+                    </div>
                 </div>
 
                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">Field of study</label>
-                    <input type="text" name="field_of_study" class="form-control" value="{{ $draft_study_leave->field_of_study ?? '' }}" required {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <label class="form-label fw-semibold">Field of study <span class="text-danger">*</span></label>
+                    <input type="text" name="field_of_study" class="form-control" 
+                           value="{{ $draft_study_leave->field_of_study ?? '' }}" 
+                           minlength="3" 
+                           maxlength="200" 
+                           required 
+                           {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <div class="invalid-feedback">
+                        Please enter the field of study (3-200 characters).
+                    </div>
                 </div>
                      <!-- Details of the Study Program -->
                     
@@ -55,14 +81,28 @@
 
                     <!-- Period of Study Leave Requested (From) -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">From</label>
-                        <input type="date" name="study_leave_from" class="form-control" value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" required {{ $readonly ?? true ? 'readonly' : '' }}>
+                        <label class="form-label fw-semibold">From <span class="text-danger">*</span></label>
+                        <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
+                               value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" 
+                               min="{{ date('Y-m-d') }}" 
+                               required 
+                               {{ $readonly ?? true ? 'readonly' : '' }}>
+                        <div class="invalid-feedback">
+                            Please select a valid start date.
+                        </div>
                     </div>
 
                     <!-- Period of Study Leave Requested (To) -->
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">To</label>
-                        <input type="date" name="study_leave_to" class="form-control" value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" required {{ $readonly ?? true ? 'readonly' : '' }}>
+                        <label class="form-label fw-semibold">To <span class="text-danger">*</span></label>
+                        <input type="date" name="study_leave_to" id="study_leave_to" class="form-control" 
+                               value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" 
+                               min="{{ date('Y-m-d') }}" 
+                               required 
+                               {{ $readonly ?? true ? 'readonly' : '' }}>
+                        <div class="invalid-feedback">
+                            Please select a valid end date (must be after start date).
+                        </div>
                     </div>
                   
 
@@ -73,7 +113,13 @@
 
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
-                    <textarea name="study_program_details" class="form-control" rows="4" {{ $readonly ?? true ? 'readonly' : '' }} >{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
+                    <textarea name="study_program_details" class="form-control" rows="4" 
+                              minlength="10" 
+                              maxlength="1000" 
+                              {{ $readonly ?? true ? 'readonly' : '' }}>{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
+                    <div class="invalid-feedback">
+                        Please provide details of the study program (10-1000 characters).
+                    </div>
                 </div>
 
                  <!-- Attachment Instructions -->
@@ -81,8 +127,15 @@
                     <div class="alert alert-info mt-3">
                         <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
                     </div>
-                    <label class="form-label fw-semibold mt-2">Attach PDF Documents</label>
-                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" accept="application/pdf" multiple  {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <label class="form-label fw-semibold mt-2">Attach PDF Documents <span class="text-danger">*</span></label>
+                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" 
+                           accept="application/pdf" 
+                           multiple 
+                           {{ !empty($draft_study_leave->placement_letter) ? '' : 'required' }}
+                           {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <div class="invalid-feedback">
+                        Please upload a PDF document (placement letter/scholarship details).
+                    </div>
 
                     <!-- Show previously uploaded file (when editing) -->
                     @if(!empty($draft_study_leave->placement_letter))
@@ -121,22 +174,28 @@
 
                 <!-- Funding Type -->
                 <div class="col-md-6">
-                        <label class="form-label fw-semibold"> Funding type</label>
-                        <select name="funding_type" class="form-select" {{ $readonly ?? true ? 'disabled' : '' }} >
-                            <option value="" {{ $draft_study_leave->funding_type ?? '' ? '' : 'selected' }}>Select funding type</option>
+                        <label class="form-label fw-semibold"> Funding type <span class="text-danger">*</span></label>
+                        <select name="funding_type" id="funding_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }} >
+                            <option value="" {{ $draft_study_leave->funding_type ?? '' ? '' : 'selected' }} disabled>Select funding type</option>
                             <option value="Full" {{ $draft_study_leave->funding_type === 'Full' ? 'selected' : '' }}>Self-Funding</option>
                             <option value="Partial" {{ $draft_study_leave->funding_type === 'Partial' ? 'selected' : '' }}>Scholarship</option>
                         </select>
+                        <div class="invalid-feedback">
+                            Please select a funding type.
+                        </div>
                     </div>
 
                     <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
-                        <label class="form-label fw-semibold">Scholarship Source</label>
-                        <select name="scholarship_source" class="form-select" {{ $readonly ?? true ? 'disabled' : '' }} >
-                            <option value="" {{ empty($draft_study_leave->scholarship_source) ? 'selected' : '' }}>Select source</option>
+                        <label class="form-label fw-semibold">Scholarship Source <span class="text-danger">*</span></label>
+                        <select name="scholarship_source" id="scholarship_source" class="form-select" {{ $readonly ?? true ? 'disabled' : '' }} >
+                            <option value="" {{ empty($draft_study_leave->scholarship_source) ? 'selected' : '' }} disabled>Select source</option>
                             <option value="agency" {{ ($draft_study_leave->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
                             <option value="project" {{ ($draft_study_leave->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
                         </select>
+                        <div class="invalid-feedback">
+                            Please select a scholarship source.
+                        </div>
                     </div>
 
                     <!-- Additional fields based on Scholarship Source -->
@@ -144,21 +203,37 @@
 
                         <!-- Scholarship Amount (conditional) - If Scholarship offering agency is selected -->
                         <div id="scholarship-amount-group" style="display: none;">
-                            <label class="form-label fw-semibold">Scholarship Amount</label>
-                            <input type="number" name="scholarship_amount" class="form-control" min="0" step="0.01" placeholder="Enter amount" value="{{ $draft_study_leave->scholarship_amount ?? '' }}" {{ $readonly ?? true ? 'readonly' : '' }} >
+                            <label class="form-label fw-semibold">Scholarship Amount <span class="text-danger">*</span></label>
+                            <input type="number" name="scholarship_amount" id="scholarship_amount" class="form-control" 
+                                   min="0.01" 
+                                   step="0.01" 
+                                   placeholder="Enter amount" 
+                                   value="{{ $draft_study_leave->scholarship_amount ?? '' }}" 
+                                   {{ $readonly ?? true ? 'readonly' : '' }}>
+                            <div class="invalid-feedback">
+                                Please enter a valid scholarship amount (must be greater than 0).
+                            </div>
                         </div>
 
                         <!-- Project Name (conditional) - If Funds from a project is selected -->
                         <div id="project-name-group" style="display: none;">
-                            <label class="form-label fw-semibold">Project Name</label>
-                            <input type="text" name="project_name" class="form-control" placeholder="Enter project name" value="{{ $draft_study_leave->project_name ?? '' }}"  {{ $readonly ?? true ? 'readonly' : '' }}>
+                            <label class="form-label fw-semibold">Project Name <span class="text-danger">*</span></label>
+                            <input type="text" name="project_name" id="project_name" class="form-control" 
+                                   placeholder="Enter project name" 
+                                   minlength="3" 
+                                   maxlength="200" 
+                                   value="{{ $draft_study_leave->project_name ?? '' }}" 
+                                   {{ $readonly ?? true ? 'readonly' : '' }}>
+                            <div class="invalid-feedback">
+                                Please enter the project name (3-200 characters).
+                            </div>
                         </div>
                     </div>
                     <!-- Additional fields (conditional) - If Self-Funding is selected -->
 
                 <!-- Air Passage Request -->
                 <div class="col-md-6" id="self-funding-extra" style="display: none;">
-                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Air Passage from this University?</label>
+                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Air Passage from this University? <span class="text-danger">*</span></label>
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
@@ -170,11 +245,14 @@
                             <label class="form-check-label" for="air_passage_no">NO</label>
                         </div>
                     </div>
+                    <div class="invalid-feedback d-block" id="air_passage_error" style="display: none !important;">
+                        Please select an option for air passage request.
+                    </div>
                 </div>
 
                 <!-- Warm Cloth Allowance Request -->
                 <div class="col-md-6" id="self-funding-extra2" style="display: none;">
-                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Warm Cloth Allowance from this University?</label>
+                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Warm Cloth Allowance from this University? <span class="text-danger">*</span></label>
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
@@ -186,6 +264,9 @@
                                 @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
                             <label class="form-check-label" for="warm_cloth_no">NO</label>
                         </div>
+                    </div>
+                    <div class="invalid-feedback d-block" id="warm_cloth_error" style="display: none !important;">
+                        Please select an option for warm cloth allowance request.
                     </div>
                 </div>
 
@@ -395,29 +476,189 @@
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const fundingType = document.querySelector('select[name="funding_type"]');
+                        const scholarshipDetails = document.getElementById('scholarship-details');
+                        const scholarshipExtraDetails = document.getElementById('scholarship-extra-details');
+                        const scholarshipSource = document.getElementById('scholarship_source');
+                        const scholarshipAmountGroup = document.getElementById('scholarship-amount-group');
+                        const projectNameGroup = document.getElementById('project-name-group');
+                        const scholarshipAmount = document.getElementById('scholarship_amount');
+                        const projectName = document.getElementById('project_name');
                         const selfFundingExtra = document.getElementById('self-funding-extra');
                         const selfFundingExtra2 = document.getElementById('self-funding-extra2');
+                        const airPassageRadios = document.querySelectorAll('input[name="air_passage_request"]');
+                        const warmClothRadios = document.querySelectorAll('input[name="warm_cloth_allowance_request"]');
                         
-                        function updateSelfFundingVisibility() {
+                        function updateConditionalValidation() {
                             if (fundingType.value === 'Full') {
+                                // Self-Funding: Show air passage and warm cloth fields
                                 selfFundingExtra.style.display = 'block';
                                 selfFundingExtra2.style.display = 'block';
-                            } else {
+                                
+                                // Make air passage and warm cloth required
+                                airPassageRadios.forEach(radio => radio.setAttribute('required', 'required'));
+                                warmClothRadios.forEach(radio => radio.setAttribute('required', 'required'));
+                                
+                                // Hide and remove scholarship requirements
+                                scholarshipDetails.style.display = 'none';
+                                scholarshipExtraDetails.style.display = 'none';
+                                scholarshipAmountGroup.style.display = 'none';
+                                projectNameGroup.style.display = 'none';
+                                scholarshipSource.removeAttribute('required');
+                                scholarshipAmount.removeAttribute('required');
+                                projectName.removeAttribute('required');
+                                
+                            } else if (fundingType.value === 'Partial') {
+                                // Scholarship: Show scholarship fields
+                                scholarshipDetails.style.display = 'block';
+                                scholarshipSource.setAttribute('required', 'required');
+                                
+                                // Hide and remove self-funding requirements
                                 selfFundingExtra.style.display = 'none';
                                 selfFundingExtra2.style.display = 'none';
-                                // Only clear radio buttons when changing away from Full funding
-                                if (fundingType.value !== '') {
-                                    document.querySelectorAll('input[name="air_passage_request"]').forEach(el => el.checked = false);
-                                    document.querySelectorAll('input[name="warm_cloth_allowance_request"]').forEach(el => el.checked = false);
+                                airPassageRadios.forEach(radio => radio.removeAttribute('required'));
+                                warmClothRadios.forEach(radio => radio.removeAttribute('required'));
+                                
+                                // Clear radio selections when hiding
+                                document.querySelectorAll('input[name="air_passage_request"]').forEach(el => el.checked = false);
+                                document.querySelectorAll('input[name="warm_cloth_allowance_request"]').forEach(el => el.checked = false);
+                                
+                            } else {
+                                // No funding type selected: Hide all conditional fields
+                                selfFundingExtra.style.display = 'none';
+                                selfFundingExtra2.style.display = 'none';
+                                scholarshipDetails.style.display = 'none';
+                                scholarshipExtraDetails.style.display = 'none';
+                                scholarshipAmountGroup.style.display = 'none';
+                                projectNameGroup.style.display = 'none';
+                                
+                                // Remove all conditional requirements
+                                airPassageRadios.forEach(radio => radio.removeAttribute('required'));
+                                warmClothRadios.forEach(radio => radio.removeAttribute('required'));
+                                scholarshipSource.removeAttribute('required');
+                                scholarshipAmount.removeAttribute('required');
+                                projectName.removeAttribute('required');
+                            }
+                        }
+                        
+                        // Handle scholarship source changes
+                        if (scholarshipSource) {
+                            scholarshipSource.addEventListener('change', function() {
+                                if (this.value === 'agency') {
+                                    scholarshipAmountGroup.style.display = 'block';
+                                    projectNameGroup.style.display = 'none';
+                                    scholarshipAmount.setAttribute('required', 'required');
+                                    projectName.removeAttribute('required');
+                                    scholarshipExtraDetails.style.display = 'block';
+                                } else if (this.value === 'project') {
+                                    projectNameGroup.style.display = 'block';
+                                    scholarshipAmountGroup.style.display = 'none';
+                                    projectName.setAttribute('required', 'required');
+                                    scholarshipAmount.removeAttribute('required');
+                                    scholarshipExtraDetails.style.display = 'block';
+                                } else {
+                                    scholarshipAmountGroup.style.display = 'none';
+                                    projectNameGroup.style.display = 'none';
+                                    scholarshipExtraDetails.style.display = 'none';
+                                    scholarshipAmount.removeAttribute('required');
+                                    projectName.removeAttribute('required');
+                                }
+                            });
+                        }
+                        
+                        // Initialize on page load
+                        updateConditionalValidation();
+                        if (scholarshipSource && scholarshipSource.value) {
+                            scholarshipSource.dispatchEvent(new Event('change'));
+                        }
+                        
+                        // Update when funding type changes
+                        fundingType.addEventListener('change', updateConditionalValidation);
+                        
+                        // Date range validation
+                        const fromDate = document.getElementById('study_leave_from');
+                        const toDate = document.getElementById('study_leave_to');
+                        
+                        function validateDateRange() {
+                            if (fromDate.value && toDate.value) {
+                                if (new Date(toDate.value) <= new Date(fromDate.value)) {
+                                    toDate.setCustomValidity('End date must be after start date');
+                                } else {
+                                    toDate.setCustomValidity('');
                                 }
                             }
                         }
                         
-                        // Show fields on page load if funding type is already set to 'Full'
-                        updateSelfFundingVisibility();
+                        if (fromDate && toDate) {
+                            fromDate.addEventListener('change', function() {
+                                toDate.min = this.value;
+                                validateDateRange();
+                            });
+                            toDate.addEventListener('change', validateDateRange);
+                        }
                         
-                        // Update visibility when funding type changes
-                        fundingType.addEventListener('change', updateSelfFundingVisibility);
+                        // Custom radio button validation
+                        function validateRadioGroups() {
+                            let isValid = true;
+                            const airPassageError = document.getElementById('air_passage_error');
+                            const warmClothError = document.getElementById('warm_cloth_error');
+                            
+                            // Check air passage if required
+                            if (fundingType.value === 'Full') {
+                                const airPassageChecked = document.querySelector('input[name="air_passage_request"]:checked');
+                                const warmClothChecked = document.querySelector('input[name="warm_cloth_allowance_request"]:checked');
+                                
+                                if (!airPassageChecked) {
+                                    airPassageError.style.display = 'block';
+                                    isValid = false;
+                                } else {
+                                    airPassageError.style.display = 'none';
+                                }
+                                
+                                if (!warmClothChecked) {
+                                    warmClothError.style.display = 'block';
+                                    isValid = false;
+                                } else {
+                                    warmClothError.style.display = 'none';
+                                }
+                            }
+                            
+                            return isValid;
+                        }
+                        
+                        // Bootstrap form validation
+                        const forms = document.querySelectorAll('.needs-validation');
+                        Array.from(forms).forEach(form => {
+                            form.addEventListener('submit', event => {
+                                validateDateRange();
+                                const radioValid = validateRadioGroups();
+                                
+                                if (!form.checkValidity() || !radioValid) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    
+                                    // Scroll to first invalid field
+                                    const firstInvalid = form.querySelector(':invalid');
+                                    if (firstInvalid) {
+                                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        firstInvalid.focus();
+                                    }
+                                }
+                                form.classList.add('was-validated');
+                            }, false);
+                        });
+                        
+                        // Clear radio error messages on selection
+                        airPassageRadios.forEach(radio => {
+                            radio.addEventListener('change', () => {
+                                document.getElementById('air_passage_error').style.display = 'none';
+                            });
+                        });
+                        
+                        warmClothRadios.forEach(radio => {
+                            radio.addEventListener('change', () => {
+                                document.getElementById('warm_cloth_error').style.display = 'none';
+                            });
+                        });
                     });
                 </script>
                     <script>

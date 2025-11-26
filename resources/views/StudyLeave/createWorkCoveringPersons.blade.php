@@ -37,7 +37,7 @@
 
     <!-- Form for Work Covering Persons -->
 
-    <form  action="{{ route('StudyLeave.WorkCoveringPersons.store') }}" method="POST" enctype="multipart/form-data" id="leave-form">
+    <form  action="{{ route('StudyLeave.WorkCoveringPersons.store') }}" method="POST" enctype="multipart/form-data" id="leave-form" class="needs-validation" novalidate>
         @csrf
 
         @if(isset($leave))
