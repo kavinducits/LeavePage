@@ -171,7 +171,26 @@
             @endif
         </div>
 
-       
+        <!-- Drafts -->
+        <div class="mb-4">
+            <div class="card shadow-sm rounded-3 border-0">
+                <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-semibold text-maroon">
+                        <i class="fas fa-edit me-2 icon-gold"></i>Drafts
+                    </h5>
+                    <button class="btn btn-outline-maroon btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#draftsCollapse" aria-expanded="false" aria-controls="draftsCollapse">
+                        <i class="bi bi-plus" id="toggleIcon"></i>
+                    </button>
+                </div>
+                <div class="collapse show card-body pt-2 pb-0 px-3" id="draftsCollapse">
+               
+
+
+
+                    
+                </div>
+            </div>
+        </div>
         
 
         <!-- Previous Leaves -->
@@ -179,7 +198,7 @@
             <div class="card shadow-sm rounded-3 border-0">
                 <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-semibold text-maroon">
-                        <i class="fas fa-history me-2 icon-gold"></i>Your Study Leaves
+                        <i class="fas fa-history me-2 icon-gold"></i>Previous Leaves
                     </h5>
                 </div>
                 <div class="card-body pt-2 pb-0 px-3">
