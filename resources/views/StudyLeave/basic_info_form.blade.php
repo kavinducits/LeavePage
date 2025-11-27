@@ -37,32 +37,7 @@
                                             <label class="form-label fw-semibold">Email Address</label>
                                             <input type="text" name="email" class="form-control" value="{{ $user->email }}" readonly>
                                         </div>
-                                        <!-- Passport No -->
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold">Passport No: <span class="text-danger">*</span></label>
-                                            <input type="text" name="passport_no" class="form-control" 
-                                                   value="{{ $draft_study_leave->passport_no ?? '' }}" 
-                                                   pattern="[A-Z0-9]{6,15}" 
-                                                   title="Passport number must be 6-15 characters (uppercase letters and numbers only)"
-                                                   required 
-                                                   {{ $readonly ?? true ? 'readonly' : '' }}>
-                                            <div class="invalid-feedback">
-                                                Please enter a valid passport number (6-15 characters, uppercase letters and numbers only).
-                                            </div>
-                                        </div>
-                                        <!-- Passport Validity -->
                                         
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold">Validity date up to: <span class="text-danger">*</span></label>
-                                            <input type="date" name="passport_validity" class="form-control" 
-                                                   value="{{ $draft_study_leave->passport_validity ?? '' }}" 
-                                                   min="{{ date('Y-m-d') }}" 
-                                                   required 
-                                                   {{ $readonly ?? true ? 'readonly' : '' }}>
-                                            <div class="invalid-feedback">
-                                                Please enter a valid future date for passport validity.
-                                            </div>
-                                        </div>
             </div>
         </div>
 

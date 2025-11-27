@@ -179,7 +179,8 @@
             <div class="card shadow-sm rounded-3 border-0">
                 <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-semibold text-maroon">
-                        <i class="fas fa-history me-2 icon-gold"></i>Your Study Leaves
+                        <i class="fas fa-history me-2 icon-gold"></i>Your  
+                        .Study Leaves
                     </h5>
                 </div>
                 <div class="card-body pt-2 pb-0 px-3">

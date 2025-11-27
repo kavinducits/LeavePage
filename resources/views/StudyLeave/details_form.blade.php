@@ -8,6 +8,31 @@
             </div>
             <div class="card-body">
                 <div class="row g-3">
+                
+                <!-- Study Leave Location -->
+                <div class="col-12 mb-3">
+                    <label class="form-label fw-semibold d-block">Is your study leave in Sri Lanka or abroad? <span class="text-danger">*</span></label>
+                    <div class="d-inline-block">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="study_location" id="location_sri_lanka" value="Sri Lanka"
+                                @checked(old('study_location', $draft_study_leave->study_location ?? '') === 'Sri Lanka') 
+                                required 
+                                {{ $readonly ?? true ? 'disabled' : '' }}>
+                            <label class="form-check-label" for="location_sri_lanka">In Sri Lanka</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="study_location" id="location_abroad" value="Abroad"
+                                @checked(old('study_location', $draft_study_leave->study_location ?? '') === 'Abroad') 
+                                required 
+                                {{ $readonly ?? true ? 'disabled' : '' }}>
+                            <label class="form-check-label" for="location_abroad">Abroad</label>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback d-block" id="study_location_error" style="display: none !important;">
+                        Please select study leave location.
+                    </div>
+                </div>
+                
                           <!-- University or the Institute -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">University or the Institute <span class="text-danger">*</span></label>
@@ -23,9 +48,9 @@
                 </div>
                 
                 <!-- Country and Field of Study -->
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold">Country <span class="text-danger">*</span></label>
-                    <input type="text" name="country" class="form-control" 
+                <div class="col-md-6" id="country_field" style="transition: all 0.3s ease;">
+                    <label class="form-label fw-semibold">Country <span class="text-danger" id="country_required">*</span></label>
+                    <input type="text" name="country" id="country" class="form-control" 
                            value="{{ $draft_study_leave->country ?? '' }}" 
                            minlength="2" 
                            maxlength="100" 
@@ -164,13 +189,32 @@
 
                  <!-- Type of Study Leave Requested -->
                      <div class="col-md-6">
-                        <label class="form-label fw-semibold">Type of Study Leave Requested</label>
-                        <select name="leave_payment_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
+                        <label class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
+                        <select name="leave_payment_type" id="leave_payment_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
+                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }} disabled>Select an option</option>
                             <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
                             <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
                         </select>
+                        <div class="invalid-feedback">
+                            Please select the type of study leave.
+                        </div>
                     </div>
+                    
+                <!-- Loan Handling (conditional) - shown only for "without Pay" -->
+                <div class="col-md-6" id="loan_handling_section">
+                    <label for="loan_handling_details" class="form-label fw-semibold">
+                        Paying of Loans taken from University of UPF? <span class="text-danger">*</span>
+                       
+                    </label>
+                    <select class="form-select" id="loan_handling_details" name="loan_handling" {{ $readonly ?? true ? 'disabled' : '' }}>
+                        <option value="" {{ empty(old('loan_handling', $draft_study_leave->loan_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
+                        <option value="Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
+                        <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select an option for loan handling.
+                    </div>
+                </div>
 
                 <!-- Funding Type -->
                 <div class="col-md-6">
@@ -488,6 +532,100 @@
                         const airPassageRadios = document.querySelectorAll('input[name="air_passage_request"]');
                         const warmClothRadios = document.querySelectorAll('input[name="warm_cloth_allowance_request"]');
                         
+                        // Study location elements
+                        const studyLocationRadios = document.querySelectorAll('input[name="study_location"]');
+                        const countryField = document.getElementById('country_field');
+                        const countryInput = document.getElementById('country');
+                        const countryRequired = document.getElementById('country_required');
+                        const studyLocationError = document.getElementById('study_location_error');
+                        
+                        console.log('Study location elements:', {
+                            radios: studyLocationRadios.length,
+                            countryField: countryField,
+                            countryInput: countryInput
+                        });
+                        
+                        // Leave payment type elements
+                        const leavePaymentType = document.getElementById('leave_payment_type');
+                        const loanHandlingSection = document.getElementById('loan_handling_section');
+                        const loanHandlingDetails = document.getElementById('loan_handling_details');
+                        
+                        // Handle leave payment type change
+                        function updateLoanHandlingVisibility() {
+                            if (!leavePaymentType || !loanHandlingSection || !loanHandlingDetails) {
+                                console.log('Loan handling elements not found, skipping');
+                                return;
+                            }
+                            
+                            if (leavePaymentType.value === 'without Pay') {
+                                // Show loan handling field for "without Pay"
+                                loanHandlingSection.style.display = 'block';
+                                loanHandlingDetails.setAttribute('required', 'required');
+                            } else {
+                                // Hide loan handling field for "with Pay" or empty
+                                loanHandlingSection.style.display = 'none';
+                                loanHandlingDetails.removeAttribute('required');
+                                loanHandlingDetails.value = ''; // Clear value when hidden
+                            }
+                        }
+                        
+                        // Add event listener to leave payment type
+                        if (leavePaymentType && loanHandlingSection && loanHandlingDetails) {
+                            leavePaymentType.addEventListener('change', updateLoanHandlingVisibility);
+                            // Initialize on page load
+                            updateLoanHandlingVisibility();
+                        }
+                        
+                        // Handle study location change
+                        function updateCountryField() {
+                            const selectedLocation = document.querySelector('input[name="study_location"]:checked');
+                            console.log('updateCountryField called, selected:', selectedLocation ? selectedLocation.value : 'none');
+                            
+                            if (!countryField || !countryInput) {
+                                console.error('Country field elements not found!');
+                                return;
+                            }
+                            
+                            if (selectedLocation && selectedLocation.value === 'Sri Lanka') {
+                                // Hide country field and set default value to Sri Lanka
+                                console.log('Setting country to Sri Lanka and hiding field');
+                                countryField.style.display = 'none';
+                                countryInput.value = 'Sri Lanka';
+                                countryInput.removeAttribute('required');
+                                if (countryRequired) countryRequired.style.display = 'none';
+                            } else if (selectedLocation && selectedLocation.value === 'Abroad') {
+                                // Show country field and make it required
+                                console.log('Showing country field for abroad');
+                                countryField.style.display = 'block';
+                                // Clear Sri Lanka value if it was set
+                                if (countryInput.value === 'Sri Lanka') {
+                                    countryInput.value = '';
+                                }
+                                countryInput.setAttribute('required', 'required');
+                                if (countryRequired) countryRequired.style.display = 'inline';
+                            } else {
+                                // No selection - hide country field but don't set default value
+                                console.log('No selection - hiding country field');
+                                countryField.style.display = 'none';
+                                countryInput.removeAttribute('required');
+                            }
+                        }
+                        
+                        // Add event listeners to study location radios
+                        if (studyLocationRadios && studyLocationRadios.length > 0) {
+                            studyLocationRadios.forEach(radio => {
+                                radio.addEventListener('change', function() {
+                                    console.log('Radio changed to:', this.value);
+                                    updateCountryField();
+                                    if (studyLocationError) studyLocationError.style.display = 'none';
+                                });
+                            });
+                        }
+                        
+                        // Initialize country field on page load
+                        console.log('Initializing country field on page load');
+                        updateCountryField();
+                        
                         function updateConditionalValidation() {
                             if (fundingType.value === 'Full') {
                                 // Self-Funding: Show air passage and warm cloth fields
@@ -601,6 +739,23 @@
                             let isValid = true;
                             const airPassageError = document.getElementById('air_passage_error');
                             const warmClothError = document.getElementById('warm_cloth_error');
+                            
+                            // Check study location
+                            const studyLocationChecked = document.querySelector('input[name="study_location"]:checked');
+                            if (!studyLocationChecked) {
+                                studyLocationError.style.display = 'block';
+                                isValid = false;
+                            } else {
+                                studyLocationError.style.display = 'none';
+                            }
+                            
+                            // Check loan handling if required (for "without Pay")
+                            if (leavePaymentType.value === 'without Pay' && !loanHandlingDetails.value) {
+                                loanHandlingDetails.setCustomValidity('Please select an option');
+                                isValid = false;
+                            } else {
+                                loanHandlingDetails.setCustomValidity('');
+                            }
                             
                             // Check air passage if required
                             if (fundingType.value === 'Full') {
