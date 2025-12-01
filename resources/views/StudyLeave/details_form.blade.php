@@ -476,17 +476,26 @@
                     document.addEventListener('DOMContentLoaded', function () {
                         const fundingType = document.querySelector('select[name="funding_type"]');
                         const selfFundingDeclaration = document.getElementById('self-funding-declaration');
+                        const selfFundingInput = document.getElementById('self-funding-declaration-input');
+                        const selfDeclarationRequired = document.getElementById('self-declaration-required');
                         
                         function updateSelfFundingDeclarationVisibility() {
                             if (fundingType.value === 'self') {
                                 selfFundingDeclaration.style.display = 'block';
+                                // Only make required if no existing file
+                                @if(empty($draft_study_leave->self_funding_declaration))
+                                    selfFundingInput.setAttribute('required', 'required');
+                                @endif
+                                if (selfDeclarationRequired) selfDeclarationRequired.style.display = 'inline';
                             } else {
                                 selfFundingDeclaration.style.display = 'none';
-                                selfFundingDeclaration.querySelector('input[type="file"]').value = '';
+                                selfFundingInput.removeAttribute('required');
+                                selfFundingInput.value = '';
+                                if (selfDeclarationRequired) selfDeclarationRequired.style.display = 'none';
                             }
                         }
                         
-                        // Show on page load if funding type is already 'Full'
+                        // Show on page load if funding type is already 'self'
                         updateSelfFundingDeclarationVisibility();
                         
                         // Update when user changes funding type

@@ -263,7 +263,7 @@ class StudyLeaveController extends Controller
             'loan_handling' => 'required_if:leave_payment_type,Without Pay|string|max:100',
         );
 
-       // dd($request->all());
+       
 
         try {
             $validatedData = $request->validate($rules);
