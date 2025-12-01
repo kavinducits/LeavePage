@@ -63,6 +63,67 @@
                     </div>
                 </div>
 
+                <!-- Passport Details (conditional - shown only for "Abroad") -->
+                <div class="col-md-6" id="passport_no_field" style="display: none;">
+                    <label class="form-label fw-semibold">Passport Number <span class="text-danger">*</span></label>
+                    <input type="text" name="passport_no" id="passport_no" class="form-control" 
+                           value="{{ $draft_study_leave->passport_no ?? '' }}" 
+                           minlength="6" 
+                           maxlength="20" 
+                           pattern="[A-Z0-9]+" 
+                           title="Passport number should contain only uppercase letters and numbers"
+                           {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <div class="invalid-feedback">
+                        Please enter a valid passport number (6-20 characters, uppercase letters and numbers only).
+                    </div>
+                </div>
+
+                <div class="col-md-6" id="passport_validity_field" style="display: none;">
+                    <label class="form-label fw-semibold">Passport Validity Date <span class="text-danger">*</span></label>
+                    <input type="date" name="passport_validity" id="passport_validity" class="form-control" 
+                           value="{{ $draft_study_leave->passport_validity ?? '' }}" 
+                           min="{{ date('Y-m-d') }}" 
+                           {{ $readonly ?? true ? 'readonly' : '' }}>
+                    <div class="invalid-feedback">
+                        Please enter a valid passport expiry date (must be a future date).
+                    </div>
+                </div>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const studyLocationRadios = document.querySelectorAll('input[name="study_location"]');
+                    const passportNoField = document.getElementById('passport_no_field');
+                    const passportValidityField = document.getElementById('passport_validity_field');
+                    const passportNoInput = document.getElementById('passport_no');
+                    const passportValidityInput = document.getElementById('passport_validity');
+                    
+                    function updatePassportFields() {
+                        const selectedLocation = document.querySelector('input[name="study_location"]:checked');
+                        
+                        if (selectedLocation && selectedLocation.value === 'Abroad') {
+                            passportNoField.style.display = 'block';
+                            passportValidityField.style.display = 'block';
+                            passportNoInput.setAttribute('required', 'required');
+                            passportValidityInput.setAttribute('required', 'required');
+                        } else {
+                            passportNoField.style.display = 'none';
+                            passportValidityField.style.display = 'none';
+                            passportNoInput.removeAttribute('required');
+                            passportValidityInput.removeAttribute('required');
+                            passportNoInput.value = '';
+                            passportValidityInput.value = '';
+                        }
+                    }
+                    
+                    studyLocationRadios.forEach(radio => {
+                        radio.addEventListener('change', updatePassportFields);
+                    });
+                    
+                    // Initialize on page load
+                    updatePassportFields();
+                });
+                </script>
+
                  <div class="col-md-6">
                     <label class="form-label fw-semibold">Field of study <span class="text-danger">*</span></label>
                     <input type="text" name="field_of_study" class="form-control" 
@@ -221,8 +282,8 @@
                         <label class="form-label fw-semibold"> Funding type <span class="text-danger">*</span></label>
                         <select name="funding_type" id="funding_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ $draft_study_leave->funding_type ?? '' ? '' : 'selected' }} disabled>Select funding type</option>
-                            <option value="Full" {{ $draft_study_leave->funding_type === 'Full' ? 'selected' : '' }}>Self-Funding</option>
-                            <option value="Partial" {{ $draft_study_leave->funding_type === 'Partial' ? 'selected' : '' }}>Scholarship</option>
+                            <option value="self" {{ $draft_study_leave->funding_type === 'self' ? 'selected' : '' }}>Self-Funding</option>
+                            <option value="scholarship" {{ $draft_study_leave->funding_type === 'scholarship' ? 'selected' : '' }}>Scholarship</option>
                         </select>
                         <div class="invalid-feedback">
                             Please select a funding type.
@@ -321,35 +382,41 @@
                 </div>
 
 
-                
-                <!-- Self-Funding Declaration (conditional) -->
-                <div class="col-md-12" id="self-funding-declaration" style="display: none;">
-                    <div class="alert alert-warning mt-3">
-                        <strong>Note:</strong> If you are not receiving any scholarship, airfare or warm cloth allowance from any University, Institute, agency or project, please attach a separate document certifying that you will not be receiving any funds mentioned above from the placement offering University, Institute or any other agency.
-                    </div>
+                                                
+                                                <!-- Self-Funding Declaration (conditional) -->
+                                                <div class="col-md-12" id="self-funding-declaration" style="display: none;">
+                                                    <div class="alert alert-warning mt-3">
+                                                        <strong>Note:</strong> If you are not receiving any scholarship, airfare or warm cloth allowance from any University, Institute, agency or project, please attach a separate document certifying that you will not be receiving any funds mentioned above from the placement offering University, Institute or any other agency.
+                                                    </div>
 
-                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ $readonly ?? true ? 'disabled' : '' }}>
+                                                    <label class="form-label fw-semibold">Self-Funding Declaration <span class="text-danger" id="self-declaration-required">*</span></label>
+                                                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ !empty($draft_study_leave->self_funding_declaration) ? '' : 'required' }} {{ $readonly ?? true ? 'disabled' : '' }}>
+                                                    <div class="invalid-feedback">
+                                                        Please upload a self-funding declaration PDF document.
+                                                    </div>
 
-                    <!-- Show previously uploaded file (when editing) -->
-                    @if(!empty($draft_study_leave->self_funding_declaration))
-                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
-                            <div>
-                                <strong>Existing file:</strong>
-                                <span class="ms-2">{{ basename($draft_study_leave->self_funding_declaration) }}</span>
-                            </div>
-                            <div>
-                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary">Preview</button>
-                            </div>
-                        </div>
-                    @endif
+                                                    <!-- Show previously uploaded file (when editing) -->
+                                                    @if(!empty($draft_study_leave->self_funding_declaration))
+                                                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
+                                                            <div>
+                                                                <strong>Existing file:</strong>
+                                                                <span class="ms-2">{{ basename($draft_study_leave->self_funding_declaration) }}</span>
+                                                            </div>
+                                                            <div>
+                                                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
+                                                                <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary">Preview</button>
+                                                            </div>
+                                                        </div>
+                                                    @endif
 
-                    <div id="self-declaration-preview-embed" class="mt-3" style="display:none;">
-                        <label class="form-label fw-semibold">Preview</label>
-                        <div style="border:1px solid #dee2e6;">
-                            <embed id="self-declaration-embed" src="" type="application/pdf" width="100%" height="600px">
-                        </div>
-                    </div>
+                                                    <div id="self-declaration-preview-embed" class="mt-3" style="display:none;">
+                                                        <label class="form-label fw-semibold">Preview</label>
+                                                        <div style="border:1px solid #dee2e6;">
+                                                            <embed id="self-declaration-embed" src="" type="application/pdf" width="100%" height="600px">
+                                                        </div>
+                                                    </div>
+
+
 
                     <script>
                     document.addEventListener('DOMContentLoaded', function () {
@@ -411,7 +478,7 @@
                         const selfFundingDeclaration = document.getElementById('self-funding-declaration');
                         
                         function updateSelfFundingDeclarationVisibility() {
-                            if (fundingType.value === 'Full') {
+                            if (fundingType.value === 'self') {
                                 selfFundingDeclaration.style.display = 'block';
                             } else {
                                 selfFundingDeclaration.style.display = 'none';
@@ -627,7 +694,7 @@
                         updateCountryField();
                         
                         function updateConditionalValidation() {
-                            if (fundingType.value === 'Full') {
+                            if (fundingType.value === 'self') {
                                 // Self-Funding: Show air passage and warm cloth fields
                                 selfFundingExtra.style.display = 'block';
                                 selfFundingExtra2.style.display = 'block';
@@ -645,7 +712,7 @@
                                 scholarshipAmount.removeAttribute('required');
                                 projectName.removeAttribute('required');
                                 
-                            } else if (fundingType.value === 'Partial') {
+                            } else if (fundingType.value === 'scholarship') {
                                 // Scholarship: Show scholarship fields
                                 scholarshipDetails.style.display = 'block';
                                 scholarshipSource.setAttribute('required', 'required');
@@ -758,7 +825,7 @@
                             }
                             
                             // Check air passage if required
-                            if (fundingType.value === 'Full') {
+                            if (fundingType.value === 'self') {
                                 const airPassageChecked = document.querySelector('input[name="air_passage_request"]:checked');
                                 const warmClothChecked = document.querySelector('input[name="warm_cloth_allowance_request"]:checked');
                                 
@@ -826,7 +893,7 @@
                             const projectNameGroup = document.getElementById('project-name-group');
 
                             function updateScholarshipVisibility() {
-                                if (fundingType.value === 'Partial') {
+                                if (fundingType.value === 'scholarship') {
                                     scholarshipDetails.style.display = 'block';
                                     // Also trigger scholarship source visibility on page load
                                     updateScholarshipSourceVisibility();
@@ -874,7 +941,7 @@
                             const scholarshipDetails = document.getElementById('scholarship-details');
 
                             fundingType.addEventListener('change', function () {
-                                if (this.value === 'Partial') {
+                                if (this.value === 'scholarship') {
                                     scholarshipDetails.style.display = 'block';
                                 } else {
                                     scholarshipDetails.style.display = 'none';
