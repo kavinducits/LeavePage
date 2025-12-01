@@ -124,7 +124,10 @@
                 });
                 </script>
 
-                 <div class="col-md-6">
+                <!-- Field of Study and Degree Title -->
+                <div  class="col-12">
+                    <div class="row g-3">
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Field of study <span class="text-danger">*</span></label>
                     <input type="text" name="field_of_study" class="form-control" 
                            value="{{ $draft_study_leave->field_of_study ?? '' }}" 
@@ -136,61 +139,58 @@
                         Please enter the field of study (3-200 characters).
                     </div>
                 </div>
-                     <!-- Details of the Study Program -->
-                    
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Degree Title</label>
-                        <select name="degree_title" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ ($draft_study_leave->degree_title ?? '') === '' ? 'selected' : '' }}>Select degree title</option>
-                            <option value="MA" {{ ($draft_study_leave->degree_title ?? '') === 'MA' ? 'selected' : '' }}>M.A.</option>
-                            <option value="MSc" {{ ($draft_study_leave->degree_title ?? '') === 'MSc' ? 'selected' : '' }}>M.Sc</option>
-                            <option value="MBA" {{ ($draft_study_leave->degree_title ?? '') === 'MBA' ? 'selected' : '' }}>MBA</option>
-                            <option value="MPhil" {{ ($draft_study_leave->degree_title ?? '') === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
-                            <option value="MD" {{ ($draft_study_leave->degree_title ?? '') === 'MD' ? 'selected' : '' }}>M.D.</option>
-                            <option value="PhD" {{ ($draft_study_leave->degree_title ?? '') === 'PhD' ? 'selected' : '' }}>PhD</option>
-                            <option value="Other" {{ ($draft_study_leave->degree_title ?? '') === 'Other' ? 'selected' : '' }}>Other</option>
-                        </select>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Degree Title <span class="text-danger">*</span></label>
+                    <select name="degree_title" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
+                        <option value="" {{ ($draft_study_leave->degree_title ?? '') === '' ? 'selected' : '' }}>Select degree title</option>
+                        <option value="MA" {{ ($draft_study_leave->degree_title ?? '') === 'MA' ? 'selected' : '' }}>M.A.</option>
+                        <option value="MSc" {{ ($draft_study_leave->degree_title ?? '') === 'MSc' ? 'selected' : '' }}>M.Sc</option>
+                        <option value="MBA" {{ ($draft_study_leave->degree_title ?? '') === 'MBA' ? 'selected' : '' }}>MBA</option>
+                        <option value="MPhil" {{ ($draft_study_leave->degree_title ?? '') === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
+                        <option value="MD" {{ ($draft_study_leave->degree_title ?? '') === 'MD' ? 'selected' : '' }}>M.D.</option>
+                        <option value="PhD" {{ ($draft_study_leave->degree_title ?? '') === 'PhD' ? 'selected' : '' }}>PhD</option>
+                        <option value="Other" {{ ($draft_study_leave->degree_title ?? '') === 'Other' ? 'selected' : '' }}>Other</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select a degree title.
                     </div>
-                    <!-- Leave Type -->
-                    <!--
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Leave Type</label>
-                        
-                        <select name="leave_type" class="form-select" required>
-                            <option value=""  {{ $draft_study_leave->leave_type === '' ? 'selected' : '' }}>Select an option</option>
-                            <option value="fresh" {{ $draft_study_leave->leave_type === 'fresh' ? 'selected' : '' }}>Fresh Study Leave</option>
-                            <option value="extension" {{ $draft_study_leave->leave_type === 'extension' ? 'selected' : '' }}>Extension</option>
-                        </select>
-                    </div>
-                -->
+                </div>
+            </div>
+                </div>
                    
+                   
+                <!-- Period of Study Leave Requested -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Period of Study Leave Requested <span class="text-danger">*</span></label>
+                                        <div class="row g-3">
+                                            <!-- From Date -->
+                                            <div class="col-md-6">
+                                                <label class="form-label">From <span class="text-danger">*</span></label>
+                                                <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
+                                                       value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" 
+                                                       min="{{ date('Y-m-d') }}" 
+                                                       required 
+                                                       {{ $readonly ?? true ? 'readonly' : '' }}>
+                                                <div class="invalid-feedback">
+                                                    Please select a valid start date.
+                                                </div>
+                                            </div>
 
-                    <!-- Period of Study Leave Requested (From) -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">From <span class="text-danger">*</span></label>
-                        <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
-                               value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" 
-                               min="{{ date('Y-m-d') }}" 
-                               required 
-                               {{ $readonly ?? true ? 'readonly' : '' }}>
-                        <div class="invalid-feedback">
-                            Please select a valid start date.
-                        </div>
-                    </div>
-
-                    <!-- Period of Study Leave Requested (To) -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">To <span class="text-danger">*</span></label>
-                        <input type="date" name="study_leave_to" id="study_leave_to" class="form-control" 
-                               value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" 
-                               min="{{ date('Y-m-d') }}" 
-                               required 
-                               {{ $readonly ?? true ? 'readonly' : '' }}>
-                        <div class="invalid-feedback">
-                            Please select a valid end date (must be after start date).
-                        </div>
-                    </div>
-                  
+                                            <!-- To Date -->
+                                            <div class="col-md-6">
+                                                <label class="form-label">To <span class="text-danger">*</span></label>
+                                                <input type="date" name="study_leave_to" id="study_leave_to" class="form-control" 
+                                                       value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" 
+                                                       min="{{ date('Y-m-d') }}" 
+                                                       required 
+                                                       {{ $readonly ?? true ? 'readonly' : '' }}>
+                                                <div class="invalid-feedback">
+                                                    Please select a valid end date (must be after start date).
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
 
 
