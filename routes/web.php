@@ -80,6 +80,8 @@ Route::post('/StudyLeave/Summary/exit', [StudyLeaveController::class, 'exitSumma
 
 //Get the emp no and name by ajax
 Route::get('/StudyLeave/get-employee-info/{emp_no}', [StudyLeaveController::class, 'getEmployeeInfo'])->name('StudyLeave.getEmployeeInfo');
+//Search Academic Employees for work covering
+Route::get('/StudyLeave/workingcovering/academic/search', [StudyLeaveController::class, 'searchAcademicEmployees'])->name('StudyLeave.searchAcademicEmployees');
 
 // Secure file serving route
 Route::get('/StudyLeave/files/{type}/{filename}', [StudyLeaveController::class, 'serveFile'])->name('StudyLeave.serveFile');

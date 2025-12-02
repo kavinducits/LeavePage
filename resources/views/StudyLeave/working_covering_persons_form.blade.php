@@ -36,7 +36,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Employee Name" readonly required >
+                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Search by name" required {{ $readonly ?? true ? 'readonly' : '' }}>
                                         @error('nominee_teaching_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -82,7 +82,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $draft_study_leave->nominee_admin_name ?? '') }}" placeholder="Employee Name" required readonly>
+                                        <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $draft_study_leave->nominee_admin_name ?? '') }}" placeholder="Search by name" required {{ $readonly ?? true ? 'readonly' : '' }}>
                                         @error('nominee_admin_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -130,7 +130,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $draft_study_leave->nominee_other_name ?? '') }}" placeholder="Employee Name" required readonly>
+                                        <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $draft_study_leave->nominee_other_name ?? '') }}" placeholder="Search by name" required {{ $readonly ?? true ? 'readonly' : '' }}>
                                         @error('nominee_other_name')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -159,7 +159,48 @@
                      
             </div>
 
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <style>
+    .autocomplete-wrapper {
+        position: relative;
+    }
+    .autocomplete-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #ced4da;
+        border-top: none;
+        border-radius: 0 0 0.25rem 0.25rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: none;
+    }
+    .autocomplete-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .autocomplete-item:hover {
+        background-color: #f8f9fa;
+    }
+    .autocomplete-item:last-child {
+        border-bottom: none;
+    }
+    .autocomplete-item .employee-no {
+        font-weight: 600;
+        color: #495057;
+    }
+    .autocomplete-item .employee-name {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-left: 8px;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
     // Prevent Enter key from submitting the form when focused in single-line text inputs
@@ -171,7 +212,56 @@ $(document).ready(function () {
         }
     });
 
-    function lookupEmployee(empInputSelector, nameOutputSelector,destinationOutputSelector) {
+    // Debounce function to limit API calls
+    let searchTimeout = null;
+
+    function searchEmployees(query, resultsSelector) {
+        if (query.length < 2) {
+            $(resultsSelector).hide().empty();
+            return;
+        }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            $.ajax({
+                url: '{{ route("StudyLeave.searchAcademicEmployees") }}',
+                type: 'GET',
+                data: { query: query },
+                dataType: 'json',
+                success: function(employees) {
+                    $(resultsSelector).empty();
+                    
+                    if (employees && employees.length > 0) {
+                        employees.forEach(function(employee) {
+                            const item = $('<div class="autocomplete-item"></div>')
+                                .html('<span class="employee-no">' + employee.employee_no + '</span>' +
+                                      '<span class="employee-name">' + employee.name + '</span>')
+                                .data('employee', employee);
+                            $(resultsSelector).append(item);
+                        });
+                        $(resultsSelector).show();
+                    } else {
+                        $(resultsSelector).html('<div class="autocomplete-item">No results found</div>').show();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Search error:', error);
+                    $(resultsSelector).hide().empty();
+                }
+            });
+        }, 300); // 300ms debounce
+    }
+
+    function selectEmployee(employee, empnoSelector, nameSelector, destinationSelector, resultsSelector) {
+        $(empnoSelector).val(employee.employee_no);
+        $(nameSelector).val(employee.name);
+        $(resultsSelector).hide().empty();
+        
+        // Lookup full details including destination
+        lookupEmployee(empnoSelector, nameSelector, destinationSelector);
+    }
+
+    function lookupEmployee(empInputSelector, nameOutputSelector, destinationOutputSelector) {
         var empno = $(empInputSelector).val() ? $(empInputSelector).val().trim() : '';
         if (!empno) {
             $(nameOutputSelector).val('');
@@ -200,6 +290,52 @@ $(document).ready(function () {
             }
         });
     }
+
+    // Setup autocomplete for each employee field
+    function setupAutocomplete(empnoSelector, nameSelector, destinationSelector, resultsSelector) {
+        // Wrap input in autocomplete wrapper if not already wrapped
+        const $empnoInput = $(empnoSelector);
+        if (!$empnoInput.parent().hasClass('autocomplete-wrapper')) {
+            $empnoInput.wrap('<div class="autocomplete-wrapper"></div>');
+        }
+        
+        // Add results div after input
+        if ($(resultsSelector).length === 0) {
+            $empnoInput.after('<div class="autocomplete-results" id="' + resultsSelector.substring(1) + '"></div>');
+        }
+
+        // Handle input event for search
+        $empnoInput.on('input', function() {
+            const query = $(this).val().trim();
+            searchEmployees(query, resultsSelector);
+        });
+
+        // Handle name field input for search
+        $(nameSelector).on('input', function() {
+            const query = $(this).val().trim();
+            searchEmployees(query, resultsSelector);
+        });
+
+        // Handle clicking on autocomplete item
+        $(document).on('click', resultsSelector + ' .autocomplete-item', function() {
+            const employee = $(this).data('employee');
+            if (employee) {
+                selectEmployee(employee, empnoSelector, nameSelector, destinationSelector, resultsSelector);
+            }
+        });
+
+        // Hide results when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.autocomplete-wrapper').length) {
+                $(resultsSelector).hide();
+            }
+        });
+    }
+
+    // Setup autocomplete for all three employee fields
+    setupAutocomplete('#nominee_teaching_empno', '#nominee_teaching_name', '#nominee_teaching_destination', '#teaching-results');
+    setupAutocomplete('#nominee_admin_empno', '#nominee_admin_name', '#nominee_admin_destination', '#admin-results');
+    setupAutocomplete('#nominee_other_empno', '#nominee_other_name', '#nominee_other_destination', '#other-results');
 
     $('#nominee_teaching_empno').on('change', function () {
         lookupEmployee('#nominee_teaching_empno', '#nominee_teaching_name','#nominee_teaching_destination');
@@ -256,9 +392,13 @@ $(document).ready(function () {
         }
     });
     
-    // Real-time uppercase conversion for employee numbers
+    // Real-time uppercase conversion for employee numbers (don't convert during autocomplete)
     $('#nominee_teaching_empno, #nominee_admin_empno, #nominee_other_empno').on('input', function() {
-        this.value = this.value.toUpperCase();
+        // Only uppercase if not actively searching (length < 2 or manual input)
+        const val = this.value;
+        if (val.length < 2 || /^[A-Z0-9]+$/.test(val)) {
+            this.value = this.value.toUpperCase();
+        }
     });
     
     // Bootstrap form validation

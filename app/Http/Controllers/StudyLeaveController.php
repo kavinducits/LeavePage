@@ -921,4 +921,19 @@ class StudyLeaveController extends Controller
             return redirect()->route('StudyLeave.create')->with('error', 'No draft study leave application found to continue.');
         }
     }
+
+    public function searchAcademicEmployees(Request $request)
+    {
+        $searchTerm = $request->input('query');
+
+        $employees = DB::table('employees')
+            ->where('employee_no', 'like', '%' . $searchTerm . '%')
+            ->orWhere(DB::raw("CONCAT(initials, ' ', last_name)"), 'like', '%' . $searchTerm . '%')
+            ->orWhere(DB::raw("CONCAT(name_denoted_by_initials, ' ', last_name)"), 'like', '%' . $searchTerm . '%')
+            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"))
+            ->limit(10)
+            ->get();
+
+        return response()->json($employees);
+    }
 }
