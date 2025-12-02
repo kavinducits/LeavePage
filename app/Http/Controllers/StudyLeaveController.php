@@ -930,6 +930,7 @@ class StudyLeaveController extends Controller
             ->where('employee_no', 'like', '%' . $searchTerm . '%')
             ->orWhere(DB::raw("CONCAT(initials, ' ', last_name)"), 'like', '%' . $searchTerm . '%')
             ->orWhere(DB::raw("CONCAT(name_denoted_by_initials, ' ', last_name)"), 'like', '%' . $searchTerm . '%')
+            ->where('main_branch_id', 52) // Assuming 2 is the branch ID for academic staff
             ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"))
             ->limit(10)
             ->get();
