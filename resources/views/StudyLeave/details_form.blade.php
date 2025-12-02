@@ -15,14 +15,14 @@
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="study_location" id="location_sri_lanka" value="Sri Lanka"
-                                @checked(old('study_location', $draft_study_leave->study_location ?? '') === 'Sri Lanka') 
+                                @checked(old('study_location', $draft_study_leave->country ?? '') === 'Sri Lanka') 
                                 required 
                                 {{ $readonly ?? true ? 'disabled' : '' }}>
                             <label class="form-check-label" for="location_sri_lanka">In Sri Lanka</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="study_location" id="location_abroad" value="Abroad"
-                                @checked(old('study_location', $draft_study_leave->study_location ?? '') === 'Abroad') 
+                                @checked(old('study_location', $draft_study_leave->country ?? '') === 'Abroad') 
                                 required 
                                 {{ $readonly ?? true ? 'disabled' : '' }}>
                             <label class="form-check-label" for="location_abroad">Abroad</label>
@@ -46,22 +46,64 @@
                         Please enter the university or institute name (3-200 characters).
                     </div>
                 </div>
-                
-                <!-- Country and Field of Study -->
-                <div class="col-md-6" id="country_field" style="transition: all 0.3s ease;">
-                    <label class="form-label fw-semibold">Country <span class="text-danger" id="country_required">*</span></label>
-                    <input type="text" name="country" id="country" class="form-control" 
-                           value="{{ $draft_study_leave->country ?? '' }}" 
-                           minlength="2" 
-                           maxlength="100" 
-                           pattern="[A-Za-z\s\-]+" 
-                           title="Country name should contain only letters, spaces, and hyphens"
-                           required 
-                           {{ $readonly ?? true ? 'readonly' : '' }}>
-                    <div class="invalid-feedback">
-                        Please enter a valid country name (letters only, 2-100 characters).
-                    </div>
-                </div>
+
+                                                                <!-- Country and Field of Study -->
+                                                                <div class="col-md-6" id="country_field" style="transition: all 0.3s ease;">
+                                                                    <label class="form-label fw-semibold">Country <span class="text-danger" id="country_required">*</span></label>
+                                                                    <select name="country" id="country" class="form-select" 
+                                                                           required 
+                                                                           {{ $readonly ?? true ? 'disabled' : '' }}>
+                                                                        <option value="">Select a country</option>
+                                                                        @if(!empty($draft_study_leave->country))
+                                                                            <option value="{{ $draft_study_leave->country }}" selected>{{ $draft_study_leave->country }}</option>
+                                                                        @endif
+                                                                    </select>
+                                                                    <div class="invalid-feedback">
+                                                                        Please select a country.
+                                                                    </div>
+                                                                </div>
+
+                                                                <script>
+                                                                document.addEventListener('DOMContentLoaded', function () {
+                                                                    const countrySelect = document.getElementById('country');
+                                                                    const savedCountry = "{{ $draft_study_leave->country ?? '' }}";
+                                                                    
+                                                                    // Fetch countries from REST Countries API
+                                                                    fetch('https://restcountries.com/v3.1/all?fields=name')
+                                                                        .then(response => response.json())
+                                                                        .then(data => {
+                                                                            // Sort countries alphabetically and exclude Sri Lanka
+                                                                            const countries = data
+                                                                                .map(country => country.name.common)
+                                                                                .filter(country => country !== 'Sri Lanka')
+                                                                                .sort((a, b) => a.localeCompare(b));
+                                                                            
+                                                                            // Clear existing options except the first one
+                                                                            countrySelect.innerHTML = '<option value="">Select a country</option>';
+                                                                            
+                                                                            // Add countries to select
+                                                                            countries.forEach(country => {
+                                                                                const option = document.createElement('option');
+                                                                                option.value = country;
+                                                                                option.textContent = country;
+                                                                                if (savedCountry && country === savedCountry) {
+                                                                                    option.selected = true;
+                                                                                }
+                                                                                countrySelect.appendChild(option);
+                                                                            });
+                                                                        })
+                                                                        .catch(error => {
+                                                                            console.error('Error fetching countries:', error);
+                                                                            // Fallback: keep the saved value if API fails
+                                                                            if (savedCountry && savedCountry !== 'Sri Lanka') {
+                                                                                countrySelect.innerHTML = `
+                                                                                    <option value="">Select a country</option>
+                                                                                    <option value="${savedCountry}" selected>${savedCountry}</option>
+                                                                                `;
+                                                                            }
+                                                                        });
+                                                                });
+                                                                </script>
 
                 <!-- Passport Details (conditional - shown only for "Abroad") -->
                 <div class="col-md-6" id="passport_no_field" style="display: none;">
