@@ -248,7 +248,7 @@ class StudyLeaveController extends Controller
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
             'university_institute' => 'required|string|max:255',
-            'country' => 'required_if:study_location,Abroad|string|max:100',
+            'country' => 'required_if:study_location,Abroad|nullable|string|max:100',
             'field_of_study' => 'required|string|max:255',
             'study_program_details' => 'nullable|string|max:1000',
             'funding_type' => 'required|string|max:100',
@@ -259,8 +259,8 @@ class StudyLeaveController extends Controller
             'air_passage_request' => 'required_if:funding_type,self|string|in:yes,no',
             'warm_cloth_allowance_request' => 'required_if:funding_type,self|string|in:yes,no',
             'self_funding_declaration' => 'required_if:funding_type,self|file|mimes:pdf|max:10240',
-            'placement_letter' => 'required|file|mimes:pdf|max:10240',
-            'loan_handling' => 'required_if:leave_payment_type,Without Pay|string|max:100',
+            'placement_letter' => 'file|mimes:pdf|max:10240',
+            'loan_handling' => 'required_if:leave_payment_type,Without Pay|nullable|string|max:100',
         );
 
        
@@ -372,6 +372,10 @@ class StudyLeaveController extends Controller
             ->where('is_draft', true)
             ->first();
 
+        if($validatedData['study_location'] == 'Sri Lanka'){
+            $validatedData['country'] = 'Sri Lanka';
+        }
+
         if ($draft) {
             // Prepare update data
             $updateData = [
@@ -472,20 +476,62 @@ class StudyLeaveController extends Controller
     public function showSummary()
     {
         $readonly = true;
+        $displayEditeBtn = true;
+        $empno = session('study_leave.employee_no') ?? session('empno');
+        $user = DB::table('employees')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.employee_no', $empno)
+            ->select(
+                'employees.employee_no as empno',
+                'employees.nic',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials as names_denoted_by_initials',
+                'employees.email as email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'employees.mobile_no as mobile',
+                'employees.assign_ma_user_id'
+            )
+            ->first();
+            
 
         // Retriev, compact('draft_study_leave')e all relefor the summary view
-
-        $empno = session('study_leave.employee_no') ?? session('empno');
+ 
 
         $draft_study_leave = StudyLeave::where('empno', $empno)
             ->where('is_draft', true)
             ->select(
-                "library_and_property_handling",
-                "loan_handling"
+                "leave_type",
+                "leave_payment_type",
+                "study_leave_from",
+                "study_leave_to",
+                "degree_title",
+                "university_institute",
+                "country",
+                "field_of_study",
+                "study_program_details",
+                "funding_type",
+                "scholarship_source",
+                "scholarship_amount",
+                "project_name",
+                "any_other_details",
+                "air_passage_request",
+                "warm_cloth_allowance_request",
+                "self_funding_declaration",
+                "placement_letter",
+                "nominee_teaching_empno",
+                "nominee_admin_empno",
+                "nominee_other_empno"
             )
             ->first();
 
-        return view('StudyLeave.showSummary', compact('draft_study_leave', 'readonly'));
+            
+
+
+        return view('StudyLeave.showSummary', compact('draft_study_leave', 'user', 'readonly','displayEditeBtn'));
     }
     public function submitApplication(Request $request)
     {

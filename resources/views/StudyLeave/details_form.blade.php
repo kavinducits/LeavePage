@@ -3,8 +3,16 @@
         <div class="card mb-4">
 
             <!-- Card Header -->
-            <div class="card-header card-header-maroon fw-semibold">
-                <i class="fas fa-user me-2"></i>Details of the Study Leave
+            
+            <div class="card-header card-header-maroon fw-semibold d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-user me-2"></i>Details of the Study Leave
+                </span>
+                @if($displayEditeBtn ?? false)
+                    <a href="{{ route('StudyLeave.BasicInfo.create') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </a>
+                @endif
             </div>
             <div class="card-body">
                 <div class="row g-3">
@@ -377,45 +385,48 @@
                         </div>
                     </div>
                     <!-- Additional fields (conditional) - If Self-Funding is selected -->
+                    <div class="col-12">
+                        <div class="row g-3">
+                            <!-- Air Passage Request -->
+                            <div class="col-md-6" id="self-funding-extra" style="display: none;">
+                                <label class="form-label fw-semibold d-block">Requesting Air Passage from this University? <span class="text-danger">*</span></label>
+                                <div class="d-inline-block">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
+                                            @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'yes') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <label class="form-check-label" for="air_passage_yes">YES</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <label class="form-check-label" for="air_passage_no">NO</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block" id="air_passage_error" style="display: none !important;">
+                                    Please select an option for air passage request.
+                                </div>
+                            </div>
 
-                <!-- Air Passage Request -->
-                <div class="col-md-6" id="self-funding-extra" style="display: none;">
-                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Air Passage from this University? <span class="text-danger">*</span></label>
-                    <div class="d-inline-block">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
-                                @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'yes') {{ $readonly ?? true ? 'readonly' : '' }}>
-                            <label class="form-check-label" for="air_passage_yes">YES</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
-                            <label class="form-check-label" for="air_passage_no">NO</label>
-                        </div>
-                    </div>
-                    <div class="invalid-feedback d-block" id="air_passage_error" style="display: none !important;">
-                        Please select an option for air passage request.
-                    </div>
-                </div>
-
-                <!-- Warm Cloth Allowance Request -->
-                <div class="col-md-6" id="self-funding-extra2" style="display: none;">
-                    <label class="form-label fw-semibold d-inline-block me-3">Requesting Warm Cloth Allowance from this University? <span class="text-danger">*</span></label>
-                    <div class="d-inline-block">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
-                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'yes')  {{ $readonly ?? true ? 'readonly' : '' }}>
-                            <label class="form-check-label" for="warm_cloth_yes">YES</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no"
-                                @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
-                            <label class="form-check-label" for="warm_cloth_no">NO</label>
+                            <!-- Warm Cloth Allowance Request -->
+                            <div class="col-md-6" id="self-funding-extra2" style="display: none;">
+                                <label class="form-label fw-semibold d-block">Requesting Warm Cloth Allowance from this University? <span class="text-danger">*</span></label>
+                                <div class="d-inline-block">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
+                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'yes')  {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <label class="form-check-label" for="warm_cloth_yes">YES</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no"
+                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <label class="form-check-label" for="warm_cloth_no">NO</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block" id="warm_cloth_error" style="display: none !important;">
+                                    Please select an option for warm cloth allowance request.
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="invalid-feedback d-block" id="warm_cloth_error" style="display: none !important;">
-                        Please select an option for warm cloth allowance request.
-                    </div>
-                </div>
 
                     <!-- Any Other Details -->
                     <div class="col-md-12">

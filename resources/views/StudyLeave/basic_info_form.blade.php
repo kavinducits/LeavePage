@@ -1,9 +1,16 @@
  <!-- Personal Details (readonly) -->
-        <div class="card mb-4">
-            <div class="card-header card-header-maroon fw-semibold">
-                <i class="fas fa-user me-2"></i>Personal Details
+        <div class="card mb-4 ">
+            <div class="card-header card-header-maroon fw-semibold d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-user me-2"></i>Personal Details
+                </span>
+                @if($displayEditeBtn ?? false)
+                    <a href="{{ route('StudyLeave.BasicInfo.create') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-edit me-1"></i>Edit
+                    </a>
+                @endif
             </div>
-
+           
             <!-- Card Body -->
             <div class="card-body">
                 <div class="row g-3">
