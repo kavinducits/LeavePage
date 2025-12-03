@@ -216,6 +216,8 @@
                                         <div class="row g-3">
                                             <!-- From Date -->
                                             <div class="col-md-6">
+                                                
+                                        
                                                 <label class="form-label">From <span class="text-danger">*</span></label>
                                                 <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
                                                        value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" 

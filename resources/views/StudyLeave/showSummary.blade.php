@@ -80,7 +80,7 @@
         <!-- Include Summary Layout Component -->
         @include('StudyLeave.partials.summary_layout')
 
-    </form>
+   
 
             <div class="card-body">
                 <div class="row g-3">
@@ -122,8 +122,21 @@
         // Restore original action (optional, for safety)
         form.action = originalAction;
     }
+
+     function submiteStudyLeave() {
+        const form = document.getElementById('leave-form');
+        const originalAction = form.action;
+        
+        // Change form action to save and exit route
+        
+        form.action = "{{ route('StudyLeave.Submit') }}";
+        form.submit();
+        
+        // Restore original action (optional, for safety)
+        form.action = originalAction;
+    }
     </script>
-            <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm">
+            <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm" onclick="submiteStudyLeave()">
                 Submit for Recommendation of Department Head <i class="fas fa-paper-plane ms-2"></i>
             </button>
         </div>

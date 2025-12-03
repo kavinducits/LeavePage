@@ -52,7 +52,6 @@
                     
 
                     <!-- Personal Details (readonly) -->
-                    @include('ma.partials.studyLeave', ['readonly' => true])
                   
                     
                   
