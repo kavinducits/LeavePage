@@ -9,7 +9,7 @@
                     <i class="fas fa-user me-2"></i>Details of the Study Leave
                 </span>
                 @if($displayEditeBtn ?? false)
-                    <a href="{{ route('StudyLeave.BasicInfo.create') }}" class="btn btn-sm btn-light">
+                    <a href="{{ route('StudyLeave.Details.create') }}" class="btn btn-sm btn-light">
                         <i class="fas fa-edit me-1"></i>Edit
                     </a>
                 @endif
@@ -23,14 +23,14 @@
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="study_location" id="location_sri_lanka" value="Sri Lanka"
-                                @checked(old('study_location', $draft_study_leave->country ?? '') === 'Sri Lanka') 
+                                @checked(old('country', $draft_study_leave->country ?? '') === 'Sri Lanka') 
                                 required 
                                 {{ $readonly ?? true ? 'disabled' : '' }}>
                             <label class="form-check-label" for="location_sri_lanka">In Sri Lanka</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="study_location" id="location_abroad" value="Abroad"
-                                @checked(old('study_location', $draft_study_leave->country ?? '') === 'Abroad') 
+                                @checked(old('country', $draft_study_leave->country ?? '') !== 'Sri Lanka' && !empty(old('country', $draft_study_leave->country ?? ''))) 
                                 required 
                                 {{ $readonly ?? true ? 'disabled' : '' }}>
                             <label class="form-check-label" for="location_abroad">Abroad</label>
@@ -278,11 +278,12 @@
                         <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-placement-letter">
                             <div>
                                 <strong>Existing file:</strong>
-                                <span class="ms-2">{{ basename($draft_study_leave->placement_letter) }}</span>
+                                <span class="ms-2">{{ pathinfo($draft_study_leave->placement_letter, PATHINFO_FILENAME) }}</span>
                             </div>
                             <div>
                                 <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary">Preview</button>
+                                <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary me-2">Preview</button>
+                                <button type="button" id="remove-placement-letter-btn" class="btn btn-sm btn-outline-danger">Remove</button>
                             </div>
                         </div>
                     @endif
@@ -302,7 +303,7 @@
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
                         <select name="leave_payment_type" id="leave_payment_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }} disabled>Select an option</option>
+                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }} >Select an option</option>
                             <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
                             <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
                         </select>
@@ -453,11 +454,12 @@
                                                         <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
                                                             <div>
                                                                 <strong>Existing file:</strong>
-                                                                <span class="ms-2">{{ basename($draft_study_leave->self_funding_declaration) }}</span>
+                                                                <span class="ms-2">{{ pathinfo($draft_study_leave->self_funding_declaration, PATHINFO_FILENAME) }}</span>
                                                             </div>
                                                             <div>
                                                                 <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                                                <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary">Preview</button>
+                                                                <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary me-2">Preview</button>
+                                                                <button type="button" id="remove-self-declaration-btn" class="btn btn-sm btn-outline-danger">Remove</button>
                                                             </div>
                                                         </div>
                                                     @endif
@@ -477,6 +479,8 @@
                         const previewWrap = document.getElementById('self-declaration-preview-embed');
                         const embed = document.getElementById('self-declaration-embed');
                         const previewBtn = document.getElementById('preview-self-declaration-btn');
+                        const removeBtn = document.getElementById('remove-self-declaration-btn');
+                        const existingSelfDeclaration = document.getElementById('existing-self-declaration');
                         let currentUrl = null;
 
                         // Preview existing stored file on page load (if present)
@@ -509,6 +513,40 @@
                                     embed.src = openLink.href;
                                     previewWrap.style.display = 'block';
                                     previewWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            });
+                        }
+
+                        // Remove existing file
+                        if (removeBtn) {
+                            removeBtn.addEventListener('click', function () {
+                                if (confirm('Are you sure you want to remove this file? You can upload a new one.')) {
+                                    // Call the backend to delete the file
+                                    fetch('{{ route("StudyLeave.deleteFile") }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify({ type: 'self_funding_declaration' })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            existingSelfDeclaration.style.display = 'none';
+                                            input.removeAttribute('disabled');
+                                            input.setAttribute('required', 'required');
+                                            previewWrap.style.display = 'none';
+                                            embed.src = '';
+                                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
+                                        } else {
+                                            alert('Failed to delete file: ' + (data.message || 'Unknown error'));
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error deleting file:', error);
+                                        alert('Failed to delete file. Please try again.');
+                                    });
                                 }
                             });
                         }
@@ -562,36 +600,68 @@
                     <!-- Show previously uploaded file (when editing) -->
                    
 
-                <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const input = document.getElementById('attachments-input');
-                    const list = document.getElementById('pdf-preview-list');
-                    const embedWrap = document.getElementById('pdf-preview-embed');
-                    const embed = document.getElementById('pdf-embed');
-                    const previewExistingBtn = document.getElementById('preview-existing-btn');
-                    let currentUrl = null;
-
-                    // Preview existing stored file on page load (if present)
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const input = document.getElementById('attachments-input');
+                        const list = document.getElementById('pdf-preview-list');
+                        const embedWrap = document.getElementById('pdf-preview-embed');
+                        const embed = document.getElementById('pdf-embed');
+                        const previewExistingBtn = document.getElementById('preview-existing-btn');
+                        const removePlacementBtn = document.getElementById('remove-placement-letter-btn');
+                        const existingPlacementDiv = document.getElementById('existing-placement-letter');
+                        let currentUrl = null;                    // Preview existing stored file on page load (if present)
                     @if(!empty($draft_study_leave->placement_letter))
                         const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}";
                         embed.src = existingFileUrl;
                         embedWrap.style.display = 'block';
                     @endif
 
-                    // Preview existing file when clicking Preview button
-                    if (previewExistingBtn) {
-                        previewExistingBtn.addEventListener('click', function () {
-                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                            const openLink = document.querySelector('#existing-placement-letter a[target="_blank"]');
-                            if (openLink) {
-                                embed.src = openLink.href;
-                                embedWrap.style.display = 'block';
-                                embedWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }
-                        });
-                    }
+                        // Preview existing file when clicking Preview button
+                        if (previewExistingBtn) {
+                            previewExistingBtn.addEventListener('click', function () {
+                                if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
+                                const openLink = document.querySelector('#existing-placement-letter a[target="_blank"]');
+                                if (openLink) {
+                                    embed.src = openLink.href;
+                                    embedWrap.style.display = 'block';
+                                    embedWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            });
+                        }
 
-                    input.addEventListener('change', function () {
+                        // Remove existing file
+                        if (removePlacementBtn) {
+                            removePlacementBtn.addEventListener('click', function () {
+                                if (confirm('Are you sure you want to remove this file? You can upload a new one.')) {
+                                    // Call the backend to delete the file
+                                    fetch('{{ route("StudyLeave.deleteFile") }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify({ type: 'placement_letter' })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            existingPlacementDiv.style.display = 'none';
+                                            input.removeAttribute('disabled');
+                                            input.setAttribute('required', 'required');
+                                            embedWrap.style.display = 'none';
+                                            embed.src = '';
+                                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
+                                        } else {
+                                            alert('Failed to delete file: ' + (data.message || 'Unknown error'));
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error deleting file:', error);
+                                        alert('Failed to delete file. Please try again.');
+                                    });
+                                }
+                            });
+                        }                    input.addEventListener('change', function () {
                         // cleanup previous
                         if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
                         list.innerHTML = '';

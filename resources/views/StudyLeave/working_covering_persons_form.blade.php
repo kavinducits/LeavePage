@@ -6,7 +6,7 @@
                     <i class="fas fa-user me-2"></i>Arrangements made to cover applicants' work during the period of leave
                 </span>
                 @if($displayEditeBtn ?? false)
-                    <a href="{{ route('StudyLeave.BasicInfo.create') }}" class="btn btn-sm btn-light">
+                    <a href="{{ route('StudyLeave.WorkCoveringPersons.create') }}" class="btn btn-sm btn-light">
                         <i class="fas fa-edit me-1"></i>Edit
                     </a>
                 @endif

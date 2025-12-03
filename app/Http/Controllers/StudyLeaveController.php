@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Models\OtherLeavesDetail;
 use App\Models\LeaveRequestDetail;
 use App\Models\StudyLeave;
@@ -199,26 +200,6 @@ class StudyLeaveController extends Controller
 
         $draft_study_leave = StudyLeave::where('empno', $empno)
             ->where('is_draft', true)
-            ->select(
-                "leave_type",
-                "leave_payment_type",
-                "study_leave_from",
-                "study_leave_to",
-                "degree_title",
-                "university_institute",
-                "country",
-                "field_of_study",
-                "study_program_details",
-                "funding_type",
-                "scholarship_source",
-                "scholarship_amount",
-                "project_name",
-                "any_other_details",
-                "air_passage_request",
-                "warm_cloth_allowance_request",
-                "self_funding_declaration",
-                "placement_letter"
-            )
             ->first();
 
         return view('StudyLeave.createDetails', compact('draft_study_leave', 'readonly'));
@@ -258,28 +239,39 @@ class StudyLeaveController extends Controller
             'any_other_details' => 'nullable|string|max:1000',
             'air_passage_request' => 'required_if:funding_type,self|string|in:yes,no',
             'warm_cloth_allowance_request' => 'required_if:funding_type,self|string|in:yes,no',
-            'self_funding_declaration' => 'required_if:funding_type,self|file|mimes:pdf|max:10240',
-            'placement_letter' => 'file|mimes:pdf|max:10240',
-            'loan_handling' => 'required_if:leave_payment_type,Without Pay|nullable|string|max:100',
+            //'self_funding_declaration' => 'required_if:funding_type,self|file|mimes:pdf|max:10240',
+           // 'placement_letter' => 'required|file|mimes:pdf|max:10240',
+            'loan_handling' => 'required_if:leave_payment_type,Without Pay|string|max:100',
         );
+          $empno = session('study_leave.employee_no') ?? session('empno');
+
+            // Get or create draft to get the study leave ID
+            $draft = StudyLeave::where('empno', $empno)
+                ->where('is_draft', true)
+                ->first();
+            
+            if($draft->placement_letter == null){
+                $rules['placement_letter'] = 'required|file|mimes:pdf|max:10240';
+            }
+            if($draft->self_funding_declaration == null){
+                $rules['self_funding_declaration'] = 'required_if:funding_type,self|file|mimes:pdf|max:10240';
+            }
+
 
        
-
         try {
             $validatedData = $request->validate($rules);
         } catch (\Illuminate\Validation\ValidationException $e) {
             
             // Optionally dump to see immediately during development
-            dd([
-                'validation_errors' => $e->errors(),
-                'request_data' => $request->all()
-            ]);
-            
-            
-        }
-      
-
-        // Handle file upload BEFORE storing in session
+        dd([
+            'validation_errors' => $e->errors(),
+            'request_data' => $request->all()
+        ]);
+    }
+   
+   
+    // Handle file upload BEFORE storing in session
         if ($request->hasFile('self_funding_declaration')) {
 
             $file = $request->file('self_funding_declaration');
@@ -346,7 +338,7 @@ class StudyLeaveController extends Controller
 
             // Store the file in storage/app/private/placement_letter (private folder)
             $path = $file->storeAs('placement_letter', $filename);
-
+           
             // Store the path directly for database storage
             $validatedData['placement_letter'] = $path;
 
@@ -396,6 +388,8 @@ class StudyLeaveController extends Controller
                 'air_passage_request' => $validatedData['air_passage_request'] ?? null,
                 'warm_cloth_allowance_request' => $validatedData['warm_cloth_allowance_request'] ?? null,
                 'loan_handling' => $validatedData['loan_handling'] ?? null,
+                'passport_no' => $validatedData['passport_no'] ?? null,
+                'passport_validity' => $validatedData['passport_validity'] ?? null,
             ];
 
             // Update existing draft
@@ -984,5 +978,49 @@ class StudyLeaveController extends Controller
             ->get();
 
         return response()->json($employees);
+    }
+
+    public function deleteFile(Request $request)
+    {
+        $fileType = $request->input('type'); // 'placement_letter' or 'self_funding_declaration'
+        $empno = session('study_leave.employee_no') ?? session('empno');
+
+        // Validate file type
+        if (!in_array($fileType, ['placement_letter', 'self_funding_declaration'])) {
+            return response()->json(['success' => false, 'message' => 'Invalid file type'], 400);
+        }
+
+        // Find the draft study leave
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+
+        if (!$draft) {
+            return response()->json(['success' => false, 'message' => 'Draft not found'], 404);
+        }
+
+        // Get the file path
+        $filePath = $draft->$fileType;
+
+        if (empty($filePath)) {
+            return response()->json(['success' => false, 'message' => 'No file to delete'], 404);
+        }
+
+        // Delete the file from storage
+        if (Storage::exists($filePath)) {
+            Storage::delete($filePath);
+        }
+
+        // Update the database to remove the file path
+        $draft->update([$fileType => null]);
+
+        // Update the session to remove the file path
+        $sessionData = session('study_leave', []);
+        if (isset($sessionData[$fileType])) {
+            $sessionData[$fileType] = null;
+            session(['study_leave' => $sessionData]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'File deleted successfully']);
     }
 }

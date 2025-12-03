@@ -85,6 +85,7 @@ Route::get('/StudyLeave/workingcovering/academic/search', [StudyLeaveController:
 
 // Secure file serving route
 Route::get('/StudyLeave/files/{type}/{filename}', [StudyLeaveController::class, 'serveFile'])->name('StudyLeave.serveFile');
+Route::post('/StudyLeave/files/delete', [StudyLeaveController::class, 'deleteFile'])->name('StudyLeave.deleteFile');
 
 //Route::get('/StudyLeave/view/{id}', [MAController::class, 'showStudyLeaveApplication'])->name('StudyLeave.show.studyLeaveApplication');
 //Route::get('/StudyLeave/view/{id}', [MAController::class, 'showStudyLeave'])->name('StudyLeave.show.studyLeaveApplication');
