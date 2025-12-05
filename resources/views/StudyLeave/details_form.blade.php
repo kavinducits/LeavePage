@@ -262,15 +262,17 @@
 
                  <!-- Attachment Instructions -->
                 <div class="col-md-12">
-                    <div class="alert alert-info mt-3">
-                        <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
-                    </div>
+                    @if(!($readonly ?? true))
+                        <div class="alert alert-info mt-3">
+                            <strong>Note:</strong> The placement offering letter and scholarship details should be attached to this application document as a PDF.
+                        </div>
+                    @endif
                     <label class="form-label fw-semibold mt-2">Attach PDF Documents <span class="text-danger">*</span></label>
                     <input type="file" name="placement_letter" id="attachments-input" class="form-control" 
                            accept="application/pdf" 
                            multiple 
                            {{ !empty($draft_study_leave->placement_letter) ? '' : 'required' }}
-                           {{ $readonly ?? true ? 'readonly' : '' }}>
+                           {{ $readonly ?? true ? 'disabled' : '' }}>
                     <div class="invalid-feedback">
                         Please upload a PDF document (placement letter/scholarship details).
                     </div>
@@ -285,7 +287,7 @@
                             <div>
                                 <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
                                 <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary me-2">Preview</button>
-                                <button type="button" id="remove-placement-letter-btn" class="btn btn-sm btn-outline-danger">Remove</button>
+                                <button type="button" id="remove-placement-letter-btn" class="btn btn-sm btn-outline-danger" {{ $readonly ?? true ? 'disabled' : '' }}>Remove</button>
                             </div>
                         </div>
                     @endif
@@ -441,9 +443,12 @@
                                                 
                                                 <!-- Self-Funding Declaration (conditional) -->
                                                 <div class="col-md-12" id="self-funding-declaration" style="display: none;">
+                                                    @if(!($readonly ?? true))
+                                                       
                                                     <div class="alert alert-warning mt-3">
                                                         <strong>Note:</strong> If you are not receiving any scholarship, airfare or warm cloth allowance from any University, Institute, agency or project, please attach a separate document certifying that you will not be receiving any funds mentioned above from the placement offering University, Institute or any other agency.
                                                     </div>
+                                                    @endif
 
                                                     <label class="form-label fw-semibold">Self-Funding Declaration <span class="text-danger" id="self-declaration-required">*</span></label>
                                                     <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ !empty($draft_study_leave->self_funding_declaration) ? '' : 'required' }} {{ $readonly ?? true ? 'disabled' : '' }}>
@@ -461,7 +466,7 @@
                                                             <div>
                                                                 <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
                                                                 <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary me-2">Preview</button>
-                                                                <button type="button" id="remove-self-declaration-btn" class="btn btn-sm btn-outline-danger">Remove</button>
+                                                                <button type="button" id="remove-self-declaration-btn" class="btn btn-sm btn-outline-danger" {{ $readonly ?? true ? 'disabled' : '' }}>Remove</button>
                                                             </div>
                                                         </div>
                                                     @endif

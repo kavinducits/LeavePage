@@ -335,7 +335,7 @@
             <div class="row g-3">
                 <!-- Library and Property Handling -->
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Library Books, Computer or Other Properties</label>
+                    <label class="form-label fw-semibold">Library Books, Computer or Other Properties --</label>
                     <input type="text" class="form-control" value="{{ $application->library_and_property_handling ?? '' }}" readonly>
                 </div>
                 <!-- Loan Handling -->

@@ -707,6 +707,7 @@ class MAController extends Controller
                'ma_empno' => self::MA_USER_ID, // Record which MA processed this
                 'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
                 //'remark' => DB::raw("CONCAT(COALESCE(remark, ' '), '" . addslashes($newRemark) . "')"),
+                // Mark as draft for resubmission
                 'updated_at' => now()
             ]);
 

@@ -86,15 +86,37 @@ class StudyLeaveController extends Controller
 
         return redirect()->route('StudyLeave.BasicInfo.create');
     }
+
+    /**
+     * Show the form for creating a basic information .
+     * Calling Route: StudyLeave.BasicInfo.create
+     */
     public function createBasicInfo()
     {
         $readonly = false;
 
-        $user = DB::table('employees')
+       $user = $this->getUserBasicInfo(session('study_leave.employee_no') ?? session('empno'));
+
+        if (!$user)
+            abort(404, 'User not found');
+
+       // session(['ma_user_id' => $user->assign_ma_user_id]);
+        return view('StudyLeave.createBasicInfo', compact('user',  'readonly'));
+    }
+
+    /**
+     * Fetch user basic information from the database.
+     */
+
+    private function getUserBasicInfo($emp_no)
+    {
+
+        // Fetch employee info from the database
+        $employee = DB::table('employees')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->where('employees.employee_no', session('empno'))
+            ->where('employees.employee_no', $emp_no)
             ->select(
                 'employees.employee_no as empno',
                 'employees.nic',
@@ -109,72 +131,42 @@ class StudyLeaveController extends Controller
             )
             ->first();
 
-        if (!$user)
-            abort(404, 'User not found');
-
-
-        session(['ma_user_id' => $user->assign_ma_user_id]);
-
-        $draft_study_leave = StudyLeave::where('empno', $user->empno)
-            ->where('is_draft', true)
-            ->select(
-                "passport_no",
-                "passport_validity"
-            )
-            ->first();
-
-        return view('StudyLeave.createBasicInfo', compact('user', 'draft_study_leave', 'readonly'));
+        return $employee;
     }
+
     /**
      * Store a basic information in storage.
+     * Calling Route: StudyLeave.BasicInfo.store
      */
     public function storeBasicInfo(Request $request)
     {
 
         $academicYear = session('study_leave.academic_year');
-
-        $empno = session('study_leave.employee_no') ?? session('empno');
-
-        $draft = StudyLeave::where('empno', $empno)
-            ->where('is_draft', true)
-            ->first();
-
-        if ($draft) {
-            // Update existing draft
-            $draft->update([
-                'academic_year' => $academicYear,
-                'is_draft' => true
-            ]);
-        } else {
-            // Create new draft record
-            StudyLeave::create([
-                'empno' => session('empno'),
-                'academic_year' => $academicYear,
-                'is_draft' => true,
-
-            ]);
-        }
-        $this->updateBasicInfo($request);
-
+        $this->updateBasicInfo($request, $academicYear);
         // redirect Details of the Study Leave
-
         return redirect()->route('StudyLeave.Details.create')->with('success', 'Basic information saved successfully!');
     }
+    /**
+     * Save draft and  exit basic information in storage.
+     * Calling Route: StudyLeave.BasicInfo.exit
+     */
     public function exiteBasicInfo(Request $request)
     {
+        $academicYear = session('study_leave.academic_year');
 
-        $this->updateBasicInfo($request);
+        $this->updateBasicInfo($request, $academicYear);
 
         return redirect()->route('StudyLeave.create')->with('success', 'Basic information saved successfully!');
     }
-    public function updateBasicInfo($request)
-    {
-       
-        // Check if there's an existing draft for this employee
+    /**
+     * Update or create basic information in storage.
+     */
+    private function updateBasicInfo($request, $academicYear = null)
+    {      
+       // Check if there's an existing draft for this employee
         $draft = StudyLeave::where('empno', session('empno'))
             ->where('is_draft', true)
             ->first();
-
         if ($draft) {
             // Update existing draft
             $draft->update([
@@ -182,15 +174,21 @@ class StudyLeaveController extends Controller
                 'current_step' => 1
             ]);
         } else {
-            // Create new draft record
+            // Create new draft record       
             StudyLeave::create([
                 'empno' => session('empno'),
                 'is_draft' => true,
-                'current_step' => 1
+                'current_step' => 1,
+                'academic_year' => $academicYear,
             ]);
         }
         return;
     }
+
+    /**
+     * Show the form for creating study leave details.
+     * Calling Route: StudyLeave.Details.create
+     */
 
     public function createDetails()
     {
@@ -198,12 +196,15 @@ class StudyLeaveController extends Controller
 
         $empno = session('study_leave.employee_no') ?? session('empno');
 
-        $draft_study_leave = StudyLeave::where('empno', $empno)
-            ->where('is_draft', true)
-            ->first();
+        $draft_study_leave =$this->getStudyLeaveDraft($empno);
 
         return view('StudyLeave.createDetails', compact('draft_study_leave', 'readonly'));
     }
+   
+    /**
+     * Store study leave details in storage.
+     * Calling Route: StudyLeave.Details.store
+     */  
     public function storeDetails(Request $request)
     {
 
@@ -212,15 +213,14 @@ class StudyLeaveController extends Controller
         return redirect()->route('StudyLeave.WorkCoveringPersons.create')->with('success', 'Study leave details saved successfully!');
     }
 
-    public function updateDetails($request)
+    /**
+     * Update study leave details in storage.
+     */
+
+    private function updateDetails($request)
     {
-        // This function can be used to update details if needed
-        // Validate the incoming request data
-
-        // Validation rules for Study Leave details - adjust fields to match your createDetails.blade.php
-
+        // Validation rules for Study Leave details 
         $rules = array(
-            // 'leave_type' => 'required|string|max:100',
             'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
             'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
@@ -239,23 +239,20 @@ class StudyLeaveController extends Controller
             'any_other_details' => 'nullable|string|max:1000',
             'air_passage_request' => 'required_if:funding_type,self|string|in:yes,no',
             'warm_cloth_allowance_request' => 'required_if:funding_type,self|string|in:yes,no',
-            //'self_funding_declaration' => 'required_if:funding_type,self|file|mimes:pdf|max:10240',
-           // 'placement_letter' => 'required|file|mimes:pdf|max:10240',
             'loan_handling' => 'required_if:leave_payment_type,Without Pay|string|max:100',
         );
-          $empno = session('study_leave.employee_no') ?? session('empno');
+        $empno = session('study_leave.employee_no') ?? session('empno');
 
-            // Get or create draft to get the study leave ID
-            $draft = StudyLeave::where('empno', $empno)
-                ->where('is_draft', true)
-                ->first();
+        // Get or create draft to get the study leave ID
+        $draft = $this->getStudyLeaveDraft($empno);
             
-            if($draft->placement_letter == null){
-                $rules['placement_letter'] = 'required|file|mimes:pdf|max:10240';
-            }
-            if($draft->self_funding_declaration == null){
-                $rules['self_funding_declaration'] = 'required_if:funding_type,self|file|mimes:pdf|max:10240';
-            }
+        if($draft->placement_letter == null){
+               
+            $rules['placement_letter'] = 'required|file|mimes:pdf|max:10240';
+       }
+        if($draft->self_funding_declaration == null){
+            $rules['self_funding_declaration'] = 'required_if:funding_type,self|file|mimes:pdf|max:10240';
+         }
 
 
        
@@ -268,7 +265,7 @@ class StudyLeaveController extends Controller
             'validation_errors' => $e->errors(),
             'request_data' => $request->all()
         ]);
-    }
+      }
    
    
     // Handle file upload BEFORE storing in session
@@ -277,19 +274,7 @@ class StudyLeaveController extends Controller
             $file = $request->file('self_funding_declaration');
             $empno = session('study_leave.employee_no') ?? session('empno');
 
-            // Get or create draft to get the study leave ID
-            $draft = StudyLeave::where('empno', $empno)
-                ->where('is_draft', true)
-                ->first();
-
-            if (!$draft) {
-                // Create draft if it doesn't exist yet
-                $draft = StudyLeave::create([
-                    'empno' => $empno,
-                    'is_draft' => true
-                ]);
-            }
-
+         
             $studyLeaveId = $draft->id;
 
             // Generate filename: empno_studyleaveid_self_funding_declaration.pdf
@@ -298,6 +283,7 @@ class StudyLeaveController extends Controller
             // Store the file in storage/app/private/self_funding_declaration (private folder)
 
             $path = $file->storeAs('self_funding_declaration', $filename);
+            dd($path);
 
             // Store the path directly for database storage
             $validatedData['self_funding_declaration'] = $path;
@@ -318,33 +304,12 @@ class StudyLeaveController extends Controller
             $file = $request->file('placement_letter');
             $empno = session('study_leave.employee_no') ?? session('empno');
 
-            // Get or create draft to get the study leave ID
-            $draft = StudyLeave::where('empno', $empno)
-                ->where('is_draft', true)
-                ->first();
-
-            if (!$draft) {
-                // Create draft if it doesn't exist yet
-                $draft = StudyLeave::create([
-                    'empno' => $empno,
-                    'is_draft' => true
-                ]);
-            }
-
-            $studyLeaveId = $draft->id;
-
-            // Generate filename: empno_studyleaveid_placement_letter.pdf
-            $filename = $empno . '_' . $studyLeaveId . '_placement_letter.pdf';
-
-            // Store the file in storage/app/private/placement_letter (private folder)
-            $path = $file->storeAs('placement_letter', $filename);
-           
             // Store the path directly for database storage
-            $validatedData['placement_letter'] = $path;
+            $validatedData['placement_letter'] = $this->saveUplodedPdfAttachment($file,$empno, $draft, 'placement_letter');
 
             if ($draft) {
                 $draft->update([
-                    'placement_letter' => $path,
+                    'placement_letter' => $validatedData['placement_letter'],
                     'is_draft' => true,
                     'current_step' => 2,
                 ]);
@@ -359,10 +324,12 @@ class StudyLeaveController extends Controller
 
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
+        /*
         $empno = session('study_leave.employee_no') ?? session('empno');
         $draft = StudyLeave::where('empno', $empno)
             ->where('is_draft', true)
             ->first();
+            */
 
         if($validatedData['study_location'] == 'Sri Lanka'){
             $validatedData['country'] = 'Sri Lanka';
@@ -396,6 +363,38 @@ class StudyLeaveController extends Controller
             $draft->update($updateData);
         }
     }
+    private function saveUplodedPdfAttachment($file,$empno, $draft, $type)
+    {
+         $studyLeaveId = $draft->id;
+         
+        $filename = $this->generateFilename($empno, $studyLeaveId, $type);
+        $directory = $type; 
+        $path = $this->savePdfToStorage($file, $directory, $filename);
+        return $path;
+    }
+    private function generateFilename($empno, $studyLeaveId, $type)
+    {
+        return $empno . '_' . $studyLeaveId . '_' . $type . '.pdf';
+        
+    }
+    /**
+     * Save uploaded PDF to private storage.
+     */
+
+    private function savePdfToStorage($file, $directory, $filename)
+    {
+        // Store the file in the specified private directory
+        return $file->storeAs($directory, $filename);
+    }
+    /**
+     * Fetch draft study leave details from the database.
+     */
+    private function getStudyLeaveDraft($empno)
+    {
+        return StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+    } 
     public function exiteDetails(Request $request)
     {
 
@@ -786,49 +785,97 @@ class StudyLeaveController extends Controller
     public function updateEditeStudyLeave(Request $request, $id)
     {
         // Validate the incoming request data
-
+//dd($request->all());
         $rules = array(
-            'empno' => 'required|string|max:20',
-            'name_with_initials' => 'required|string|max:100',
-            'email' => 'required|email|max:100',
-            'department' => 'required|string|max:100',
-            'faculty' => 'required|string|max:100',
-            'designation' => 'required|string|max:100',
-            'passport_no' => 'nullable|string|max:50',
-            'passport_validity' => 'nullable|date',
+             'study_location' => 'required|string|max:100',
+            'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
+            'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
             'leave_payment_type' => 'required|string|max:100',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
             'university_institute' => 'required|string|max:255',
-            'country' => 'required|string|max:100',
+            'country' => 'required_if:study_location,Abroad|nullable|string|max:100',
             'field_of_study' => 'required|string|max:255',
             'study_program_details' => 'nullable|string|max:1000',
             'funding_type' => 'required|string|max:100',
-            'scholarship_source' => 'nullable|string|max:1000',
-            'scholarship_amount' => 'nullable|numeric|min:0',
-            'project_name' => 'nullable|string|max:255',
+            'scholarship_source' => 'required_if:funding_type,scholarship|string|max:1000',
+            'scholarship_amount' => 'required_if:scholarship_source,agency|nullable|numeric|min:10',
+            'project_name' => 'required_if:scholarship_source,project|nullable|string|max:255',
             'any_other_details' => 'nullable|string|max:1000',
-            'air_passage_request' => 'nullable|in:yes,no',
-            'warm_cloth_allowance_request' => 'nullable|in:yes,no',
-            'self_funding_declaration' => 'nullable|file|mimes:pdf|max:10240',
-            'placement_letter' => 'nullable|file|mimes:pdf|max:10240',
+            'air_passage_request' => 'required_if:funding_type,self|string|in:yes,no',
+            'warm_cloth_allowance_request' => 'required_if:funding_type,self|string|in:yes,no',
+            'loan_handling' => 'required_if:leave_payment_type,Without Pay|string|max:100',
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',
-            'library_and_property_handling' => 'required|string|max:100',
-            'loan_handling' => 'required|string|max:100',
         );
 
-        $validatedData = $request->validate($rules);
         $studyLeave = StudyLeave::find($id);
-        if ($studyLeave) {
-            $studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
-
-            return redirect()->route('StudyLeave.create')->with('success', 'Study leave application updated successfully.');
-        } else {
+        
+        if (!$studyLeave) {
             return redirect()->route('StudyLeave.create')->with('error', 'Study leave application not found.');
         }
+
+        // Check if files already exist
+        if($studyLeave->placement_letter == null){
+            $rules['placement_letter'] = 'required|file|mimes:pdf|max:10240';
+        } else {
+            $rules['placement_letter'] = 'nullable|file|mimes:pdf|max:10240';
+        }
+        
+        if($studyLeave->self_funding_declaration == null){
+            $rules['self_funding_declaration'] = 'required_if:funding_type,self|file|mimes:pdf|max:10240';
+        } else {
+            $rules['self_funding_declaration'] = 'nullable|file|mimes:pdf|max:10240';
+        }
+
+        $validatedData = $request->validate($rules);
+        
+        // Handle placement_letter file upload
+        if ($request->hasFile('placement_letter')) {
+            $file = $request->file('placement_letter');
+            $empno = $studyLeave->empno;
+            $studyLeaveId = $studyLeave->id;
+
+            // Delete old file if exists
+            if ($studyLeave->placement_letter && Storage::exists($studyLeave->placement_letter)) {
+                Storage::delete($studyLeave->placement_letter);
+            }
+
+            // Generate filename: empno_studyleaveid_placement_letter.pdf
+            $filename = $empno . '_' . $studyLeaveId . '_placement_letter.pdf';
+            $path = $file->storeAs('placement_letter', $filename);
+            $validatedData['placement_letter'] = $path;
+        } else {
+            // Keep existing file path if no new file uploaded
+            unset($validatedData['placement_letter']);
+        }
+
+        // Handle self_funding_declaration file upload
+        if ($request->hasFile('self_funding_declaration')) {
+            $file = $request->file('self_funding_declaration');
+            $empno = $studyLeave->empno;
+            $studyLeaveId = $studyLeave->id;
+
+            // Delete old file if exists
+            if ($studyLeave->self_funding_declaration && Storage::exists($studyLeave->self_funding_declaration)) {
+                Storage::delete($studyLeave->self_funding_declaration);
+            }
+
+            // Generate filename: empno_studyleaveid_self_funding_declaration.pdf
+            $filename = $empno . '_' . $studyLeaveId . '_self_funding_declaration.pdf';
+            $path = $file->storeAs('self_funding_declaration', $filename);
+            $validatedData['self_funding_declaration'] = $path;
+        } else {
+            // Keep existing file path if no new file uploaded
+            unset($validatedData['self_funding_declaration']);
+        }
+
+        // Update study leave with validated data
+        $studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
+
+        return redirect()->route('StudyLeave.create')->with('success', 'Study leave application updated successfully.');
     }
 
     /**
