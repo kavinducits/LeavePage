@@ -243,7 +243,7 @@
                                                         $btnName = 'View';
                                                     }else{
                                                         if($iteration ==1 && $isEnableStudyLeaveRequiste && !$hasActiveDraft){
-                                                             $route = 'StudyLeave.show.editeForm';
+                                                             $route = 'StudyLeave.show.extendForm';
                                                             $btnName = 'Extend';
                                                         }else{
                                                              $route = 'StudyLeave.show.studyLeave';

@@ -1085,4 +1085,30 @@ class StudyLeaveController extends Controller
 
         return $years;
     }
+
+    public function showExtendStudyLeaveForm($id){
+
+        $readonly = false;
+        $study_leave = StudyLeave::where('id', $id)
+  
+            ->select(
+                "leave_type",
+                "leave_payment_type",
+                "study_leave_from",
+                "study_leave_to",
+                "funding_type",
+                "scholarship_source",
+                "scholarship_amount",
+                "project_name",
+                "nominee_teaching_empno",
+                "nominee_admin_empno",
+                "nominee_other_empno",
+                "reference_no"
+            )
+            ->first();
+
+        return view('StudyLeave.study_leave_extend_form', compact('study_leave', 'readonly'));
+
+
+    }
 }

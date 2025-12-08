@@ -97,6 +97,7 @@ Route::get('/StudyLeave/view/{id}', [StudyLeaveController::class, 'showStudyLeav
 Route::get('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'showEditeStudyLeaveForm'])->name('StudyLeave.show.editeForm');
 Route::post('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'editeStudyLeaveApplication'])->name('StudyLeave.edite.application');
 Route::post('/StudyLeave/view/{id}/edite/update', [StudyLeaveController::class, 'updateEditeStudyLeave'])->name('StudyLeave.update.edite.application');
+Route::get('/StudyLeave/view/{id}/extend', [StudyLeaveController::class, 'showExtendStudyLeaveForm'])->name('StudyLeave.show.extendForm');
 
 Route::get('/StudyLeave/draft/{id}/continue', [StudyLeaveController::class, 'continueDraft'])->name('StudyLeave.continue.draft');
 
