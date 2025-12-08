@@ -283,8 +283,7 @@ class StudyLeaveController extends Controller
             // Store the file in storage/app/private/self_funding_declaration (private folder)
 
             $path = $file->storeAs('self_funding_declaration', $filename);
-            dd($path);
-
+           
             // Store the path directly for database storage
             $validatedData['self_funding_declaration'] = $path;
 
