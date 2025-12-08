@@ -13,7 +13,7 @@
                 @include('StudyLeave.basic_info_form')
                 @include('StudyLeave.details_form')
                 @include('StudyLeave.working_covering_persons_form')
-                @include('StudyLeave.summary_form')
+             
                 
                 <div class="form-group mt-4 mb-3 d-flex justify-content-center">
                     <a href="{{ route('StudyLeave.create') }}" class="btn btn-primary btn-lg">Back</a>
