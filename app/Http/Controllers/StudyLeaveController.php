@@ -75,7 +75,9 @@ class StudyLeaveController extends Controller
             $isEnableStudyLeaveRequiste = true;
         }
 
-        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate'));
+        $academicYears = $this->academicYears();
+
+        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate', 'academicYears'));
     }
     public function storeStudyLeave(Request $request)
     {
@@ -1068,5 +1070,19 @@ class StudyLeaveController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'File deleted successfully']);
+    }
+
+    public function academicYears()
+    {
+        $currentYear = date('Y');
+        $years = [];
+
+        for ($i = -3; $i < 3; $i++) {
+            $startYear = $currentYear + $i;
+            $endYear = $startYear + 1;
+            $years[] = "{$startYear}/{$endYear}";
+        }
+
+        return $years;
     }
 }

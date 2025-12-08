@@ -153,11 +153,9 @@
                             </label>
                             <select class="form-select" id="academic-year" name="academic_year">
                                 <option value="">Choose Academic Year...</option>
-                                <option value="20/21">20/21</option>
-                                <option value="21/22">21/22</option>
-                                <option value="22/23">22/23</option>
-                                <option value="23/24">23/24</option>
-                                <option value="24/25">24/25</option>
+                                @foreach($academicYears as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <a href="#" class="d-inline-block text-decoration-none" id="new-application-button" onclick="startNewApplication(event)">
