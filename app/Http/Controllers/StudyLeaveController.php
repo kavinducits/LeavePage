@@ -214,6 +214,18 @@ class StudyLeaveController extends Controller
 
         return redirect()->route('StudyLeave.WorkCoveringPersons.create')->with('success', 'Study leave details saved successfully!');
     }
+    /**
+     * Save draft and  exit study leave details in storage.
+     * Calling Route: StudyLeave.Details.exit
+     */
+    public function exiteDetails(Request $request)
+    {
+
+        $this->updateDetails($request);
+
+        return redirect()->route('StudyLeave.create')->with('success', 'Study leave details saved successfully!');
+    }
+
 
     /**
      * Update study leave details in storage.
@@ -275,24 +287,14 @@ class StudyLeaveController extends Controller
 
             $file = $request->file('self_funding_declaration');
             $empno = session('study_leave.employee_no') ?? session('empno');
-
+           // Store the path directly for database storage
+            $validatedData['self_funding_declaration'] = $this->saveUplodedPdfAttachment($file,$empno, $draft, 'self_funding_declaration');
          
-            $studyLeaveId = $draft->id;
-
-            // Generate filename: empno_studyleaveid_self_funding_declaration.pdf
-            $filename = $empno . '_' . $studyLeaveId . '_self_funding_declaration.pdf';
-
-            // Store the file in storage/app/private/self_funding_declaration (private folder)
-
-            $path = $file->storeAs('self_funding_declaration', $filename);
-           
-            // Store the path directly for database storage
-            $validatedData['self_funding_declaration'] = $path;
 
             // Update the existing draft with the file path
             if ($draft) {
                 $draft->update([
-                    'self_funding_declaration' => $path,
+                    'self_funding_declaration' => $validatedData['self_funding_declaration'],
                     'is_draft' => true
                 ]);
             }
@@ -320,17 +322,10 @@ class StudyLeaveController extends Controller
             unset($validatedData['placement_letter']);
         }
 
-        // Now store in session (file is already processed and stored as path)
-        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
 
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
-        /*
-        $empno = session('study_leave.employee_no') ?? session('empno');
-        $draft = StudyLeave::where('empno', $empno)
-            ->where('is_draft', true)
-            ->first();
-            */
+      
 
         if($validatedData['study_location'] == 'Sri Lanka'){
             $validatedData['country'] = 'Sri Lanka';
@@ -364,6 +359,10 @@ class StudyLeaveController extends Controller
             $draft->update($updateData);
         }
     }
+
+    /**
+     * Save uploaded PDF attachment to private storage and return the path.
+     */
     private function saveUplodedPdfAttachment($file,$empno, $draft, $type)
     {
          $studyLeaveId = $draft->id;
@@ -373,6 +372,9 @@ class StudyLeaveController extends Controller
         $path = $this->savePdfToStorage($file, $directory, $filename);
         return $path;
     }
+    /**
+     * Generate a unique filename for the uploaded PDF.
+     */
     private function generateFilename($empno, $studyLeaveId, $type)
     {
         return $empno . '_' . $studyLeaveId . '_' . $type . '.pdf';
@@ -396,14 +398,7 @@ class StudyLeaveController extends Controller
             ->where('is_draft', true)
             ->first();
     } 
-    public function exiteDetails(Request $request)
-    {
-
-        $this->updateDetails($request);
-
-        return redirect()->route('StudyLeave.create')->with('success', 'Study leave details saved successfully!');
-    }
-
+    
   
     public function createWorkCoveringPersons()
     {
@@ -786,7 +781,7 @@ class StudyLeaveController extends Controller
     public function updateEditeStudyLeave(Request $request, $id)
     {
         // Validate the incoming request data
-//dd($request->all());
+
         $rules = array(
              'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
@@ -1107,7 +1102,7 @@ class StudyLeaveController extends Controller
             )
             ->first();
 
-        return view('StudyLeave.study_leave_extend_form', compact('study_leave', 'readonly'));
+        return view('StudyLeave.study_leave_extension_form', compact('study_leave', 'readonly'));
 
 
     }

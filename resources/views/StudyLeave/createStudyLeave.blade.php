@@ -231,42 +231,94 @@
                                             
                                         </td>
                                         <td>
-                                           
                                             @php
                                                 $statusValue = $leave->status_id ?? 0;
-                                                if ($statusValue == 1) {
-                                                   // $route = 'Approved';
-                                                  //  $btnName = 'View';
-                                                    $badgeClass = 'bg-success';
-                                                    if($leave->study_leave_to >= $currentDate){
-                                                        $route = 'StudyLeave.show.studyLeave';
-                                                        $btnName = 'View';
-                                                    }else{
-                                                        if($iteration ==1 && $isEnableStudyLeaveRequiste && !$hasActiveDraft){
-                                                             $route = 'StudyLeave.show.extendForm';
-                                                            $btnName = 'Extend';
-                                                        }else{
-                                                             $route = 'StudyLeave.show.studyLeave';
-                                                            $btnName = 'View';
-                                                        }
-                                                       // $btnName = 'Extend';
+                                                $leaveFrom = \Carbon\Carbon::parse($leave->study_leave_from);
+                                                $leaveTo = \Carbon\Carbon::parse($leave->study_leave_to);
+                                                $today = \Carbon\Carbon::parse($currentDate);
+                                                
+                                                // Check if leave is in progress (between start and end date)
+                                                $isInProgress = $today->greaterThanOrEqualTo($leaveFrom) && $today->lessThanOrEqualTo($leaveTo);
+                                                
+                                                // Check if leave has ended
+                                                $hasEnded = $today->greaterThan($leaveTo);
+                                                $isBeforeThreeMonthsToEnd =$today->lessThan($leaveTo->copy()->subMonths(3));
+                                                // Check if leave ended within last 3 months
+                                                $threeMonthsAfterEnd = $leaveTo->copy()->addMonths(3);
+                                               // $isWithinThreeMonths = $hasEnded && $today->lessThanOrEqualTo($threeMonthsAfterEnd);
+                                                $isWithinThreeMonths = $today->greaterThan($leaveTo->copy()->subMonths(3)) && $today->lessThanOrEqualTo($leaveTo);
+                                                
+                                                // Check if beyond 3 months after end
+                                               // $isBeyondThreeMonths = $hasEnded && $today->greaterThan($threeMonthsAfterEnd);
+                                               //$isBeyondEnd = $hasEnded && $today->greaterThan($threeMonthsAfterEnd);
+
+                                               // $isBeforeThreeMonthsToEnd =$today->lessThan($leaveTo->copy()->subMonths(3));
+                                                
+                                                // Determine which buttons to show
+                                                $showView = false;
+                                                $showEdit = false;
+                                                $showExtend = false;
+                                                $showProgress = false;
+                                                
+                                                if ($statusValue == 1) { // Approved
+                                                    if ($isInProgress && $isBeforeThreeMonthsToEnd) {
+                                                        // During leave period: show Progress, View, Extend
+                                                        $showProgress = true;
+                                                        $showView = true;
+                                                        $showExtend = true;
+                                                    } elseif ($isWithinThreeMonths) {
+                                                        // Within 3 months after end: show Progress, View
+                                                        $showProgress = true;
+                                                        $showView = true;
+                                                    } elseif ($hasEnded) {
+                                                        // After leave ended (beyond 3 months): show View only
+                                                        $showView = true;
                                                     }
-                                                } elseif ($statusValue == 2) {
-                                                    $route = 'Rejected';
-                                                     $btnName = 'Close';
-                                                    $badgeClass = 'bg-danger';
-                                                } elseif ($statusValue == 3) {
-                                                    $route = 'StudyLeave.show.editeForm';
-                                                     $btnName = 'Edite';
-                                                    $badgeClass = 'bg-warning text-dark';
-                                                    
-                                                } else {
-                                                     $route = 'Pending';
-                                                     $btnName = 'Pending';
-                                                    $badgeClass = 'bg-secondary';
+                                                } elseif ($statusValue == 3) { // Returned by MA
+                                                    $showView = true;
+                                                    $showEdit = true;
                                                 }
                                             @endphp
-                                            <a href="{{ route($route, $leave->id) }}" class="btn btn-sm btn-primary">{{ $btnName }}</a>
+                                            
+                                            <div class="btn-group" role="group">
+                                                @if($showView)
+                                                    <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}" 
+                                                       class="btn btn-sm btn-info" 
+                                                       title="View Details">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
+                                                @endif
+                                                
+                                                @if($showEdit)
+                                                    <a href="{{ route('StudyLeave.show.editeForm', $leave->id) }}" 
+                                                       class="btn btn-sm btn-warning" 
+                                                       title="Edit Application">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                @endif
+                                                
+                                                @if($showExtend)
+                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}" 
+                                                       class="btn btn-sm btn-success" 
+                                                       title="Request Extension">
+                                                        <i class="fas fa-calendar-plus"></i> Extend
+                                                    </a>
+                                                @endif
+                                                
+                                                @if($showProgress)
+                                                    <a href="{{ route('StudyLeave.progressReports.show', $leave->id) }}" 
+                                                       class="btn btn-sm btn-primary" 
+                                                       title="Submit Progress Reports">
+                                                        <i class="fas fa-chart-line"></i> Progress
+                                                    </a>
+                                                @endif
+                                                
+                                                @if(!$showView && !$showEdit && !$showExtend && !$showProgress)
+                                                    <button class="btn btn-sm btn-secondary" disabled>
+                                                        No Actions
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

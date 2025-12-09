@@ -9,6 +9,8 @@ use App\Http\Controllers\DeanController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use App\Http\Controllers\VCController;
 use App\Http\Controllers\StudyLeaveController;
+use App\Http\Controllers\StudyLeaveExtensionController;
+use App\Http\Controllers\StudyLeaveProgressReportsController;
 
 
 // Login routes
@@ -97,7 +99,13 @@ Route::get('/StudyLeave/view/{id}', [StudyLeaveController::class, 'showStudyLeav
 Route::get('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'showEditeStudyLeaveForm'])->name('StudyLeave.show.editeForm');
 Route::post('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'editeStudyLeaveApplication'])->name('StudyLeave.edite.application');
 Route::post('/StudyLeave/view/{id}/edite/update', [StudyLeaveController::class, 'updateEditeStudyLeave'])->name('StudyLeave.update.edite.application');
-Route::get('/StudyLeave/view/{id}/extend', [StudyLeaveController::class, 'showExtendStudyLeaveForm'])->name('StudyLeave.show.extendForm');
+Route::get('/StudyLeave/view/{id}/extend', [StudyLeaveExtensionController::class, 'showStudyLeaveExtensionForm'])->name('StudyLeave.show.extensionForm');
+Route::POST('/StudyLeave/view/{id}/extend', [StudyLeaveExtensionController::class, 'storeStudyLeaveExtension'])->name('StudyLeave.store.extension');
+
+// Progress Reports Routes
+Route::get('/StudyLeave/view/{id}/progress-reports', [StudyLeaveProgressReportsController::class, 'showProgressReports'])->name('StudyLeave.progressReports.show');
+Route::POST('/StudyLeave/{study_leave_id}/progress-report/upload', [StudyLeaveProgressReportsController::class, 'uploadProgressReport'])->name('StudyLeave.progressReport.upload');
+Route::get('/StudyLeave/progress-report/files/{filename}', [StudyLeaveProgressReportsController::class, 'serveProgressReportFile'])->name('StudyLeave.serveProgressReport');
 
 Route::get('/StudyLeave/draft/{id}/continue', [StudyLeaveController::class, 'continueDraft'])->name('StudyLeave.continue.draft');
 

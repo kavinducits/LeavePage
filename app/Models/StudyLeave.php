@@ -54,4 +54,12 @@ class StudyLeave extends Model
         'ma_remarks',
         'current_step',
     ];
+
+    /**
+     * Get the progress reports for the study leave
+     */
+    public function progressReports()
+    {
+        return $this->hasMany(StudyLeaveProgressReports::class, 'study_leave_id');
+    }
 }
