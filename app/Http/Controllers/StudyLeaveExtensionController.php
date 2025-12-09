@@ -96,17 +96,17 @@ class StudyLeaveExtensionController extends Controller
         // Validate the incoming request data
         $rules = array(
             
-            'leave_payment_type' => 'required|string|max:100',
+            //'leave_payment_type' => 'required|string|max:100',
             'old_end_date' => 'required|date',
             'new_end_date' => 'required|date|after_or_equal:old_end_date',
-            'funding_type' => 'required|string|max:100',
-            'scholarship_source' => 'required_if:funding_type,scholarship|string|max:1000',
-            'scholarship_amount' => 'required_if:scholarship_source,agency|nullable|numeric|min:10',
-            'project_name' => 'required_if:scholarship_source,project|nullable|string|max:255',
+            //'funding_type' => 'required|string|max:100',
+           // 'scholarship_source' => 'required_if:funding_type,scholarship|string|max:1000',
+           // 'scholarship_amount' => 'required_if:scholarship_source,agency|nullable|numeric|min:10',
+           // 'project_name' => 'required_if:scholarship_source,project|nullable|string|max:255',
             'reason_for_extension' => 'required|string|max:2000',
         );
         $validator = Validator::make($request->all(), $rules);
-        $validator = \Validator::make($request->all(), $rules);
+        //$validator = \Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             dd([
@@ -134,13 +134,13 @@ class StudyLeaveExtensionController extends Controller
             // Create a new StudyLeaveExtension record
             $studyLeaveExtension = new StudyLeaveExtension();
             $studyLeaveExtension->study_leave_id = $study_leave_id;
-            $studyLeaveExtension->leave_payment_type = $validatedData['leave_payment_type'];
+          //  $studyLeaveExtension->leave_payment_type = $validatedData['leave_payment_type'];
             $studyLeaveExtension->extension_from = $validatedData['old_end_date'];
             $studyLeaveExtension->extension_to = $validatedData['new_end_date'];
-            $studyLeaveExtension->funding_type = $validatedData['funding_type'];
-            $studyLeaveExtension->scholarship_source = $validatedData['scholarship_source'] ?? null;
-            $studyLeaveExtension->scholarship_amount = $validatedData['scholarship_amount'] ?? null;
-            $studyLeaveExtension->project_name = $validatedData['project_name'] ?? null;
+      //      $studyLeaveExtension->funding_type = $validatedData['funding_type'];
+      //      $studyLeaveExtension->scholarship_source = $validatedData['scholarship_source'] ?? null;
+       //     $studyLeaveExtension->scholarship_amount = $validatedData['scholarship_amount'] ?? null;
+       //     $studyLeaveExtension->project_name = $validatedData['project_name'] ?? null;
             $studyLeaveExtension->reason_for_extension = $validatedData['reason_for_extension'];
             $studyLeaveExtension->save();
             

@@ -280,7 +280,7 @@
                                                 }
                                             @endphp
                                             
-                                            <div class="btn-group" role="group">
+                                            <div class="d-flex flex-wrap gap-1">
                                                 @if($showView)
                                                     <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}" 
                                                        class="btn btn-sm btn-info" 

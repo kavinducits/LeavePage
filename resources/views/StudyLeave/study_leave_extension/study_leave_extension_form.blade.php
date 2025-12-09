@@ -46,7 +46,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">From </label>
-                                <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
+                                <input type="date" name="old_end_date" id="old_end_date" class="form-control" 
                                        value="{{optional($study_leave)->study_leave_to ?? ''}}" 
                                        min="{{ date('Y-m-d') }}" 
                                        readonly required>
@@ -57,7 +57,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">To <span class="text-danger">*</span></label>
-                                <input type="date" name="study_leave_to" id="study_leave_to" class="form-control" 
+                                <input type="date" name="new_end_date" id="new_end_date" class="form-control" 
                                        value=''
                                        min="{{ date('Y-m-d') }}" 
                                        required 
@@ -69,87 +69,24 @@
                         </div>
                     </div>
 
-                    <!-- Type of Study Leave Requested -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
-                        <select name="leave_payment_type" id="leave_payment_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ $study_leave->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
-                            <option value="with Pay" {{ $study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
-                            <option value="without Pay" {{ $study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Please select the type of study leave.
-                        </div>
-                    </div>
-                    
-                    <!-- Loan Handling -->
-                    <div class="col-md-6" id="loan_handling_section">
-                        <label for="loan_handling_details" class="form-label fw-semibold">
-                            Paying of Loans taken from University of UPF? <span class="text-danger">*</span>
+
+                    <!-- Reason for Extension -->
+                    <div class="col-12">
+                        <label for="reason_for_extension" class="form-label fw-semibold">
+                            Reason for Extension <span class="text-danger">*</span>
                         </label>
-                        <select class="form-select" id="loan_handling_details" name="loan_handling" {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ empty(old('loan_handling', $study_leave->loan_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
-                            <option value="Make Arrangements" {{ old('loan_handling', $study_leave->loan_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
-                            <option value="Not Make Arrangements" {{ old('loan_handling', $study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
-                        </select>
+                        <textarea name="reason_for_extension" id="reason_for_extension" class="form-control" 
+                                  rows="4" placeholder="Enter reason for requesting extension" 
+                                  required {{ $readonly ?? true ? 'readonly' : '' }}>{{ old('reason_for_extension', $study_leave->reason_for_extension ?? '') }}</textarea>
                         <div class="invalid-feedback">
-                            Please select an option for loan handling.
+                            Please provide a reason for the extension.
                         </div>
                     </div>
 
-                    <!-- Funding Type -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Funding type <span class="text-danger">*</span></label>
-                        <select name="funding_type" id="funding_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ $study_leave->funding_type ?? '' ? '' : 'selected' }} disabled>Select funding type</option>
-                            <option value="self" {{ $study_leave->funding_type === 'self' ? 'selected' : '' }}>Self-Funding</option>
-                            <option value="scholarship" {{ $study_leave->funding_type === 'scholarship' ? 'selected' : '' }}>Scholarship</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Please select a funding type.
-                        </div>
-                    </div>
+                  
 
-                    <!-- Scholarship Details -->
-                    <div class="col-md-6" id="scholarship-details" style="display: none;">
-                        <label class="form-label fw-semibold">Scholarship Source <span class="text-danger">*</span></label>
-                        <select name="scholarship_source" id="scholarship_source" class="form-select" {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ empty($study_leave->scholarship_source) ? 'selected' : '' }} disabled>Select source</option>
-                            <option value="agency" {{ ($study_leave->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
-                            <option value="project" {{ ($study_leave->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            Please select a scholarship source.
-                        </div>
-                    </div>
-
-                    <div class="col-md-6" id="scholarship-extra-details" style="display: none;">
-                        <div id="scholarship-amount-group" style="display: none;">
-                            <label class="form-label fw-semibold">Scholarship Amount <span class="text-danger">*</span></label>
-                            <input type="number" name="scholarship_amount" id="scholarship_amount" class="form-control" 
-                                   min="0.01" step="0.01" placeholder="Enter amount" 
-                                   value="{{ $study_leave->scholarship_amount ?? '' }}" 
-                                   {{ $readonly ?? true ? 'readonly' : '' }}>
-                            <div class="invalid-feedback">
-                                Please enter a valid scholarship amount (must be greater than 0).
-                            </div>
-                        </div>
-
-                        <div id="project-name-group" style="display: none;">
-                            <label class="form-label fw-semibold">Project Name <span class="text-danger">*</span></label>
-                            <input type="text" name="project_name" id="project_name" class="form-control" 
-                                   placeholder="Enter project name" minlength="3" maxlength="200" 
-                                   value="{{ $study_leave->project_name ?? '' }}" 
-                                   {{ $readonly ?? true ? 'readonly' : '' }}>
-                            <div class="invalid-feedback">
-                                Please enter the project name (3-200 characters).
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
+                    
+                  
             <!-- Action Buttons -->
             <div class="card mt-4">
                 <div class="card-body">
