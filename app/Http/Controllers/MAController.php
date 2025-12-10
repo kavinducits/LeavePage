@@ -504,11 +504,34 @@ class MAController extends Controller
             )
             ->get();
 
-           
+        // Get study leave extension applications
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where(function($query) {
+                $query->where('statuses.status', 'Processing MA')
+                      ->orWhereNull('study_leave_extensions.status_id');
+            })
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
 
-        
-
-        return view('ma.studyLeave', compact('studyLeaveApplications'));
+        return view('ma.studyLeave', compact('studyLeaveApplications', 'extensionApplications'));
     }
     public function studyLeaveStatusPage()
     {
@@ -714,6 +737,84 @@ class MAController extends Controller
         return redirect()->route('ma.studyleave')->with('success', 'Study Leave Application returned to user successfully.');
     }
 
+    /**
+     * Show study leave extension details
+     */
+    public function showExtension($extension_id)
+    {
+        $maUserId = self::MA_USER_ID;
+
+        // Get the extension application with related study leave and employee details
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->select(
+                'study_leave_extensions.*',
+                'study_leaves.reference_no',
+                'study_leaves.degree_title',
+                'study_leaves.university_institute',
+                'study_leaves.study_leave_from',
+                'study_leaves.study_leave_to',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials',
+                'employees.nic',
+                'employees.email',
+                'employees.mobile_no as mobile',
+                'employees.department_id',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status'
+            )
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('ma.studyleave')->with('error', 'Extension application not found.');
+        }
+
+        $user = (object)[
+            'empno' => $extension->empno,
+            'name_with_initials' => $extension->name_with_initials,
+            'names_denoted_by_initials' => $extension->name_denoted_by_initials,
+            'nic' => $extension->nic,
+            'email' => $extension->email,
+            'mobile' => $extension->mobile,
+            'department' => $extension->department,
+            'faculty' => $extension->faculty,
+            'designation' => $extension->designation,
+        ];
+
+        // Get Department Head details
+        $departmentHead = null;
+        if ($extension->department_id) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions', 'department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $extension->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+        $readonly = false;
+
+        return view('ma.showExtension', compact('extension', 'user', 'departmentHead', 'readonly'));
+    }
    
     
 }

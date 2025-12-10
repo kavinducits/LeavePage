@@ -131,6 +131,9 @@
     @endif
 </div>
 
+<!-- Include Extension Applications Table -->
+@include('ma.study_leave.study_leave_extensions_table')
+
 <style>
 .table th {
     border-top: none;

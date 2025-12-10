@@ -92,6 +92,7 @@ Route::post('/StudyLeave/files/delete', [StudyLeaveController::class, 'deleteFil
 //Route::get('/StudyLeave/view/{id}', [MAController::class, 'showStudyLeaveApplication'])->name('StudyLeave.show.studyLeaveApplication');
 //Route::get('/StudyLeave/view/{id}', [MAController::class, 'showStudyLeave'])->name('StudyLeave.show.studyLeaveApplication');
 Route::get('/dashboard/StudyLeave/{id}', [MAController::class, 'showStudyLeave'])->name('ma.show.studyleave');
+Route::get('/dashboard/StudyLeaveExtension/{extension_id}', [MAController::class, 'showExtension'])->name('ma.show.extension');
 
 Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudyLeave'])->name('StudyLeave.approve');
 
