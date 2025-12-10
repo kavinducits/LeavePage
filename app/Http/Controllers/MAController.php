@@ -744,7 +744,7 @@ class MAController extends Controller
     {
         $maUserId = self::MA_USER_ID;
 
-        // Get the extension application with related study leave and employee details
+        // Get the complete study leave data for the extension
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
@@ -755,12 +755,14 @@ class MAController extends Controller
             ->where('study_leave_extensions.id', $extension_id)
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
-                'study_leave_extensions.*',
-                'study_leaves.reference_no',
-                'study_leaves.degree_title',
-                'study_leaves.university_institute',
-                'study_leaves.study_leave_from',
-                'study_leaves.study_leave_to',
+                'study_leave_extensions.id',
+                'study_leave_extensions.study_leave_id',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.status_id as extension_status_id',
+                'study_leave_extensions.ma_remarks',
+                'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'employees.name_denoted_by_initials',
@@ -779,6 +781,7 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave')->with('error', 'Extension application not found.');
         }
 
+        // Create user object for forms
         $user = (object)[
             'empno' => $extension->empno,
             'name_with_initials' => $extension->name_with_initials,
@@ -790,6 +793,9 @@ class MAController extends Controller
             'faculty' => $extension->faculty,
             'designation' => $extension->designation,
         ];
+
+        // Create draft_study_leave object for forms (using the original study leave data)
+        $draft_study_leave = $extension;
 
         // Get Department Head details
         $departmentHead = null;
@@ -811,9 +817,100 @@ class MAController extends Controller
                 ->first();
         }
 
+        // Calculate duration for display
+        $oldDate = \Carbon\Carbon::parse($extension->old_end_date);
+        $newDate = \Carbon\Carbon::parse($extension->new_end_date);
+        $durationDays = $oldDate->diffInDays($newDate);
+        $durationMonths = round($durationDays / 30, 1);
+
         $readonly = false;
 
-        return view('ma.showExtension', compact('extension', 'user', 'departmentHead', 'readonly'));
+        return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
+    }
+
+    /**
+     * Forward extension to HOD
+     */
+    public function forwardExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'remark' => 'nullable|string|max:1000',
+        ]);
+
+        $maUserId = self::MA_USER_ID;
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_extensions.*')
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('ma.studyleave')->with('error', 'Extension application not found.');
+        }
+
+        // Prepare remark
+        $newRemark = '';
+        if ($request->remark) {
+            $timestamp = now()->format('Y-m-d');
+            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
+        }
+
+        // Update status to Processing HOD (status_id = 5)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 5, // Processing HOD
+                'ma_empno' => self::MA_USER_ID,
+                'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave')->with('success', 'Extension request forwarded to HOD successfully.');
+    }
+
+    /**
+     * Return extension to user
+     */
+    public function returnExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'remark' => 'required|string|max:1000',
+        ], [
+            'remark.required' => 'Remarks are required when returning an extension request.'
+        ]);
+
+        $maUserId = self::MA_USER_ID;
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_extensions.*')
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('ma.studyleave')->with('error', 'Extension application not found.');
+        }
+
+        // Prepare remark
+        $timestamp = now()->format('Y-m-d');
+        $newRemark = "\n\n[MA Return - " . $timestamp . "]\n" . $request->remark;
+
+        // Update status to Returned (status_id = 3)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 3, // Returned
+                'ma_empno' => self::MA_USER_ID,
+                'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave')->with('success', 'Extension request returned to user successfully.');
     }
    
     
