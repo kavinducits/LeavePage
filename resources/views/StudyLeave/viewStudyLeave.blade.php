@@ -7,6 +7,9 @@
             
             
 
+            <!-- Extension History Section (Top) -->
+            @include('StudyLeave.study_leave_extension.extension_history')
+
             <form method="POST" class="my-4">
                 @csrf
                     <!-- Personal Details (readonly) -->

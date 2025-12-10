@@ -967,10 +967,15 @@ class StudyLeaveController extends Controller
                 ->first();
         }
 
+        // Get extensions for this study leave
+        $extensions = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         // Decide which blade to use and readonly status
         $readonly = true;
        
-        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly'));
+        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions'));
     }
 
     public function continueDraft($id)

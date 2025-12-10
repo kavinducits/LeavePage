@@ -18,6 +18,16 @@ class StudyLeaveExtensionController extends Controller
     }
 
     /**
+     * Get all extensions for a specific study leave
+     */
+    public function getExtensionsByStudyLeaveId($study_leave_id)
+    {
+        return StudyLeaveExtension::where('study_leave_id', $study_leave_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -105,6 +115,7 @@ class StudyLeaveExtensionController extends Controller
            // 'project_name' => 'required_if:scholarship_source,project|nullable|string|max:255',
             'reason_for_extension' => 'required|string|max:2000',
         );
+        
         $validator = Validator::make($request->all(), $rules);
         //$validator = \Validator::make($request->all(), $rules);
 
@@ -117,7 +128,7 @@ class StudyLeaveExtensionController extends Controller
         }
 
         $validatedData = $validator->validated();
-        dd($validatedData);
+      // dd($id,$validatedData);
 
         // Create a new StudyLeaveExtension record
         $creationSuccess = $this->createStudyLeaveExtension($id, $validatedData);
@@ -130,22 +141,30 @@ class StudyLeaveExtensionController extends Controller
 
     public function createStudyLeaveExtension($study_leave_id, $validatedData)
     {
+        //dd($study_leave_id, $validatedData);
         try {
+            
             // Create a new StudyLeaveExtension record
             $studyLeaveExtension = new StudyLeaveExtension();
+           
             $studyLeaveExtension->study_leave_id = $study_leave_id;
+           
           //  $studyLeaveExtension->leave_payment_type = $validatedData['leave_payment_type'];
-            $studyLeaveExtension->extension_from = $validatedData['old_end_date'];
-            $studyLeaveExtension->extension_to = $validatedData['new_end_date'];
+            $studyLeaveExtension->old_end_date = $validatedData['old_end_date'];
+            $studyLeaveExtension->new_end_date = $validatedData['new_end_date'];
+
       //      $studyLeaveExtension->funding_type = $validatedData['funding_type'];
       //      $studyLeaveExtension->scholarship_source = $validatedData['scholarship_source'] ?? null;
        //     $studyLeaveExtension->scholarship_amount = $validatedData['scholarship_amount'] ?? null;
        //     $studyLeaveExtension->project_name = $validatedData['project_name'] ?? null;
             $studyLeaveExtension->reason_for_extension = $validatedData['reason_for_extension'];
+           
             $studyLeaveExtension->save();
+           // dd('after save');
             
             return true;
         } catch (\Exception $e) {
+            dd($e->getMessage());
             //\Log::error('Study Leave Extension Creation Error: ' . $e->getMessage());
             return false;
         }
