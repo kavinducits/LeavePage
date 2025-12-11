@@ -492,6 +492,7 @@ class MAController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->where('statuses.status', 'Processing MA') // filter for MA Processing status
+            ->where()
             ->select(
                 'study_leaves.id as id',
                 'study_leaves.reference_no as reference_no',
@@ -755,7 +756,7 @@ class MAController extends Controller
             ->where('study_leave_extensions.id', $extension_id)
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
-                'study_leave_extensions.id',
+                'study_leave_extensions.id as extension_id',
                 'study_leave_extensions.study_leave_id',
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
@@ -824,7 +825,7 @@ class MAController extends Controller
         $durationMonths = round($durationDays / 30, 1);
 
         $readonly = false;
-
+       
         return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
     }
 
@@ -891,6 +892,7 @@ class MAController extends Controller
             ->where('employees.assign_ma_user_id', $maUserId)
             ->select('study_leave_extensions.*')
             ->first();
+           
 
         if (!$extension) {
             return redirect()->route('ma.studyleave')->with('error', 'Extension application not found.');

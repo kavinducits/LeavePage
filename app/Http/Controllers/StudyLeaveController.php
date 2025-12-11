@@ -616,11 +616,26 @@ class StudyLeaveController extends Controller
     public function getStudyLeaves($emp_no)
     {
 
-        // Fetch employee info from the database
+        // Fetch employee info from the database with latest extension status and total duration
         $previousLeaves = DB::table('study_leaves')
             ->where('empno', $emp_no)
-            ->select('id', 'degree_title', 'university_institute', 'study_leave_from', 'study_leave_to', 'leave_payment_type', 'study_leaves.created_at', 'status_id', 'status', 'reference_no')
+            ->select(
+                'study_leaves.id', 
+                'degree_title', 
+                'university_institute', 
+                'study_leave_from', 
+                'study_leave_to', 
+                'leave_payment_type', 
+                'study_leaves.created_at', 
+                'study_leaves.status_id', 
+                'statuses.status', 
+                'reference_no',
+                'latest_extensions.extension_status_id',
+                DB::raw('COALESCE(extension_durations.total_extension_days, 0) as total_extension_days')
+            )
             ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, status_id as extension_status_id FROM study_leave_extensions WHERE id IN (SELECT MAX(id) FROM study_leave_extensions GROUP BY study_leave_id)) as latest_extensions'), 'study_leaves.id', '=', 'latest_extensions.study_leave_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, SUM(DATEDIFF(new_end_date, old_end_date)) as total_extension_days FROM study_leave_extensions WHERE status_id = 1 GROUP BY study_leave_id) as extension_durations'), 'study_leaves.id', '=', 'extension_durations.study_leave_id')
             ->get();
 
         return $previousLeaves;

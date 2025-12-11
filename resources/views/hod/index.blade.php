@@ -3,8 +3,8 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold text-maroon dashboard-header">
-            <i class="fas fa-user-tie me-2 icon-gold"></i>HOD Dashboard
+        <h2 class="mb-0 fw-bold text-dark dashboard-header">
+            <i class="fas fa-user-tie me-2 text-primary"></i>HOD Dashboard
         </h2>
         <div class="text-muted">
             <i class="fas fa-clock me-1"></i>Applications Pending HOD Review
@@ -25,7 +25,7 @@
     @endif
 
     <div class="card">
-        <div class="card-header card-header-maroon fw-semibold">
+        <div class="card-header card-header-dark fw-semibold">
             <i class="fas fa-list me-2"></i>Submitted Applications
         </div>
         <div class="card-body p-0">
@@ -47,7 +47,7 @@
                             @foreach($applications as $app)
                                 <tr>
                                     <td class="px-3">
-                                        <span class="fw-semibold text-maroon">{{ $app->reference_no }}</span>
+                                        <span class="fw-semibold text-dark">{{ $app->reference_no }}</span>
                                     </td>
                                     <td>
                                         <div class="fw-semibold">{{ $app->name_with_initials }}</div>
@@ -55,7 +55,7 @@
                                     <td>{{ $app->department }}</td>
                                     <td>{{ $app->faculty }}</td>
                                     <td>
-                                        <span class="badge badge-gold">{{ $app->leave_type }}</span>
+                                        <span class="badge bg-primary">{{ $app->leave_type }}</span>
                                     </td>
                                     <td>
                                         <div class="text-muted">
@@ -66,7 +66,7 @@
                                         </small>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('hod.show', $app->id) }}" class="btn btn-sm btn-outline-maroon">
+                                        <a href="{{ route('hod.show', $app->id) }}" class="btn btn-sm btn-outline-dark">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>
@@ -94,7 +94,22 @@
     @endif
 </div>
 
+<!-- Include Study Leave Applications Table -->
+@include('hod.study_leave.study_leave_table')
+
 <style>
+.card-header-dark {
+    background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+    color: white;
+    border-bottom: 3px solid #0d6efd;
+}
+
+.btn-outline-dark:hover {
+    color: white;
+    background-color: #212529;
+    border-color: #212529;
+}
+
 .table th {
     border-top: none;
     font-weight: 600;

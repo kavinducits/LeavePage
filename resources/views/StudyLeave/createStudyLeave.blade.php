@@ -177,8 +177,7 @@
             <div class="card shadow-sm rounded-3 border-0">
                 <div class="card-header bg-white border-bottom-0 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-semibold text-maroon">
-                        <i class="fas fa-history me-2 icon-gold"></i>Your  
-                        .Study Leaves
+                        <i class="fas fa-history me-2 icon-gold"></i>Your Study Leaves
                     </h5>
                 </div>
                 <div class="card-body pt-2 pb-0 px-3">
@@ -233,9 +232,17 @@
                                         <td>
                                             @php
                                                 $statusValue = $leave->status_id ?? 0;
+                                                $extensionStatus = $leave->extension_status_id ?? null;
                                                 $leaveFrom = \Carbon\Carbon::parse($leave->study_leave_from);
                                                 $leaveTo = \Carbon\Carbon::parse($leave->study_leave_to);
                                                 $today = \Carbon\Carbon::parse($currentDate);
+                                                
+                                                // Calculate total duration to check 3-year limit
+                                                $originalDuration = $leaveFrom->diffInDays($leaveTo);
+                                                $totalExtensionDays = $leave->total_extension_days ?? 0;
+                                                $totalDurationDays = $originalDuration + $totalExtensionDays;
+                                                $threeYearsInDays = 3 * 365; // 1095 days
+                                                $canExtendByDuration = $totalDurationDays < $threeYearsInDays;
                                                 
                                                 // Check if leave is in progress (between start and end date)
                                                 $isInProgress = $today->greaterThanOrEqualTo($leaveFrom) && $today->lessThanOrEqualTo($leaveTo);
@@ -253,30 +260,53 @@
                                                //$isBeyondEnd = $hasEnded && $today->greaterThan($threeMonthsAfterEnd);
 
                                                // $isBeforeThreeMonthsToEnd =$today->lessThan($leaveTo->copy()->subMonths(3));
+
+                                               
                                                 
                                                 // Determine which buttons to show
                                                 $showView = false;
                                                 $showEdit = false;
                                                 $showExtend = false;
                                                 $showProgress = false;
-                                                
-                                                if ($statusValue == 1) { // Approved
-                                                    if ($isInProgress && $isBeforeThreeMonthsToEnd) {
-                                                        // During leave period: show Progress, View, Extend
+                                                $showReturnedExtend = false;
+
+                                                // Check extension status first (takes priority)
+                                                if ($extensionStatus !== null) {
+                                                    if ($extensionStatus == 3) {
+                                                        // Extension returned by MA - show View, Return Extend, Progress
+                                                        $showView = true;
+                                                        $showReturnedExtend = $canExtendByDuration; // Only if under 3 years
                                                         $showProgress = true;
+                                                    } elseif (in_array($extensionStatus, [4, 5, 6, 7, 8])) {
+                                                        // Extension in processing - show View, Progress only
                                                         $showView = true;
-                                                        $showExtend = true;
-                                                    } elseif ($isWithinThreeMonths) {
-                                                        // Within 3 months after end: show Progress, View
                                                         $showProgress = true;
+                                                    } elseif (in_array($extensionStatus, [1, 2])) {
+                                                        // Extension approved or pending - show View, Extend, Progress
                                                         $showView = true;
-                                                    } elseif ($hasEnded) {
-                                                        // After leave ended (beyond 3 months): show View only
-                                                        $showView = true;
+                                                        $showExtend = $canExtendByDuration; // Only if under 3 years
+                                                        $showProgress = true;
                                                     }
-                                                } elseif ($statusValue == 3) { // Returned by MA
-                                                    $showView = true;
-                                                    $showEdit = true;
+                                                } else {
+                                                    // No extension - use original study leave logic
+                                                    if ($statusValue == 1) { // Approved
+                                                        if ($isInProgress && $isBeforeThreeMonthsToEnd) {
+                                                            // During leave period: show Progress, View, Extend (if under 3 years)
+                                                            $showProgress = true;
+                                                            $showView = true;
+                                                            $showExtend = $canExtendByDuration;
+                                                        } elseif ($isWithinThreeMonths) {
+                                                            // Within 3 months after end: show Progress, View
+                                                            $showProgress = true;
+                                                            $showView = true;
+                                                        } elseif ($hasEnded) {
+                                                            // After leave ended (beyond 3 months): show View only
+                                                            $showView = true;
+                                                        }
+                                                    } elseif ($statusValue == 3) { // Returned by MA
+                                                        $showView = true;
+                                                        $showEdit = true;
+                                                    }
                                                 }
                                             @endphp
                                             
@@ -305,6 +335,14 @@
                                                     </a>
                                                 @endif
                                                 
+                                                @if($showReturnedExtend)
+                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}" 
+                                                       class="btn btn-sm btn-warning" 
+                                                       title="Resubmit Returned Extension">
+                                                        <i class="fas fa-redo"></i> Return Extend
+                                                    </a>
+                                                @endif
+                                                
                                                 @if($showProgress)
                                                     <a href="{{ route('StudyLeave.progressReports.show', $leave->id) }}" 
                                                        class="btn btn-sm btn-primary" 
@@ -313,7 +351,7 @@
                                                     </a>
                                                 @endif
                                                 
-                                                @if(!$showView && !$showEdit && !$showExtend && !$showProgress)
+                                                @if(!$showView && !$showEdit && !$showExtend && !$showProgress && !$showReturnedExtend)
                                                     <button class="btn btn-sm btn-secondary" disabled>
                                                         No Actions
                                                     </button>

@@ -96,13 +96,62 @@ class StudyLeaveExtensionController extends Controller
             )
             ->first();
 
-        return view('StudyLeave.study_leave_extension.study_leave_extension_form', compact('study_leave', 'readonly'));
+        // Calculate total duration including all extensions
+        $originalDuration = \Carbon\Carbon::parse($study_leave->study_leave_from)
+            ->diffInDays(\Carbon\Carbon::parse($study_leave->study_leave_to));
+        
+        // Get all approved extensions for this study leave
+        $extensions = StudyLeaveExtension::where('study_leave_id', $id)
+            ->whereIn('status_id', [1]) // Only approved extensions
+            ->get();
+        
+        $totalExtensionDays = 0;
+        foreach ($extensions as $extension) {
+            $extensionDays = \Carbon\Carbon::parse($extension->old_end_date)
+                ->diffInDays(\Carbon\Carbon::parse($extension->new_end_date));
+            $totalExtensionDays += $extensionDays;
+        }
+        
+        $totalDurationDays = $originalDuration + $totalExtensionDays;
+        $threeYearsInDays = 3 * 365; // 1095 days
+        
+        $canExtend = $totalDurationDays < $threeYearsInDays;
+        $remainingDays = $threeYearsInDays - $totalDurationDays;
+
+        return view('StudyLeave.study_leave_extension.study_leave_extension_form', compact('study_leave', 'readonly', 'canExtend', 'totalDurationDays', 'remainingDays'));
 
 
     }
 
     public function storeStudyLeaveExtension(Request $request, $id)
     {
+        // First, check if total duration exceeds 3 years
+        $study_leave = StudyLeave::findOrFail($id);
+        
+        $originalDuration = \Carbon\Carbon::parse($study_leave->study_leave_from)
+            ->diffInDays(\Carbon\Carbon::parse($study_leave->study_leave_to));
+        
+        // Get all approved extensions
+        $extensions = StudyLeaveExtension::where('study_leave_id', $id)
+            ->whereIn('status_id', [1])
+            ->get();
+        
+        $totalExtensionDays = 0;
+        foreach ($extensions as $extension) {
+            $extensionDays = \Carbon\Carbon::parse($extension->old_end_date)
+                ->diffInDays(\Carbon\Carbon::parse($extension->new_end_date));
+            $totalExtensionDays += $extensionDays;
+        }
+        
+        $totalDurationDays = $originalDuration + $totalExtensionDays;
+        $threeYearsInDays = 3 * 365;
+        
+        if ($totalDurationDays >= $threeYearsInDays) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Cannot extend: Total study leave duration (including approved extensions) has reached or exceeded 3 years limit.'])
+                ->withInput();
+        }
+        
         // Validate the incoming request data
         $rules = array(
             
