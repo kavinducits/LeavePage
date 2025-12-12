@@ -48,11 +48,15 @@ return new class extends Migration
             $table->string('hod_recommend')->nullable();
             $table->text('hod_not_recommend_reason')->nullable();
              $table->text('hod_remarks')->nullable();
-            $table->boolean('dean_leave_recommendation_status')->nullable();
-            $table->text('dean_not_recommended_reason')->nullable();
             $table->string('vc_empno')->nullable();
-            $table->boolean('vc_recommend_submit_to_committee')->nullable();
-            $table->boolean('vc_council_covering_approval_status')->nullable();
+            $table->string('vc_recommend_submit_to_committee')->nullable();
+            $table->string('vc_council_covering_approval_status')->nullable();
+            $table->text('vc_not_approve_reason')->nullable();
+            $table->text('vc_remarks')->nullable();
+            $table->string('dean_empno')->nullable();
+            $table->string('dean_leave_recommendation_status')->nullable();
+            $table->text('dean_not_recommended_reason')->nullable();
+            $table->text('dean_remarks')->nullable();
             $table->unsignedInteger('status_id')->nullable();
             $table->timestamps();
             $table->boolean('is_draft')->default(false);
@@ -60,6 +64,7 @@ return new class extends Migration
             $table->string('placement_letter')->nullable();
             $table->boolean('is_completed')->nullable();
             $table->unsignedInteger('current_step')->nullable();
+
             
             //$table->foreign('status_id')->references('id')->on('study_leave_statuses')->onDelete('set null');
         });

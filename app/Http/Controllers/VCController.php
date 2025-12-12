@@ -36,7 +36,29 @@ class VCController extends Controller
             )
             ->get();
 
-        return view('vc.index', compact('applications'));
+        // Get all study leave applications for VC review (status_id = 7)
+        // Filter by employees.main_branch_id = 52
+        $studyLeaveApplications = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.status_id', 7) // Processing VC
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->orderByDesc('study_leaves.created_at')
+            ->select(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leaves.created_at as applied_date',
+                'statuses.status'
+            )
+            ->get();
+
+        return view('vc.index', compact('applications', 'studyLeaveApplications'));
     }
 
     public function show($id)
@@ -160,5 +182,97 @@ class VCController extends Controller
             ]);
 
         return redirect()->route('vc.index')->with('success', 'Application forwarded.');
+    }
+
+    public function showStudyLeaveApplication($id)
+    {
+        // Fetch study leave application with main_branch_id filtering
+        $draft_study_leave = DB::table('study_leaves')
+            ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
+            ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
+            ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
+            ->where('study_leaves.id', $id)
+            ->where('study_leaves.status_id', 7) // Processing VC
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->select(
+                'study_leaves.*',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status',
+                'study_leaves.nominee_teaching_empno as teaching_nominee_emp_no',
+                DB::raw("CONCAT(teaching_nominee_t.initials, ' ', teaching_nominee_t.last_name) as teaching_nominee_name"),
+                'study_leaves.nominee_admin_empno as admin_nominee_emp_no',
+                DB::raw("CONCAT(admin_nominee_t.initials, ' ', admin_nominee_t.last_name) as admin_nominee_name"),
+                'study_leaves.nominee_other_empno as other_nominee_emp_no',
+                DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name")
+            )
+            ->first();
+
+        if (!$draft_study_leave) {
+            return redirect()->route('vc.index')->with('error', 'Study leave application not found or not accessible.');
+        }
+
+        // Prepare user object for the partial view
+        $user = (object) [
+            'empno' => $draft_study_leave->employee_no,
+            'name_with_initials' => $draft_study_leave->name_with_initials,
+            'email' => $draft_study_leave->email,
+            'department' => $draft_study_leave->department,
+            'faculty' => $draft_study_leave->faculty,
+            'designation' => $draft_study_leave->designation
+        ];
+        
+        $readonly = true;
+
+        return view('vc.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly'));
+    }
+
+    public function approveStudyLeave(Request $request, $id)
+    {
+        // Validate the VC review inputs
+        $request->validate([
+            'vc_recommend_committee' => 'required|string',
+            'vc_approved_council' => 'required|string',
+            'vc_not_approve_reason' => 'required_if:vc_approved_council,no|string|nullable',
+            'vc_remarks' => 'nullable|string',
+        ]);
+
+        // Verify the application belongs to employees with main_branch_id = 52
+        $application = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leaves.id', $id)
+            ->where('study_leaves.status_id', 7) // Processing VC
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->select('study_leaves.*')
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('vc.index')->with('error', 'Application not found or not accessible.');
+        }
+
+        // Update the study leave application with VC review
+        DB::table('study_leaves')
+            ->where('id', $id)
+            ->update([
+                'status_id' => 1, // Approved (final approval by VC)
+                'vc_empno' => self::VC_EMP_NO,
+                'vc_recommend_submit_to_committee' => $request->vc_recommend_committee,
+                'vc_council_covering_approval_status' => $request->vc_approved_council,
+                'vc_not_approve_reason' => $request->vc_not_approve_reason,
+                'vc_remarks' => $request->vc_remarks,
+               // 'vc_reviewed_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+          
+        return redirect()->route('vc.index')->with('success', 'Study Leave Application reviewed and approved successfully.');
     }
 } 

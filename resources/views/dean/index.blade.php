@@ -96,6 +96,9 @@
             <small>Total Applications: {{ $applications->count() }}</small>
         </div>
     @endif
+
+    <!-- Study Leave Applications Table -->
+    @include('dean.study_leave.study_leave_table')
 </div>
 
 <style>

@@ -279,6 +279,7 @@ class HODController extends Controller
     }
    public function showStudyLeaveApplication($id)
     {
+   
         
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
@@ -317,7 +318,7 @@ class HODController extends Controller
                 
             )
             ->first();
-dd($draft_study_leave);
+
        
         if (!$draft_study_leave) {
             return redirect()->route('hod.show.studyleaves')->with('error', 'Study leave application not found or not accessible.');
@@ -344,7 +345,7 @@ dd($draft_study_leave);
 
         // Set user and readonly flag for the partial view
         $user = (object) [
-            'employee_no' => $draft_study_leave->employee_no,
+            'empno' => $draft_study_leave->employee_no,
             'name_with_initials' => $draft_study_leave->name_with_initials,
             'email' => $draft_study_leave->email,
             'department' => $draft_study_leave->department,
@@ -353,7 +354,7 @@ dd($draft_study_leave);
         ];
         
         $readonly = true;
-        dd($draft_study_leave);
+      
 
         return view('hod.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'deanInfo'));
     }

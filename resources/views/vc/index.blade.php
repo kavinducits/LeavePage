@@ -64,5 +64,8 @@
             </table>
         </div>
     </div>
+
+    <!-- Study Leave Applications Table -->
+    @include('vc.study_leave.study_leave_table')
 </div>
 @endsection 

@@ -9,7 +9,7 @@
             </h2>
             <p class="text-muted mb-0">Reference No: {{ $draft_study_leave->reference_no }}</p>
         </div>
-        <a href="{{ route('hod.show.studyleaves') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('dean.index') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
         </a>
     </div>
@@ -28,95 +28,35 @@
         </div>
     @endif
 
-    <!-- Study Leave Details (readonly) -->
+     <!-- Study Leave Details (readonly) -->
     @include('StudyLeave.basic_info_form', ['readonly' => true])
     @include('StudyLeave.details_form', ['readonly' => true])
     @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
 
-    <!-- HOD Review Section -->
-    <form action="{{ route('hod.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="hodReviewForm">
+    <!-- Dean Review Section -->
+    <form action="{{ route('dean.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="deanReviewForm">
         @csrf
         
         <div class="card mt-4">
             <div class="card-header card-header-dark text-white fw-semibold">
-                <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
+                <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
             </div>
             <div class="card-body">
                 
-                <!-- Question 1 -->
+                <!-- Question 1 - Recommendation -->
                 <div class="mb-4">
                     <label class="form-label fw-semibold">
-                        Whether adequate staff available for the continuation of academic programs during the period of applicant's leave?
+                        Is leave recommended?
                         <span class="text-danger">*</span>
                     </label>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="adequateStaffYes" value="yes" required>
-                        <label class="form-check-label" for="adequateStaffYes">
-                            Yes
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="adequateStaffNo" value="no" required>
-                        <label class="form-check-label" for="adequateStaffNo">
-                            No
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Question 2 -->
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        Whether satisfactory agreements can be made to cover applicant's teaching activities and other commitments?
-                        <span class="text-danger">*</span>
-                    </label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_teaching_covered" id="teachingCoveredYes" value="yes" required>
-                        <label class="form-check-label" for="teachingCoveredYes">
-                            Yes
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_teaching_covered" id="teachingCoveredNo" value="no" required>
-                        <label class="form-check-label" for="teachingCoveredNo">
-                            No
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Question 3 -->
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        Whether the applicant has served at least one (01) year in the Department?
-                        <span class="text-danger">*</span>
-                    </label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_service_period" id="servicePeriodYes" value="yes" required>
-                        <label class="form-check-label" for="servicePeriodYes">
-                            Yes
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_service_period" id="servicePeriodNo" value="no" required>
-                        <label class="form-check-label" for="servicePeriodNo">
-                            No
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Question 4 - Recommendation -->
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        Leave is recommended
-                        <span class="text-danger">*</span>
-                    </label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_recommend" id="recommendYes" value="yes" required>
+                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendYes" value="yes" required>
                         <label class="form-check-label" for="recommendYes">
                             Yes
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="hod_recommend" id="recommendNo" value="no" required>
+                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendNo" value="no" required>
                         <label class="form-check-label" for="recommendNo">
                             No
                         </label>
@@ -125,11 +65,11 @@
 
                 <!-- Conditional: If not recommended -->
                 <div class="mb-4" id="notRecommendReasonDiv" style="display: none;">
-                    <label for="hod_not_recommend_reason" class="form-label fw-semibold">
+                    <label for="dean_not_recommend_reason" class="form-label fw-semibold">
                         If not recommended, please give reasons
                         <span class="text-danger">*</span>
                     </label>
-                    <textarea class="form-control" id="hod_not_recommend_reason" name="hod_not_recommend_reason" rows="4" 
+                    <textarea class="form-control" id="dean_not_recommend_reason" name="dean_not_recommend_reason" rows="4" 
                               placeholder="Please provide detailed reasons for not recommending this leave"></textarea>
                     <div class="invalid-feedback">
                         Please provide reasons for not recommending.
@@ -138,10 +78,10 @@
 
                 <!-- Any other remarks -->
                 <div class="mb-4">
-                    <label for="hod_remarks" class="form-label fw-semibold">
+                    <label for="dean_remarks" class="form-label fw-semibold">
                         Any other remarks
                     </label>
-                    <textarea class="form-control" id="hod_remarks" name="hod_remarks" rows="3" 
+                    <textarea class="form-control" id="dean_remarks" name="dean_remarks" rows="3" 
                               placeholder="Add any additional comments or remarks (optional)"></textarea>
                 </div>
 
@@ -152,37 +92,26 @@
         <div class="card mt-4">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <a href="{{ route('hod.show.studyleaves') }}" class="btn btn-outline-secondary btn-lg">
+                    <a href="{{ route('dean.index') }}" class="btn btn-outline-secondary btn-lg">
                         <i class="fas fa-times me-2"></i>Cancel
                     </a>
 
                     <div class="text-end">
                         <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
-                            <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Dean
+                            <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to VC
                         </button>
                         
-                        @if(isset($deanInfo))
-                            <div class="card mt-2" style="min-width: 280px;">
-                                <div class="card-body py-2">
-                                    <div class="d-flex align-items-center">
-                                        <strong>Forward to,&nbsp;</strong>
-                                        <div>
-                                            <div class="fw-semibold">{{ $deanInfo->title ?? 'Dean' }}&nbsp;{{ $deanInfo->initials ?? '' }}&nbsp;{{ $deanInfo->last_name ?? '' }}</div>
-                                            <div class="text-muted small">{{ $deanInfo->faculty_name ?? '' }}</div>
-                                        </div>
+                        <div class="card mt-2" style="min-width: 280px;">
+                            <div class="card-body py-2">
+                                <div class="d-flex align-items-center">
+                                    <strong>Forward to,&nbsp;</strong>
+                                    <div>
+                                        <div class="fw-semibold">Vice Chancellor</div>
+                                        <div class="text-muted small">Final Approval</div>
                                     </div>
                                 </div>
                             </div>
-                        @else
-                            <div class="card mt-2 border-warning" style="min-width: 280px;">
-                                <div class="card-body py-2">
-                                    <div class="text-danger">
-                                        <strong>No active Dean found</strong>
-                                        <div class="text-muted small">Please contact administrator.</div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,6 +124,14 @@
     background: linear-gradient(135deg, #212529 0%, #343a40 100%);
     color: white;
     border-bottom: 3px solid #0d6efd;
+}
+
+.text-dark {
+    color: #212529;
+}
+
+.text-primary {
+    color: #0d6efd;
 }
 
 .form-check-input:checked {
@@ -212,6 +149,16 @@
     padding: 0.5rem 1.5rem;
     font-size: 1rem;
 }
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
 </style>
 
 <script>
@@ -219,8 +166,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const recommendYes = document.getElementById('recommendYes');
     const recommendNo = document.getElementById('recommendNo');
     const notRecommendReasonDiv = document.getElementById('notRecommendReasonDiv');
-    const notRecommendReasonTextarea = document.getElementById('hod_not_recommend_reason');
-    const form = document.getElementById('hodReviewForm');
+    const notRecommendReasonTextarea = document.getElementById('dean_not_recommend_reason');
+    const form = document.getElementById('deanReviewForm');
 
     // Show/hide reason textarea based on recommendation
     function toggleReasonField() {
@@ -258,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Confirm submission
         if (isValid) {
             const confirmMessage = recommendYes.checked 
-                ? 'Are you sure you want to submit your review and forward this application to the Dean?' 
+                ? 'Are you sure you want to submit your review and forward this application to the Vice Chancellor?' 
                 : 'Are you sure you want to submit your review with a NOT RECOMMENDED status?';
             
             if (!confirm(confirmMessage)) {

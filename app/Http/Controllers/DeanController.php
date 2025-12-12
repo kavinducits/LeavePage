@@ -63,7 +63,28 @@ class DeanController extends Controller
             )
             ->get();
 
-        return view('dean.index', compact('applications'));
+        // Get all study leave applications for Dean review (status_id = 6) from assigned faculties
+        $studyLeaveApplications = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.status_id', 6) // Processing Dean
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->orderByDesc('study_leaves.created_at')
+            ->select(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leaves.created_at as applied_date',
+                'statuses.status'
+            )
+            ->get();
+
+        return view('dean.index', compact('applications', 'studyLeaveApplications'));
     }
 
     public function show($id)
@@ -193,12 +214,13 @@ class DeanController extends Controller
         return redirect()->route('dean.index')->with('success', $msg);
     }
 
-     public function showStudyLeaveApplication($id)
+    public function showStudyLeaveApplication($id)
     {
+        // Get faculty IDs for this Dean
+        $facultyIds = $this->getDeanFaculties();
        
-       
-        // Try to find by reference_no first, then by id
-        $application = DB::table('study_leaves')
+        // Fetch study leave application with faculty filtering
+        $draft_study_leave = DB::table('study_leaves')
             ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -207,8 +229,9 @@ class DeanController extends Controller
             ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
-            
             ->where('study_leaves.id', $id)
+            ->where('study_leaves.status_id', 6) // Processing Dean
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->select(
                 'study_leaves.*',
                 'employees.employee_no as employee_no',
@@ -216,6 +239,7 @@ class DeanController extends Controller
                 'employees.email',
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
+                'faculties.id as faculty_id',
                 'designations.designation_name as designation',
                 'statuses.status',
                 'study_leaves.nominee_teaching_empno as teaching_nominee_emp_no',
@@ -223,39 +247,66 @@ class DeanController extends Controller
                 'study_leaves.nominee_admin_empno as admin_nominee_emp_no',
                 DB::raw("CONCAT(admin_nominee_t.initials, ' ', admin_nominee_t.last_name) as admin_nominee_name"),
                 'study_leaves.nominee_other_empno as other_nominee_emp_no',
-                DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
-                'departments.id as department_id'
-                
+                DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name")
             )
             ->first();
 
-       
+        if (!$draft_study_leave) {
+            return redirect()->route('dean.index')->with('error', 'Study leave application not found or not accessible.');
+        }
+
+        // Prepare user object for the partial view
+        $user = (object) [
+            'empno' => $draft_study_leave->employee_no,
+            'name_with_initials' => $draft_study_leave->name_with_initials,
+            'email' => $draft_study_leave->email,
+            'department' => $draft_study_leave->department,
+            'faculty' => $draft_study_leave->faculty,
+            'designation' => $draft_study_leave->designation
+        ];
+        
+        $readonly = true;
+
+        return view('dean.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly'));
+    }
+
+    public function approveStudyLeave(Request $request, $id)
+    {
+        // Validate the Dean review inputs
+        $request->validate([
+            'dean_recommend' => 'required|string',
+            'dean_not_recommend_reason' => 'required_if:dean_recommend,no|string|nullable',
+            'dean_remarks' => 'nullable|string',
+        ]);
+
+        // Get faculty IDs for this Dean
+        $facultyIds = $this->getDeanFaculties();
+
+        // Verify the application belongs to this Dean's faculties
+        $application = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leaves.id', $id)
+            ->where('study_leaves.status_id', 6) // Processing Dean
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->select('study_leaves.*')
+            ->first();
+
         if (!$application) {
-            abort(404, 'Study leave application not found');
+            return redirect()->route('dean.index')->with('error', 'Application not found or not accessible.');
         }
 
-        $departmentHead = null;
-        if ($application && isset($application->department_id)) {
-            $departmentHead = DB::table('department_heads')
-                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
-                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
-       
-                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
-                ->where('department_heads.department_id', $application->department_id)
-                ->where('department_heads.active_status', 1)
-                ->select(
-                    'department_heads.emp_no as head_emp_no',
-                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
-                    'categories.category_name as head_title',
-                    'categories.id as head_title_id',
-                    'head_positions.category_name as head_position',
-                    'head_positions.id as head_position_id'
-                )
-                ->first();
-        }
-
-//dd($departmentHead);
-
-        return view('hod.showStudyLeave', compact('application', 'departmentHead'));
+        // Update the study leave application with Dean review
+        DB::table('study_leaves')
+            ->where('id', $id)
+            ->update([
+                'status_id' => 7, // Processing VC (forward to VC)
+                'dean_empno' => self::DEAN_EMP_NO,
+                'dean_leave_recommendation_status' => $request->dean_recommend,
+                'dean_not_recommended_reason' => $request->dean_not_recommend_reason,
+                //'dean_remarks' => $request->dean_remarks,
+                //'updated_at' => now()
+            ]);
+          
+        return redirect()->route('dean.index')->with('success', 'Study Leave Application reviewed and forwarded to VC successfully.');
     }
 } 
