@@ -485,9 +485,6 @@ class HODController extends Controller
     public function approveExtension(Request $request, $extension_id)
     {
         $request->validate([
-            'hod_adequate_staff_available' => 'required|string',
-            'hod_teaching_covered' => 'required|string',
-            'hod_service_period' => 'required|string',
             'hod_recommend' => 'required|string',
             'hod_not_recommend_reason' => 'required_if:hod_recommend,no|string|nullable',
             'hod_remarks' => 'nullable|string',
@@ -511,9 +508,6 @@ class HODController extends Controller
 
         // Prepare HOD remarks
         $hodRemarks = "HOD Review:\n";
-        $hodRemarks .= "- Adequate Staff Available: " . ucfirst($request->hod_adequate_staff_available) . "\n";
-        $hodRemarks .= "- Teaching Covered: " . ucfirst($request->hod_teaching_covered) . "\n";
-        $hodRemarks .= "- Service Period: " . ucfirst($request->hod_service_period) . "\n";
         $hodRemarks .= "- Recommendation: " . ucfirst($request->hod_recommend) . "\n";
         
         if ($request->hod_recommend === 'no' && $request->hod_not_recommend_reason) {
@@ -533,9 +527,6 @@ class HODController extends Controller
             ->update([
                 'status_id' => 6, // Processing Dean
                 'hod_empno' => self::HOD_EMP_NO,
-                'hod_adequate_staff_available' => $request->hod_adequate_staff_available,
-                'hod_teaching_covered' => $request->hod_teaching_covered,
-                'hod_service_period' => $request->hod_service_period,
                 'hod_recommend' => $request->hod_recommend,
                 'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
                 'hod_remarks' => DB::raw("CONCAT(COALESCE(hod_remarks, ''), '" . addslashes($hodRemarks) . "')"),
