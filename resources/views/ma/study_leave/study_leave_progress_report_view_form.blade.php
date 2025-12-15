@@ -238,7 +238,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-start">
-                                <form id="returnForm" action="{{ route('ma.progressreport.return', $progressReport->id) }}" method="POST" class="d-inline">
+                                <form id="returnForm" action="{{ route('ma.progressreport.return', $progressReport->progress_report_id) }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" id="returnRemarkInput" name="remark" value="">
                                     <button type="submit" class="btn btn-danger btn-lg">
@@ -247,7 +247,7 @@
                                 </form>
 
                                 <div class="text-right">
-                                    <form id="approveForm" action="{{ route('ma.progressreport.approve', $progressReport->id) }}" method="POST" class="d-inline">
+                                    <form id="approveForm" action="{{ route('ma.progressreport.approve', $progressReport->progress_report_id) }}" method="POST" class="d-inline">
                                         @csrf
                                         <input type="hidden" id="approveRemarkInput" name="remark" value="">
                                         <button type="submit" class="btn btn-success btn-lg" {{ empty($departmentHead) ? 'disabled' : '' }}>

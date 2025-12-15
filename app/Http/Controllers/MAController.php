@@ -959,7 +959,8 @@ class MAController extends Controller
             ->where('employees.assign_ma_user_id', $maUserId) // Ensure MA has access
             ->select(
                 'study_leave_progress_reports.*',
-                 'study_leaves.*',
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
                 'study_leaves.project_name as project_name',
@@ -978,7 +979,7 @@ class MAController extends Controller
                 'statuses.status'
             )
             ->first();
-
+      
         if (!$progressReport) {
             return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
         }
@@ -1047,6 +1048,7 @@ class MAController extends Controller
         $maUserId = self::MA_USER_ID;
 
         // Verify the progress report belongs to this MA
+       
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
@@ -1054,7 +1056,7 @@ class MAController extends Controller
             ->where('employees.assign_ma_user_id', $maUserId)
             ->select('study_leave_progress_reports.*')
             ->first();
-
+          
         if (!$progressReport) {
             return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
         }

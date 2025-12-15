@@ -633,4 +633,100 @@ class HODController extends Controller
           
         return redirect()->route('hod.index')->with('success', 'Study Leave Application reviewed and forwarded to Dean successfully.');
     }
+
+    public function showProgressReport($progress_report_id)
+    {
+        // Get department IDs for this HOD
+        $departmentIds = $this->getHodDepartments();
+
+        // Fetch the progress report with related study leave and employee details
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports.status_id', 5) // Processing HOD
+            ->whereIn('employees.department_id', $departmentIds) // Ensure HOD has access
+            ->select(
+                'study_leave_progress_reports.*',
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.*',
+                'study_leaves.scholarship_source as scholarship_source',
+                'study_leaves.scholarship_amount as scholarship_amount',
+                'study_leaves.project_name as project_name',
+                'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
+                'study_leaves.nominee_admin_empno as nominee_admin_empno',
+                'study_leaves.nominee_other_empno as nominee_other_empno',
+                'study_leaves.self_funding_declaration as self_funding_declaration',
+                'study_leaves.placement_letter as placement_letter',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'departments.id as department_id',
+                'faculties.faculty_name as faculty',
+                'faculties.id as faculty_id',
+                'designations.designation_name as designation',
+                'statuses.status'
+            )
+            ->first();
+      
+        if (!$progressReport) {
+            return redirect()->route('hod.index')->with('error', 'Progress report not found.');
+        }
+        $draft_study_leave=$progressReport;
+
+        // Fetch all approved progress reports for this study leave (status_id = 1)
+        $approvedReports = DB::table('study_leave_progress_reports')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.study_leave_id', $progressReport->study_leave_id)
+            ->where('study_leave_progress_reports.status_id', 1) // Approved status
+            ->where('study_leave_progress_reports.id', '!=', $progress_report_id) // Exclude current report
+            ->select(
+                'study_leave_progress_reports.id',
+                'study_leave_progress_reports.due_date',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.document_path',
+                'statuses.status'
+            )
+            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->get();
+
+        // Prepare user object for the view
+        $user = (object) [
+            'empno' => $progressReport->employee_no,
+            'name_with_initials' => $progressReport->name_with_initials,
+            'email' => $progressReport->email,
+            'department' => $progressReport->department,
+            'faculty' => $progressReport->faculty,
+            'designation' => $progressReport->designation
+        ];
+
+        // Get Dean information for forwarding
+        $deanInfo = null;
+        if ($progressReport->faculty_id) {
+            $deanInfo = DB::table('faculty_deans')
+                ->join('employees', 'faculty_deans.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as dean_positions', 'faculty_deans.dean_position', '=', 'dean_positions.id')
+                ->where('faculty_deans.faculty_id', $progressReport->faculty_id)
+                ->where('faculty_deans.active_status', 1)
+                ->select(
+                    'faculty_deans.emp_no as dean_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as dean_name"),
+                    'categories.category_name as dean_title',
+                    'categories.id as dean_title_id',
+                    'dean_positions.category_name as dean_position',
+                    'dean_positions.id as dean_position_id'
+                )
+                ->first();
+        }
+
+        $readonly = false;
+
+        return view('hod.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'deanInfo', 'draft_study_leave'));
+    }
 } 

@@ -138,6 +138,7 @@ Route::POST('/HODDashboard/view/{id}/approve', [HODController::class, 'approveSt
 Route::get('/HODDashboard/extension/{extension_id}', [HODController::class, 'showExtension'])->name('hod.show.extension');
 Route::POST('/HODDashboard/extension/{extension_id}/approve', [HODController::class, 'approveExtension'])->name('hod.extension.approve');
 Route::POST('/HODDashboard/extension/{extension_id}/return', [HODController::class, 'returnExtension'])->name('hod.extension.return');
+Route::get('/HODDashboard/progressreport/{progress_report_id}', [HODController::class, 'showProgressReport'])->name('hod.show.studyleave.progressreport');
 
 
 
