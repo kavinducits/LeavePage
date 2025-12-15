@@ -111,7 +111,30 @@ class HODController extends Controller
             )
             ->get();
 
-        return view('hod.index', compact('applications', 'studyLeaveApplications', 'extensionApplications'));
+        // Get study leave progress report applications for HOD review from assigned departments
+        $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.status_id', 5) // Processing HOD (status_id = 5)
+            ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
+            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('hod.index', compact('applications', 'studyLeaveApplications', 'extensionApplications', 'progressReportApplications'));
     }
 
     public function show($id)
@@ -506,20 +529,7 @@ class HODController extends Controller
             return redirect()->route('hod.index')->with('error', 'Extension application not found.');
         }
 
-        // Prepare HOD remarks
-        $hodRemarks = "HOD Review:\n";
-        $hodRemarks .= "- Recommendation: " . ucfirst($request->hod_recommend) . "\n";
-        
-        if ($request->hod_recommend === 'no' && $request->hod_not_recommend_reason) {
-            $hodRemarks .= "- Reason for Not Recommending: " . $request->hod_not_recommend_reason . "\n";
-        }
-        
-        if ($request->hod_remarks) {
-            $hodRemarks .= "- Additional Remarks: " . $request->hod_remarks . "\n";
-        }
-
-        $timestamp = now()->format('Y-m-d H:i:s');
-        $hodRemarks .= "\n[HOD Reviewed - " . $timestamp . "]";
+     //  dd($request->hod_not_recommend_reason);
 
         // Update extension status to Processing Dean (status_id = 6)
         DB::table('study_leave_extensions')
@@ -529,9 +539,10 @@ class HODController extends Controller
                 'hod_empno' => self::HOD_EMP_NO,
                 'hod_recommend' => $request->hod_recommend,
                 'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
-                'hod_remarks' => DB::raw("CONCAT(COALESCE(hod_remarks, ''), '" . addslashes($hodRemarks) . "')"),
+                'hod_remarks' => $request->hod_remarks,
                 'updated_at' => now()
             ]);
+           
 
         return redirect()->route('hod.index')->with('success', 'Extension request forwarded to Dean successfully.');
     }

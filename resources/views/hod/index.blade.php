@@ -100,6 +100,9 @@
 <!-- Include Study Leave Extension Applications Table -->
 @include('hod.study_leave.study_leave_extensions_table')
 
+<!-- Include Study Leave Progress Reports Table -->
+@include('hod.study_leave.study_leave_progress_reports_table')
+
 <style>
 .card-header-dark {
     background: linear-gradient(135deg, #212529 0%, #343a40 100%);

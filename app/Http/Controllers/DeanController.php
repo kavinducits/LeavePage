@@ -363,8 +363,9 @@ class DeanController extends Controller
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions.status_id as extension_status_id',
                 'study_leave_extensions.ma_remarks',
-                'study_leave_extensions.hod_remarks',
-                //'study_leave_extensions.dean_remarks',
+                'study_leave_extensions.hod_remarks as extension_hod_remarks',
+                'study_leave_extensions.hod_recommend as extension_hod_recommend',
+                'study_leave_extensions.dean_remark',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -380,6 +381,8 @@ class DeanController extends Controller
                 'statuses.status'
             )
             ->first();
+
+            
 
         if (!$extension) {
             return redirect()->route('dean.index')->with('error', 'Extension application not found or not accessible.');
@@ -408,6 +411,7 @@ class DeanController extends Controller
         $durationMonths = round($durationDays / 30, 1);
 
         $readonly = true;
+       // dd( $extension);
     
         return view('dean.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
     }
@@ -460,9 +464,9 @@ class DeanController extends Controller
             ->update([
                 'status_id' => 7, // Processing VC
                 'dean_empno' => self::DEAN_EMP_NO,
-                'dean_recommend' => $request->dean_recommend,
-                'dean_not_recommend_reason' => $request->dean_not_recommend_reason,
-                'dean_remarks' => DB::raw("CONCAT(COALESCE(dean_remarks, ''), '" . addslashes($deanRemarks) . "')"),
+                'dean_leave_recommendation_status' => $request->dean_recommend,
+                'dean_not_recommended_reason' => $request->dean_not_recommend_reason,
+                'dean_remark' => DB::raw("CONCAT(COALESCE(dean_remark, ''), '" . addslashes($deanRemarks) . "')"),
                 'updated_at' => now()
             ]);
 

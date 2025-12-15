@@ -58,7 +58,32 @@ class VCController extends Controller
             )
             ->get();
 
-        return view('vc.index', compact('applications', 'studyLeaveApplications'));
+        // Get study leave extension applications for VC review
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.status_id', 7) // Processing VC (status_id = 7)
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->orderByDesc('study_leave_extensions.created_at')
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'study_leaves.empno as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status'
+            )
+            ->get();
+
+        return view('vc.index', compact('applications', 'studyLeaveApplications', 'extensionApplications'));
     }
 
     public function show($id)
@@ -274,5 +299,175 @@ class VCController extends Controller
             ]);
           
         return redirect()->route('vc.index')->with('success', 'Study Leave Application reviewed and approved successfully.');
+    }
+
+    /**
+     * Show study leave extension for VC review
+     */
+    public function showExtension($extension_id)
+    {
+        // Get the complete study leave extension data
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 7) // Processing VC
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leave_extensions.study_leave_id',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.status_id as extension_status_id',
+                'study_leave_extensions.ma_remarks',
+                'study_leave_extensions.hod_remarks as extension_hod_remarks',
+                'study_leave_extensions.hod_recommend as extension_hod_recommend',
+                'study_leave_extensions.hod_not_recommend_reason as extension_hod_not_recommend_reason',
+                'study_leave_extensions.dean_remark as extension_dean_remarks',
+                'study_leave_extensions.dean_leave_recommendation_status as extension_dean_recommend',
+                'study_leave_extensions.dean_not_recommended_reason as extension_dean_not_recommend_reason',
+                'study_leaves.*', // Get all study leave fields
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials',
+                'employees.nic',
+                'employees.email',
+                'employees.mobile_no as mobile',
+                'employees.department_id',
+                'employees.faculty_id',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status'
+            )
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('vc.index')->with('error', 'Extension application not found or not accessible.');
+        }
+
+        // Create user object for forms
+        $user = (object)[
+            'empno' => $extension->empno,
+            'name_with_initials' => $extension->name_with_initials,
+            'names_denoted_by_initials' => $extension->name_denoted_by_initials,
+            'nic' => $extension->nic,
+            'email' => $extension->email,
+            'mobile' => $extension->mobile,
+            'department' => $extension->department,
+            'faculty' => $extension->faculty,
+            'designation' => $extension->designation,
+        ];
+
+        // Create draft_study_leave object for forms (using the original study leave data)
+        $draft_study_leave = $extension;
+
+        // Calculate duration for display
+        $oldDate = Carbon::parse($extension->old_end_date);
+        $newDate = Carbon::parse($extension->new_end_date);
+        $durationDays = $oldDate->diffInDays($newDate);
+        $durationMonths = round($durationDays / 30, 1);
+//dd($extension);
+        return view('vc.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'draft_study_leave', 'durationDays', 'durationMonths'));
+    }
+
+    /**
+     * Approve extension (final approval by VC)
+     */
+    public function approveExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'vc_recommend' => 'required|string',
+            'vc_not_recommend_reason' => 'required_if:vc_recommend,no|string|nullable',
+            'vc_remarks' => 'nullable|string',
+        ]);
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 7)
+            ->where('employees.main_branch_id', 52)
+            ->select('study_leave_extensions.*')
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('vc.index')->with('error', 'Extension application not found.');
+        }
+
+        // Prepare VC remarks
+        $vcRemarks = "VC Review:\n";
+        $vcRemarks .= "- Recommendation: " . ucfirst($request->vc_recommend) . "\n";
+        
+        if ($request->vc_recommend === 'no' && $request->vc_not_recommend_reason) {
+            $vcRemarks .= "- Reason for Not Recommending: " . $request->vc_not_recommend_reason . "\n";
+        }
+        
+        if ($request->vc_remarks) {
+            $vcRemarks .= "- Additional Remarks: " . $request->vc_remarks . "\n";
+        }
+
+        $timestamp = Carbon::now()->format('Y-m-d H:i:s');
+        $vcRemarks .= "\n[VC Reviewed - " . $timestamp . "]";
+
+        // Update extension status to Approved (status_id = 1)
+        //dd($request->all());
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 1, // Approved
+                'vc_empno' => self::VC_EMP_NO,
+                'vc_recommend' => $request->vc_recommend,
+                'vc_not_recommend_reason' => $request->vc_not_recommend_reason,
+                'vc_remarks' => DB::raw("CONCAT(COALESCE(vc_remarks, ''), '" . addslashes($vcRemarks) . "')"),
+                'updated_at' => Carbon::now()
+            ]);
+
+        return redirect()->route('vc.index')->with('success', 'Extension request approved successfully.');
+    }
+
+    /**
+     * Return extension to employee
+     */
+    public function returnExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'vc_remarks' => 'required|string|max:1000',
+        ]);
+       
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 7)
+            ->where('employees.main_branch_id', 52)
+            ->select('study_leave_extensions.*')
+            ->first();
+       
+        if (!$extension) {
+            return redirect()->route('vc.index')->with('error', 'Extension application not found.');
+        }
+
+        $timestamp = Carbon::now()->format('Y-m-d H:i:s');
+        $returnRemark = "\n\n[VC Returned - " . $timestamp . "]\n" . $request->vc_remarks;
+       
+
+        // Update extension status to Returned (status_id = 3)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 3, // Returned
+                'vc_empno' => self::VC_EMP_NO,
+                'vc_remarks' => DB::raw("CONCAT(COALESCE(vc_remarks, ''), '" . addslashes($returnRemark) . "')"),
+                'updated_at' => Carbon::now()
+            ]);
+
+        return redirect()->route('vc.index')->with('success', 'Extension request returned to employee.');
     }
 } 

@@ -57,6 +57,11 @@ Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name(
 Route::get('/VCpage/studyleave/view/{id}', [VCController::class, 'showStudyLeaveApplication'])->name('vc.view.studyLeave');
 Route::post('/VCpage/studyleave/view/{id}/approve', [VCController::class, 'approveStudyLeave'])->name('vc.view.studyLeave.approve');
 
+// VC Extension routes
+Route::get('/VCpage/extension/{extension_id}', [VCController::class, 'showExtension'])->name('vc.show.extension');
+Route::post('/VCpage/extension/{extension_id}/approve', [VCController::class, 'approveExtension'])->name('vc.extension.approve');
+Route::post('/VCpage/extension/{extension_id}/return', [VCController::class, 'returnExtension'])->name('vc.extension.return');
+
 //Study Leave routes (no authentication required)
 //Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
 Route::get('/StudyLeave', [StudyLeaveController::class, 'createStudyLeave'])->name('StudyLeave.create');

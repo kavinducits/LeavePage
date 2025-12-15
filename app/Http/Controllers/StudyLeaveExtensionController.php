@@ -206,7 +206,9 @@ class StudyLeaveExtensionController extends Controller
       //      $studyLeaveExtension->scholarship_source = $validatedData['scholarship_source'] ?? null;
        //     $studyLeaveExtension->scholarship_amount = $validatedData['scholarship_amount'] ?? null;
        //     $studyLeaveExtension->project_name = $validatedData['project_name'] ?? null;
+       
             $studyLeaveExtension->reason_for_extension = $validatedData['reason_for_extension'];
+            $studyLeaveExtension->status_id = 4; // Pending status
            
             $studyLeaveExtension->save();
            // dd('after save');

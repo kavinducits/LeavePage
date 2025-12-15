@@ -34,11 +34,14 @@ return new class extends Migration
             $table->string('hod_recommend')->nullable();
             $table->text('hod_not_recommend_reason')->nullable();
              $table->text('hod_remarks')->nullable();
-            $table->boolean('dean_leave_recommendation_status')->nullable();
+            $table->string('dean_leave_recommendation_status')->nullable();
+            $table->string('dean_empno')->nullable();
+            $table->string('dean_remark')->nullable();
             $table->text('dean_not_recommended_reason')->nullable();
             $table->string('vc_empno')->nullable();
-            $table->boolean('vc_recommend_submit_to_committee')->nullable();
-            $table->boolean('vc_council_covering_approval_status')->nullable();
+            $table->string('vc_recommend')->nullable();
+            $table->text('vc_not_recommend_reason')->nullable();
+            $table->text('vc_remarks')->nullable();
             $table->unsignedInteger('status_id')->nullable();     
             $table->timestamps();
         });

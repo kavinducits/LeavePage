@@ -137,7 +137,7 @@ class StudyLeaveProgressReportsController extends Controller
                 'submitted_date' => Carbon::now()->format('Y-m-d'),
                 'document_path' => $path,
                 'remark' => $request->input('remark'),
-                'status_id' => 3, // Status 3 as per requirement
+                'status_id' => 4, // Status 3 as per requirement
             ]);
 
             return redirect()->route('StudyLeave.progressReports.show', $studyLeave->id)

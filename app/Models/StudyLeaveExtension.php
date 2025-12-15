@@ -29,10 +29,13 @@ class StudyLeaveExtension extends Model
         'hod_not_recommend_reason',
         'hod_remarks',
         'dean_leave_recommendation_status',
+        'dean_empno',
+        'dean_remark',
         'dean_not_recommended_reason',
         'vc_empno',
-        'vc_recommend_submit_to_committee',
-        'vc_council_covering_approval_status',
+         'vc_recommend' ,
+                'vc_not_recommend_reason', 
+                'vc_remarks',
         'status_id',
     ];
 }

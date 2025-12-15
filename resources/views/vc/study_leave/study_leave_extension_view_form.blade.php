@@ -9,7 +9,7 @@
             </h2>
             <p class="text-muted mb-0">Reference No: {{ $extension->reference_no }}</p>
         </div>
-        <a href="{{ route('dean.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('vc.index') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
         </a>
     </div>
@@ -135,13 +135,13 @@
     </div>
 
     <!-- HOD Remarks (if any) -->
-    @if(!empty($extension->extension_hod_remarks) || !empty($extension->extension_hod_recommend) || true)
+    @if(!empty($extension->extension_hod_remarks) || !empty($extension_hod_recommend))
     <div class="card mb-4">
         <div class="card-header card-header-dark text-white fw-semibold">
             <i class="fas fa-comment-dots me-2"></i>HOD Review & Remarks
         </div>
         <div class="card-body">
-            @if(!empty($extension->extension_hod_recommend) || true)
+            @if(!empty($extension->extension_hod_recommend))
             <div class="mb-3">
                 <label class="form-label fw-semibold">HOD Recommendation</label>
                 <div class="form-check">
@@ -161,23 +161,60 @@
             </div>
             @endif
             
-            @if(!empty($extension->extension_hod_remarks))
-            <div class="alert alert-dark mb-0">
+            @if(!empty($extension->hod_remarks))
+            <div class="alert alert-secondary mb-0">
                 <label class="text-muted small mb-1">HOD Remarks</label>
-                <div style="white-space: pre-wrap;">{{ $extension->extension_hod_remarks }}</div>
+                <div style="white-space: pre-wrap;">{{ $extension->hod_remarks }}</div>
             </div>
             @endif
         </div>
     </div>
     @endif
 
-    <!-- Dean Review Section -->
-    <form action="{{ route('dean.extension.approve', $extension->extension_id) }}" method="POST" id="deanReviewForm">
+    <!-- Dean Remarks (if any) -->
+    @if(!empty($extension->extension_dean_remarks) || !empty($extension->extension_dean_recommend))
+    <div class="card mb-4">
+        <div class="card-header card-header-dark text-white fw-semibold">
+            <i class="fas fa-comment-dots me-2"></i>Dean Review & Remarks
+        </div>
+        <div class="card-body">
+            @if(!empty($extension->extension_dean_recommend))
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Dean Recommendation</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" disabled 
+                           {{ $extension->extension_dean_recommend == 'yes' ? 'checked' : '' }}>
+                    <label class="form-check-label">
+                        Yes - Recommended
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" disabled 
+                           {{ $extension->extension_dean_recommend == 'no' ? 'checked' : '' }}>
+                    <label class="form-check-label">
+                        No - Not Recommended
+                    </label>
+                </div>
+            </div>
+            @endif
+            
+            @if(!empty($extension->dean_remarks))
+            <div class="alert alert-secondary mb-0">
+                <label class="text-muted small mb-1">Dean Remarks</label>
+                <div style="white-space: pre-wrap;">{{ $extension->dean_remarks }}</div>
+            </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    <!-- VC Review Section -->
+    <form action="{{ route('vc.extension.approve', $extension->extension_id) }}" method="POST" id="vcReviewForm">
         @csrf
         
         <div class="card mt-4">
             <div class="card-header card-header-dark text-white fw-semibold">
-                <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
+                <i class="fas fa-clipboard-check me-2"></i>VC Review & Recommendation
             </div>
             <div class="card-body">
                 
@@ -188,13 +225,13 @@
                         <span class="text-danger">*</span>
                     </label>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendYes" value="yes" required>
+                        <input class="form-check-input" type="radio" name="vc_recommend" id="recommendYes" value="yes" required>
                         <label class="form-check-label" for="recommendYes">
                             Yes
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendNo" value="no" required>
+                        <input class="form-check-input" type="radio" name="vc_recommend" id="recommendNo" value="no" required>
                         <label class="form-check-label" for="recommendNo">
                             No
                         </label>
@@ -203,11 +240,11 @@
 
                 <!-- Conditional: If not recommended -->
                 <div class="mb-4" id="notRecommendReasonDiv" style="display: none;">
-                    <label for="dean_not_recommend_reason" class="form-label fw-semibold">
+                    <label for="vc_not_recommend_reason" class="form-label fw-semibold">
                         If not recommended, please give reasons
                         <span class="text-danger">*</span>
                     </label>
-                    <textarea class="form-control" id="dean_not_recommend_reason" name="dean_not_recommend_reason" rows="4" 
+                    <textarea class="form-control" id="vc_not_recommend_reason" name="vc_not_recommend_reason" rows="4" 
                               placeholder="Please provide detailed reasons for not recommending this extension"></textarea>
                     <div class="invalid-feedback">
                         Please provide reasons for not recommending.
@@ -216,10 +253,10 @@
 
                 <!-- Any other remarks -->
                 <div class="mb-4">
-                    <label for="dean_remarks" class="form-label fw-semibold">
+                    <label for="vc_remarks" class="form-label fw-semibold">
                         Any other remarks
                     </label>
-                    <textarea class="form-control" id="dean_remarks" name="dean_remarks" rows="3" 
+                    <textarea class="form-control" id="vc_remarks" name="vc_remarks" rows="3" 
                               placeholder="Add any additional comments or remarks (optional)"></textarea>
                 </div>
 
@@ -237,13 +274,13 @@
 
                     <div class="text-end">
                         <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
-                            <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to VC
+                            <i class="fas fa-check-circle me-2"></i>Approve Extension Request
                         </button>
                         
                         <div class="card mt-2" style="min-width: 280px;">
                             <div class="card-body py-2">
                                 <div class="d-flex align-items-center">
-                                    <strong>Forward to Vice-Chancellor</strong>
+                                    <strong>Final Approval - Extension will be approved</strong>
                                 </div>
                             </div>
                         </div>
@@ -258,7 +295,7 @@
 <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('dean.extension.return', $extension->extension_id) }}" method="POST" id="returnForm">
+            <form action="{{ route('vc.extension.return', $extension->extension_id) }}" method="POST" id="returnForm">
                 @csrf
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="returnModalLabel">
@@ -275,7 +312,7 @@
                         <label for="returnRemarks" class="form-label fw-semibold">
                             Remarks <span class="text-danger">*</span>
                         </label>
-                        <textarea class="form-control" id="returnRemarks" name="dean_remarks" rows="4" 
+                        <textarea class="form-control" id="returnRemarks" name="vc_remarks" rows="4" 
                                   placeholder="Please provide reasons for returning this extension request" required></textarea>
                         <div class="invalid-feedback">
                             Remarks are required when returning an extension request.
@@ -327,9 +364,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Show/hide not recommend reason field
-    const recommendRadios = document.querySelectorAll('input[name="dean_recommend"]');
+    const recommendRadios = document.querySelectorAll('input[name="vc_recommend"]');
     const notRecommendDiv = document.getElementById('notRecommendReasonDiv');
-    const notRecommendTextarea = document.getElementById('dean_not_recommend_reason');
+    const notRecommendTextarea = document.getElementById('vc_not_recommend_reason');
 
     recommendRadios.forEach(radio => {
         radio.addEventListener('change', function() {
@@ -347,9 +384,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form validation
-    const deanReviewForm = document.getElementById('deanReviewForm');
-    deanReviewForm.addEventListener('submit', function(e) {
-        const recommendValue = document.querySelector('input[name="dean_recommend"]:checked')?.value;
+    const vcReviewForm = document.getElementById('vcReviewForm');
+    vcReviewForm.addEventListener('submit', function(e) {
+        const recommendValue = document.querySelector('input[name="vc_recommend"]:checked')?.value;
         
         if (recommendValue === 'no') {
             const reason = notRecommendTextarea.value.trim();
@@ -361,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        if (!confirm('Are you sure you want to submit this review and forward to VC?')) {
+        if (!confirm('Are you sure you want to approve this extension request? This is the final approval.')) {
             e.preventDefault();
             return false;
         }
