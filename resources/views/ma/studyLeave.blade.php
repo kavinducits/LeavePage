@@ -134,6 +134,9 @@
 <!-- Include Extension Applications Table -->
 @include('ma.study_leave.study_leave_extensions_table')
 
+<!-- Include Progress Reports Table -->
+@include('ma.study_leave.study_leave_progress_reports_table')
+
 <style>
 .table th {
     border-top: none;

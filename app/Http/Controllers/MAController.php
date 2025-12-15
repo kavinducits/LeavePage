@@ -532,7 +532,32 @@ class MAController extends Controller
             )
             ->get();
 
-        return view('ma.studyLeave', compact('studyLeaveApplications', 'extensionApplications'));
+        // Get study leave progress reports pending review
+        $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
+            ->where('statuses.status', 'Processing MA') // Filter for MA Processing status
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.due_date',
+                'statuses.status as status'
+            )
+            ->get();
+           
+
+        return view('ma.studyLeave', compact('studyLeaveApplications', 'extensionApplications', 'progressReportApplications'));
     }
     public function studyLeaveStatusPage()
     {
@@ -913,6 +938,186 @@ class MAController extends Controller
             ]);
 
         return redirect()->route('ma.studyleave')->with('success', 'Extension request returned to user successfully.');
+    }
+
+    /**
+     * Show progress report for review
+     */
+    public function showProgressReport($progress_report_id)
+    {
+        $maUserId = self::MA_USER_ID;
+
+        // Fetch the progress report with related study leave and employee details
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('employees.assign_ma_user_id', $maUserId) // Ensure MA has access
+            ->select(
+                'study_leave_progress_reports.*',
+                 'study_leaves.*',
+                'study_leaves.scholarship_source as scholarship_source',
+                'study_leaves.scholarship_amount as scholarship_amount',
+                'study_leaves.project_name as project_name',
+                'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
+                'study_leaves.nominee_admin_empno as nominee_admin_empno',
+                'study_leaves.nominee_other_empno as nominee_other_empno',
+                'study_leaves.self_funding_declaration as self_funding_declaration',
+                'study_leaves.placement_letter as placement_letter',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'departments.id as department_id',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status'
+            )
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
+        }
+        $draft_study_leave=$progressReport;
+
+        // Fetch all approved progress reports for this study leave (status_id = 1)
+        $approvedReports = DB::table('study_leave_progress_reports')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.study_leave_id', $progressReport->study_leave_id)
+            ->where('study_leave_progress_reports.status_id', 1) // Approved status
+            ->where('study_leave_progress_reports.id', '!=', $progress_report_id) // Exclude current report
+            ->select(
+                'study_leave_progress_reports.id',
+                'study_leave_progress_reports.due_date',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.document_path',
+                'statuses.status'
+            )
+            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->get();
+
+        // Prepare user object for the view
+        $user = (object) [
+            'empno' => $progressReport->employee_no,
+            'name_with_initials' => $progressReport->name_with_initials,
+            'email' => $progressReport->email,
+            'department' => $progressReport->department,
+            'faculty' => $progressReport->faculty,
+            'designation' => $progressReport->designation
+        ];
+
+        // Get department head information for forwarding
+        $departmentHead = null;
+        if ($progressReport->department_id) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions', 'department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $progressReport->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+        $readonly = false;
+
+        return view('ma.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'departmentHead', 'draft_study_leave'));
+    }
+
+    /**
+     * Forward progress report to HOD
+     */
+    public function approveProgressReport(Request $request, $progress_report_id)
+    {
+        $request->validate([
+            'remark' => 'nullable|string|max:1000',
+        ]);
+
+        $maUserId = self::MA_USER_ID;
+
+        // Verify the progress report belongs to this MA
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_progress_reports.*')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
+        }
+
+        // Prepare remark
+        $newRemark = '';
+        if ($request->remark) {
+            $timestamp = now()->format('Y-m-d');
+            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
+        }
+
+        // Update status to Processing HOD (status_id = 5)
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
+            ->update([
+                'status_id' => 5, // Processing HOD
+                'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave')->with('success', 'Progress report forwarded to HOD successfully.');
+    }
+
+    /**
+     * Return progress report to user
+     */
+    public function returnProgressReport(Request $request, $progress_report_id)
+    {
+        $request->validate([
+            'remark' => 'required|string|max:1000',
+        ], [
+            'remark.required' => 'Remarks are required when returning a progress report.'
+        ]);
+
+        $maUserId = self::MA_USER_ID;
+
+        // Verify the progress report belongs to this MA
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_progress_reports.*')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
+        }
+
+        // Prepare remark
+        $timestamp = now()->format('Y-m-d');
+        $newRemark = "\n\n[MA Returned - " . $timestamp . "]\n" . $request->remark;
+
+        // Update status to Returned (status_id = 3)
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
+            ->update([
+                'status_id' => 3, // Returned
+                'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave')->with('success', 'Progress report returned to user successfully.');
     }
    
     

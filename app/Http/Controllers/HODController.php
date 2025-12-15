@@ -85,7 +85,33 @@ class HODController extends Controller
             )
             ->get();
 
-        return view('hod.index', compact('applications', 'studyLeaveApplications'));
+        // Get study leave extension applications for HOD review from assigned departments
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.status_id', 5) // Processing HOD (status_id = 5)
+            ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
+            ->orderByDesc('study_leave_extensions.created_at')
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('hod.index', compact('applications', 'studyLeaveApplications', 'extensionApplications'));
     }
 
     public function show($id)
@@ -357,6 +383,207 @@ class HODController extends Controller
       
 
         return view('hod.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'deanInfo'));
+    }
+
+    /**
+     * Show study leave extension for HOD review
+     */
+    public function showExtension($extension_id)
+    {
+        // Get department IDs for this HOD
+        $departmentIds = $this->getHodDepartments();
+
+        // Get the complete study leave extension data
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 5) // Processing HOD
+            ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leave_extensions.study_leave_id',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.status_id as extension_status_id',
+                'study_leave_extensions.ma_remarks',
+                'study_leave_extensions.hod_remarks',
+                'study_leaves.*', // Get all study leave fields
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.name_denoted_by_initials',
+                'employees.nic',
+                'employees.email',
+                'employees.mobile_no as mobile',
+                'employees.department_id',
+                'employees.faculty_id',
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status'
+            )
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('hod.index')->with('error', 'Extension application not found or not accessible.');
+        }
+
+        // Create user object for forms
+        $user = (object)[
+            'empno' => $extension->empno,
+            'name_with_initials' => $extension->name_with_initials,
+            'names_denoted_by_initials' => $extension->name_denoted_by_initials,
+            'nic' => $extension->nic,
+            'email' => $extension->email,
+            'mobile' => $extension->mobile,
+            'department' => $extension->department,
+            'faculty' => $extension->faculty,
+            'designation' => $extension->designation,
+        ];
+
+        // Create draft_study_leave object for forms (using the original study leave data)
+        $draft_study_leave = $extension;
+
+        // Get Dean details for forwarding
+        $deanInfo = null;
+        if ($extension->faculty_id) {
+            $deanInfo = DB::table('faculty_deans')
+                ->join('employees as dean_emp', 'faculty_deans.emp_no', '=', 'dean_emp.employee_no')
+                ->leftJoin('categories', 'dean_emp.title_id', '=', 'categories.id')
+                ->leftJoin('faculties', 'faculty_deans.faculty_id', '=', 'faculties.id')
+                ->where('faculty_deans.faculty_id', $extension->faculty_id)
+                ->where('faculty_deans.active_status', 1)
+                ->whereRaw('(faculty_deans.end_date IS NULL OR faculty_deans.end_date >= CURDATE())')
+                ->select(
+                    'categories.category_name as title',
+                    'dean_emp.initials',
+                    'dean_emp.last_name',
+                    'faculties.faculty_name'
+                )
+                ->first();
+        }
+
+        // Calculate duration for display
+        $oldDate = \Carbon\Carbon::parse($extension->old_end_date);
+        $newDate = \Carbon\Carbon::parse($extension->new_end_date);
+        $durationDays = $oldDate->diffInDays($newDate);
+        $durationMonths = round($durationDays / 30, 1);
+
+        $readonly = true;
+       
+        return view('hod.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'deanInfo', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
+    }
+
+    /**
+     * Approve/Forward extension to Dean
+     */
+    public function approveExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'hod_adequate_staff_available' => 'required|string',
+            'hod_teaching_covered' => 'required|string',
+            'hod_service_period' => 'required|string',
+            'hod_recommend' => 'required|string',
+            'hod_not_recommend_reason' => 'required_if:hod_recommend,no|string|nullable',
+            'hod_remarks' => 'nullable|string',
+        ]);
+
+        // Get department IDs for this HOD
+        $departmentIds = $this->getHodDepartments();
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 5)
+            ->whereIn('employees.department_id', $departmentIds)
+            ->select('study_leave_extensions.*')
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('hod.index')->with('error', 'Extension application not found.');
+        }
+
+        // Prepare HOD remarks
+        $hodRemarks = "HOD Review:\n";
+        $hodRemarks .= "- Adequate Staff Available: " . ucfirst($request->hod_adequate_staff_available) . "\n";
+        $hodRemarks .= "- Teaching Covered: " . ucfirst($request->hod_teaching_covered) . "\n";
+        $hodRemarks .= "- Service Period: " . ucfirst($request->hod_service_period) . "\n";
+        $hodRemarks .= "- Recommendation: " . ucfirst($request->hod_recommend) . "\n";
+        
+        if ($request->hod_recommend === 'no' && $request->hod_not_recommend_reason) {
+            $hodRemarks .= "- Reason for Not Recommending: " . $request->hod_not_recommend_reason . "\n";
+        }
+        
+        if ($request->hod_remarks) {
+            $hodRemarks .= "- Additional Remarks: " . $request->hod_remarks . "\n";
+        }
+
+        $timestamp = now()->format('Y-m-d H:i:s');
+        $hodRemarks .= "\n[HOD Reviewed - " . $timestamp . "]";
+
+        // Update extension status to Processing Dean (status_id = 6)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 6, // Processing Dean
+                'hod_empno' => self::HOD_EMP_NO,
+                'hod_adequate_staff_available' => $request->hod_adequate_staff_available,
+                'hod_teaching_covered' => $request->hod_teaching_covered,
+                'hod_service_period' => $request->hod_service_period,
+                'hod_recommend' => $request->hod_recommend,
+                'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
+                'hod_remarks' => DB::raw("CONCAT(COALESCE(hod_remarks, ''), '" . addslashes($hodRemarks) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('hod.index')->with('success', 'Extension request forwarded to Dean successfully.');
+    }
+
+    /**
+     * Return extension to employee
+     */
+    public function returnExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'hod_remarks' => 'required|string|max:1000',
+        ]);
+
+        // Get department IDs for this HOD
+        $departmentIds = $this->getHodDepartments();
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 5)
+            ->whereIn('employees.department_id', $departmentIds)
+            ->select('study_leave_extensions.*')
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('hod.index')->with('error', 'Extension application not found.');
+        }
+
+        $timestamp = now()->format('Y-m-d H:i:s');
+        $returnRemark = "\n\n[HOD Returned - " . $timestamp . "]\n" . $request->hod_remarks;
+
+        // Update extension status to Returned (status_id = 3)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 3, // Returned
+                'hod_empno' => self::HOD_EMP_NO,
+                'hod_remarks' => DB::raw("CONCAT(COALESCE(hod_remarks, ''), '" . addslashes($returnRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('hod.index')->with('success', 'Extension request returned to employee.');
     }
 
     public function approveStudyLeave(Request $request, $id)

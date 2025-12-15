@@ -103,6 +103,9 @@ Route::get('/dashboard/StudyLeave/{id}', [MAController::class, 'showStudyLeave']
 Route::get('/dashboard/StudyLeaveExtension/{extension_id}', [MAController::class, 'showExtension'])->name('ma.show.extension');
 Route::POST('/dashboard/StudyLeaveExtension/{extension_id}/forward', [MAController::class, 'forwardExtension'])->name('ma.extension.forward');
 Route::POST('/dashboard/StudyLeaveExtension/{extension_id}/return', [MAController::class, 'returnExtension'])->name('ma.extension.return');
+Route::get('/dashboard/StudyLeaveProgressReport/{progress_report_id}', [MAController::class, 'showProgressReport'])->name('ma.show.studyleave.progressreport');
+Route::POST('/dashboard/StudyLeaveProgressReport/{progress_report_id}/approve', [MAController::class, 'approveProgressReport'])->name('ma.progressreport.approve');
+Route::POST('/dashboard/StudyLeaveProgressReport/{progress_report_id}/return', [MAController::class, 'returnProgressReport'])->name('ma.progressreport.return');
 
 Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudyLeave'])->name('StudyLeave.approve');
 
@@ -124,6 +127,9 @@ Route::get('/StudyLeave/draft/{id}/continue', [StudyLeaveController::class, 'con
 Route::get('/HODDashboard', [HODController::class, 'showStudyLeaves'])->name('hod.show.studyleaves');
 Route::get('/HODDashboard/view/{id}', [HODController::class, 'showStudyLeaveApplication'])->name('hod.view.studyLeave');
 Route::POST('/HODDashboard/view/{id}/approve', [HODController::class, 'approveStudyLeave'])->name('hod.view.studyLeave.approve');
+Route::get('/HODDashboard/extension/{extension_id}', [HODController::class, 'showExtension'])->name('hod.show.extension');
+Route::POST('/HODDashboard/extension/{extension_id}/approve', [HODController::class, 'approveExtension'])->name('hod.extension.approve');
+Route::POST('/HODDashboard/extension/{extension_id}/return', [HODController::class, 'returnExtension'])->name('hod.extension.return');
 
 
 
