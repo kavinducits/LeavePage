@@ -31,6 +31,7 @@
                                 $statusText = '';
                                 
                                 switch($extension->status_id) {
+                                    /*
                                     case 0:
                                         $statusBadge = 'bg-secondary';
                                         $statusText = 'Draft';
@@ -54,6 +55,18 @@
                                     default:
                                         $statusBadge = 'bg-secondary';
                                         $statusText = 'Unknown';
+                                        */
+                                    case 1:
+                                        $statusBadge = 'bg-success';
+                                        $statusText = 'Approved';
+                                        break;
+                                    case 2:
+                                        $statusBadge = 'bg-danger';
+                                        $statusText = 'Rejected';
+                                        break;
+                                    default:
+                                        $statusBadge = 'bg-warning text-dark';
+                                        $statusText = 'Pending';
                                 }
                             @endphp
                             <tr>
