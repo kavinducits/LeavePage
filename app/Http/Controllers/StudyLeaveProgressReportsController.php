@@ -94,6 +94,9 @@ class StudyLeaveProgressReportsController extends Controller
 
         return $extensions > 0;
     }
+    /**
+     * Get the last extended end date for a study leave
+     */
 
     private function getLastExtendedEndDate($study_leave_id)
     {
@@ -118,11 +121,23 @@ class StudyLeaveProgressReportsController extends Controller
     private function calculateNextDueDate($study_leave, $progress_reports)
     {
         $leaveStart = Carbon::parse($study_leave->study_leave_from);
-        $leaveEnd = Carbon::parse($study_leave->study_leave_to);
+        
+        if($this->isExtended($study_leave->id)) {
+            $leaveEnd = $this->getLastExtendedEndDate($study_leave->id);
+            
+        } else {
+            $leaveEnd = Carbon::parse($study_leave->study_leave_to);
+        }
 
         // If no reports yet, first due date is 6 months from start
         if ($progress_reports->count() == 0) {
-            return $leaveStart->copy()->addMonths(6);
+            if($leaveStart->copy()->addMonths(6)->greaterThan($leaveEnd)) {
+                return $leaveEnd;
+            }
+            else{
+                return $leaveStart->copy()->addMonths(6);
+            }
+           
         }
 
         // Get the last report's due date and add 6 months
@@ -131,7 +146,7 @@ class StudyLeaveProgressReportsController extends Controller
 
         // Don't set due date beyond leave end date
         if ($nextDueDate->greaterThan($leaveEnd)) {
-            return null;
+            return $leaveEnd;
         }
 
         return $nextDueDate;
