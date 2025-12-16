@@ -181,17 +181,18 @@
                     </h5>
                 </div>
                 <div class="card-body pt-2 pb-0 px-3">
-                    <table class="table table-striped table-bordered bg-white align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Applied Date</th>
-                                <th>Ref No</th>
-                                <th>Leave Type</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-center" style="width: 12%;">Applied Date</th>
+                                    <th class="text-center" style="width: 18%;">Reference No</th>
+                                    <th class="text-center" style="width: 15%;">Leave Type</th>
+                                    <th class="text-center" style="width: 12%;">Status</th>
+                                    <th class="text-center" style="width: 43%;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                             
                                    @php
                                 $iteration=0;
@@ -203,12 +204,12 @@
                                 $iteration=$iteration+1;
                             @endphp
                                     <tr class="hoverable-row">
-                                        <td>
+                                        <td class="text-center">
                                             {{ optional($leave->created_at) ? \Carbon\Carbon::parse($leave->created_at)->format('Y-m-d') : '' }}
                                         </td>
-                                        <td>{{ $leave->reference_no ?? 'N/A' }}</td>
-                                        <td>{{ $leave->leave_payment_type ?? 'Study Leave' }}</td>
-                                        <td>
+                                        <td class="text-center fw-semibold">{{ $leave->reference_no ?? 'N/A' }}</td>
+                                        <td class="text-center">{{ $leave->leave_payment_type ?? 'Study Leave' }}</td>
+                                        <td class="text-center">
                                             @php
                                                 $statusValue = $leave->status_id ?? 0;
                                                 if ($statusValue == 1) {
@@ -229,7 +230,7 @@
                                             <span class="badge {{ $badgeClass }}">{{ $status }}</span>
                                             
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             @php
                                                 $statusValue = $leave->status_id ?? 0;
                                                 $extensionStatus = $leave->extension_status_id ?? null;
@@ -310,7 +311,7 @@
                                                 }
                                             @endphp
                                             
-                                            <div class="d-flex flex-wrap gap-1">
+                                            <div class="d-flex flex-wrap gap-2 justify-content-center">
                                                 @if($showView)
                                                     <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}" 
                                                        class="btn btn-sm btn-info" 
@@ -371,6 +372,7 @@
                            
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -389,9 +391,23 @@
     font-weight: 600;
     color: #2d2d2d;
     background: #f8fafc;
+    vertical-align: middle;
 }
 .table td {
     color: #3a3a3a;
+    vertical-align: middle;
+}
+.table-responsive {
+    overflow-x: auto;
+}
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.875rem;
+    }
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
 }
     .new-app-icon {
     width: 90px;

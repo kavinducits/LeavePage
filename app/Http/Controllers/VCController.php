@@ -285,10 +285,16 @@ class VCController extends Controller
         }
 
         // Update the study leave application with VC review
+        if($request->vc_approved_council === 'yes' && $request->vc_recommend_committee === 'yes') {
+           $stauts_id = 1; // Approved
+        }
+        else {
+           $stauts_id = 2; // Rejected or sent back for corrections
+        }
         DB::table('study_leaves')
             ->where('id', $id)
             ->update([
-                'status_id' => 1, // Approved (final approval by VC)
+                'status_id' => $stauts_id, // Approved (final approval by VC)
                 'vc_empno' => self::VC_EMP_NO,
                 'vc_recommend_submit_to_committee' => $request->vc_recommend_committee,
                 'vc_council_covering_approval_status' => $request->vc_approved_council,
@@ -298,7 +304,7 @@ class VCController extends Controller
                 'updated_at' => Carbon::now()
             ]);
           
-        return redirect()->route('vc.index')->with('success', 'Study Leave Application reviewed and approved successfully.');
+        return redirect()->route('vc.index')->with('success', 'Study Leave Application reviewed and Submitted successfully.');
     }
 
     /**
@@ -456,6 +462,8 @@ class VCController extends Controller
 
         $timestamp = Carbon::now()->format('Y-m-d H:i:s');
         $returnRemark = "\n\n[VC Returned - " . $timestamp . "]\n" . $request->vc_remarks;
+
+        
        
 
         // Update extension status to Returned (status_id = 3)

@@ -368,7 +368,7 @@ class StudyLeaveController extends Controller
          $studyLeaveId = $draft->id;
          
         $filename = $this->generateFilename($empno, $studyLeaveId, $type);
-        $directory = $type; 
+        $directory = 'study_leave_documents/'.$type; 
         $path = $this->savePdfToStorage($file, $directory, $filename);
         return $path;
     }
@@ -655,7 +655,7 @@ class StudyLeaveController extends Controller
         }
 
         // Construct the file path
-        $filePath = storage_path('app/private/' . $type . '/' . $filename);
+        $filePath = storage_path('app/private/study_leave_documents/' . $type . '/' . $filename);
 
         // Check if file exists
         if (!file_exists($filePath)) {
