@@ -1061,7 +1061,7 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
         }
 
-        // Prepare remark
+        // Prepare remarkh
         $newRemark = '';
         if ($request->remark) {
             $timestamp = now()->format('Y-m-d');
