@@ -216,34 +216,80 @@
                                         <div class="row g-3">
                                             <!-- From Date -->
                                             <div class="col-md-6">
-                                                
-                                        
-                                                <label class="form-label">From <span class="text-danger">*</span></label>
-                                                <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
-                                                       value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" 
-                                                       min="{{ date('Y-m-d') }}" 
-                                                       required 
-                                                       {{ $readonly ?? true ? 'readonly' : '' }}>
-                                                <div class="invalid-feedback">
-                                                    Please select a valid start date.
-                                                </div>
-                                            </div>
+                                                                                            
+                                                                                    
+                                                                                            <label class="form-label">From <span class="text-danger">*</span></label>
+                                                                                            <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
+                                                                                                   value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" 
+                                                                                                   min="{{ date('Y-m-d') }}" 
+                                                                                                   required 
+                                                                                                   {{ $readonly ?? true ? 'readonly' : '' }}>
+                                                                                            <div class="invalid-feedback">
+                                                                                                Please select a valid start date.
+                                                                                            </div>
+                                                                                        </div>
 
-                                            <!-- To Date -->
-                                            <div class="col-md-6">
-                                                <label class="form-label">To <span class="text-danger">*</span></label>
-                                                <input type="date" name="study_leave_to" id="study_leave_to" class="form-control" 
-                                                       value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" 
-                                                       min="{{ date('Y-m-d') }}" 
-                                                       required 
-                                                       {{ $readonly ?? true ? 'readonly' : '' }}>
-                                                <div class="invalid-feedback">
-                                                    Please select a valid end date (must be after start date).
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                                                        <!-- To Date -->
+                                                                                        <div class="col-md-6">
+                                                                                            <label class="form-label">To <span class="text-danger">*</span></label>
+                                                                                            <input type="date" name="study_leave_to" id="study_leave_to" class="form-control" 
+                                                                                                   value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" 
+                                                                                                   min="{{ date('Y-m-d') }}" 
+                                                                                                   required 
+                                                                                                   {{ $readonly ?? true ? 'readonly' : '' }}
+                                                                                                   disabled>
+                                                                                            <div class="invalid-feedback">
+                                                                                                Please select a valid end date (must be after start date).
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
 
+                                                                                <script>
+                                                                                document.addEventListener('DOMContentLoaded', function () {
+                                                                                    const fromDate = document.getElementById('study_leave_from');
+                                                                                    const toDate = document.getElementById('study_leave_to');
+                                                                                    const totalDaysStudyLeave = {{ $totalDaysStydyLeave ?? 0 }};
+                                                                                    
+                                                                                    fromDate.addEventListener('change', function() {
+                                                                                        if (this.value) {
+                                                                                            toDate.disabled = false;
+                                                                                            toDate.min = this.value;
+                                                                                            
+                                                                                            // Calculate max date: From date + totalDaysStudyLeave
+                                                                                            const selectedDate = new Date(this.value);
+                                                                                            const maxDate = new Date(selectedDate);
+                                                                                            maxDate.setDate(maxDate.getDate() + 1095 - totalDaysStudyLeave);
+                                                                                            
+                                                                                            // Format max date as YYYY-MM-DD
+                                                                                            const maxDateString = maxDate.toISOString().split('T')[0];
+                                                                                            toDate.max = maxDateString;
+                                                                                            
+                                                                                            // If current "To" value exceeds max date, clear it
+                                                                                            if (toDate.value && new Date(toDate.value) > maxDate) {
+                                                                                                toDate.value = '';
+                                                                                            }
+                                                                                        } else {
+                                                                                            toDate.disabled = true;
+                                                                                            toDate.value = '';
+                                                                                            toDate.removeAttribute('max');
+                                                                                        }
+                                                                                    });
+                                                                                    
+                                                                                    // Initialize on page load
+                                                                                    if (fromDate.value) {
+                                                                                        toDate.disabled = false;
+                                                                                        
+                                                                                        // Set max date on page load if From date exists
+                                                                                        const selectedDate = new Date(fromDate.value);
+                                                                                        const maxDate = new Date(selectedDate);
+                                                                                        maxDate.setDate(maxDate.getDate() + totalDaysStudyLeave);
+                                                                                        const maxDateString = maxDate.toISOString().split('T')[0];
+                                                                                        toDate.max = maxDateString;
+                                                                                        toDate.min = fromDate.value;
+                                                                                    }
+                                                                                });
+                                                                                </script>
 
 
 
