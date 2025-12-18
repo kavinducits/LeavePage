@@ -95,6 +95,48 @@
                         </div>
                     </div>
 
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const oldEndDate = document.getElementById('old_end_date');
+                            const newEndDate = document.getElementById('new_end_date');
+                            const remainingDays = {{ $remainingDays ?? 0 }};
+                            const studyLeaveFrom = '{{ $study_leave->study_leave_from }}';
+                            
+                            function updateNewEndDateRestrictions() {
+                                if (oldEndDate.value && studyLeaveFrom) {
+                                    // Set minimum to the day after old_end_date (must be greater than "From" date)
+                                    const minDate = new Date(oldEndDate.value);
+                                    minDate.setDate(minDate.getDate() + 1);
+                                    const minDateString = minDate.toISOString().split('T')[0];
+                                    newEndDate.min = minDateString;
+                                    
+                                    // Calculate maximum date: original study_leave_from + remainingDays
+                                    // This ensures total duration doesn't exceed 3 years from original start
+                                    const originalStartDate = new Date(studyLeaveFrom);
+                                    const maxDate = new Date(originalStartDate);
+                                    maxDate.setDate(maxDate.getDate() + remainingDays + {{ $totalDurationDays ?? 0 }});
+                                    const maxDateString = maxDate.toISOString().split('T')[0];
+                                    newEndDate.max = maxDateString;
+                                    
+                                    // If current value exceeds max date, clear it
+                                    if (newEndDate.value && new Date(newEndDate.value) > maxDate) {
+                                        newEndDate.value = '';
+                                    }
+                                    
+                                    // If current value is less than min date, clear it
+                                    if (newEndDate.value && new Date(newEndDate.value) < minDate) {
+                                        newEndDate.value = '';
+                                    }
+                                }
+                            }
+                            
+                            // Initialize on page load
+                            updateNewEndDateRestrictions();
+                            
+                            // Update when old_end_date changes (though it's readonly, good to have for consistency)
+                            oldEndDate.addEventListener('change', updateNewEndDateRestrictions);
+                        });
+                    </script>
 
                     <!-- Reason for Extension -->
                     <div class="col-12">

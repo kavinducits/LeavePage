@@ -1148,6 +1148,7 @@ class StudyLeaveController extends Controller
     }
 
     public function showExtendStudyLeaveForm($id){
+    
 
         $readonly = false;
         $study_leave = StudyLeave::where('id', $id)
@@ -1168,7 +1169,9 @@ class StudyLeaveController extends Controller
             )
             ->first();
 
-        return view('StudyLeave.study_leave_extension_form', compact('study_leave', 'readonly'));
+        $totalDaysStudyLeave = $this->calculateTotalStudyLeaveDays(session('empno'));
+
+        return view('StudyLeave.study_leave_extension_form', compact('study_leave', 'readonly', 'totalDaysStudyLeave'));
 
 
     }

@@ -81,6 +81,7 @@ class StudyLeaveExtensionController extends Controller
   
             ->select(
                 "id",
+                "empno",
                 "leave_type",
                 "leave_payment_type",
                 "study_leave_from",
@@ -112,14 +113,53 @@ class StudyLeaveExtensionController extends Controller
             $totalExtensionDays += $extensionDays;
         }
         
-        $totalDurationDays = $originalDuration + $totalExtensionDays;
+        $totalDurationDays = $this->calculateTotalStudyLeaveDays($study_leave->empno);
         $threeYearsInDays = 3 * 365; // 1095 days
         
         $canExtend = $totalDurationDays < $threeYearsInDays;
         $remainingDays = $threeYearsInDays - $totalDurationDays;
 
+        
         return view('StudyLeave.study_leave_extension.study_leave_extension_form', compact('study_leave', 'readonly', 'canExtend', 'totalDurationDays', 'remainingDays'));
 
+
+    }
+
+     /**
+     * Calculate total study leave days taken by an employee.
+     */
+    public function calculateTotalStudyLeaveDays($emp_no)
+    {
+        $totalDays = 0;
+        $previousLeaves=StudyLeave::where('empno', $emp_no)
+        ->where('is_draft', false)
+        ->where('status_id', 1)
+        ->select('study_leave_from','study_leave_to');
+
+        if($previousLeaves->count() > 0){
+            foreach($previousLeaves->get() as $leave){
+                $leave_id = $leave->id;
+                $extensions = StudyLeaveExtension::where('study_leave_id', $leave_id)
+                ->where('status_id', 1)
+                ->select('new_end_date')
+                ->OrderBy('id', 'desc')
+                ->first();
+                if($extensions){
+                    $extended_end_date = $extensions->new_end_date;
+                } else {
+                    $extended_end_date = $leave->study_leave_to;
+                }
+                $from = new \DateTime($leave->study_leave_from);
+                $to = new \DateTime($extended_end_date);
+                $interval = $from->diff($to);
+                $totalDays += $interval->days + 1; // +1 to include both start and end dates
+                
+            }
+            return $totalDays;
+        }
+        else {
+            return $totalDays;
+        }
 
     }
 
