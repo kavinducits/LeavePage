@@ -283,6 +283,134 @@ Restict date selection in "To" field in study_leave_extension_form.blade.php
 When user select the "From" date, then "To" date should be restict thate "To" date should be greater than "From" date
 And also "To" date should not exceed more than 3 years from the original study leave and we can calculate that using till that date $remainingDays+"From" date
 
+----------------------------HOD review section mandatory-----------------------------
+make study_leave_hod_review_section.blade.php fields readonly and editeble according to readonly varibale true or false
+
+
+all field in study_leave_hod_review_section.blade.php is field if available using hod_adequate_staff_available,hod_teaching_covered,hod_service_period,hod_recommend,hod_not_recommend_reason,hod_remarks
+
+----------------------------------------------------------------------------------------------------------------------
+
+ <div class="card mt-4">
+            <div class="card-header card-header-dark text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
+            </div>
+            <div class="card-body">
+                
+                <!-- Question 1 -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Whether adequate staff available for the continuation of academic programs during the period of applicant's leave?
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="adequateStaffYes" value="yes" required>
+                        <label class="form-check-label" for="adequateStaffYes">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="adequateStaffNo" value="no" required>
+                        <label class="form-check-label" for="adequateStaffNo">
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Whether satisfactory agreements can be made to cover applicant's teaching activities and other commitments?
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_teaching_covered" id="teachingCoveredYes" value="yes" required>
+                        <label class="form-check-label" for="teachingCoveredYes">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_teaching_covered" id="teachingCoveredNo" value="no" required>
+                        <label class="form-check-label" for="teachingCoveredNo">
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Whether the applicant has served at least one (01) year in the Department?
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_service_period" id="servicePeriodYes" value="yes" required>
+                        <label class="form-check-label" for="servicePeriodYes">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_service_period" id="servicePeriodNo" value="no" required>
+                        <label class="form-check-label" for="servicePeriodNo">
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 4 - Recommendation -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Leave is recommended
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_recommend" id="recommendYes" value="yes" required>
+                        <label class="form-check-label" for="recommendYes">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="hod_recommend" id="recommendNo" value="no" required>
+                        <label class="form-check-label" for="recommendNo">
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Conditional: If not recommended -->
+                <div class="mb-4" id="notRecommendReasonDiv" style="display: none;">
+                    <label for="hod_not_recommend_reason" class="form-label fw-semibold">
+                        If not recommended, please give reasons
+                        <span class="text-danger">*</span>
+                    </label>
+                    <textarea class="form-control" id="hod_not_recommend_reason" name="hod_not_recommend_reason" rows="4" 
+                              placeholder="Please provide detailed reasons for not recommending this leave"></textarea>
+                    <div class="invalid-feedback">
+                        Please provide reasons for not recommending.
+                    </div>
+                </div>
+
+                <!-- Any other remarks -->
+                <div class="mb-4">
+                    <label for="hod_remarks" class="form-label fw-semibold">
+                        Any other remarks
+                    </label>
+                    <textarea class="form-control" id="hod_remarks" name="hod_remarks" rows="3" 
+                              placeholder="Add any additional comments or remarks (optional)"></textarea>
+                </div>
+
+            </div>
+        </div>
+
+
+        ---------------------------------------------------------------------------------------------------
+        ----------------------------Dean review section mandatory-----------------------------
+make study_leave_dean_review_section.blade.php fields readonly and editeble according to readonly varibale true or false
+
+
+all field in study_leave_hod_review_section.blade.php is field if available using hod_adequate_staff_available,hod_teaching_covered,hod_service_period,hod_recommend,hod_not_recommend_reason,hod_remarks
+
+----------------------------------------------------------------------------------------------------------------------
 
 
 
