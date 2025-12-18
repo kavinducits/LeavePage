@@ -16,15 +16,7 @@ class StudyLeaveController extends Controller
 {
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-
-        return redirect()->route('StudyLeave.BasicInfo.create');
-    }
-
+  
 
     /**
      * Show the form for creating a basic information .
@@ -72,7 +64,7 @@ class StudyLeaveController extends Controller
             )
             ->first();
 
-        if (($allStudyLeavesCount->total_count - $approvedLeavesCount->approved_count) == 0  && $approvedLeavesInProgress == 0 && $this->calculateTotalStudyLeaveDays(session('empno')) <= 1095) {
+        if (($allStudyLeavesCount->total_count-$rejectLeaves->count() - $approvedLeavesCount->approved_count) == 0  && $approvedLeavesInProgress == 0 && $this->calculateTotalStudyLeaveDays(session('empno')) <= 1095) {
             $isEnableStudyLeaveRequiste = true;
         }
 
