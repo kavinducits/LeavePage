@@ -16,8 +16,6 @@ class StudyLeaveController extends Controller
 {
 
 
-  
-
     /**
      * Show the form for creating a basic information .
      */
@@ -138,7 +136,7 @@ class StudyLeaveController extends Controller
         if (!$user)
             abort(404, 'User not found');
 
-       // session(['ma_user_id' => $user->assign_ma_user_id]);
+      
         return view('StudyLeave.createBasicInfo', compact('user',  'readonly'));
     }
 
@@ -612,11 +610,7 @@ class StudyLeaveController extends Controller
         if ($draft) {
             $draft->update([
                 'is_draft' => true,
-               // 'library_and_property_handling' => $validatedData['library_and_property_handling'],
-               // 'loan_handling' => $validatedData['loan_handling'],
                 'current_step' => 4,
-                //'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
-
             ]);
         }
     }
@@ -1130,7 +1124,7 @@ class StudyLeaveController extends Controller
         $currentYear = date('Y');
         $years = [];
 
-        for ($i = -3; $i < 3; $i++) {
+        for ($i = -1; $i < 3; $i++) {
             $startYear = $currentYear + $i;
             $endYear = $startYear + 1;
             $years[] = "{$startYear}/{$endYear}";
@@ -1139,32 +1133,5 @@ class StudyLeaveController extends Controller
         return $years;
     }
 
-    public function showExtendStudyLeaveForm($id){
     
-
-        $readonly = false;
-        $study_leave = StudyLeave::where('id', $id)
-  
-            ->select(
-                "leave_type",
-                "leave_payment_type",
-                "study_leave_from",
-                "study_leave_to",
-                "funding_type",
-                "scholarship_source",
-                "scholarship_amount",
-                "project_name",
-                "nominee_teaching_empno",
-                "nominee_admin_empno",
-                "nominee_other_empno",
-                "reference_no"
-            )
-            ->first();
-
-        $totalDaysStudyLeave = $this->calculateTotalStudyLeaveDays(session('empno'));
-
-        return view('StudyLeave.study_leave_extension_form', compact('study_leave', 'readonly', 'totalDaysStudyLeave'));
-
-
-    }
 }

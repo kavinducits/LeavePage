@@ -9,13 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class StudyLeaveExtensionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    
 
     /**
      * Get all extensions for a specific study leave
@@ -27,53 +21,7 @@ class StudyLeaveExtensionController extends Controller
             ->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(StudyLeaveExtension $studyLeaveExtension)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(StudyLeaveExtension $studyLeaveExtension)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, StudyLeaveExtension $studyLeaveExtension)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(StudyLeaveExtension $studyLeaveExtension)
-    {
-        //
-    }
+    
      public function showStudyLeaveExtensionForm($id){
 
         $readonly = false;
@@ -195,18 +143,13 @@ class StudyLeaveExtensionController extends Controller
         // Validate the incoming request data
         $rules = array(
             
-            //'leave_payment_type' => 'required|string|max:100',
+           
             'old_end_date' => 'required|date',
             'new_end_date' => 'required|date|after_or_equal:old_end_date',
-            //'funding_type' => 'required|string|max:100',
-           // 'scholarship_source' => 'required_if:funding_type,scholarship|string|max:1000',
-           // 'scholarship_amount' => 'required_if:scholarship_source,agency|nullable|numeric|min:10',
-           // 'project_name' => 'required_if:scholarship_source,project|nullable|string|max:255',
             'reason_for_extension' => 'required|string|max:2000',
         );
         
         $validator = Validator::make($request->all(), $rules);
-        //$validator = \Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             dd([
@@ -217,8 +160,7 @@ class StudyLeaveExtensionController extends Controller
         }
 
         $validatedData = $validator->validated();
-      // dd($id,$validatedData);
-
+    
         // Create a new StudyLeaveExtension record
         $creationSuccess = $this->createStudyLeaveExtension($id, $validatedData);
         if (!$creationSuccess) {
@@ -230,7 +172,7 @@ class StudyLeaveExtensionController extends Controller
 
     public function createStudyLeaveExtension($study_leave_id, $validatedData)
     {
-        //dd($study_leave_id, $validatedData);
+        
         try {
             
             // Create a new StudyLeaveExtension record
@@ -238,25 +180,18 @@ class StudyLeaveExtensionController extends Controller
            
             $studyLeaveExtension->study_leave_id = $study_leave_id;
            
-          //  $studyLeaveExtension->leave_payment_type = $validatedData['leave_payment_type'];
+        
             $studyLeaveExtension->old_end_date = $validatedData['old_end_date'];
             $studyLeaveExtension->new_end_date = $validatedData['new_end_date'];
-
-      //      $studyLeaveExtension->funding_type = $validatedData['funding_type'];
-      //      $studyLeaveExtension->scholarship_source = $validatedData['scholarship_source'] ?? null;
-       //     $studyLeaveExtension->scholarship_amount = $validatedData['scholarship_amount'] ?? null;
-       //     $studyLeaveExtension->project_name = $validatedData['project_name'] ?? null;
-       
             $studyLeaveExtension->reason_for_extension = $validatedData['reason_for_extension'];
             $studyLeaveExtension->status_id = 4; // Pending status
            
             $studyLeaveExtension->save();
-           // dd('after save');
+          
             
             return true;
         } catch (\Exception $e) {
             dd($e->getMessage());
-            //\Log::error('Study Leave Extension Creation Error: ' . $e->getMessage());
             return false;
         }
     }
