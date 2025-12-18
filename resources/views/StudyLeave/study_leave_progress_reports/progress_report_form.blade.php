@@ -122,7 +122,11 @@
                         @endif
                         @php
                             // Log the next due date and related information to browser console
-                            echo "<script>console.log('Next Due Date:', '" . $nextDueDate->format('Y-m-d H:i:s') . "');</script>";
+                            if ($nextDueDate) {
+                                echo "<script>console.log('Next Due Date:', '" . $nextDueDate->format('Y-m-d H:i:s') . "');</script>";
+                            } else {
+                                echo "<script>console.log('Next Due Date:', null);</script>";
+                            }
                             echo "<script>console.log('Can Upload Next:', " . json_encode($canUploadNext) . ");</script>";
                             echo "<script>console.log('Next Report Index:', " . ($progress_reports->count() + 1) . ");</script>";
                         @endphp
