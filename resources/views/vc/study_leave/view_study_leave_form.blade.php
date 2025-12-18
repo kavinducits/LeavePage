@@ -32,6 +32,8 @@
     @include('StudyLeave.basic_info_form', ['readonly' => true])
     @include('StudyLeave.details_form', ['readonly' => true])
     @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
+    @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => true])
+    @include('dean.study_leave.study_leave_dean_review_section', ['readonly' => true])
 
     <!-- VC Review Section -->
     <form action="{{ route('vc.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="vcReviewForm">
@@ -200,8 +202,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    approvedCouncilYes.addEventListener('change', toggleReasonField);
-    approvedCouncilNo.addEventListener('change', toggleReasonField);
+   approvedCouncilYes.addEventListener('change', toggleReasonField);
+   approvedCouncilNo.addEventListener('change', toggleReasonField);
 
     // Form validation
     form.addEventListener('submit', function(e) {

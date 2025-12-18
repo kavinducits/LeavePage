@@ -108,28 +108,7 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const recommendYes = document.getElementById('recommendYes');
-    const recommendNo = document.getElementById('recommendNo');
-    const notRecommendReasonDiv = document.getElementById('notRecommendReasonDiv');
-    const notRecommendReasonTextarea = document.getElementById('hod_not_recommend_reason');
-    const form = document.getElementById('hodReviewForm');
 
-    // Show/hide reason textarea based on recommendation
-    function toggleReasonField() {
-        if (recommendNo.checked) {
-            notRecommendReasonDiv.style.display = 'block';
-            notRecommendReasonTextarea.setAttribute('required', 'required');
-        } else {
-            notRecommendReasonDiv.style.display = 'none';
-            notRecommendReasonTextarea.removeAttribute('required');
-            notRecommendReasonTextarea.value = '';
-            notRecommendReasonTextarea.classList.remove('is-invalid');
-        }
-    }
-
-    recommendYes.addEventListener('change', toggleReasonField);
-    recommendNo.addEventListener('change', toggleReasonField);
 
     // Form validation
     form.addEventListener('submit', function(e) {

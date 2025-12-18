@@ -32,61 +32,13 @@
     @include('StudyLeave.basic_info_form', ['readonly' => true])
     @include('StudyLeave.details_form', ['readonly' => true])
     @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
+    @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => true])
 
     <!-- Dean Review Section -->
     <form action="{{ route('dean.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="deanReviewForm">
         @csrf
         
-        <div class="card mt-4">
-            <div class="card-header card-header-dark text-white fw-semibold">
-                <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
-            </div>
-            <div class="card-body">
-                
-                <!-- Question 1 - Recommendation -->
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        Is leave recommended?
-                        <span class="text-danger">*</span>
-                    </label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendYes" value="yes" required>
-                        <label class="form-check-label" for="recommendYes">
-                            Yes
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendNo" value="no" required>
-                        <label class="form-check-label" for="recommendNo">
-                            No
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Conditional: If not recommended -->
-                <div class="mb-4" id="notRecommendReasonDiv" style="display: none;">
-                    <label for="dean_not_recommend_reason" class="form-label fw-semibold">
-                        If not recommended, please give reasons
-                        <span class="text-danger">*</span>
-                    </label>
-                    <textarea class="form-control" id="dean_not_recommend_reason" name="dean_not_recommend_reason" rows="4" 
-                              placeholder="Please provide detailed reasons for not recommending this leave"></textarea>
-                    <div class="invalid-feedback">
-                        Please provide reasons for not recommending.
-                    </div>
-                </div>
-
-                <!-- Any other remarks -->
-                <div class="mb-4">
-                    <label for="dean_remarks" class="form-label fw-semibold">
-                        Any other remarks
-                    </label>
-                    <textarea class="form-control" id="dean_remarks" name="dean_remarks" rows="3" 
-                              placeholder="Add any additional comments or remarks (optional)"></textarea>
-                </div>
-
-            </div>
-        </div>
+        @include('dean.study_leave.study_leave_dean_review_section', ['readonly' => false])
 
         <!-- Action Buttons -->
         <div class="card mt-4">
@@ -162,28 +114,7 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const recommendYes = document.getElementById('recommendYes');
-    const recommendNo = document.getElementById('recommendNo');
-    const notRecommendReasonDiv = document.getElementById('notRecommendReasonDiv');
-    const notRecommendReasonTextarea = document.getElementById('dean_not_recommend_reason');
-    const form = document.getElementById('deanReviewForm');
 
-    // Show/hide reason textarea based on recommendation
-    function toggleReasonField() {
-        if (recommendNo.checked) {
-            notRecommendReasonDiv.style.display = 'block';
-            notRecommendReasonTextarea.setAttribute('required', 'required');
-        } else {
-            notRecommendReasonDiv.style.display = 'none';
-            notRecommendReasonTextarea.removeAttribute('required');
-            notRecommendReasonTextarea.value = '';
-            notRecommendReasonTextarea.classList.remove('is-invalid');
-        }
-    }
-
-    recommendYes.addEventListener('change', toggleReasonField);
-    recommendNo.addEventListener('change', toggleReasonField);
 
     // Form validation
     form.addEventListener('submit', function(e) {

@@ -103,13 +103,13 @@
                 </div>
 
                 <!-- Conditional: If not recommended -->
-                <div class="mb-4" id="notRecommendReasonDiv" style="display: {{ isset($draft_study_leave->hod_not_recommend_reason) && $draft_study_leave->hod_not_recommend_reason ? 'block' : 'none' }};">
+                <div class="mb-4" id="notRecommendReasonDiv" style="display: {{ (optional($draft_study_leave)->hod_recommend == 'no' || optional($draft_study_leave)->hod_not_recommend_reason) ? 'block' : 'none' }};">
                     <label for="hod_not_recommend_reason" class="form-label fw-semibold">
                         If not recommended, please give reasons
                         <span class="text-danger">*</span>
                     </label>
                     <textarea class="form-control" id="hod_not_recommend_reason" name="hod_not_recommend_reason" rows="4" 
-                              placeholder="Please provide detailed reasons for not recommending this leave" {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ $draft_study_leave->hod_not_recommend_reason ?? '' }}</textarea>
+                              placeholder="Please provide detailed reasons for not recommending this leave" {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->hod_not_recommend_reason ?? '' }}</textarea>
                     <div class="invalid-feedback">
                         Please provide reasons for not recommending.
                     </div>
@@ -121,8 +121,32 @@
                         Any other remarks
                     </label>
                     <textarea class="form-control" id="hod_remarks" name="hod_remarks" rows="3" 
-                              placeholder="Add any additional comments or remarks (optional)" {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ $hod_remarks ?? '' }}</textarea>
+                              placeholder="Add any additional comments or remarks (optional)" {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ $draft_study_leave->hod_remarks ?? '' }}</textarea>
                 </div>
 
             </div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const recommendYes = document.getElementById('recommendYes');
+                const recommendNo = document.getElementById('recommendNo');
+                const notRecommendReasonDiv = document.getElementById('notRecommendReasonDiv');
+                const notRecommendReasonTextarea = document.getElementById('hod_not_recommend_reason');
+
+                // Show/hide reason textarea based on recommendation
+                function toggleReasonField() {
+                    if (recommendNo.checked) {
+                        notRecommendReasonDiv.style.display = 'block';
+                        notRecommendReasonTextarea.setAttribute('required', 'required');
+                    } else {
+                        notRecommendReasonDiv.style.display = 'none';
+                        notRecommendReasonTextarea.removeAttribute('required');
+                        notRecommendReasonTextarea.value = '';
+                        notRecommendReasonTextarea.classList.remove('is-invalid');
+                    }
+                }
+
+                recommendYes.addEventListener('change', toggleReasonField);
+                recommendNo.addEventListener('change', toggleReasonField);
+            });
+        </script>

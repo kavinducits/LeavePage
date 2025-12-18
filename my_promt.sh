@@ -408,9 +408,67 @@ all field in study_leave_hod_review_section.blade.php is field if available usin
 make study_leave_dean_review_section.blade.php fields readonly and editeble according to readonly varibale true or false
 
 
-all field in study_leave_hod_review_section.blade.php is field if available using hod_adequate_staff_available,hod_teaching_covered,hod_service_period,hod_recommend,hod_not_recommend_reason,hod_remarks
+all field in study_leave_dean_review_section.blade.php is field if available using draft_study_leave->vc_recommend_submit_to_committee,vc_council_covering_approval_status,vc_not_approve_reason,vc_remarks
 
 ----------------------------------------------------------------------------------------------------------------------
 
+<div class="card mt-4">
+            <div class="card-header card-header-dark text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
+            </div>
+            <div class="card-body">
+                
+                <!-- Question 1 - Recommendation -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Is leave recommended?
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendYes" value="yes" required>
+                        <label class="form-check-label" for="recommendYes">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendNo" value="no" required>
+                        <label class="form-check-label" for="recommendNo">
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Conditional: If not recommended -->
+                <div class="mb-4" id="notRecommendReasonDiv" style="display: none;">
+                    <label for="dean_not_recommend_reason" class="form-label fw-semibold">
+                        If not recommended, please give reasons
+                        <span class="text-danger">*</span>
+                    </label>
+                    <textarea class="form-control" id="dean_not_recommend_reason" name="dean_not_recommend_reason" rows="4" 
+                              placeholder="Please provide detailed reasons for not recommending this leave"></textarea>
+                    <div class="invalid-feedback">
+                        Please provide reasons for not recommending.
+                    </div>
+                </div>
+
+                <!-- Any other remarks -->
+                <div class="mb-4">
+                    <label for="dean_remarks" class="form-label fw-semibold">
+                        Any other remarks
+                    </label>
+                    <textarea class="form-control" id="dean_remarks" name="dean_remarks" rows="3" 
+                              placeholder="Add any additional comments or remarks (optional)"></textarea>
+                </div>
+
+            </div>
+        </div>
+
+-------------------------------------------------------------------------------------------------------------
+
+-----------hod if not recommended reson shwing---------------
+
+if  $draft_study_leave->hod_not_recommend_reason is null,it should visible  If not recommended, please give reasons field
+
+if select "recommendNo" option  in "dean_recommend" radio button,it should visible  "dean_not_recommend_reason" field
 
 
