@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\StudyLeaveProgressReports;
 use App\Models\StudyLeave;
+use App\Models\StudyLeaveExtension;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -48,7 +49,12 @@ class StudyLeaveProgressReportsController extends Controller
     {
         $today = Carbon::now();
         $leaveStart = Carbon::parse($study_leave->study_leave_from);
-        $leaveEnd = Carbon::parse($study_leave->study_leave_to);
+        if($this->isExtended($study_leave->id)) {
+            $leaveEnd = $this->getLastExtendedEndDate($study_leave->id);
+            
+        } else {
+            $leaveEnd = Carbon::parse($study_leave->study_leave_to);
+        }
 
         // Can't upload if study leave hasn't started
         if ($today->lessThan($leaveStart)) {
@@ -64,6 +70,9 @@ class StudyLeaveProgressReportsController extends Controller
         if ($progress_reports->count() == 0) {
             return true;
         }
+        if ($progress_reports->count() < $today->diffInMonths($leaveStart) / 6) {
+            return false;
+        }
 
         // Get the last submitted report
         $lastReport = $progress_reports->sortByDesc('due_date')->first();
@@ -72,6 +81,35 @@ class StudyLeaveProgressReportsController extends Controller
         $lastDueDate = Carbon::parse($lastReport->due_date);
         
         return $today->greaterThan($lastDueDate);
+    }
+
+    /**
+     * Check if the study leave has any approved extensions
+     */
+    private function isExtended($study_leave_id)
+    {   
+        $extensions = StudyLeaveExtension::where('study_leave_id', $study_leave_id)
+            ->whereIn('status_id', [1]) // Only approved extensions
+            ->count();
+
+        return $extensions > 0;
+    }
+
+    private function getLastExtendedEndDate($study_leave_id)
+    {
+        $extensions = StudyLeaveExtension::where('study_leave_id', $study_leave_id)
+            ->whereIn('status_id', [1]) // Only approved extensions
+            ->orderBy('new_end_date', 'desc')
+            ->first();
+
+        if ($extensions) {
+            return $extensions->new_end_date;
+        }
+        else {
+            return null;
+        }
+
+        
     }
 
     /**
