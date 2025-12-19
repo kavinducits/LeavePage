@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Models\StudyLeave;
+use App\Models\StudyLeaveExtension;
 
 class MAController extends Controller
 {
@@ -674,9 +676,56 @@ class MAController extends Controller
         // Decide which blade to use and readonly status
         $readonly = false;
         $view = 'ma.showStudyLeave';
+
+      
+
+        $totalStudyLeaveDays = $this->calculateTotalStudyLeaveDays($draft_study_leave->employee_no);
+      
+
+        $from = new \DateTime($draft_study_leave->study_leave_from);
+        $to = new \DateTime($draft_study_leave->study_leave_to);
+        $interval = $from->diff($to);
+        $requistedStudyLeaveDays = $interval->days + 1; // +1 to include both start and end dates
        
 
-        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user'));
+        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays'));
+    }
+     /**
+     * Calculate total study leave days taken by an employee.
+     */
+    public function calculateTotalStudyLeaveDays($emp_no)
+    {
+        $totalDays = 0;
+        $previousLeaves=StudyLeave::where('empno', $emp_no)
+        ->where('is_draft', false)
+        ->where('status_id', 1)
+        ->select('study_leave_from','study_leave_to');
+
+        if($previousLeaves->count() > 0){
+            foreach($previousLeaves->get() as $leave){
+                $leave_id = $leave->id;
+                $extensions = StudyLeaveExtension::where('study_leave_id', $leave_id)
+                ->where('status_id', 1)
+                ->select('new_end_date')
+                ->OrderBy('id', 'desc')
+                ->first();
+                if($extensions){
+                    $extended_end_date = $extensions->new_end_date;
+                } else {
+                    $extended_end_date = $leave->study_leave_to;
+                }
+                $from = new \DateTime($leave->study_leave_from);
+                $to = new \DateTime($extended_end_date);
+                $interval = $from->diff($to);
+                $totalDays += $interval->days + 1; // +1 to include both start and end dates
+                
+            }
+            return $totalDays;
+        }
+        else {
+            return $totalDays;
+        }
+
     }
 
     public function approveStudyLeave(Request $request, $id)

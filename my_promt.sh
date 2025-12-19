@@ -469,6 +469,12 @@ all field in study_leave_dean_review_section.blade.php is field if available usi
 
 if  $draft_study_leave->hod_not_recommend_reason is null,it should visible  If not recommended, please give reasons field
 
-if select "recommendNo" option  in "dean_recommend" radio button,it should visible  "dean_not_recommend_reason" field
+if select "recommendNo" option  in "dean_recommend" radio button at study_leave_dean_review_section.blade.php,it should visible "If not recommended, please give reasons" field
+if select "recommendYes" option  in "dean_recommend" radio button at study_leave_dean_review_section.blade.php,it should not visible  "If not recommended, please give reasons" field
+
+
+------------------------------------showing time duration in cards----------------------------
+write blade page(ma/study_leave/study_leave_duration_card.blade.php) to show the time duration in each study leave application that should be show total time duration applicat have applyed($totalStudyLeaveDays), current requisting time duration($requistedStudyLeaveDays) and remaning study leave time duration that can be applyed duration
+use the same theme that is used in createStudyLeave.blade.php page cards, and it should include to top of ma/showStudyLeave.blade.php page,
 
 

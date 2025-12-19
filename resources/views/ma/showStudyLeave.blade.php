@@ -49,7 +49,8 @@
                         </a>
                     </div>
 
-                    
+                    <!-- Study Leave Duration Card -->
+                    @include('ma.study_leave.study_leave_duration_card')
 
                     <!-- Personal Details (readonly) -->
                     @include('ma.partials.studyLeave', ['readonly' => true])

@@ -639,8 +639,19 @@ class StudyLeaveController extends Controller
         // Fetch employee info from the database
         $employee = DB::table('employees')
             ->join('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
             ->where('employee_no', $emp_no)
-            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"), 'assign_ma_user_id', 'designation_name as designation')
+            ->select(
+                'employee_no', 
+                DB::raw("CONCAT(initials, ' ', last_name) as name"), 
+                'assign_ma_user_id', 
+                'designation_name as designation',
+                'department_name as department',
+                'faculty_name as faculty',
+                'categories.category_name as title'
+            )
             ->first();
 
         return $employee;
@@ -1062,13 +1073,22 @@ class StudyLeaveController extends Controller
         $searchTerm = $request->input('query');
 
         $employees = DB::table('employees')
-            ->where('main_branch_id', 52) // Filter for academic staff first
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+            ->where('employees.main_branch_id', 52) // Filter for academic staff first
             ->where(function($query) use ($searchTerm) {
-            $query->where('employee_no', 'like', '%' . $searchTerm . '%')
-                ->orWhere(DB::raw("CONCAT(initials, ' ', last_name)"), 'like', '%' . $searchTerm . '%')
-                ->orWhere(DB::raw("CONCAT(name_denoted_by_initials, ' ', last_name)"), 'like', '%' . $searchTerm . '%');
+                $query->where('employees.employee_no', 'like', '%' . $searchTerm . '%')
+                    ->orWhere(DB::raw("CONCAT(employees.initials, ' ', employees.last_name)"), 'like', '%' . $searchTerm . '%')
+                    ->orWhere(DB::raw("CONCAT(employees.name_denoted_by_initials, ' ', employees.last_name)"), 'like', '%' . $searchTerm . '%');
             })
-            ->select('employee_no', DB::raw("CONCAT(initials, ' ', last_name) as name"))
+            ->select(
+                'employees.employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name"),
+                'faculties.faculty_name',
+                'departments.department_name',
+                'categories.category_name as title'
+            )
             ->limit(10)
             ->get();
 

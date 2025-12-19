@@ -19,10 +19,10 @@
                     <div class="col-12">
 
                         <!-- Nominee Person For Teaching -->
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-semibold">Nominate Person For Teaching </label>
                                 <div class="row g-2">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('nominee_teaching_empno') is-invalid @enderror" 
                                                id="nominee_teaching_empno" 
@@ -42,7 +42,7 @@
                                             Please enter a valid employee number (3-15 characters, uppercase letters and numbers).
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
                                         <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Search by name" required readonly>
                                         @error('nominee_teaching_name')
@@ -51,41 +51,24 @@
                                             </div>
                                         @enderror
                                     </div>
-                                </div>
-                                <!-- Employee Details Card -->
-                                <div id="nominee_teaching_details" class="nominee-details-card mt-2" style="display: none;">
-                                    <div class="card bg-dark text-white border-0">
-                                        <div class="card-body p-3">
-                                            <div class="row g-2">
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Title</small>
-                                                    <span class="fw-semibold" id="nominee_teaching_title">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Designation</small>
-                                                    <span class="fw-semibold" id="nominee_teaching_destination_display">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Department</small>
-                                                    <span class="fw-semibold" id="nominee_teaching_department">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Faculty</small>
-                                                    <span class="fw-semibold" id="nominee_teaching_faculty">-</span>
-                                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Destination</label>
+                                        <input type="text" class="form-control @error('nominee_teaching_destination') is-invalid @enderror" id="nominee_teaching_destination" name="nominee_teaching_destination" value="{{ old('nominee_teaching_destination', $draft_study_leave->nominee_teaching_destination ?? '') }}" placeholder="Destination" readonly required>
+                                        @error('nominee_teaching_destination')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
                                             </div>
-                                        </div>
+                                        @enderror
                                     </div>
                                 </div>
-                                <input type="hidden" id="nominee_teaching_destination" name="nominee_teaching_destination" value="{{ old('nominee_teaching_destination', $draft_study_leave->nominee_teaching_destination ?? '') }}">
                             </div>
 
                             <!-- Nominee Person For Administrative Work -->
 
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-semibold">Nominate Person For Administrative Work </label>
                                 <div class="row g-2">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('nominee_admin_empno') is-invalid @enderror" 
                                                id="nominee_admin_empno" 
@@ -105,7 +88,7 @@
                                             Please enter a valid employee number (3-15 characters, uppercase letters and numbers).
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
                                         <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $draft_study_leave->nominee_admin_name ?? '') }}" placeholder="Search by name" required readonly>
                                         @error('nominee_admin_name')
@@ -114,41 +97,26 @@
                                             </div>
                                         @enderror
                                     </div>
-                                </div>
-                                <!-- Employee Details Card -->
-                                <div id="nominee_admin_details" class="nominee-details-card mt-2" style="display: none;">
-                                    <div class="card bg-dark text-white border-0">
-                                        <div class="card-body p-3">
-                                            <div class="row g-2">
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Title</small>
-                                                    <span class="fw-semibold" id="nominee_admin_title">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Designation</small>
-                                                    <span class="fw-semibold" id="nominee_admin_destination_display">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Department</small>
-                                                    <span class="fw-semibold" id="nominee_admin_department">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Faculty</small>
-                                                    <span class="fw-semibold" id="nominee_admin_faculty">-</span>
-                                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Destination</label>
+                                        <input type="text" class="form-control @error('nominee_admin_destination') is-invalid @enderror" id="nominee_admin_destination" name="nominee_admin_destination" value="{{ old('nominee_admin_destination', $draft_study_leave->nominee_admin_destination ?? '') }}" placeholder="Destination" readonly>
+                                        @error('nominee_admin_destination')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
                                             </div>
-                                        </div>
+                                        @enderror
                                     </div>
                                 </div>
-                                <input type="hidden" id="nominee_admin_destination" name="nominee_admin_destination" value="{{ old('nominee_admin_destination', $draft_study_leave->nominee_admin_destination ?? '') }}">    
+                                    
+                                </div>
                             </div>
 
                             <!--  Nominee Person For Other Work -->
 
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-semibold">Nominate Person For Other Work</label>
                                 <div class="row g-2">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee No <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('nominee_other_empno') is-invalid @enderror" 
                                                id="nominee_other_empno" 
@@ -168,7 +136,7 @@
                                             Please enter a valid employee number (3-15 characters, uppercase letters and numbers).
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="form-label fw-semibold">Employee Name</label>
                                         <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $draft_study_leave->nominee_other_name ?? '') }}" placeholder="Search by name" required readonly>
                                         @error('nominee_other_name')
@@ -177,33 +145,18 @@
                                             </div>
                                         @enderror
                                     </div>
-                                </div>
-                                <!-- Employee Details Card -->
-                                <div id="nominee_other_details" class="nominee-details-card mt-2" style="display: none;">
-                                    <div class="card bg-dark text-white border-0">
-                                        <div class="card-body p-3">
-                                            <div class="row g-2">
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Title</small>
-                                                    <span class="fw-semibold" id="nominee_other_title">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Designation</small>
-                                                    <span class="fw-semibold" id="nominee_other_destination_display">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Department</small>
-                                                    <span class="fw-semibold" id="nominee_other_department">-</span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Faculty</small>
-                                                    <span class="fw-semibold" id="nominee_other_faculty">-</span>
-                                                </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Destination</label>
+                                        <input type="text" class="form-control @error('nominee_other_destination') is-invalid @enderror" id="nominee_other_destination" name="nominee_other_destination" value="{{ old('nominee_other_destination', $draft_study_leave->nominee_other_destination ?? '') }}" placeholder="Destination" readonly>
+                                        @error('nominee_other_destination')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
                                             </div>
-                                        </div>
+                                        @enderror
                                     </div>
                                 </div>
-                                <input type="hidden" id="nominee_other_destination" name="nominee_other_destination" value="{{ old('nominee_other_destination', $draft_study_leave->nominee_other_destination ?? '') }}">
+                               
+                                </div>
                                
                             </div>
                           
@@ -252,56 +205,6 @@
         font-size: 0.875rem;
         color: #6c757d;
         margin-left: 8px;
-    }
-    
-    /* Nominee Details Card Styling */
-    .nominee-details-card {
-        animation: slideDown 0.3s ease-out;
-    }
-    
-    .nominee-details-card .card {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        border-radius: 8px;
-    }
-    
-    .nominee-details-card .card-body {
-        padding: 1rem;
-    }
-    
-    .nominee-details-card small {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.25rem;
-    }
-    
-    .nominee-details-card .fw-semibold {
-        font-size: 0.95rem;
-        color: #ffffff;
-    }
-    
-    .text-white-50 {
-        opacity: 0.7;
-    }
-    
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .nominee-details-card .col-md-3 {
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .nominee-details-card .col-md-3:last-child {
-        border-right: none;
     }
 </style>
 
@@ -371,9 +274,6 @@ $(document).ready(function () {
         if (!empno) {
             $(nameOutputSelector).val('');
             $(destinationOutputSelector).val('');
-            // Hide details card
-            var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
-            $('#nominee_' + prefix + '_details').hide();
             return;
         }
 
@@ -385,24 +285,9 @@ $(document).ready(function () {
                 if (response && response.success && response.data && response.data.name) {
                     $(nameOutputSelector).val(response.data.name);
                     $(destinationOutputSelector).val(response.data.designation);
-                    
-                    // Determine which nominee this is (teaching, admin, or other)
-                    var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
-                    
-                    // Update the details card with all information
-                    $('#nominee_' + prefix + '_title').text(response.data.title || '-');
-                    $('#nominee_' + prefix + '_destination_display').text(response.data.designation || '-');
-                    $('#nominee_' + prefix + '_department').text(response.data.department || '-');
-                    $('#nominee_' + prefix + '_faculty').text(response.data.faculty || '-');
-                    
-                    // Show the details card with animation
-                    $('#nominee_' + prefix + '_details').slideDown(300);
                 } else {
                     $(nameOutputSelector).val('Not found');
                     $(destinationOutputSelector).val('Not found');
-                    // Hide details card
-                    var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
-                    $('#nominee_' + prefix + '_details').slideUp(300);
                     console.warn('Lookup returned no name for', empno, response);
                 }
             },
@@ -410,9 +295,6 @@ $(document).ready(function () {
                 console.error('Employee lookup error for', empno, status, error, xhr.responseText);
                 $(nameOutputSelector).val('Lookup failed');
                 $(destinationOutputSelector).val('Lookup failed');
-                // Hide details card
-                var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
-                $('#nominee_' + prefix + '_details').slideUp(300);
             }
         });
     }
