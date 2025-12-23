@@ -474,8 +474,23 @@ class StudyLeaveController extends Controller
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',
-
         ]);
+
+        // Validate that each employee number exists
+        $employeeNumbers = [
+            'nominee_teaching_empno' => $validatedData['nominee_teaching_empno'],
+            'nominee_admin_empno' => $validatedData['nominee_admin_empno'],
+            'nominee_other_empno' => $validatedData['nominee_other_empno']
+        ];
+
+        foreach ($employeeNumbers as $field => $empNo) {
+            $employee = $this->getEmployee($empNo);
+            if (!$employee) {
+                return back()->withErrors([
+                    $field => 'Employee number ' . $empNo . ' does not exist.'
+                ])->withInput();
+            }
+        }
 
         session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
         // Here you can handle the validated data, e.g., save it to the database or session

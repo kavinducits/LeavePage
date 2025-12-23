@@ -36,7 +36,23 @@
 </nav> 
 
 <style>
-   .bg-info {
+    /* Fixed navbar styles */
+    .main-header {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        z-index: 1030 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Adjust content wrapper for fixed navbar */
+    .content-wrapper {
+        margin-top: 57px !important;
+        transition: margin-left 0.3s;
+    }
+
+    .bg-info {
         background-color: #007bff !important;
     }
 

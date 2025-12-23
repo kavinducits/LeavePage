@@ -44,15 +44,18 @@
                           <!-- University or the Institute -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">University or the Institute <span class="text-danger">*</span></label>
-                    <input type="text" name="university_institute" class="form-control" 
-                           value="{{ $draft_study_leave->university_institute ?? '' }}" 
-                           minlength="3" 
-                           maxlength="200" 
-                           required 
+                    <input type="text" name="university_institute" class="form-control @if(!($readonly ?? true)) @error('university_institute') is-invalid @enderror @endif" 
+                           value="{{ $draft_study_leave->university_institute ?? old('university_institute') }}" 
+                           @if(!($readonly ?? true)) minlength="3" maxlength="200" required @endif
                            {{ $readonly ?? true ? 'readonly' : '' }}>
+                    @if(!($readonly ?? true))
+                    @error('university_institute')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                     <div class="invalid-feedback">
                         Please enter the university or institute name (3-200 characters).
                     </div>
+                    @endif
                 </div>
 
                                                                 <!-- Country and Field of Study -->
@@ -179,32 +182,40 @@
                     <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Field of study <span class="text-danger">*</span></label>
-                    <input type="text" name="field_of_study" class="form-control" 
-                           value="{{ $draft_study_leave->field_of_study ?? '' }}" 
-                           minlength="3" 
-                           maxlength="200" 
-                           required 
+                    <input type="text" name="field_of_study" class="form-control @if(!($readonly ?? true)) @error('field_of_study') is-invalid @enderror @endif" 
+                           value="{{ $draft_study_leave->field_of_study ?? old('field_of_study') }}" 
+                           @if(!($readonly ?? true)) minlength="3" maxlength="200" required @endif
                            {{ $readonly ?? true ? 'readonly' : '' }}>
+                    @if(!($readonly ?? true))
+                    @error('field_of_study')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                     <div class="invalid-feedback">
                         Please enter the field of study (3-200 characters).
                     </div>
+                    @endif
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Degree Title <span class="text-danger">*</span></label>
-                    <select name="degree_title" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
-                        <option value="" {{ ($draft_study_leave->degree_title ?? '') === '' ? 'selected' : '' }}>Select degree title</option>
-                        <option value="MA" {{ ($draft_study_leave->degree_title ?? '') === 'MA' ? 'selected' : '' }}>M.A.</option>
-                        <option value="MSc" {{ ($draft_study_leave->degree_title ?? '') === 'MSc' ? 'selected' : '' }}>M.Sc</option>
-                        <option value="MBA" {{ ($draft_study_leave->degree_title ?? '') === 'MBA' ? 'selected' : '' }}>MBA</option>
-                        <option value="MPhil" {{ ($draft_study_leave->degree_title ?? '') === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
-                        <option value="MD" {{ ($draft_study_leave->degree_title ?? '') === 'MD' ? 'selected' : '' }}>M.D.</option>
-                        <option value="PhD" {{ ($draft_study_leave->degree_title ?? '') === 'PhD' ? 'selected' : '' }}>PhD</option>
-                        <option value="Other" {{ ($draft_study_leave->degree_title ?? '') === 'Other' ? 'selected' : '' }}>Other</option>
+                    <select name="degree_title" class="form-select @if(!($readonly ?? true)) @error('degree_title') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
+                        <option value="" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === '' ? 'selected' : '' }}>Select degree title</option>
+                        <option value="MA" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MA' ? 'selected' : '' }}>M.A.</option>
+                        <option value="MSc" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MSc' ? 'selected' : '' }}>M.Sc</option>
+                        <option value="MBA" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MBA' ? 'selected' : '' }}>MBA</option>
+                        <option value="MPhil" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
+                        <option value="MD" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MD' ? 'selected' : '' }}>M.D.</option>
+                        <option value="PhD" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'PhD' ? 'selected' : '' }}>PhD</option>
+                        <option value="Other" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'Other' ? 'selected' : '' }}>Other</option>
                     </select>
+                    @if(!($readonly ?? true))
+                    @error('degree_title')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                     <div class="invalid-feedback">
                         Please select a degree title.
                     </div>
+                    @endif
                 </div>
             </div>
                 </div>
@@ -219,28 +230,36 @@
                                                                                             
                                                                                     
                                                                                             <label class="form-label">From <span class="text-danger">*</span></label>
-                                                                                            <input type="date" name="study_leave_from" id="study_leave_from" class="form-control" 
-                                                                                                   value="{{optional($draft_study_leave)->study_leave_from ?? ''}}" 
-                                                                                                   min="{{ date('Y-m-d') }}" 
-                                                                                                   required 
+                                                                                            <input type="date" name="study_leave_from" id="study_leave_from" class="form-control @if(!($readonly ?? true)) @error('study_leave_from') is-invalid @enderror @endif" 
+                                                                                                   value="{{optional($draft_study_leave)->study_leave_from ?? old('study_leave_from')}}" 
+                                                                                                   @if(!($readonly ?? true)) min="{{ date('Y-m-d') }}" required @endif
                                                                                                    {{ $readonly ?? true ? 'readonly' : '' }}>
+                                                                                            @if(!($readonly ?? true))
+                                                                                            @error('study_leave_from')
+                                                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                                            @enderror
                                                                                             <div class="invalid-feedback">
                                                                                                 Please select a valid start date.
                                                                                             </div>
+                                                                                            @endif
                                                                                         </div>
 
                                                                                         <!-- To Date -->
                                                                                         <div class="col-md-6">
                                                                                             <label class="form-label">To <span class="text-danger">*</span></label>
-                                                                                            <input type="date" name="study_leave_to" id="study_leave_to" class="form-control" 
-                                                                                                   value="{{optional($draft_study_leave)->study_leave_to ?? ''}}" 
-                                                                                                   min="{{ date('Y-m-d') }}" 
-                                                                                                   required 
+                                                                                            <input type="date" name="study_leave_to" id="study_leave_to" class="form-control @if(!($readonly ?? true)) @error('study_leave_to') is-invalid @enderror @endif" 
+                                                                                                   value="{{optional($draft_study_leave)->study_leave_to ?? old('study_leave_to')}}" 
+                                                                                                   @if(!($readonly ?? true)) required @endif
                                                                                                    {{ $readonly ?? true ? 'readonly' : '' }}
                                                                                                    disabled>
+                                                                                            @if(!($readonly ?? true))
+                                                                                            @error('study_leave_to')
+                                                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                                            @enderror
                                                                                             <div class="invalid-feedback">
-                                                                                                Please select a valid end date (must be after start date).
+                                                                                                Please select a valid end date (must be on or after start date).
                                                                                             </div>
+                                                                                            @endif
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -283,7 +302,7 @@
                                                                                         // Set max date on page load if From date exists
                                                                                         const selectedDate = new Date(fromDate.value);
                                                                                         const maxDate = new Date(selectedDate);
-                                                                                        maxDate.setDate(maxDate.getDate() + totalDaysStudyLeave);
+                                                                                        maxDate.setDate(maxDate.getDate() + 1095 - totalDaysStudyLeave);
                                                                                         const maxDateString = maxDate.toISOString().split('T')[0];
                                                                                         toDate.max = maxDateString;
                                                                                         toDate.min = fromDate.value;
@@ -297,13 +316,17 @@
 
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
-                    <textarea name="study_program_details" class="form-control" rows="4" 
-                              minlength="10" 
-                              maxlength="1000" 
-                              {{ $readonly ?? true ? 'readonly' : '' }}>{{ $draft_study_leave->study_program_details ?? '' }}</textarea>
+                    <textarea name="study_program_details" class="form-control @if(!($readonly ?? true)) @error('study_program_details') is-invalid @enderror @endif" rows="4" 
+                              @if(!($readonly ?? true)) minlength="10" maxlength="1000" @endif
+                              {{ $readonly ?? true ? 'readonly' : '' }}>{{ $draft_study_leave->study_program_details ?? old('study_program_details') }}</textarea>
+                    @if(!($readonly ?? true))
+                    @error('study_program_details')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                     <div class="invalid-feedback">
                         Please provide details of the study program (10-1000 characters).
                     </div>
+                    @endif
                 </div>
 
                  <!-- Attachment Instructions -->
@@ -314,14 +337,19 @@
                         </div>
                     @endif
                     <label class="form-label fw-semibold mt-2">Attach PDF Documents <span class="text-danger">*</span></label>
-                    <input type="file" name="placement_letter" id="attachments-input" class="form-control" 
+                    <input type="file" name="placement_letter" id="attachments-input" class="form-control @if(!($readonly ?? true)) @error('placement_letter') is-invalid @enderror @endif" 
                            accept="application/pdf" 
                            multiple 
                            {{ !empty($draft_study_leave->placement_letter) ? '' : 'required' }}
                            {{ $readonly ?? true ? 'disabled' : '' }}>
+                    @if(!($readonly ?? true))
+                    @error('placement_letter')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                     <div class="invalid-feedback">
                         Please upload a PDF document (placement letter/scholarship details).
                     </div>
+                    @endif
 
                     <!-- Show previously uploaded file (when editing) -->
                     @if(!empty($draft_study_leave->placement_letter))
@@ -352,14 +380,19 @@
                  <!-- Type of Study Leave Requested -->
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
-                        <select name="leave_payment_type" id="leave_payment_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ $draft_study_leave->leave_payment_type === '' ? 'selected' : '' }} >Select an option</option>
-                            <option value="with Pay" {{ $draft_study_leave->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
-                            <option value="without Pay" {{ $draft_study_leave->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
+                        <select name="leave_payment_type" id="leave_payment_type" class="form-select @if(!($readonly ?? true)) @error('leave_payment_type') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
+                            <option value="" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) === '' ? 'selected' : '' }} >Select an option</option>
+                            <option value="with Pay" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) === 'with Pay' ? 'selected' : '' }}>With Pay</option>
+                            <option value="without Pay" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
                         </select>
+                        @if(!($readonly ?? true))
+                        @error('leave_payment_type')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                         <div class="invalid-feedback">
                             Please select the type of study leave.
                         </div>
+                        @endif
                     </div>
                     
                 <!-- Loan Handling (conditional) - shown only for "without Pay" -->
@@ -373,35 +406,47 @@
                         <option value="Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
                         <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
+                    @if(!($readonly ?? true))
                     <div class="invalid-feedback">
                         Please select an option for loan handling.
                     </div>
+                    @endif
                 </div>
 
                 <!-- Funding Type -->
                 <div class="col-md-6">
                         <label class="form-label fw-semibold"> Funding type <span class="text-danger">*</span></label>
-                        <select name="funding_type" id="funding_type" class="form-select" required {{ $readonly ?? true ? 'disabled' : '' }} >
-                            <option value="" {{ $draft_study_leave->funding_type ?? '' ? '' : 'selected' }} disabled>Select funding type</option>
-                            <option value="self" {{ $draft_study_leave->funding_type === 'self' ? 'selected' : '' }}>Self-Funding</option>
-                            <option value="scholarship" {{ $draft_study_leave->funding_type === 'scholarship' ? 'selected' : '' }}>Scholarship</option>
+                        <select name="funding_type" id="funding_type" class="form-select @if(!($readonly ?? true)) @error('funding_type') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }} >
+                            <option value="" {{ ($draft_study_leave->funding_type ?? old('funding_type')) ? '' : 'selected' }} disabled>Select funding type</option>
+                            <option value="self" {{ ($draft_study_leave->funding_type ?? old('funding_type')) === 'self' ? 'selected' : '' }}>Self-Funding</option>
+                            <option value="scholarship" {{ ($draft_study_leave->funding_type ?? old('funding_type')) === 'scholarship' ? 'selected' : '' }}>Scholarship</option>
                         </select>
+                        @if(!($readonly ?? true))
+                        @error('funding_type')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                         <div class="invalid-feedback">
                             Please select a funding type.
                         </div>
+                        @endif
                     </div>
 
                     <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
                         <label class="form-label fw-semibold">Scholarship Source <span class="text-danger">*</span></label>
-                        <select name="scholarship_source" id="scholarship_source" class="form-select" {{ $readonly ?? true ? 'disabled' : '' }} >
-                            <option value="" {{ empty($draft_study_leave->scholarship_source) ? 'selected' : '' }} disabled>Select source</option>
-                            <option value="agency" {{ ($draft_study_leave->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
-                            <option value="project" {{ ($draft_study_leave->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
+                        <select name="scholarship_source" id="scholarship_source" class="form-select @if(!($readonly ?? true)) @error('scholarship_source') is-invalid @enderror @endif" {{ $readonly ?? true ? 'disabled' : '' }} >
+                            <option value="" {{ empty($draft_study_leave->scholarship_source ?? old('scholarship_source')) ? 'selected' : '' }} disabled>Select source</option>
+                            <option value="agency" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
+                            <option value="project" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) === 'project' ? 'selected' : '' }}>Funds from a project</option>
                         </select>
+                        @if(!($readonly ?? true))
+                        @error('scholarship_source')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                         <div class="invalid-feedback">
                             Please select a scholarship source.
                         </div>
+                        @endif
                     </div>
 
                     <!-- Additional fields based on Scholarship Source -->
@@ -410,15 +455,19 @@
                         <!-- Scholarship Amount (conditional) - If Scholarship offering agency is selected -->
                         <div id="scholarship-amount-group" style="display: none;">
                             <label class="form-label fw-semibold">Scholarship Amount <span class="text-danger">*</span></label>
-                            <input type="number" name="scholarship_amount" id="scholarship_amount" class="form-control" 
-                                   min="0.01" 
-                                   step="0.01" 
+                            <input type="number" name="scholarship_amount" id="scholarship_amount" class="form-control @if(!($readonly ?? true)) @error('scholarship_amount') is-invalid @enderror @endif" 
+                                   @if(!($readonly ?? true)) min="0.01" step="0.01" @endif
                                    placeholder="Enter amount" 
-                                   value="{{ $draft_study_leave->scholarship_amount ?? '' }}" 
+                                   value="{{ $draft_study_leave->scholarship_amount ?? old('scholarship_amount') }}" 
                                    {{ $readonly ?? true ? 'readonly' : '' }}>
+                            @if(!($readonly ?? true))
+                            @error('scholarship_amount')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                             <div class="invalid-feedback">
                                 Please enter a valid scholarship amount (must be greater than 0).
                             </div>
+                            @endif
                         </div>
 
                         <!-- Project Name (conditional) - If Funds from a project is selected -->
@@ -430,9 +479,11 @@
                                    maxlength="200" 
                                    value="{{ $draft_study_leave->project_name ?? '' }}" 
                                    {{ $readonly ?? true ? 'readonly' : '' }}>
+                            @if(!($readonly ?? true))
                             <div class="invalid-feedback">
                                 Please enter the project name (3-200 characters).
                             </div>
+                            @endif
                         </div>
                     </div>
                     <!-- Additional fields (conditional) - If Self-Funding is selected -->

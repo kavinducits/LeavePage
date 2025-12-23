@@ -21,56 +21,61 @@
                         <!-- Nominee Person For Teaching -->
                             <div class="mb-4">
                                 <label class="form-label fw-semibold">Nominate Person For Teaching </label>
+                                @if(!($readonly ?? true))
                                 <div class="row g-2">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Employee No <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('nominee_teaching_empno') is-invalid @enderror" 
-                                               id="nominee_teaching_empno" 
-                                               name="nominee_teaching_empno" 
-                                               value="{{ old('nominee_teaching_empno', $draft_study_leave->nominee_teaching_empno ?? '') }}" 
-                                               placeholder="Employee Number" 
-                                               pattern="[A-Z0-9]{3,15}" 
-                                               title="Employee number must be 3-15 characters (uppercase letters and numbers)"
-                                               required 
-                                               {{ $readonly ?? true ? 'readonly' : '' }}>
-                                        @error('nominee_teaching_empno')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter a valid employee number (3-15 characters, uppercase letters and numbers).
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                            <input type="text" class="form-control search-employee @error('nominee_teaching_empno') is-invalid @enderror" 
+                                                   id="nominee_teaching_empno" 
+                                                   name="nominee_teaching_empno" 
+                                                   value="{{ old('nominee_teaching_empno', $draft_study_leave->nominee_teaching_empno ?? '') }}" 
+                                                   placeholder="Search by Employee Number or Name..." 
+                                                   title="Search by employee number or name"
+                                                   required>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_teaching_name') is-invalid @enderror" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}" placeholder="Search by name" required readonly>
-                                        @error('nominee_teaching_name')
-                                            <div class="invalid-feedback">
+                                        @error('nominee_teaching_empno')
+                                            <div class="invalid-feedback d-block">
                                                 {{ $message }}
                                             </div>
                                         @enderror
+                                        <div class="invalid-feedback" id="nominee_teaching_error" style="display: none;">
+                                            <i class="fas fa-exclamation-circle"></i> Not found
+                                        </div>
+                                        <small class="text-muted" id="nominee_teaching_helper">Type employee number or name to search</small>
                                     </div>
                                 </div>
+                                @else
+                                <input type="hidden" id="nominee_teaching_empno" name="nominee_teaching_empno" value="{{ old('nominee_teaching_empno', $draft_study_leave->nominee_teaching_empno ?? '') }}">
+                                @endif
+                                <input type="hidden" id="nominee_teaching_name" name="nominee_teaching_name" value="{{ old('nominee_teaching_name', $draft_study_leave->nominee_teaching_name ?? '') }}">
                                 <!-- Employee Details Card -->
                                 <div id="nominee_teaching_details" class="nominee-details-card mt-2" style="display: none;">
-                                    <div class="card bg-dark text-white border-0">
+                                    <div class="card bg-light border">
                                         <div class="card-body p-3">
+                                            <div class="mb-2 pb-2 border-bottom">
+                                                <h6 class="mb-0 fw-bold">
+                                                    <span id="nominee_teaching_title">-</span> <span id="nominee_teaching_name_display">-</span>
+                                                </h6>
+                                            </div>
                                             <div class="row g-2">
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Title</small>
-                                                    <span class="fw-semibold" id="nominee_teaching_title">-</span>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Employee No</small>
+                                                    <span class="fw-semibold" id="nominee_teaching_empno_display2">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Designation</small>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Designation</small>
                                                     <span class="fw-semibold" id="nominee_teaching_destination_display">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Department</small>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Department</small>
                                                     <span class="fw-semibold" id="nominee_teaching_department">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Faculty</small>
+                                            </div>
+                                            <div class="row g-2 mt-2">
+                                                <div class="col-md-12">
+                                                    <small class="text-muted d-block">Faculty</small>
                                                     <span class="fw-semibold" id="nominee_teaching_faculty">-</span>
                                                 </div>
                                             </div>
@@ -84,56 +89,61 @@
 
                             <div class="mb-4">
                                 <label class="form-label fw-semibold">Nominate Person For Administrative Work </label>
+                                @if(!($readonly ?? true))
                                 <div class="row g-2">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Employee No <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('nominee_admin_empno') is-invalid @enderror" 
-                                               id="nominee_admin_empno" 
-                                               name="nominee_admin_empno" 
-                                               value="{{ old('nominee_admin_empno', $draft_study_leave->nominee_admin_empno ?? '') }}" 
-                                               placeholder="Employee Number" 
-                                               pattern="[A-Z0-9]{3,15}" 
-                                               title="Employee number must be 3-15 characters (uppercase letters and numbers)"
-                                               required 
-                                               {{ $readonly ?? true ? 'readonly' : '' }}>
-                                        @error('nominee_admin_empno')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter a valid employee number (3-15 characters, uppercase letters and numbers).
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                            <input type="text" class="form-control search-employee @error('nominee_admin_empno') is-invalid @enderror" 
+                                                   id="nominee_admin_empno" 
+                                                   name="nominee_admin_empno" 
+                                                   value="{{ old('nominee_admin_empno', $draft_study_leave->nominee_admin_empno ?? '') }}" 
+                                                   placeholder="Search by Employee Number or Name..." 
+                                                   title="Search by employee number or name"
+                                                   required>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_admin_name') is-invalid @enderror" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $draft_study_leave->nominee_admin_name ?? '') }}" placeholder="Search by name" required readonly>
-                                        @error('nominee_admin_name')
-                                            <div class="invalid-feedback">
+                                        @error('nominee_admin_empno')
+                                            <div class="invalid-feedback d-block">
                                                 {{ $message }}
                                             </div>
                                         @enderror
+                                        <div class="invalid-feedback" id="nominee_admin_error" style="display: none;">
+                                            <i class="fas fa-exclamation-circle"></i> Not found
+                                        </div>
+                                        <small class="text-muted" id="nominee_admin_helper">Type employee number or name to search</small>
                                     </div>
                                 </div>
+                                @else
+                                <input type="hidden" id="nominee_admin_empno" name="nominee_admin_empno" value="{{ old('nominee_admin_empno', $draft_study_leave->nominee_admin_empno ?? '') }}">
+                                @endif
+                                <input type="hidden" id="nominee_admin_name" name="nominee_admin_name" value="{{ old('nominee_admin_name', $draft_study_leave->nominee_admin_name ?? '') }}">
                                 <!-- Employee Details Card -->
                                 <div id="nominee_admin_details" class="nominee-details-card mt-2" style="display: none;">
-                                    <div class="card bg-dark text-white border-0">
+                                    <div class="card bg-light border">
                                         <div class="card-body p-3">
+                                            <div class="mb-2 pb-2 border-bottom">
+                                                <h6 class="mb-0 fw-bold">
+                                                    <span id="nominee_admin_title">-</span> <span id="nominee_admin_name_display">-</span>
+                                                </h6>
+                                            </div>
                                             <div class="row g-2">
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Title</small>
-                                                    <span class="fw-semibold" id="nominee_admin_title">-</span>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Employee No</small>
+                                                    <span class="fw-semibold" id="nominee_admin_empno_display2">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Designation</small>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Designation</small>
                                                     <span class="fw-semibold" id="nominee_admin_destination_display">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Department</small>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Department</small>
                                                     <span class="fw-semibold" id="nominee_admin_department">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Faculty</small>
+                                            </div>
+                                            <div class="row g-2 mt-2">
+                                                <div class="col-md-12">
+                                                    <small class="text-muted d-block">Faculty</small>
                                                     <span class="fw-semibold" id="nominee_admin_faculty">-</span>
                                                 </div>
                                             </div>
@@ -147,56 +157,61 @@
 
                             <div class="mb-4">
                                 <label class="form-label fw-semibold">Nominate Person For Other Work</label>
+                                @if(!($readonly ?? true))
                                 <div class="row g-2">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Employee No <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('nominee_other_empno') is-invalid @enderror" 
-                                               id="nominee_other_empno" 
-                                               name="nominee_other_empno" 
-                                               value="{{ old('nominee_other_empno', $draft_study_leave->nominee_other_empno ?? '') }}" 
-                                               placeholder="Employee Number" 
-                                               pattern="[A-Z0-9]{3,15}" 
-                                               title="Employee number must be 3-15 characters (uppercase letters and numbers)"
-                                               required 
-                                               {{ $readonly ?? true ? 'readonly' : '' }}>
-                                        @error('nominee_other_empno')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter a valid employee number (3-15 characters, uppercase letters and numbers).
+                                    <div class="col-md-12">
+                                        <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                            <input type="text" class="form-control search-employee @error('nominee_other_empno') is-invalid @enderror" 
+                                                   id="nominee_other_empno" 
+                                                   name="nominee_other_empno" 
+                                                   value="{{ old('nominee_other_empno', $draft_study_leave->nominee_other_empno ?? '') }}" 
+                                                   placeholder="Search by Employee Number or Name..." 
+                                                   title="Search by employee number or name"
+                                                   required>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Employee Name</label>
-                                        <input type="text" class="form-control @error('nominee_other_name') is-invalid @enderror" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $draft_study_leave->nominee_other_name ?? '') }}" placeholder="Search by name" required readonly>
-                                        @error('nominee_other_name')
-                                            <div class="invalid-feedback">
+                                        @error('nominee_other_empno')
+                                            <div class="invalid-feedback d-block">
                                                 {{ $message }}
                                             </div>
                                         @enderror
+                                        <div class="invalid-feedback" id="nominee_other_error" style="display: none;">
+                                            <i class="fas fa-exclamation-circle"></i> Not found
+                                        </div>
+                                        <small class="text-muted" id="nominee_other_helper">Type employee number or name to search</small>
                                     </div>
                                 </div>
+                                @else
+                                <input type="hidden" id="nominee_other_empno" name="nominee_other_empno" value="{{ old('nominee_other_empno', $draft_study_leave->nominee_other_empno ?? '') }}">
+                                @endif
+                                <input type="hidden" id="nominee_other_name" name="nominee_other_name" value="{{ old('nominee_other_name', $draft_study_leave->nominee_other_name ?? '') }}">
                                 <!-- Employee Details Card -->
                                 <div id="nominee_other_details" class="nominee-details-card mt-2" style="display: none;">
-                                    <div class="card bg-dark text-white border-0">
+                                    <div class="card bg-light border">
                                         <div class="card-body p-3">
+                                            <div class="mb-2 pb-2 border-bottom">
+                                                <h6 class="mb-0 fw-bold">
+                                                    <span id="nominee_other_title">-</span> <span id="nominee_other_name_display">-</span>
+                                                </h6>
+                                            </div>
                                             <div class="row g-2">
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Title</small>
-                                                    <span class="fw-semibold" id="nominee_other_title">-</span>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Employee No</small>
+                                                    <span class="fw-semibold" id="nominee_other_empno_display2">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Designation</small>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Designation</small>
                                                     <span class="fw-semibold" id="nominee_other_destination_display">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Department</small>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted d-block">Department</small>
                                                     <span class="fw-semibold" id="nominee_other_department">-</span>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <small class="text-white-50 d-block">Faculty</small>
+                                            </div>
+                                            <div class="row g-2 mt-2">
+                                                <div class="col-md-12">
+                                                    <small class="text-muted d-block">Faculty</small>
                                                     <span class="fw-semibold" id="nominee_other_faculty">-</span>
                                                 </div>
                                             </div>
@@ -215,6 +230,58 @@
             </div>
 
             <style>
+    /* Search Employee Input Styling */
+    .search-employee {
+        border-left: none;
+        padding-left: 0.5rem;
+    }
+    
+    .search-employee:focus {
+        border-color: #80bdff;
+        box-shadow: none;
+    }
+    
+    .search-employee.is-invalid {
+        border-color: #dc3545;
+    }
+    
+    .input-group:focus-within .input-group-text {
+        border-color: #80bdff;
+    }
+    
+    .input-group.border-danger {
+        border: 1px solid #dc3545 !important;
+        border-radius: 0.25rem;
+    }
+    
+    .input-group.border-danger .input-group-text,
+    .input-group.border-danger .search-employee {
+        border-color: #dc3545 !important;
+    }
+    
+    .input-group-text {
+        border-right: none;
+    }
+    
+    /* Error message styling */
+    .invalid-feedback {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        color: #dc3545;
+    }
+    
+    /* Shake animation for error */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    .shake-animation {
+        animation: shake 0.5s ease-in-out;
+    }
+    
     .autocomplete-wrapper {
         position: relative;
     }
@@ -260,8 +327,7 @@
     }
     
     .nominee-details-card .card {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         border-radius: 8px;
     }
     
@@ -278,11 +344,7 @@
     
     .nominee-details-card .fw-semibold {
         font-size: 0.95rem;
-        color: #ffffff;
-    }
-    
-    .text-white-50 {
-        opacity: 0.7;
+        color: #212529;
     }
     
     @keyframes slideDown {
@@ -296,11 +358,11 @@
         }
     }
     
-    .nominee-details-card .col-md-3 {
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    .nominee-details-card .col-md-4 {
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
     }
     
-    .nominee-details-card .col-md-3:last-child {
+    .nominee-details-card .col-md-4:last-child {
         border-right: none;
     }
 </style>
@@ -368,12 +430,14 @@ $(document).ready(function () {
 
     function lookupEmployee(empInputSelector, nameOutputSelector, destinationOutputSelector) {
         var empno = $(empInputSelector).val() ? $(empInputSelector).val().trim() : '';
+        var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
+        
         if (!empno) {
             $(nameOutputSelector).val('');
             $(destinationOutputSelector).val('');
-            // Hide details card
-            var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
+            // Hide details card and clear error
             $('#nominee_' + prefix + '_details').hide();
+            clearEmployeeError(prefix);
             return;
         }
 
@@ -386,23 +450,26 @@ $(document).ready(function () {
                     $(nameOutputSelector).val(response.data.name);
                     $(destinationOutputSelector).val(response.data.designation);
                     
-                    // Determine which nominee this is (teaching, admin, or other)
-                    var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
-                    
                     // Update the details card with all information
+                    $('#nominee_' + prefix + '_empno_display').text(empno || '-');
+                    $('#nominee_' + prefix + '_empno_display2').text(empno || '-');
                     $('#nominee_' + prefix + '_title').text(response.data.title || '-');
+                    $('#nominee_' + prefix + '_name_display').text(response.data.name || '-');
                     $('#nominee_' + prefix + '_destination_display').text(response.data.designation || '-');
                     $('#nominee_' + prefix + '_department').text(response.data.department || '-');
                     $('#nominee_' + prefix + '_faculty').text(response.data.faculty || '-');
                     
                     // Show the details card with animation
                     $('#nominee_' + prefix + '_details').slideDown(300);
+                    
+                    // Clear any error states
+                    clearEmployeeError(prefix);
                 } else {
                     $(nameOutputSelector).val('Not found');
                     $(destinationOutputSelector).val('Not found');
-                    // Hide details card
-                    var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
+                    // Hide details card and show error
                     $('#nominee_' + prefix + '_details').slideUp(300);
+                    showEmployeeError(prefix, 'Not found');
                     console.warn('Lookup returned no name for', empno, response);
                 }
             },
@@ -410,24 +477,70 @@ $(document).ready(function () {
                 console.error('Employee lookup error for', empno, status, error, xhr.responseText);
                 $(nameOutputSelector).val('Lookup failed');
                 $(destinationOutputSelector).val('Lookup failed');
-                // Hide details card
-                var prefix = empInputSelector.replace('#nominee_', '').replace('_empno', '');
+                // Hide details card and show error
                 $('#nominee_' + prefix + '_details').slideUp(300);
+                showEmployeeError(prefix, 'Not found');
             }
         });
+    }
+    
+    // Function to show employee lookup error
+    function showEmployeeError(prefix, message) {
+        const $input = $('#nominee_' + prefix + '_empno');
+        const $inputGroup = $input.closest('.input-group');
+        const $error = $('#nominee_' + prefix + '_error');
+        const $helper = $('#nominee_' + prefix + '_helper');
+        
+        // Add error styling
+        $input.addClass('is-invalid');
+        $inputGroup.addClass('border-danger');
+        
+        // Update and show error message
+        if (message) {
+            $error.html('<i class="fas fa-exclamation-circle"></i> ' + message);
+        }
+        $error.show();
+        $helper.hide();
+        
+        // Add shake animation
+        $inputGroup.addClass('shake-animation');
+        setTimeout(() => {
+            $inputGroup.removeClass('shake-animation');
+        }, 500);
+    }
+    
+    // Function to clear employee lookup error
+    function clearEmployeeError(prefix) {
+        const $input = $('#nominee_' + prefix + '_empno');
+        const $inputGroup = $input.closest('.input-group');
+        const $error = $('#nominee_' + prefix + '_error');
+        const $helper = $('#nominee_' + prefix + '_helper');
+        
+        // Remove error styling
+        $input.removeClass('is-invalid');
+        $inputGroup.removeClass('border-danger');
+        
+        // Hide error and show helper
+        $error.hide();
+        $helper.show();
     }
 
     // Setup autocomplete for each employee field
     function setupAutocomplete(empnoSelector, nameSelector, destinationSelector, resultsSelector) {
-        // Wrap input in autocomplete wrapper if not already wrapped
+        // Wrap input-group in autocomplete wrapper if not already wrapped
         const $empnoInput = $(empnoSelector);
-        if (!$empnoInput.parent().hasClass('autocomplete-wrapper')) {
+        const $inputGroup = $empnoInput.closest('.input-group');
+        
+        if ($inputGroup.length && !$inputGroup.parent().hasClass('autocomplete-wrapper')) {
+            $inputGroup.wrap('<div class="autocomplete-wrapper"></div>');
+        } else if (!$empnoInput.parent().hasClass('autocomplete-wrapper')) {
             $empnoInput.wrap('<div class="autocomplete-wrapper"></div>');
         }
         
-        // Add results div after input
-        if ($(resultsSelector).length === 0) {
-            $empnoInput.after('<div class="autocomplete-results" id="' + resultsSelector.substring(1) + '"></div>');
+        // Add results div after wrapper
+        const $wrapper = $inputGroup.length ? $inputGroup.parent('.autocomplete-wrapper') : $empnoInput.parent('.autocomplete-wrapper');
+        if ($wrapper.find(resultsSelector).length === 0) {
+            $wrapper.append('<div class="autocomplete-results" id="' + resultsSelector.substring(1) + '"></div>');
         }
 
         // Handle input event for search
@@ -470,23 +583,30 @@ $(document).ready(function () {
     $('#nominee_admin_empno').on('change', function () {
         lookupEmployee('#nominee_admin_empno', '#nominee_admin_name','#nominee_admin_destination');
     });
+    
     $('#nominee_other_empno').on('change', function () {
         lookupEmployee('#nominee_other_empno', '#nominee_other_name','#nominee_other_destination');
+    });
+    
+    // Clear error when user starts typing
+    $('#nominee_teaching_empno, #nominee_admin_empno, #nominee_other_empno').on('input', function() {
+        const prefix = $(this).attr('id').replace('nominee_', '').replace('_empno', '');
+        clearEmployeeError(prefix);
     });
     
     // Validation for employee lookup - ensure employee is found before submission
     $('form').on('submit', function(e) {
         let isValid = true;
+        let firstInvalidField = null;
         
         // Check teaching nominee
         if ($('#nominee_teaching_empno').val() && 
             ($('#nominee_teaching_name').val() === 'Not found' || 
              $('#nominee_teaching_name').val() === 'Lookup failed' || 
              $('#nominee_teaching_name').val() === '')) {
-            $('#nominee_teaching_name').addClass('is-invalid');
+            showEmployeeError('teaching', 'Not found');
             isValid = false;
-        } else {
-            $('#nominee_teaching_name').removeClass('is-invalid');
+            if (!firstInvalidField) firstInvalidField = $('#nominee_teaching_empno');
         }
         
         // Check admin nominee
@@ -494,10 +614,9 @@ $(document).ready(function () {
             ($('#nominee_admin_name').val() === 'Not found' || 
              $('#nominee_admin_name').val() === 'Lookup failed' || 
              $('#nominee_admin_name').val() === '')) {
-            $('#nominee_admin_name').addClass('is-invalid');
+            showEmployeeError('admin', 'Not found');
             isValid = false;
-        } else {
-            $('#nominee_admin_name').removeClass('is-invalid');
+            if (!firstInvalidField) firstInvalidField = $('#nominee_admin_empno');
         }
         
         // Check other nominee
@@ -505,15 +624,20 @@ $(document).ready(function () {
             ($('#nominee_other_name').val() === 'Not found' || 
              $('#nominee_other_name').val() === 'Lookup failed' || 
              $('#nominee_other_name').val() === '')) {
-            $('#nominee_other_name').addClass('is-invalid');
+            showEmployeeError('other', 'Not found');
             isValid = false;
-        } else {
-            $('#nominee_other_name').removeClass('is-invalid');
+            if (!firstInvalidField) firstInvalidField = $('#nominee_other_empno');
         }
         
         if (!isValid) {
             e.preventDefault();
             alert('Please ensure all employee numbers are valid and found in the system.');
+            
+            // Scroll to first invalid field
+            if (firstInvalidField) {
+                firstInvalidField[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstInvalidField.focus();
+            }
             return false;
         }
     });

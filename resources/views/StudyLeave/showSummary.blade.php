@@ -100,6 +100,9 @@
                 <label class="form-check-label fw-semibold" for="declaration">
                                 I, undersigned, certify that the details provided in this form are accurate. Details of the programme and other relevant documents are attached.
                             </label>
+                <div class="invalid-feedback">
+                    You must agree to the declaration before submitting.
+                </div>
             </div>
         </div>
     </div>
@@ -125,6 +128,22 @@
 
      function submiteStudyLeave() {
         const form = document.getElementById('leave-form');
+        const declaration = document.getElementById('declaration');
+        
+        // Check if declaration is checked
+        if (!declaration.checked) {
+            // Add validation class to show error
+            form.classList.add('was-validated');
+            declaration.focus();
+            
+            // Scroll to declaration
+            declaration.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Show alert
+            alert('Please agree to the declaration before submitting.');
+            return false;
+        }
+        
         const originalAction = form.action;
         
         // Change form action to save and exit route
@@ -178,24 +197,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('leave-form');
     const libraryHandling = document.getElementById('library_and_property_handling');
     const loanHandling = document.getElementById('loan_handling');
+    const declaration = document.getElementById('declaration');
     
     if (form) {
         form.addEventListener('submit', function(event) {
             let isValid = true;
             
-            // Check library and property handling
-            if (!libraryHandling.value) {
-                libraryHandling.setCustomValidity('Please select an option');
+            // Check declaration
+            if (!declaration.checked) {
+                declaration.setCustomValidity('You must agree to the declaration');
                 isValid = false;
             } else {
+                declaration.setCustomValidity('');
+            }
+            
+            // Check library and property handling
+            if (libraryHandling && !libraryHandling.value) {
+                libraryHandling.setCustomValidity('Please select an option');
+                isValid = false;
+            } else if (libraryHandling) {
                 libraryHandling.setCustomValidity('');
             }
             
             // Check loan handling
-            if (!loanHandling.value) {
+            if (loanHandling && !loanHandling.value) {
                 loanHandling.setCustomValidity('Please select an option');
                 isValid = false;
-            } else {
+            } else if (loanHandling) {
                 loanHandling.setCustomValidity('');
             }
             
@@ -215,20 +243,34 @@ document.addEventListener('DOMContentLoaded', function() {
             form.classList.add('was-validated');
         });
         
-        // Clear validation on selection
-        libraryHandling.addEventListener('change', function() {
-            this.setCustomValidity('');
-            if (form.classList.contains('was-validated')) {
-                this.classList.remove('is-invalid');
-            }
-        });
+        // Clear validation on declaration change
+        if (declaration) {
+            declaration.addEventListener('change', function() {
+                this.setCustomValidity('');
+                if (form.classList.contains('was-validated')) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        }
         
-        loanHandling.addEventListener('change', function() {
-            this.setCustomValidity('');
-            if (form.classList.contains('was-validated')) {
-                this.classList.remove('is-invalid');
-            }
-        });
+        // Clear validation on selection
+        if (libraryHandling) {
+            libraryHandling.addEventListener('change', function() {
+                this.setCustomValidity('');
+                if (form.classList.contains('was-validated')) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        }
+        
+        if (loanHandling) {
+            loanHandling.addEventListener('change', function() {
+                this.setCustomValidity('');
+                if (form.classList.contains('was-validated')) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        }
     }
 });
 </script>

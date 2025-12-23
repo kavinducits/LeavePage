@@ -478,3 +478,7 @@ write blade page(ma/study_leave/study_leave_duration_card.blade.php) to show the
 use the same theme that is used in createStudyLeave.blade.php page cards, and it should include to top of ma/showStudyLeave.blade.php page,
 
 
+University or the Institute ,Field of study *,Degree Title *,Relevancy and Details of the Study Program,
+Attach PDF Documents *,Type of Study Leave Requested *,Funding type *,Scholarship Source *,Scholarship Amount *,
+
+above fields in details page showing erro msg when include this page to another blade, check and fix
