@@ -61,17 +61,22 @@
                                                                 <!-- Country and Field of Study -->
                                                                 <div class="col-md-6" id="country_field" style="transition: all 0.3s ease;">
                                                                     <label class="form-label fw-semibold">Country <span class="text-danger" id="country_required">*</span></label>
-                                                                    <select name="country" id="country" class="form-select" 
-                                                                           required 
+                                                                    <select name="country" id="country" class="form-select @if(!($readonly ?? true)) @error('country') is-invalid @enderror @endif" 
+                                                                           @if(!($readonly ?? true)) required @endif
                                                                            {{ $readonly ?? true ? 'disabled' : '' }}>
                                                                         <option value="">Select a country</option>
                                                                         @if(!empty($draft_study_leave->country))
                                                                             <option value="{{ $draft_study_leave->country }}" selected>{{ $draft_study_leave->country }}</option>
                                                                         @endif
                                                                     </select>
+                                                                    @if(!($readonly ?? true))
+                                                                    @error('country')
+                                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                    @enderror
                                                                     <div class="invalid-feedback">
                                                                         Please select a country.
                                                                     </div>
+                                                                    @endif
                                                                 </div>
 
                                                                 <script>
@@ -119,27 +124,35 @@
                 <!-- Passport Details (conditional - shown only for "Abroad") -->
                 <div class="col-md-6" id="passport_no_field" style="display: none;">
                     <label class="form-label fw-semibold">Passport Number <span class="text-danger">*</span></label>
-                    <input type="text" name="passport_no" id="passport_no" class="form-control" 
-                           value="{{ $draft_study_leave->passport_no ?? '' }}" 
-                           minlength="6" 
-                           maxlength="20" 
-                           pattern="[A-Z0-9]+" 
+                    <input type="text" name="passport_no" id="passport_no" class="form-control @if(!($readonly ?? true)) @error('passport_no') is-invalid @enderror @endif" 
+                           value="{{ $draft_study_leave->passport_no ?? old('passport_no') }}" 
+                           @if(!($readonly ?? true)) minlength="6" maxlength="20" pattern="[A-Z0-9]+" @endif
                            title="Passport number should contain only uppercase letters and numbers"
                            {{ $readonly ?? true ? 'readonly' : '' }}>
+                    @if(!($readonly ?? true))
+                    @error('passport_no')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                     <div class="invalid-feedback">
                         Please enter a valid passport number (6-20 characters, uppercase letters and numbers only).
                     </div>
+                    @endif
                 </div>
 
                 <div class="col-md-6" id="passport_validity_field" style="display: none;">
                     <label class="form-label fw-semibold">Passport Validity Date <span class="text-danger">*</span></label>
-                    <input type="date" name="passport_validity" id="passport_validity" class="form-control" 
-                           value="{{ $draft_study_leave->passport_validity ?? '' }}" 
-                           min="{{ date('Y-m-d') }}" 
+                    <input type="date" name="passport_validity" id="passport_validity" class="form-control @if(!($readonly ?? true)) @error('passport_validity') is-invalid @enderror @endif" 
+                           value="{{ $draft_study_leave->passport_validity ?? old('passport_validity') }}" 
+                           @if(!($readonly ?? true)) min="{{ date('Y-m-d') }}" @endif
                            {{ $readonly ?? true ? 'readonly' : '' }}>
+                    @if(!($readonly ?? true))
+                    @error('passport_validity')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                     <div class="invalid-feedback">
                         Please enter a valid passport expiry date (must be a future date).
                     </div>
+                    @endif
                 </div>
 
                 <script>
