@@ -23,7 +23,7 @@
                                 <label class="form-label fw-semibold">Nominate Person For Teaching </label>
                                 @if(!($readonly ?? true))
                                 <div class="row g-2">
-                                    <div class="col-md-12">
+                                    <div class="col-md-8">
                                         <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
@@ -43,7 +43,7 @@
                                         <div class="invalid-feedback" id="nominee_teaching_error" style="display: none;">
                                             <i class="fas fa-exclamation-circle"></i> Not found
                                         </div>
-                                        <small class="text-muted" id="nominee_teaching_helper">Type employee number or name to search</small>
+                                       
                                     </div>
                                 </div>
                                 @else
@@ -91,7 +91,7 @@
                                 <label class="form-label fw-semibold">Nominate Person For Administrative Work </label>
                                 @if(!($readonly ?? true))
                                 <div class="row g-2">
-                                    <div class="col-md-12">
+                                    <div class="col-md-8">
                                         <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
@@ -111,7 +111,7 @@
                                         <div class="invalid-feedback" id="nominee_admin_error" style="display: none;">
                                             <i class="fas fa-exclamation-circle"></i> Not found
                                         </div>
-                                        <small class="text-muted" id="nominee_admin_helper">Type employee number or name to search</small>
+                                       
                                     </div>
                                 </div>
                                 @else
@@ -159,7 +159,7 @@
                                 <label class="form-label fw-semibold">Nominate Person For Other Work</label>
                                 @if(!($readonly ?? true))
                                 <div class="row g-2">
-                                    <div class="col-md-12">
+                                    <div class="col-md-8">
                                         <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
@@ -179,7 +179,7 @@
                                         <div class="invalid-feedback" id="nominee_other_error" style="display: none;">
                                             <i class="fas fa-exclamation-circle"></i> Not found
                                         </div>
-                                        <small class="text-muted" id="nominee_other_helper">Type employee number or name to search</small>
+                                       
                                     </div>
                                 </div>
                                 @else
