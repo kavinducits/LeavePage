@@ -403,6 +403,13 @@ class StudyLeaveController extends Controller
     {
          $studyLeaveId = $draft->id;
          
+        // Delete existing file if it exists
+        if (!empty($draft->$type)) {
+            if (Storage::exists($draft->$type)) {
+                Storage::delete($draft->$type);
+            }
+        }
+         
         $filename = $this->generateFilename($empno, $studyLeaveId, $type);
         $directory = 'study_leave_documents/'.$type; 
         $path = $this->savePdfToStorage($file, $directory, $filename);
@@ -913,9 +920,9 @@ class StudyLeaveController extends Controller
             }
 
             // Generate filename: empno_studyleaveid_placement_letter.pdf
-            $filename = $empno . '_' . $studyLeaveId . '_placement_letter.pdf';
-            $path = $file->storeAs('placement_letter', $filename);
-            $validatedData['placement_letter'] = $path;
+            //$filename = $empno . '_' . $studyLeaveId . '_placement_letter.pdf';
+           // $path = $file->storeAs('placement_letter', $filename);
+            $validatedData['placement_letter'] = $this->saveUplodedPdfAttachment($file,$empno, $studyLeave, 'placement_letter');
         } else {
             // Keep existing file path if no new file uploaded
             unset($validatedData['placement_letter']);
@@ -933,9 +940,10 @@ class StudyLeaveController extends Controller
             }
 
             // Generate filename: empno_studyleaveid_self_funding_declaration.pdf
-            $filename = $empno . '_' . $studyLeaveId . '_self_funding_declaration.pdf';
-            $path = $file->storeAs('self_funding_declaration', $filename);
-            $validatedData['self_funding_declaration'] = $path;
+          //  $filename = $empno . '_' . $studyLeaveId . '_self_funding_declaration.pdf';
+          //  $path = $file->storeAs('self_funding_declaration', $filename);
+          //$validatedData['self_funding_declaration'] = $path;
+            $validatedData['self_funding_declaration'] = $this->saveUplodedPdfAttachment($file,$empno, $studyLeave, 'self_funding_declaration');
         } else {
             // Keep existing file path if no new file uploaded
             unset($validatedData['self_funding_declaration']);
@@ -1122,7 +1130,7 @@ class StudyLeaveController extends Controller
 
         // Find the draft study leave
         $draft = StudyLeave::where('empno', $empno)
-            ->where('is_draft', true)
+            ->where('id', $request->input('study_leave_id'))
             ->first();
 
         if (!$draft) {

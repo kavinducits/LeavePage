@@ -646,7 +646,7 @@
                                             'Content-Type': 'application/json',
                                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                         },
-                                        body: JSON.stringify({ type: 'self_funding_declaration' })
+                                        body: JSON.stringify({ type: 'self_funding_declaration',study_leave_id: {{ $draft_study_leave->id ?? '' }} })
                                     })
                                     .then(response => response.json())
                                     .then(data => {
@@ -758,7 +758,7 @@
                                             'Content-Type': 'application/json',
                                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                         },
-                                        body: JSON.stringify({ type: 'placement_letter' })
+                                        body: JSON.stringify({ type: 'placement_letter',study_leave_id: {{ $draft_study_leave->id ?? '' }} })
                                     })
                                     .then(response => response.json())
                                     .then(data => {
