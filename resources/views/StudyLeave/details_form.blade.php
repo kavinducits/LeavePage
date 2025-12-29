@@ -353,7 +353,8 @@
                     <input type="file" name="placement_letter" id="attachments-input" class="form-control @if(!($readonly ?? true)) @error('placement_letter') is-invalid @enderror @endif" 
                            accept="application/pdf" 
                            multiple 
-                           {{ !empty($draft_study_leave->placement_letter) ? '' : 'required' }}
+                           {{ !empty($draft_study_leave->placement_letter) ? 'disabled' : 'required' }}
+                           
                            {{ $readonly ?? true ? 'disabled' : '' }}>
                     @if(!($readonly ?? true))
                     @error('placement_letter')
@@ -561,7 +562,7 @@
                                                     @endif
 
                                                     <label class="form-label fw-semibold">Self-Funding Declaration <span class="text-danger" id="self-declaration-required">*</span></label>
-                                                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ !empty($draft_study_leave->self_funding_declaration) ? '' : 'required' }} {{ $readonly ?? true ? 'disabled' : '' }}>
+                                                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ !empty($draft_study_leave->self_funding_declaration) ? 'disabled' : 'required' }} {{ $readonly ?? true ? 'disabled' : '' }}>
                                                     <div class="invalid-feedback">
                                                         Please upload a self-funding declaration PDF document.
                                                     </div>
