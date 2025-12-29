@@ -113,7 +113,7 @@ svg {
       <div class="action-link-wrap">
         <a onclick="history.back(-1)" class="link-button link-back-button">Go Back</a>
 
-        <a href="{{ route('home') }}" class="link-button">Go to Home</a>
+        <a href="{{ route('ma.index') }}" class="link-button">Go to Home</a>
 
       </div>
     </div>
