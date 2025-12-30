@@ -180,8 +180,8 @@ class StudyLeaveProgressReportsController extends Controller
             // Generate filename: empno_studyleaveid_timestamp_progress_report.pdf
             $filename = $empno . '_' . $studyLeaveId . '_' . $timestamp . '_progress_report.pdf';
             
-            // Store the file in storage/app/private/study_leave_progress_report
-            $path = $file->storeAs('private/study_leave_progress_report', $filename);
+            // Store the file in storage/app/study_leave_documents/study_leave_progress_report
+            $path = $file->storeAs('study_leave_documents/study_leave_progress_report', $filename);
 
             // Create new progress report record
             StudyLeaveProgressReports::create([
@@ -205,9 +205,10 @@ class StudyLeaveProgressReportsController extends Controller
      */
     public function serveProgressReportFile($filename)
     {
-        // Construct the file path - storage/app/private/study_leave_progress_report/filename
-        $relativePath = 'private/study_leave_progress_report/' . $filename;
-        $filePath = storage_path('app/' . $relativePath);
+       
+        // Construct the file path - storage/app/study_leave_documents/study_leave_progress_report/filename
+        $relativePath = 'study_leave_documents/study_leave_progress_report/' . $filename;
+        $filePath = storage_path('app/private/' . $relativePath);
 
         // Check if file exists
         if (!file_exists($filePath)) {
@@ -221,6 +222,7 @@ class StudyLeaveProgressReportsController extends Controller
         // Authorization check
         $currentEmpNo = (string) session('empno');
         $isOwner = ($currentEmpNo === $fileEmpNo);
+        
 
         if (!$isOwner) {
             abort(403, 'Unauthorized access to this file');

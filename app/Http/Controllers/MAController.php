@@ -1170,6 +1170,52 @@ class MAController extends Controller
 
         return redirect()->route('ma.studyleave')->with('success', 'Progress report returned to user successfully.');
     }
+
+     public function serveProgressReportFile($filename)
+    {
+       
+        // Construct the file path - storage/app/study_leave_documents/study_leave_progress_report/filename
+        $relativePath = 'study_leave_documents/study_leave_progress_report/' . $filename;
+        $filePath = storage_path('app/private/' . $relativePath);
+
+        // Check if file exists
+        if (!file_exists($filePath)) {
+            abort(404, 'File not found');
+        }
+
+        // Extract employee number from filename (format: empno_studyleaveid_reportid_progress_report.pdf)
+        $parts = explode('_', $filename);
+        $fileEmpNo = $parts[0] ?? null;
+
+        // Authorization check
+        //$currentEmpNo = (string) session('empno');
+        //$isOwner = ($currentEmpNo === $fileEmpNo);
+        $maUserId = self::MA_USER_ID;
+        $studyLeaveRecord = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_progress_reports.document_path', $relativePath)
+            ->select('employees.assign_ma_user_id as ma_user_id')
+            ->first();
+            
+            if($studyLeaveRecord->ma_user_id == $maUserId){
+                $isOwner = true;
+            } else {
+                $isOwner = false;
+            }
+        
+        
+
+        if (!$isOwner) {
+            abort(403, 'Unauthorized access to this file');
+        }
+
+        // Serve the file
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . basename($filename) . '"'
+        ]);
+    }
    
     
 }

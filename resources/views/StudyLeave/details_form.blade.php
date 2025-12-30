@@ -36,10 +36,32 @@
                             <label class="form-check-label" for="location_abroad">Abroad</label>
                         </div>
                     </div>
-                    <div class="invalid-feedback d-block" id="study_location_error" style="display: none !important;">
+                    @if(!($readonly ?? true))
+                    @error('study_location')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror   
+                    <div class="invalid-feedback d-block" id="study_location_errors" style="display: none !important;">
                         Please select study leave location.
                     </div>
+                    @endif
                 </div>
+                <script>
+                // Client-side validation for Study Leave Location
+                document.addEventListener('DOMContentLoaded', function () {
+                    const studyLocationRadios = document.querySelectorAll('input[name="study_location"]');
+                    const studyLocationError = document.getElementById('study_location_errors');
+                    studyLocationRadios.forEach(radio => {
+                        radio.addEventListener('change', function () {
+                            if (studyLocationError) {
+                                console.log('Hiding study location error');
+                                studyLocationError.classList.remove('is-invalid');
+                                studyLocationError.style.display = 'none';
+                                console.log('Hiding study location error 2');
+                            }
+                        });
+                    });
+                });
+                </script>
                 
                           <!-- University or the Institute -->
                 <div class="col-md-6">
@@ -52,11 +74,28 @@
                     @error('university_institute')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback" id="university_institute_error" style="display: none !important;">
                         Please enter the university or institute name (3-200 characters).
                     </div>
                     @endif
                 </div>
+                <script>
+                // Client-side validation for University/Institute field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const universityInput = document.querySelector('input[name="university_institute"]');
+                    const universityError = document.getElementById('university_institute_error');
+                    universityInput.addEventListener('input', function () {
+                        const value = this.value.trim();
+                        if (value.length < 3 || value.length > 200) {
+                            universityInput.classList.add('is-invalid');
+                            universityError.style.display = 'block';
+                        } else {
+                            universityInput.classList.remove('is-invalid');
+                            universityError.style.display = 'none';
+                        }
+                    });
+                });
+                </script>
 
                                                                 <!-- Country and Field of Study -->
                                                                 <div class="col-md-6" id="country_field" style="transition: all 0.3s ease;">
@@ -73,7 +112,7 @@
                                                                     @error('country')
                                                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                     @enderror
-                                                                    <div class="invalid-feedback">
+                                                                    <div class="invalid-feedback" >
                                                                         Please select a country.
                                                                     </div>
                                                                     @endif
@@ -133,11 +172,29 @@
                     @error('passport_no')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback" id="passport_no_error" style="display: none !important;">
                         Please enter a valid passport number (6-20 characters, uppercase letters and numbers only).
                     </div>
                     @endif
                 </div>
+                <script>
+                // Client-side validation for Passport Number field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const passportInput = document.getElementById('passport_no');
+                    const passportError = document.getElementById('passport_no_error');
+                    passportInput.addEventListener('input', function () {
+                        const value = this.value.trim();
+                        const pattern = /^[A-Z0-9]{6,20}$/;
+                        if (!pattern.test(value)) {
+                            passportInput.classList.add('is-invalid');
+                            passportError.style.display = 'block';
+                        } else {
+                            passportInput.classList.remove('is-invalid');
+                            passportError.style.display = 'none';
+                        }
+                    });
+                });
+                </script>
 
                 <div class="col-md-6" id="passport_validity_field" style="display: none;">
                     <label class="form-label fw-semibold">Passport Validity Date <span class="text-danger">*</span></label>
@@ -149,11 +206,30 @@
                     @error('passport_validity')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback"  id="passport_validity_error" style="display: none !important;">
                         Please enter a valid passport expiry date (must be a future date).
                     </div>
                     @endif
                 </div>
+                <script>
+                // Client-side validation for Passport Validity Date field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const validityInput = document.getElementById('passport_validity');
+                    const validityError = document.getElementById('passport_validity_error');
+                    validityInput.addEventListener('change', function () {
+                        const selectedDate = new Date(this.value);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0); // Set to start of the day
+                        if (selectedDate <= today) {
+                            validityInput.classList.add('is-invalid');
+                            validityError.style.display = 'block';
+                        } else {
+                            validityInput.classList.remove('is-invalid');
+                            validityError.style.display = 'none';
+                        }
+                    });
+                });
+                </script>
 
                 <script>
                 document.addEventListener('DOMContentLoaded', function () {
@@ -203,11 +279,28 @@
                     @error('field_of_study')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback" id="field_of_study_error" style="display: none !important;">
                         Please enter the field of study (3-200 characters).
                     </div>
                     @endif
                 </div>
+                <script>
+                // Client-side validation for Field of Study field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const fieldInput = document.querySelector('input[name="field_of_study"]');
+                    const fieldError = document.getElementById('field_of_study_error');
+                    fieldInput.addEventListener('input', function () {
+                        const value = this.value.trim();
+                        if (value.length < 3 || value.length > 200) {
+                            fieldInput.classList.add('is-invalid');
+                            fieldError.style.display = 'block';
+                        } else {
+                            fieldInput.classList.remove('is-invalid');
+                            fieldError.style.display = 'none';
+                        }
+                    });
+                });
+                </script>
 
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Degree Title <span class="text-danger">*</span></label>
@@ -225,13 +318,29 @@
                     @error('degree_title')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback" id="degree_title_error" style="display: none !important;">
                         Please select a degree title.
                     </div>
                     @endif
                 </div>
             </div>
                 </div>
+                <script>
+                // Client-side validation for Degree Title field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const degreeSelect = document.querySelector('select[name="degree_title"]');
+                    const degreeError = document.getElementById('degree_title_error');
+                    degreeSelect.addEventListener('change', function () {
+                        if (this.value === '') {
+                            degreeSelect.classList.add('is-invalid');
+                            degreeError.style.display = 'block';
+                        } else {
+                            degreeSelect.classList.remove('is-invalid');
+                            degreeError.style.display = 'none';
+                        }
+                    });
+                });
+                </script>
                    
                    
                 <!-- Period of Study Leave Requested -->
@@ -251,11 +360,30 @@
                                                                                             @error('study_leave_from')
                                                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                                             @enderror
-                                                                                            <div class="invalid-feedback">
+                                                                                            <div class="invalid-feedback" id="study_leave_from_error" style="display: none !important;" >
                                                                                                 Please select a valid start date.
                                                                                             </div>
                                                                                             @endif
                                                                                         </div>
+                                                                                        <script>
+                                                                                        // Client-side validation for Study Leave From Date field
+                                                                                        document.addEventListener('DOMContentLoaded', function () {
+                                                                                            const fromDateInput = document.getElementById('study_leave_from');
+                                                                                            const fromDateError = document.getElementById('study_leave_from_error');
+                                                                                            fromDateInput.addEventListener('change', function () {
+                                                                                                const selectedDate = new Date(this.value);
+                                                                                                const today = new Date();
+                                                                                                today.setHours(0, 0, 0, 0); // Set to start of the day
+                                                                                                if (selectedDate < today) {
+                                                                                                    fromDateInput.classList.add('is-invalid');
+                                                                                                    fromDateError.style.display = 'block';
+                                                                                                } else {
+                                                                                                    fromDateInput.classList.remove('is-invalid');
+                                                                                                    fromDateError.style.display = 'none';
+                                                                                                }
+                                                                                            });
+                                                                                        });
+                                                                                        </script>
 
                                                                                         <!-- To Date -->
                                                                                         <div class="col-md-6">
@@ -269,7 +397,7 @@
                                                                                             @error('study_leave_to')
                                                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                                             @enderror
-                                                                                            <div class="invalid-feedback">
+                                                                                            <div class="invalid-feedback" id="study_leave_to_error" style="display: none !important;">
                                                                                                 Please select a valid end date (must be on or after start date).
                                                                                             </div>
                                                                                             @endif
@@ -281,6 +409,8 @@
                                                                                 document.addEventListener('DOMContentLoaded', function () {
                                                                                     const fromDate = document.getElementById('study_leave_from');
                                                                                     const toDate = document.getElementById('study_leave_to');
+                                                                                    
+                                                                                    const toDateError = document.getElementById('study_leave_to_error');
                                                                                     const totalDaysStudyLeave = {{ $totalDaysStydyLeave ?? 0 }};
                                                                                     
                                                                                     fromDate.addEventListener('change', function() {
@@ -320,6 +450,19 @@
                                                                                         toDate.max = maxDateString;
                                                                                         toDate.min = fromDate.value;
                                                                                     }
+
+                                                                                    toDate.addEventListener('change', function () {
+                                                                                        const fromDateValue = new Date(fromDate.value);
+                                                                                        const toDateValue = new Date(this.value);
+                                                                                        
+                                                                                        if (toDateValue < fromDateValue) {
+                                                                                            toDate.classList.add('is-invalid');
+                                                                                            toDateError.style.display = 'block';
+                                                                                        } else {
+                                                                                            toDate.classList.remove('is-invalid');
+                                                                                            toDateError.style.display = 'none';
+                                                                                        }
+                                                                                    });
                                                                                 });
                                                                                 </script>
 
@@ -336,11 +479,28 @@
                     @error('study_program_details')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback" id="study_program_details_error" style="display: none !important;">
                         Please provide details of the study program (10-1000 characters).
                     </div>
                     @endif
                 </div>
+                <script>
+                // Client-side validation for Study Program Details field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const detailsTextarea = document.querySelector('textarea[name="study_program_details"]');
+                    const detailsError = document.getElementById('study_program_details_error');
+                    detailsTextarea.addEventListener('input', function () {
+                        const value = this.value.trim();
+                        if (value.length < 10 || value.length > 1000) {
+                            detailsTextarea.classList.add('is-invalid');
+                            detailsError.style.display = 'block';
+                        } else {
+                            detailsTextarea.classList.remove('is-invalid');
+                            detailsError.style.display = 'none';
+                        }
+                    });
+                });
+                </script>
 
                  <!-- Attachment Instructions -->
                 <div class="col-md-12">
@@ -354,22 +514,23 @@
                            accept="application/pdf" 
                            multiple 
                            {{ !empty($draft_study_leave->placement_letter) ? 'disabled' : 'required' }}
-                           
                            {{ $readonly ?? true ? 'disabled' : '' }}>
                     @if(!($readonly ?? true))
-                    @error('placement_letter')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                    <div class="invalid-feedback">
-                        Please upload a PDF document (placement letter/scholarship details).
-                    </div>
+                        @if(empty($draft_study_leave->placement_letter))
+                            @error('placement_letter')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            <div class="invalid-feedback" id="attachments_error" >
+                                Please upload a PDF document (placement letter/scholarship details).
+                            </div>
+                        @endif
                     @endif
 
                     <!-- Show previously uploaded file (when editing) -->
                     @if(!empty($draft_study_leave->placement_letter))
                         <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-placement-letter">
                             <div>
-                                <strong>Existing file:</strong>
+                                <strong>File uploaded:</strong>
                                 <span class="ms-2">{{ pathinfo($draft_study_leave->placement_letter, PATHINFO_FILENAME) }}</span>
                             </div>
                             <div>
@@ -389,6 +550,7 @@
                         </div>
                     </div>
                 </div>
+              
 
 
                  <!-- Type of Study Leave Requested -->
@@ -403,11 +565,26 @@
                         @error('leave_payment_type')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback" id="leave_payment_type_error" style="display: none !important;"   >
                             Please select the type of study leave.
                         </div>
                         @endif
                     </div>
+                    <script>
+                    // Client-side validation for Leave Payment Type field
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const leaveTypeSelect = document.getElementById('leave_payment_type');
+                        const leaveTypeError = document.getElementById('leave_payment_type_error');
+                        leaveTypeSelect.addEventListener('change', function () {
+                            if (this.value === '') {
+                                leaveTypeSelect.classList.add('is-invalid');
+                                leaveTypeError.style.display = 'block';
+                            } else {
+                                leaveTypeSelect.classList.remove('is-invalid');
+                                leaveTypeError.style.display = 'none';
+                            }
+                        });
+                    });
                     
                 <!-- Loan Handling (conditional) - shown only for "without Pay" -->
                 <div class="col-md-6" id="loan_handling_section">
@@ -421,11 +598,27 @@
                         <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
                     @if(!($readonly ?? true))
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback" id="loan_handling_error" style="display: none !important;">
                         Please select an option for loan handling.
                     </div>
                     @endif
                 </div>
+                <script>
+                // Client-side validation for Loan Handling field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const loanHandlingSelect = document.getElementById('loan_handling_details');
+                    const loanHandlingError = document.getElementById('loan_handling_error');
+                    loanHandlingSelect.addEventListener('change', function () {
+                        if (this.value === '') {
+                            loanHandlingSelect.classList.add('is-invalid');
+                            loanHandlingError.style.display = 'block';
+                        } else {
+                            loanHandlingSelect.classList.remove('is-invalid');
+                            loanHandlingError.style.display = 'none';
+                        }
+                    });
+                });
+                </script>
 
                 <!-- Funding Type -->
                 <div class="col-md-6">
@@ -439,11 +632,27 @@
                         @error('funding_type')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback" id="funding_type_error" style="display: none !important;" >
                             Please select a funding type.
                         </div>
                         @endif
                     </div>
+                    <script>
+                    // Client-side validation for Funding Type field
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const fundingTypeSelect = document.getElementById('funding_type');
+                        const fundingTypeError = document.getElementById('funding_type_error');
+                        fundingTypeSelect.addEventListener('change', function () {
+                            if (this.value === '') {
+                                fundingTypeSelect.classList.add('is-invalid');
+                                fundingTypeError.style.display = 'block';
+                            } else {
+                                fundingTypeSelect.classList.remove('is-invalid');
+                                fundingTypeError.style.display = 'none';
+                            }
+                        });
+                    });
+                    </script>
 
                     <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
@@ -457,11 +666,27 @@
                         @error('scholarship_source')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
-                        <div class="invalid-feedback">
+                        <div class="invalid-feedback" id="scholarship_source_error" style="display: none !important;"   >
                             Please select a scholarship source.
                         </div>
                         @endif
                     </div>
+                    <script>
+                    // Client-side validation for Scholarship Source field
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const scholarshipSourceSelect = document.getElementById('scholarship_source');
+                        const scholarshipSourceError = document.getElementById('scholarship_source_error');
+                        scholarshipSourceSelect.addEventListener('change', function () {
+                            if (this.value === '') {
+                                scholarshipSourceSelect.classList.add('is-invalid');
+                                scholarshipSourceError.style.display = 'block';
+                            } else {
+                                scholarshipSourceSelect.classList.remove('is-invalid');
+                                scholarshipSourceError.style.display = 'none';
+                            }
+                        });
+                    });
+                    </script>
 
                     <!-- Additional fields based on Scholarship Source -->
                     <div class="col-md-6" id="scholarship-extra-details" style="display: none;">
@@ -478,11 +703,27 @@
                             @error('scholarship_amount')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback" id="scholarship_amount_error" style="display: none !important;">
                                 Please enter a valid scholarship amount (must be greater than 0).
                             </div>
                             @endif
                         </div>
+                        <script>
+                        // Client-side validation for Scholarship Amount field
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const scholarshipAmountInput = document.getElementById('scholarship_amount');
+                            const scholarshipAmountError = document.getElementById('scholarship_amount_error');
+                            scholarshipAmountInput.addEventListener('input', function () {
+                                if (this.value === '' || parseFloat(this.value) <= 0) {
+                                    scholarshipAmountInput.classList.add('is-invalid');
+                                    scholarshipAmountError.style.display = 'block';
+                                } else {
+                                    scholarshipAmountInput.classList.remove('is-invalid');
+                                    scholarshipAmountError.style.display = 'none';
+                                }
+                            });
+                        });
+                        </script>   
 
                         <!-- Project Name (conditional) - If Funds from a project is selected -->
                         <div id="project-name-group" style="display: none;">
@@ -494,12 +735,29 @@
                                    value="{{ $draft_study_leave->project_name ?? '' }}" 
                                    {{ $readonly ?? true ? 'readonly' : '' }}>
                             @if(!($readonly ?? true))
-                            <div class="invalid-feedback">
+                            <div class="invalid-feedback" id="project_name_error" style="display: none !important;" >
                                 Please enter the project name (3-200 characters).
                             </div>
                             @endif
                         </div>
                     </div>
+                    <script>
+                    // Client-side validation for Project Name field
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const projectNameInput = document.getElementById('project_name');
+                        const projectNameError = document.getElementById('project_name_error');
+                        projectNameInput.addEventListener('input', function () {
+                            if (this.value.length < 3 || this.value.length > 200) {
+                                projectNameInput.classList.add('is-invalid');
+                                projectNameError.style.display = 'block';
+                            } else {
+                                projectNameInput.classList.remove('is-invalid');
+                                projectNameError.style.display = 'none';
+                            }
+                        });
+                    });
+                    </script>   
+
                     <!-- Additional fields (conditional) - If Self-Funding is selected -->
                     <div class="col-12">
                         <div class="row g-3">
@@ -563,15 +821,17 @@
 
                                                     <label class="form-label fw-semibold">Self-Funding Declaration <span class="text-danger" id="self-declaration-required">*</span></label>
                                                     <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ !empty($draft_study_leave->self_funding_declaration) ? 'disabled' : 'required' }} {{ $readonly ?? true ? 'disabled' : '' }}>
-                                                    <div class="invalid-feedback">
-                                                        Please upload a self-funding declaration PDF document.
-                                                    </div>
+                                                    @if(empty($draft_study_leave->self_funding_declaration))
+                                                        <div class="invalid-feedback">
+                                                            Please upload a self-funding declaration PDF document.
+                                                        </div>
+                                                    @endif
 
                                                     <!-- Show previously uploaded file (when editing) -->
                                                     @if(!empty($draft_study_leave->self_funding_declaration))
                                                         <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
                                                             <div>
-                                                                <strong>Existing file:</strong>
+                                                                <strong>File uploaded:</strong>
                                                                 <span class="ms-2">{{ pathinfo($draft_study_leave->self_funding_declaration, PATHINFO_FILENAME) }}</span>
                                                             </div>
                                                             <div>
@@ -727,6 +987,7 @@
                         const previewExistingBtn = document.getElementById('preview-existing-btn');
                         const removePlacementBtn = document.getElementById('remove-placement-letter-btn');
                         const existingPlacementDiv = document.getElementById('existing-placement-letter');
+                        const placement_letter_error = document.getElementById('attachments_error');
                         let currentUrl = null;                    // Preview existing stored file on page load (if present)
                     @if(!empty($draft_study_leave->placement_letter))
                         const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}";
@@ -934,7 +1195,10 @@
                                 radio.addEventListener('change', function() {
                                     console.log('Radio changed to:', this.value);
                                     updateCountryField();
-                                    if (studyLocationError) studyLocationError.style.display = 'none';
+                                    if (studyLocationError) {
+                                        
+                                        studyLocationError.style.display = 'none';
+                                    }
                                 });
                             });
                         }
@@ -1063,7 +1327,7 @@
                                 studyLocationError.style.display = 'block';
                                 isValid = false;
                             } else {
-                                studyLocationError.style.display = 'none';
+                             studyLocationError.style.display = 'none';
                             }
                             
                             // Check loan handling if required (for "without Pay")
