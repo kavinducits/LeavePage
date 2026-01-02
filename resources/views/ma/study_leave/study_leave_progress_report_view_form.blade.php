@@ -134,7 +134,7 @@
                                                             <div class="text-muted small">Click to view the submitted document</div>
                                                         </div>
                                                     </div>
-                                                    <a href="{{ asset('storage/' . $progressReport->document_path) }}" 
+                                                    <a href="{{ route('ma.serveProgressReport', ['filename' => basename($progressReport->document_path)]) }}" 
                                                        target="_blank" 
                                                        class="btn btn-outline-primary">
                                                         <i class="fas fa-eye me-1"></i>View PDF

@@ -30,6 +30,8 @@ Route::post('/MApage/{id}/approve', [MAController::class, 'approve'])->name('ma.
 Route::post('/MApage/{id}/return', [MAController::class, 'return'])->name('ma.return');
 Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'returnStudyLeave'])->name('ma.studyleave.return');
 
+Route::get('/MApage/progressReport/file/{filename}', [MAController::class, 'serveProgressReportFile'])->name('ma.serveProgressReport');
+
 // HOD routes (no authentication required)
 Route::get('/HODpage', [HODController::class, 'index'])->name('hod.index');
 Route::get('/HODpage/{id}', [HODController::class, 'show'])->name('hod.show');

@@ -636,6 +636,7 @@ class HODController extends Controller
 
     public function showProgressReport($progress_report_id)
     {
+       
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 

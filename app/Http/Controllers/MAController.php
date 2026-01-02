@@ -1177,6 +1177,7 @@ class MAController extends Controller
         // Construct the file path - storage/app/study_leave_documents/study_leave_progress_report/filename
         $relativePath = 'study_leave_documents/study_leave_progress_report/' . $filename;
         $filePath = storage_path('app/private/' . $relativePath);
+      
 
         // Check if file exists
         if (!file_exists($filePath)) {
@@ -1197,7 +1198,7 @@ class MAController extends Controller
             ->where('study_leave_progress_reports.document_path', $relativePath)
             ->select('employees.assign_ma_user_id as ma_user_id')
             ->first();
-            
+           
             if($studyLeaveRecord->ma_user_id == $maUserId){
                 $isOwner = true;
             } else {
