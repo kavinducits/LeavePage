@@ -26,7 +26,7 @@
                 <span class="brand-text font-weight-light">MA Dashboard</span>
             </a>
             <!-- Sidebar -->
-            @php($pageName = 'Applications')
+            @php($pageName = 'Study Leave')
             @include('ma.partials.sidebar')
         </aside>
 
