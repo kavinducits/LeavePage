@@ -5,10 +5,18 @@
     <div class="row justify-content-center">
         <div class="col-md-11">
             
-            
+            <div>
+                <h2 class="mb-0 fw-bold text-maroon dashboard-header">
+                    <i class="fas fa-file-alt me-2 icon-gold"></i>
+                    View Study Leave Application
+                </h2>
+            </div>
 
             <!-- Extension History Section (Top) -->
+            @if(isset($extensions) && $extensions->count() > 0){
             @include('StudyLeave.study_leave_extension.extension_history')
+            }
+            @endif
 
             <form method="POST" class="my-4">
                 @csrf
