@@ -246,6 +246,7 @@ class StudyLeaveController extends Controller
     public function storeDetails(Request $request)
     {
 
+
         $this->updateDetails($request);
 
         return redirect()->route('StudyLeave.WorkCoveringPersons.create')->with('success', 'Study leave details saved successfully!');
@@ -861,6 +862,9 @@ class StudyLeaveController extends Controller
     public function updateEditeStudyLeave(Request $request, $id)
     {
         // Validate the incoming request data
+       //
+       
+       
 
         $rules = array(
              'study_location' => 'required|string|max:100',
@@ -887,6 +891,8 @@ class StudyLeaveController extends Controller
             'nominee_other_empno' => 'required|string|max:255',
         );
 
+        
+
         $studyLeave = StudyLeave::find($id);
         
         if (!$studyLeave) {
@@ -907,6 +913,9 @@ class StudyLeaveController extends Controller
         }
 
         $validatedData = $request->validate($rules);
+        if($validatedData['study_location'] == 'Sri Lanka'){
+            $validatedData['country'] = 'Sri Lanka';
+        }
         
         // Handle placement_letter file upload
         if ($request->hasFile('placement_letter')) {
@@ -920,8 +929,7 @@ class StudyLeaveController extends Controller
             }
 
             // Generate filename: empno_studyleaveid_placement_letter.pdf
-            //$filename = $empno . '_' . $studyLeaveId . '_placement_letter.pdf';
-           // $path = $file->storeAs('placement_letter', $filename);
+          
             $validatedData['placement_letter'] = $this->saveUplodedPdfAttachment($file,$empno, $studyLeave, 'placement_letter');
         } else {
             // Keep existing file path if no new file uploaded
@@ -940,9 +948,7 @@ class StudyLeaveController extends Controller
             }
 
             // Generate filename: empno_studyleaveid_self_funding_declaration.pdf
-          //  $filename = $empno . '_' . $studyLeaveId . '_self_funding_declaration.pdf';
-          //  $path = $file->storeAs('self_funding_declaration', $filename);
-          //$validatedData['self_funding_declaration'] = $path;
+        
             $validatedData['self_funding_declaration'] = $this->saveUplodedPdfAttachment($file,$empno, $studyLeave, 'self_funding_declaration');
         } else {
             // Keep existing file path if no new file uploaded
@@ -950,6 +956,7 @@ class StudyLeaveController extends Controller
         }
 
         // Update study leave with validated data
+       
         $studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
 
         return redirect()->route('StudyLeave.create')->with('success', 'Study leave application updated successfully.');
