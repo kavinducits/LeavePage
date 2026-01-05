@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use SebastianBergmann\Environment\Console;
 
 class HODController extends Controller
 {
@@ -640,6 +642,8 @@ class HODController extends Controller
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
+       
+
         // Fetch the progress report with related study leave and employee details
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
@@ -712,20 +716,21 @@ class HODController extends Controller
             $deanInfo = DB::table('faculty_deans')
                 ->join('employees', 'faculty_deans.emp_no', '=', 'employees.employee_no')
                 ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
-                ->leftJoin('categories as dean_positions', 'faculty_deans.dean_position', '=', 'dean_positions.id')
+              // ->leftJoin('categories as dean_positions', 'faculty_deans.dean_position', '=', 'dean_positions.id')
                 ->where('faculty_deans.faculty_id', $progressReport->faculty_id)
                 ->where('faculty_deans.active_status', 1)
                 ->select(
                     'faculty_deans.emp_no as dean_emp_no',
                     DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as dean_name"),
                     'categories.category_name as dean_title',
-                    'categories.id as dean_title_id',
-                    'dean_positions.category_name as dean_position',
-                    'dean_positions.id as dean_position_id'
+                    //'categories.id as dean_title_id',
+                    //'dean_positions.category_name as dean_position',
+                   // 'dean_positions.id as dean_position_id'
                 )
                 ->first();
         }
-
+    
+   
         $readonly = false;
 
         return view('hod.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'deanInfo', 'draft_study_leave'));
