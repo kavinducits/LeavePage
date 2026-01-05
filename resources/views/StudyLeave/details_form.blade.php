@@ -40,7 +40,7 @@
                     @error('study_location')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror   
-                    <div class="invalid-feedback d-block" id="study_location_errors" style="display: none !important;">
+                    <div class="invalid-feedback" id="study_location_errors" style="display: none;">
                         Please select study leave location.
                     </div>
                     @endif
@@ -50,13 +50,12 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     const studyLocationRadios = document.querySelectorAll('input[name="study_location"]');
                     const studyLocationError = document.getElementById('study_location_errors');
+                    
                     studyLocationRadios.forEach(radio => {
                         radio.addEventListener('change', function () {
                             if (studyLocationError) {
-                                console.log('Hiding study location error');
-                                studyLocationError.classList.remove('is-invalid');
                                 studyLocationError.style.display = 'none';
-                                console.log('Hiding study location error 2');
+                                studyLocationRadios.forEach(r => r.classList.remove('is-invalid'));
                             }
                         });
                     });
@@ -74,7 +73,7 @@
                     @error('university_institute')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback" id="university_institute_error" style="display: none !important;">
+                    <div class="invalid-feedback" id="university_institute_error" style="display: none;">
                         Please enter the university or institute name (3-200 characters).
                     </div>
                     @endif
@@ -172,7 +171,7 @@
                     @error('passport_no')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback" id="passport_no_error" style="display: none !important;">
+                    <div class="invalid-feedback" id="passport_no_error" style="display: none;">
                         Please enter a valid passport number (6-20 characters, uppercase letters and numbers only).
                     </div>
                     @endif
@@ -206,7 +205,7 @@
                     @error('passport_validity')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback"  id="passport_validity_error" style="display: none !important;">
+                    <div class="invalid-feedback" id="passport_validity_error" style="display: none;">
                         Please enter a valid passport expiry date (must be a future date).
                     </div>
                     @endif
@@ -279,7 +278,7 @@
                     @error('field_of_study')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback" id="field_of_study_error" style="display: none !important;">
+                    <div class="invalid-feedback" id="field_of_study_error" style="display: none;">
                         Please enter the field of study (3-200 characters).
                     </div>
                     @endif
@@ -318,7 +317,7 @@
                     @error('degree_title')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback" id="degree_title_error" style="display: none !important;">
+                    <div class="invalid-feedback" id="degree_title_error" style="display: none;">
                         Please select a degree title.
                     </div>
                     @endif
@@ -360,7 +359,7 @@
                                                                                             @error('study_leave_from')
                                                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                                             @enderror
-                                                                                            <div class="invalid-feedback" id="study_leave_from_error" style="display: none !important;" >
+                                                                                            <div class="invalid-feedback" id="study_leave_from_error" style="display: none;">
                                                                                                 Please select a valid start date.
                                                                                             </div>
                                                                                             @endif
@@ -397,7 +396,7 @@
                                                                                             @error('study_leave_to')
                                                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                                             @enderror
-                                                                                            <div class="invalid-feedback" id="study_leave_to_error" style="display: none !important;">
+                                                                                            <div class="invalid-feedback" id="study_leave_to_error" style="display: none;">
                                                                                                 Please select a valid end date (must be on or after start date).
                                                                                             </div>
                                                                                             @endif
@@ -479,7 +478,7 @@
                     @error('study_program_details')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback" id="study_program_details_error" style="display: none !important;">
+                    <div class="invalid-feedback" id="study_program_details_error" style="display: none;">
                         Please provide details of the study program (10-1000 characters).
                     </div>
                     @endif
@@ -565,7 +564,7 @@
                         @error('leave_payment_type')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
-                        <div class="invalid-feedback" id="leave_payment_type_error" style="display: none !important;"   >
+                        <div class="invalid-feedback" id="leave_payment_type_error" style="display: none;">
                             Please select the type of study leave.
                         </div>
                         @endif
@@ -598,7 +597,7 @@
                         <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
                     @if(!($readonly ?? true))
-                    <div class="invalid-feedback" id="loan_handling_error" style="display: none !important;">
+                    <div class="invalid-feedback" id="loan_handling_error" style="display: none;">
                         Please select an option for loan handling.
                     </div>
                     @endif
@@ -632,7 +631,7 @@
                         @error('funding_type')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
-                        <div class="invalid-feedback" id="funding_type_error" style="display: none !important;" >
+                        <div class="invalid-feedback" id="funding_type_error" style="display: none;">
                             Please select a funding type.
                         </div>
                         @endif
@@ -666,7 +665,7 @@
                         @error('scholarship_source')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
-                        <div class="invalid-feedback" id="scholarship_source_error" style="display: none !important;"   >
+                        <div class="invalid-feedback" id="scholarship_source_error" style="display: none;">
                             Please select a scholarship source.
                         </div>
                         @endif
@@ -703,7 +702,7 @@
                             @error('scholarship_amount')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
-                            <div class="invalid-feedback" id="scholarship_amount_error" style="display: none !important;">
+                            <div class="invalid-feedback" id="scholarship_amount_error" style="display: none;">
                                 Please enter a valid scholarship amount (must be greater than 0).
                             </div>
                             @endif
@@ -735,7 +734,7 @@
                                    value="{{ $draft_study_leave->project_name ?? '' }}" 
                                    {{ $readonly ?? true ? 'readonly' : '' }}>
                             @if(!($readonly ?? true))
-                            <div class="invalid-feedback" id="project_name_error" style="display: none !important;" >
+                            <div class="invalid-feedback" id="project_name_error" style="display: none;">
                                 Please enter the project name (3-200 characters).
                             </div>
                             @endif
@@ -775,7 +774,7 @@
                                         <label class="form-check-label" for="air_passage_no">NO</label>
                                     </div>
                                 </div>
-                                <div class="invalid-feedback d-block" id="air_passage_error" style="display: none !important;">
+                                <div class="invalid-feedback" id="air_passage_error" style="display: none;">
                                     Please select an option for air passage request.
                                 </div>
                             </div>
@@ -795,7 +794,7 @@
                                         <label class="form-check-label" for="warm_cloth_no">NO</label>
                                     </div>
                                 </div>
-                                <div class="invalid-feedback d-block" id="warm_cloth_error" style="display: none !important;">
+                                <div class="invalid-feedback" id="warm_cloth_error" style="display: none;">
                                     Please select an option for warm cloth allowance request.
                                 </div>
                             </div>
@@ -1115,7 +1114,7 @@
                         const countryField = document.getElementById('country_field');
                         const countryInput = document.getElementById('country');
                         const countryRequired = document.getElementById('country_required');
-                        const studyLocationError = document.getElementById('study_location_error');
+                        const studyLocationError = document.getElementById('study_location_errors');
                         
                         console.log('Study location elements:', {
                             radios: studyLocationRadios.length,
@@ -1297,8 +1296,9 @@
                         const fromDate = document.getElementById('study_leave_from');
                         const toDate = document.getElementById('study_leave_to');
                         
-                        function validateDateRange() {
-                            if (fromDate.value && toDate.value) {
+                        // Make validation functions global so they can be called from saveAndExit()
+                        window.validateDateRange = function() {
+                            if (fromDate && toDate && fromDate.value && toDate.value) {
                                 if (new Date(toDate.value) <= new Date(fromDate.value)) {
                                     toDate.setCustomValidity('End date must be after start date');
                                 } else {
@@ -1310,51 +1310,63 @@
                         if (fromDate && toDate) {
                             fromDate.addEventListener('change', function() {
                                 toDate.min = this.value;
-                                validateDateRange();
+                                window.validateDateRange();
                             });
-                            toDate.addEventListener('change', validateDateRange);
+                            toDate.addEventListener('change', window.validateDateRange);
                         }
                         
-                        // Custom radio button validation
-                        function validateRadioGroups() {
+                        // Custom radio button validation - Make global
+                        window.validateRadioGroups = function() {
                             let isValid = true;
                             const airPassageError = document.getElementById('air_passage_error');
                             const warmClothError = document.getElementById('warm_cloth_error');
+                            const studyLocationError = document.getElementById('study_location_errors');
+                            const leavePaymentType = document.getElementById('leave_payment_type');
+                            const loanHandlingDetails = document.getElementById('loan_handling_details');
+                            const fundingType = document.querySelector('select[name="funding_type"]');
                             
                             // Check study location
                             const studyLocationChecked = document.querySelector('input[name="study_location"]:checked');
-                            if (!studyLocationChecked) {
-                                studyLocationError.style.display = 'block';
-                                isValid = false;
-                            } else {
-                             studyLocationError.style.display = 'none';
+                            if (studyLocationError) {
+                                if (!studyLocationChecked) {
+                                    studyLocationError.style.display = 'block';
+                                    isValid = false;
+                                } else {
+                                    studyLocationError.style.display = 'none';
+                                }
                             }
                             
                             // Check loan handling if required (for "without Pay")
-                            if (leavePaymentType.value === 'without Pay' && !loanHandlingDetails.value) {
-                                loanHandlingDetails.setCustomValidity('Please select an option');
-                                isValid = false;
-                            } else {
-                                loanHandlingDetails.setCustomValidity('');
+                            if (leavePaymentType && loanHandlingDetails) {
+                                if (leavePaymentType.value === 'without Pay' && !loanHandlingDetails.value) {
+                                    loanHandlingDetails.setCustomValidity('Please select an option');
+                                    isValid = false;
+                                } else {
+                                    loanHandlingDetails.setCustomValidity('');
+                                }
                             }
                             
                             // Check air passage if required
-                            if (fundingType.value === 'self') {
+                            if (fundingType && fundingType.value === 'self') {
                                 const airPassageChecked = document.querySelector('input[name="air_passage_request"]:checked');
                                 const warmClothChecked = document.querySelector('input[name="warm_cloth_allowance_request"]:checked');
                                 
-                                if (!airPassageChecked) {
-                                    airPassageError.style.display = 'block';
-                                    isValid = false;
-                                } else {
-                                    airPassageError.style.display = 'none';
+                                if (airPassageError) {
+                                    if (!airPassageChecked) {
+                                        airPassageError.style.display = 'block';
+                                        isValid = false;
+                                    } else {
+                                        airPassageError.style.display = 'none';
+                                    }
                                 }
                                 
-                                if (!warmClothChecked) {
-                                    warmClothError.style.display = 'block';
-                                    isValid = false;
-                                } else {
-                                    warmClothError.style.display = 'none';
+                                if (warmClothError) {
+                                    if (!warmClothChecked) {
+                                        warmClothError.style.display = 'block';
+                                        isValid = false;
+                                    } else {
+                                        warmClothError.style.display = 'none';
+                                    }
                                 }
                             }
                             
@@ -1365,8 +1377,8 @@
                         const forms = document.querySelectorAll('.needs-validation');
                         Array.from(forms).forEach(form => {
                             form.addEventListener('submit', event => {
-                                validateDateRange();
-                                const radioValid = validateRadioGroups();
+                                window.validateDateRange();
+                                const radioValid = window.validateRadioGroups();
                                 
                                 if (!form.checkValidity() || !radioValid) {
                                     event.preventDefault();
@@ -1447,21 +1459,6 @@
 
                             // Update when user changes scholarship source
                             scholarshipSource.addEventListener('change', updateScholarshipSourceVisibility);
-                        });
-                    </script>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            const fundingType = document.querySelector('select[name="funding_type"]');
-                            const scholarshipDetails = document.getElementById('scholarship-details');
-
-                            fundingType.addEventListener('change', function () {
-                                if (this.value === 'scholarship') {
-                                    scholarshipDetails.style.display = 'block';
-                                } else {
-                                    scholarshipDetails.style.display = 'none';
-                                    scholarshipDetails.querySelector('select').value = '';
-                                }
-                            });
                         });
                     </script>
                        

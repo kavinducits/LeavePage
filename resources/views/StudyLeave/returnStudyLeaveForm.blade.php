@@ -17,9 +17,9 @@
             <form method="POST" action="{{ route('StudyLeave.update.edite.application', ['id' => $draft_study_leave->id]) }}" enctype="multipart/form-data" class="my-4">
                 @csrf
                     <!-- Personal Details (readonly) -->
-                @include('StudyLeave.basic_info_form')
-                @include('StudyLeave.details_form')
-                @include('StudyLeave.working_covering_persons_form')
+                @include('StudyLeave.basic_info_form', ['readonly' => false])
+                @include('StudyLeave.details_form', ['readonly' => false])
+                @include('StudyLeave.working_covering_persons_form', ['readonly' => false])
                
                 
                 <div class="form-group mt-4 mb-3 d-flex justify-content-center">

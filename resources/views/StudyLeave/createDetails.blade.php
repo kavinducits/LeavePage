@@ -60,7 +60,7 @@
         @endif
         
 
-        @include('StudyLeave.details_form')
+        @include('StudyLeave.details_form', ['readonly' => false])
 
         
         
@@ -75,10 +75,38 @@
      <script>
     function saveAndExit() {
         const form = document.getElementById('leave-form');
+        
+        // Trigger custom validation functions if they exist
+        if (typeof validateDateRange === 'function') {
+            validateDateRange();
+        }
+        
+        let customValid = true;
+        if (typeof validateRadioGroups === 'function') {
+            customValid = validateRadioGroups();
+        }
+        
+        // Validate the form
+        const formValid = form.checkValidity();
+        
+        if (!formValid || !customValid) {
+            // Show validation errors
+            form.classList.add('was-validated');
+            
+            // Scroll to first invalid field or error message
+            const firstInvalid = form.querySelector(':invalid, .invalid-feedback[style*="display: block"]');
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (firstInvalid.focus) {
+                    firstInvalid.focus();
+                }
+            }
+            return false;
+        }
+        
         const originalAction = form.action;
         
         // Change form action to save and exit route
-        
         form.action = "{{ route('StudyLeave.Details.exit') }}";
         form.submit();
         
