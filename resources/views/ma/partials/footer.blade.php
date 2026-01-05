@@ -9,7 +9,7 @@
         position: fixed !important;
         bottom: 0 !important;
         right: 0 !important;
-        left: 250px !important;
+        left: 0 !important;
         z-index: 1029 !important;
         box-shadow: 0 -2px 4px rgba(0,0,0,0.1) !important;
         transition: left 0.3s;
