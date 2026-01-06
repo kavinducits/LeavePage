@@ -194,11 +194,11 @@
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="actionRemark" class="form-label fw-semibold">MA Remarks</label>
+                                <label for="actionRemark" class="form-label fw-semibold">HOD Remarks</label>
                                 <textarea class="form-control" id="actionRemark" name="remark" rows="4"
                                           placeholder="Add your comments or remarks about this progress report"></textarea>
                                 <div id="remarkError" class="form-text text-danger" style="display: none;">
-                                    Remarks are required when returning a progress report.
+                                    Remarks are required when approve a progress report.
                                 </div>
                             </div>
 
@@ -206,9 +206,7 @@
                                 <form id="returnForm" action="{{ route('ma.progressreport.return', $progressReport->progress_report_id) }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" id="returnRemarkInput" name="remark" value="">
-                                    <button type="submit" class="btn btn-danger btn-lg">
-                                        <i class="fas fa-undo me-2"></i>Return to User
-                                    </button>
+                                   
                                 </form>
 
                                 <div class="text-right">
@@ -216,7 +214,7 @@
                                         @csrf
                                         <input type="hidden" id="approveRemarkInput" name="remark" value="">
                                         <button type="submit" class="btn btn-success btn-lg" {{ empty($departmentHead) ? 'disabled' : '' }}>
-                                            <i class="fas fa-forward me-2"></i>Forward to HOD
+                                            <i class="fas fa-forward me-2"></i>Approve
                                         </button>
                                     </form>
 
