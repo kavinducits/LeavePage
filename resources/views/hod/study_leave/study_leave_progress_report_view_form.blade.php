@@ -186,6 +186,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
                     <!-- Action Section -->
                     <div class="card">
@@ -243,7 +244,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                   <!-- </div>--> 
                   
                 </div>
             </section>
