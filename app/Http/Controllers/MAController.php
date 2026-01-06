@@ -19,6 +19,9 @@ class MAController extends Controller
 
         // Get all submitted applications (form_status = 2) that are being processed by MA (status_id = 4)
         // and are assigned to this specific MA
+       
+        try {
+        
         $applications = DB::table('leave_details')
             ->join('employees', 'leave_details.nic', '=', 'employees.nic')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
@@ -42,6 +45,9 @@ class MAController extends Controller
                 'statuses.status'
             )
             ->get();
+            } catch (\Exception $e) {
+           return view('errors.500');
+        }
 
           
 
