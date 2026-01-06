@@ -18,6 +18,7 @@ class StudyLeaveController extends Controller
 
     /**
      * Show the form for creating a basic information .
+     * Calling Route: StudyLeave.create
      */
     public function createStudyLeave()
     {
