@@ -55,7 +55,9 @@ Route::post('/Deanpage/extension/{extension_id}/approve', [DeanController::class
 Route::post('/Deanpage/extension/{extension_id}/return', [DeanController::class, 'returnExtension'])->name('dean.extension.return');
 
 // VC routes (no authentication required)
-Route::get('/VCpage', [VCController::class, 'index'])->name('vc.index');
+Route::get('/VCpage', [VCController::class, 'leave_index'])->name('vc.index');
+Route::get('/VCpage/leave', [VCController::class, 'leave_index'])->name('vc.leave.index');
+Route::get('/VCpage/studyLeave', [VCController::class, 'study_leave_index'])->name('vc.study.leave.index');
 Route::get('/VCpage/{id}', [VCController::class, 'show'])->name('vc.show');
 Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name('vc.recommend');
 
