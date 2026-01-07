@@ -1,7 +1,7 @@
 <!-- Study Leave Extension Applications Table -->
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold text-maroon">Study Leave Extension Applications</h2>
+        <h2 class="mb-0 fw-bold text-dark"><i class="fas fa-file-alt me-2 text-primary"></i>Study Leave Extension Applications</h2>
         <div class="text-muted">Extension Requests for Review</div>
     </div>
 

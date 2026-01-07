@@ -41,7 +41,9 @@ Route::post('/HODpage/{id}/approve', [HODController::class, 'approve'])->name('h
 Route::post('/HODpage/{id}/return', [HODController::class, 'return'])->name('hod.return');
 
 // Dean/Registrar routes (no authentication required)
-Route::get('/Deanpage', [DeanController::class, 'index'])->name('dean.index');
+Route::get('/Deanpage', [DeanController::class, 'leave_index'])->name('dean.index');
+Route::get('/Deanpage/leave', [DeanController::class, 'leave_index'])->name('dean.leave.index');
+Route::get('/Deanpage/studyLeave', [DeanController::class, 'study_leave_index'])->name('dean.study.leave.index');
 Route::get('/Deanpage/{id}', [DeanController::class, 'show'])->name('dean.show');
 Route::post('/Deanpage/{id}/recommend', [DeanController::class, 'recommend'])->name('dean.recommend');
 

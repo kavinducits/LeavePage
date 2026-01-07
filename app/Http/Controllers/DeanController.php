@@ -112,6 +112,94 @@ class DeanController extends Controller
 
         return view('dean.index', compact('applications', 'studyLeaveApplications', 'extensionApplications'));
     }
+     public function leave_index()
+    {
+        // Get faculty IDs for this Dean
+        $facultyIds = $this->getDeanFaculties();
+
+        // Get all applications for Dean review (status_id = 6) from assigned faculties
+        $applications = DB::table('leave_details')
+            ->join('employees', 'leave_details.nic', '=', 'employees.nic')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('otherLeavesDetails', 'leave_details.reference_no', '=', 'otherLeavesDetails.reference_no')
+            ->join('leave_types', 'otherLeavesDetails.leave_type_id', '=', 'leave_types.id')
+            ->join('statuses', 'leave_details.status_id', '=', 'statuses.stat_id')
+            ->where('leave_details.form_status', 2) // Complete/Submitted
+            ->where('leave_details.status_id', 6) // Processing Dean
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->orderByDesc('leave_details.applied_date')
+            ->select(
+                'leave_details.id',
+                'leave_details.reference_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'leave_details.applied_date',
+                'leave_types.name as leave_type',
+                'statuses.status'
+            )
+            ->get();
+
+       
+
+        return view('dean.leave_dashboard', compact('applications'));
+    }
+     public function study_leave_index()
+    {
+        // Get faculty IDs for this Dean
+        $facultyIds = $this->getDeanFaculties();
+
+
+        // Get all study leave applications for Dean review (status_id = 6) from assigned faculties
+        $studyLeaveApplications = DB::table('study_leaves')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.status_id', 6) // Processing Dean
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->orderByDesc('study_leaves.created_at')
+            ->select(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leaves.created_at as applied_date',
+                'statuses.status'
+            )
+            ->get();
+
+        // Get study leave extension applications for Dean review from assigned faculties
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.status_id', 6) // Processing Dean (status_id = 6)
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->orderByDesc('study_leave_extensions.created_at')
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('dean.study_leave_dashboard', compact('studyLeaveApplications', 'extensionApplications'));
+    }
 
     public function show($id)
     {
