@@ -10,20 +10,4 @@
 
 @section('main-content')
     @include('hod.study_leave.study_leave_index')
-
-    <style>
-        .card-header-dark {
-            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
-            color: white;
-            border-bottom: 3px solid #0d6efd;
-        }
-
-        .btn-outline-dark:hover {
-            color: white;
-            background-color: #212529;
-            border-color: #212529;
-        }
-
-       
-    </style>
 @endsection

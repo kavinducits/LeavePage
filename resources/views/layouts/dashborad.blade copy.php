@@ -30,12 +30,36 @@
             @yield('sidebar')
             <!-- /.sidebar -->
         </aside>
-   
 
-    <!-- Content Wrapper. Contains page content -->
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            @yield('content-header')
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+
+                    <div class="container py-4">
+
+
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+                            </div>
+                        @endif
+
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+                            </div>
+                        @endif
+                    </div>
                     @yield('main-content')
-              
-     
+                </div>
+            </section>
+        </div>
 
         <!-- Footer -->
         @yield('footer')

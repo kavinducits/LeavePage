@@ -136,7 +136,8 @@ class HODController extends Controller
             )
             ->get();
 
-        return view('hod.index', compact('applications', 'studyLeaveApplications', 'extensionApplications', 'progressReportApplications'));
+        return view('hod.study_leave.study_leave_index', compact('applications', 'studyLeaveApplications', 'extensionApplications', 'progressReportApplications'));
+       // return view('hod.leave_index', compact('applications', 'studyLeaveApplications', 'extensionApplications', 'progressReportApplications'));
     }
      public function leave_index()
     {
