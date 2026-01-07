@@ -24,23 +24,6 @@
             border-color: #212529;
         }
 
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .table td {
-            vertical-align: middle;
-        }
-
-        .badge {
-            font-size: 0.75rem;
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.875rem;
-        }
+       
     </style>
 @endsection
