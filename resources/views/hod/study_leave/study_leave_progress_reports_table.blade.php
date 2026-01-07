@@ -11,7 +11,7 @@
             <i class="fas fa-file-alt me-2"></i>Submitted Progress Reports
         </div>
         <div class="card-body p-0">
-            @if(isset($progressReportApplications) && $progressReportApplications->count() > 0)
+            @if (isset($progressReportApplications) && $progressReportApplications->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
@@ -27,7 +27,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($progressReportApplications as $application)
+                            @foreach ($progressReportApplications as $application)
                                 <tr>
                                     <td class="px-3">
                                         <span class="fw-semibold text-dark">{{ $application->reference_no }}</span>
@@ -55,9 +55,8 @@
                                         <span class="badge bg-info">{{ $application->status }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('hod.show.studyleave.progressreport', $application->progress_report_id) }}" 
-                                           class="btn btn-sm btn-outline-dark"
-                                           title="View Progress Report">
+                                        <a href="{{ route('hod.show.studyleave.progressreport', $application->progress_report_id) }}"
+                                            class="btn btn-sm btn-outline-dark" title="View Progress Report">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>
@@ -78,7 +77,7 @@
         </div>
     </div>
 
-    @if(isset($progressReportApplications) && $progressReportApplications->count() > 0)
+    @if (isset($progressReportApplications) && $progressReportApplications->count() > 0)
         <div class="mt-3 text-muted text-center">
             <small>Total Progress Reports: {{ $progressReportApplications->count() }}</small>
         </div>
@@ -86,34 +85,34 @@
 </div>
 
 <style>
-.card-header-dark {
-    background: linear-gradient(135deg, #212529 0%, #343a40 100%);
-    color: white;
-    border-bottom: 3px solid #0d6efd;
-}
+    .card-header-dark {
+        background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+        color: white;
+        border-bottom: 3px solid #0d6efd;
+    }
 
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
 
-.table td {
-    vertical-align: middle;
-}
+    .table td {
+        vertical-align: middle;
+    }
 
-.badge {
-    font-size: 0.75rem;
-}
+    .badge {
+        font-size: 0.75rem;
+    }
 
-.btn-sm {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
-}
+    .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
 
-.btn-outline-dark:hover {
-    color: white;
-    background-color: #212529;
-    border-color: #212529;
-}
+    .btn-outline-dark:hover {
+        color: white;
+        background-color: #212529;
+        border-color: #212529;
+    }
 </style>

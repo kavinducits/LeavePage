@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     <title>@yield('title')</title>
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
@@ -31,12 +31,12 @@
             @yield('sidebar')
             <!-- /.sidebar -->
         </aside>
-   
 
-    <!-- Content Wrapper. Contains page content -->
-                    @yield('main-content')
-              
-     
+
+        <!-- Content Wrapper. Contains page content -->
+        @yield('main-content')
+
+
 
         <!-- Footer -->
         @yield('footer')

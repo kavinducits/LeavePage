@@ -1,35 +1,32 @@
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="container py-4">
 
 
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+                    </div>
+                @endif
 
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-
-                <div class="container py-4">
-
-
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-                        </div>
-                    @endif
-                </div>
-                @include('hod.study_leave.study_leave_table')
-                @include('hod.study_leave.study_leave_progress_reports_table')
-                @include('hod.study_leave.study_leave_extensions_table')
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+                    </div>
+                @endif
             </div>
-        </section>
-    </div>
+            @include('hod.study_leave.study_leave_table')
+            @include('hod.study_leave.study_leave_progress_reports_table')
+            @include('hod.study_leave.study_leave_extensions_table')
+        </div>
+    </section>
+</div>
 
 
 <style>

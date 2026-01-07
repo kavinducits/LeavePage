@@ -1,7 +1,7 @@
 @extends('layouts.dashborad')
 @section('brand-logo')
-   <a href="{{ route('hod.index') }}" class="brand-link">
-                <span class="brand-text font-weight-light">HOD Dashboard</span>
+    <a href="{{ route('hod.index') }}" class="brand-link">
+        <span class="brand-text font-weight-light">HOD Dashboard</span>
     </a>
 @endsection
 @section('sidebar')

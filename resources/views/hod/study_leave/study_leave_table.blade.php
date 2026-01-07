@@ -13,7 +13,7 @@
             <i class="fas fa-list me-2"></i>Study Leave Applications - Status: Processing HOD
         </div>
         <div class="card-body p-0">
-            @if($studyLeaveApplications->count() > 0)
+            @if ($studyLeaveApplications->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
@@ -29,7 +29,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($studyLeaveApplications as $application)
+                            @foreach ($studyLeaveApplications as $application)
                                 <tr class="hoverable-row">
                                     <td class="px-3">
                                         <span class="fw-semibold text-dark">{{ $application->reference_no }}</span>
@@ -42,7 +42,7 @@
                                     </td>
                                     <td>{{ $application->department ?? 'N/A' }}</td>
                                     <td>{{ $application->faculty ?? 'N/A' }}</td>
-                                    
+
                                     <td>
                                         <div class="text-muted">
                                             {{ \Carbon\Carbon::parse($application->applied_date)->format('M d, Y') }}
@@ -57,9 +57,8 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('hod.view.studyLeave', $application->id) }}" 
-                                           class="btn btn-sm btn-outline-dark" 
-                                           title="View Details">
+                                        <a href="{{ route('hod.view.studyLeave', $application->id) }}"
+                                            class="btn btn-sm btn-outline-dark" title="View Details">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>
@@ -78,10 +77,11 @@
                 </div>
             @endif
         </div>
-        @if($studyLeaveApplications->count() > 0)
+        @if ($studyLeaveApplications->count() > 0)
             <div class="card-footer bg-light">
                 <div class="text-muted text-center">
-                    <small><i class="fas fa-info-circle me-1"></i>Total Applications: <strong>{{ $studyLeaveApplications->count() }}</strong></small>
+                    <small><i class="fas fa-info-circle me-1"></i>Total Applications:
+                        <strong>{{ $studyLeaveApplications->count() }}</strong></small>
                 </div>
             </div>
         @endif
@@ -89,19 +89,19 @@
 </div>
 
 <style>
-.hoverable-row {
-    transition: background-color 0.2s ease;
-}
+    .hoverable-row {
+        transition: background-color 0.2s ease;
+    }
 
-.hoverable-row:hover {
-    background-color: #f8f9fa;
-}
+    .hoverable-row:hover {
+        background-color: #f8f9fa;
+    }
 
-.shadow-sm {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-}
+    .shadow-sm {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
 
-.card {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
+    .card {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
 </style>

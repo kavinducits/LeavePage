@@ -10,7 +10,7 @@
             <i class="fas fa-calendar-plus me-2"></i> Extension Requests - Processing HOD
         </div>
         <div class="card-body p-0">
-            @if(isset($extensionApplications) && $extensionApplications->count() > 0)
+            @if (isset($extensionApplications) && $extensionApplications->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
@@ -26,7 +26,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($extensionApplications as $extension)
+                            @foreach ($extensionApplications as $extension)
                                 <tr class="hoverable-row">
                                     <td class="px-3">
                                         <span class="fw-semibold text-dark">{{ $extension->reference_no }}</span>
@@ -47,9 +47,9 @@
                                             {{ \Carbon\Carbon::parse($extension->extension_applied_date)->format('M d, Y') }}
                                         </div>
                                         <div class="small text-muted">
-                                            <i class="far fa-calendar"></i> 
-                                            {{ \Carbon\Carbon::parse($extension->old_end_date)->format('M d, Y') }} 
-                                            <i class="fas fa-arrow-right mx-1"></i> 
+                                            <i class="far fa-calendar"></i>
+                                            {{ \Carbon\Carbon::parse($extension->old_end_date)->format('M d, Y') }}
+                                            <i class="fas fa-arrow-right mx-1"></i>
                                             {{ \Carbon\Carbon::parse($extension->new_end_date)->format('M d, Y') }}
                                         </div>
                                     </td>
@@ -57,21 +57,20 @@
                                         @php
                                             $statusBadge = 'bg-warning';
                                             $statusText = $extension->status ?? 'Processing HOD';
-                                            
-                                            if(stripos($statusText, 'approved') !== false) {
+
+                                            if (stripos($statusText, 'approved') !== false) {
                                                 $statusBadge = 'bg-success';
-                                            } elseif(stripos($statusText, 'rejected') !== false) {
+                                            } elseif (stripos($statusText, 'rejected') !== false) {
                                                 $statusBadge = 'bg-danger';
-                                            } elseif(stripos($statusText, 'returned') !== false) {
+                                            } elseif (stripos($statusText, 'returned') !== false) {
                                                 $statusBadge = 'bg-info';
                                             }
                                         @endphp
                                         <span class="badge {{ $statusBadge }}">{{ $statusText }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('hod.show.extension', $extension->extension_id) }}" 
-                                           class="btn btn-sm btn-outline-dark"
-                                           title="View Extension Request">
+                                        <a href="{{ route('hod.show.extension', $extension->extension_id) }}"
+                                            class="btn btn-sm btn-outline-dark" title="View Extension Request">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>
@@ -92,7 +91,7 @@
         </div>
     </div>
 
-    @if(isset($extensionApplications) && $extensionApplications->count() > 0)
+    @if (isset($extensionApplications) && $extensionApplications->count() > 0)
         <div class="mt-3 text-muted text-center">
             <small>Total Extension Requests: {{ $extensionApplications->count() }}</small>
         </div>
@@ -100,32 +99,32 @@
 </div>
 
 <style>
-.hoverable-row:hover {
-    background-color: #f8f9fa;
-}
+    .hoverable-row:hover {
+        background-color: #f8f9fa;
+    }
 
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+    }
 
-.table td {
-    vertical-align: middle;
-}
+    .table td {
+        vertical-align: middle;
+    }
 
-.badge {
-    font-size: 0.75rem;
-}
+    .badge {
+        font-size: 0.75rem;
+    }
 
-.btn-sm {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
-}
+    .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
 
-.btn-outline-dark:hover {
-    color: #fff;
-    background-color: #212529;
-    border-color: #212529;
-}
+    .btn-outline-dark:hover {
+        color: #fff;
+        background-color: #212529;
+        border-color: #212529;
+    }
 </style>
