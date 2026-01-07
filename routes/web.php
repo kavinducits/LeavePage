@@ -33,7 +33,9 @@ Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'return
 Route::get('/MApage/progressReport/file/{filename}', [MAController::class, 'serveProgressReportFile'])->name('ma.serveProgressReport');
 
 // HOD routes (no authentication required)
-Route::get('/HODpage', [HODController::class, 'index'])->name('hod.index');
+//Route::get('/HODpage', [HODController::class, 'index'])->name('hod.index');//remove
+Route::get('/HODpage/leave', [HODController::class, 'leave_index'])->name('hod.leave.index');
+Route::get('/HODpage/studyLeave', [HODController::class, 'study_leave_index'])->name('hod.study.leave.index');
 Route::get('/HODpage/{id}', [HODController::class, 'show'])->name('hod.show');
 Route::post('/HODpage/{id}/approve', [HODController::class, 'approve'])->name('hod.approve');
 Route::post('/HODpage/{id}/return', [HODController::class, 'return'])->name('hod.return');
