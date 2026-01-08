@@ -9,8 +9,8 @@
 
                  <div class="d-flex justify-content-between align-items-center mb-4">
                      <div>
-                         <h2 class="mb-0 fw-bold text-maroon dashboard-header">
-                             <i class="fas fa-crown me-2 icon-gold"></i>Applications for VC Recommendation
+                         <h2 class="mb-0 fw-bold text-dark dashboard-header">
+                             <i class="fas fa-crown me-2  text-primary"></i>Applications for VC Recommendation
                          </h2>
                      </div>
                  </div>

@@ -1,7 +1,7 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold text-maroon">
-            <i class="fas fa-graduation-cap me-2 icon-gold"></i>Pending Study Leave Applications
+        <h2 class="mb-0 fw-bold text-dark">
+            <i class="fas fa-graduation-cap me-2  text-primary"></i>Pending Study Leave Applications
         </h2>
         <div class="text-muted">
             <i class="fas fa-clock me-1"></i>Applications Pending Review
@@ -70,7 +70,7 @@
             @else
                 <div class="text-center py-5">
                     <div class="text-muted mb-3">
-                        <i class="fas fa-inbox fa-3x text-maroon opacity-50"></i>
+                        <i class="fas fa-inbox fa-3x text-dark opacity-50"></i>
                     </div>
                     <h5 class="text-muted">No Study Leave Applications Pending</h5>
                     <p class="text-muted">There are no study leave applications currently waiting for your review.</p>
