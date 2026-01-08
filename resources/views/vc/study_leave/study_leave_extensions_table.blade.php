@@ -12,7 +12,7 @@
             <i class="fas fa-calendar-plus me-2"></i> Extension Requests
         </div>
         <div class="card-body p-0">
-            @if(isset($extensionApplications) && $extensionApplications->count() > 0)
+            @if (isset($extensionApplications) && $extensionApplications->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
@@ -28,7 +28,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($extensionApplications as $extension)
+                            @foreach ($extensionApplications as $extension)
                                 <tr>
                                     <td class="px-3">
                                         <span class="fw-semibold text-maroon">{{ $extension->reference_no }}</span>
@@ -47,13 +47,15 @@
                                     <td>
                                         <div class="small">
                                             <div class="text-muted mb-1">
-                                                <i class="far fa-calendar"></i> Applied: 
+                                                <i class="far fa-calendar"></i> Applied:
                                                 {{ \Carbon\Carbon::parse($extension->extension_applied_date)->format('M d, Y') }}
                                             </div>
                                             <div class="fw-semibold">
-                                                <span class="text-danger">{{ \Carbon\Carbon::parse($extension->old_end_date)->format('M d, Y') }}</span>
-                                                <i class="fas fa-arrow-right mx-1 text-maroon"></i> 
-                                                <span class="text-success">{{ \Carbon\Carbon::parse($extension->new_end_date)->format('M d, Y') }}</span>
+                                                <span
+                                                    class="text-danger">{{ \Carbon\Carbon::parse($extension->old_end_date)->format('M d, Y') }}</span>
+                                                <i class="fas fa-arrow-right mx-1 text-maroon"></i>
+                                                <span
+                                                    class="text-success">{{ \Carbon\Carbon::parse($extension->new_end_date)->format('M d, Y') }}</span>
                                             </div>
                                         </div>
                                     </td>
@@ -61,21 +63,20 @@
                                         @php
                                             $statusBadge = 'bg-warning';
                                             $statusText = $extension->status ?? 'Processing VC';
-                                            
-                                            if(stripos($statusText, 'approved') !== false) {
+
+                                            if (stripos($statusText, 'approved') !== false) {
                                                 $statusBadge = 'bg-success';
-                                            } elseif(stripos($statusText, 'rejected') !== false) {
+                                            } elseif (stripos($statusText, 'rejected') !== false) {
                                                 $statusBadge = 'bg-danger';
-                                            } elseif(stripos($statusText, 'returned') !== false) {
+                                            } elseif (stripos($statusText, 'returned') !== false) {
                                                 $statusBadge = 'bg-info';
                                             }
                                         @endphp
                                         <span class="badge {{ $statusBadge }}">{{ $statusText }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('vc.show.extension', $extension->extension_id) }}" 
-                                           class="btn btn-sm btn-outline-maroon"
-                                           title="View Extension Request">
+                                        <a href="{{ route('vc.show.extension', $extension->extension_id) }}"
+                                            class="btn btn-sm btn-outline-maroon" title="View Extension Request">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>
@@ -96,7 +97,7 @@
         </div>
     </div>
 
-    @if(isset($extensionApplications) && $extensionApplications->count() > 0)
+    @if (isset($extensionApplications) && $extensionApplications->count() > 0)
         <div class="mt-3 text-muted text-center">
             <small>Total Extension Requests: {{ $extensionApplications->count() }}</small>
         </div>
