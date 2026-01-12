@@ -15,6 +15,7 @@ class MAController extends Controller
 
     public function index()
     {
+        
         $maUserId = self::MA_USER_ID;
 
         // Get all submitted applications (form_status = 2) that are being processed by MA (status_id = 4)
@@ -566,6 +567,76 @@ class MAController extends Controller
            
 
         return view('ma.studyLeave', compact('studyLeaveApplications', 'extensionApplications', 'progressReportApplications'));
+    }
+    public function test(){
+        dd('test');
+    }
+    public function showStudyLeaveExtensionsPage()
+    {
+        dd('here');
+        $maUserId = self::MA_USER_ID;
+
+         $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where(function($query) {
+                $query->where('statuses.status', 'Processing MA')
+                      ->orWhereNull('study_leave_extensions.status_id');
+            })
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('ma.showStudyLeaveExtensions', compact('extensionApplications'));
+    }
+    public function studyLeaveProgressReportsPages(){
+        return "safewwe";
+    }
+    public function studyLeaveProgressReportsPage()
+    {
+        dd('here');
+        $maUserId = self::MA_USER_ID;
+
+         $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
+            ->where('statuses.status', 'Processing MA') // Filter for MA Processing status
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.due_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('ma.showStudyLeaveProgressReport', compact('progressReportApplications'));
     }
     public function studyLeaveStatusPage()
     {

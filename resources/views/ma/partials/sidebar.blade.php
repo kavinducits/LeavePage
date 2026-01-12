@@ -32,6 +32,18 @@
                                 <p>Study Leave</p>
                             </a>
                         </li>
+                         <li class="nav-item">
+                            <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Extensions') ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-stream"></i>
+                                <p>Study Leave Extensions</p>
+                            </a>
+                        </li>
+                         <li class="nav-item">
+                            <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave') ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-stream"></i>
+                                <p>Study Leave Progress</p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a href="{{ route('ma.studyleavestatus') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Status') ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>

@@ -29,6 +29,9 @@ Route::get('/MApage/{id}', [MAController::class, 'show'])->name('ma.show');
 Route::post('/MApage/{id}/approve', [MAController::class, 'approve'])->name('ma.approve');
 Route::post('/MApage/{id}/return', [MAController::class, 'return'])->name('ma.return');
 Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'returnStudyLeave'])->name('ma.studyleave.return');
+Route::get('/MApage/studyLeaveExtensions', [MAController::class, 'test'])->name('ma.studyleave.extensions');
+
+Route::get('/MApage/studyLeaveProgress', [MAController::class, 'studyLeaveProgressReportsPages'])->name('ma.studyleave.progress');
 
 Route::get('/MApage/progressReport/file/{filename}', [MAController::class, 'serveProgressReportFile'])->name('ma.serveProgressReport');
 
