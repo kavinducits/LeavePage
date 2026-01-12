@@ -25,13 +25,12 @@ Route::get('/leaves/{id}', [LoginController::class, 'loginById'])->name('login.b
 // MA routes (no authentication required)
 Route::get('/MApage', [MAController::class, 'index'])->name('ma.index');
 Route::get('/MAPage', [MAController::class, 'index'])->name('ma.index.alt'); // Alternative route
+Route::get('/MApage/studyLeaveExtensions', [MAController::class, 'showStudyLeaveExtensionsPage'])->name('ma.studyleave.extensions');
+Route::get('/MApage/studyLeaveProgress', [MAController::class, 'studyLeaveProgressReportsPage'])->name('ma.studyleave.progress');
+Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'returnStudyLeave'])->name('ma.studyleave.return');
 Route::get('/MApage/{id}', [MAController::class, 'show'])->name('ma.show');
 Route::post('/MApage/{id}/approve', [MAController::class, 'approve'])->name('ma.approve');
 Route::post('/MApage/{id}/return', [MAController::class, 'return'])->name('ma.return');
-Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'returnStudyLeave'])->name('ma.studyleave.return');
-Route::get('/MApage/studyLeaveExtensions', [MAController::class, 'test'])->name('ma.studyleave.extensions');
-
-Route::get('/MApage/studyLeaveProgress', [MAController::class, 'studyLeaveProgressReportsPages'])->name('ma.studyleave.progress');
 
 Route::get('/MApage/progressReport/file/{filename}', [MAController::class, 'serveProgressReportFile'])->name('ma.serveProgressReport');
 

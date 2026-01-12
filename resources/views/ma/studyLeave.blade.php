@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MA Dashboard - Leave Management</title>
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- AdminLTE CSS -->
@@ -13,6 +15,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Navbar -->
@@ -26,7 +29,7 @@
             </a>
             <!-- Sidebar -->
             @php($pageName = 'Study Leave')
-            @include('ma.partials.sidebar')	
+            @include('ma.partials.sidebar')
         </aside>
 
         <!-- Content Wrapper -->
@@ -37,126 +40,127 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                   
-        <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold">Pending Study Leave Applications</h2>
-        <div class="text-muted">Applications Pending Review </div>
-    </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-           <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-        </div>
-    @endif
+                    <div class="container py-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="mb-0 fw-bold">Pending Study Leave Applications</h2>
+                            <div class="text-muted">Applications Pending Review </div>
+                        </div>
 
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-           <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-        </div>
-    @endif
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+                            </div>
+                        @endif
 
-    <div class="card">
-        <div class="card-header bg-primary text-white fw-semibold">
-            <i class="fas fa-list me-2"></i> Submitted Applications
-        </div>
-        <div class="card-body p-0">
-            @if($studyLeaveApplications->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="px-3">Reference No</th>
-                                <th>Employee No</th>
-                                <th>Name with Initials</th>
-                                <th>Department</th>
-                                <th>Faculty</th>
-                                <th>Applied Date</th>
-                                <th>Status</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($studyLeaveApplications as $application)
-                                <tr>
-                                    <td class="px-3">
-                                        <span class="fw-semibold text-primary">{{ $application->reference_no }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary">{{ $application->empno }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="fw-semibold">{{ $application->name_with_initials }}</div>
-                                    </td>
-                                    <td>{{ $application->department }}</td>
-                                    <td>{{ $application->faculty }}</td>
-                                    
-                                    <td>
-                                        <div class="text-muted">
-                                            {{ \Carbon\Carbon::parse($application->applied_date)->format('M d, Y') }}
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
+                            </div>
+                        @endif
+
+                        <div class="card">
+                            <div class="card-header bg-primary text-white fw-semibold">
+                                <i class="fas fa-list me-2"></i> Submitted Applications
+                            </div>
+                            <div class="card-body p-0">
+                                @if ($studyLeaveApplications->count() > 0)
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="px-3">Reference No</th>
+                                                    <th>Employee No</th>
+                                                    <th>Name with Initials</th>
+                                                    <th>Department</th>
+                                                    <th>Faculty</th>
+                                                    <th>Applied Date</th>
+                                                    <th>Status</th>
+                                                    <th class="text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($studyLeaveApplications as $application)
+                                                    <tr>
+                                                        <td class="px-3">
+                                                            <span
+                                                                class="fw-semibold text-primary">{{ $application->reference_no }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span
+                                                                class="badge bg-secondary">{{ $application->empno }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="fw-semibold">
+                                                                {{ $application->name_with_initials }}</div>
+                                                        </td>
+                                                        <td>{{ $application->department }}</td>
+                                                        <td>{{ $application->faculty }}</td>
+
+                                                        <td>
+                                                            <div class="text-muted">
+                                                                {{ \Carbon\Carbon::parse($application->applied_date)->format('M d, Y') }}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span
+                                                                class="badge bg-warning">{{ $application->status }}</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <a href="{{ route('ma.show.studyleave', $application->id) }}"
+                                                                class="btn btn-sm btn-outline-primary">
+                                                                <i class="fas fa-eye me-1"></i>View
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <div class="text-center py-5">
+                                        <div class="text-muted mb-3">
+                                            <i class="fas fa-inbox fa-3x"></i>
                                         </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-warning">{{ $application->status }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="{{ route('ma.show.studyleave', $application->id) }}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye me-1"></i>View
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="text-center py-5">
-                    <div class="text-muted mb-3">
-                        <i class="fas fa-inbox fa-3x"></i>
+                                        <h5 class="text-muted">No Applications Pending</h5>
+                                        <p class="text-muted">There are no applications currently waiting for review.
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if ($studyLeaveApplications->count() > 0)
+                            <div class="mt-3 text-muted text-center">
+                                <small>Total Applications: {{ $studyLeaveApplications->count() }}</small>
+                            </div>
+                        @endif
                     </div>
-                    <h5 class="text-muted">No Applications Pending</h5>
-                    <p class="text-muted">There are no applications currently waiting for review.</p>
-                </div>
-            @endif
-        </div>
-    </div>
 
-    @if($studyLeaveApplications->count() > 0)
-        <div class="mt-3 text-muted text-center">
-            <small>Total Applications: {{ $studyLeaveApplications->count() }}</small>
-        </div>
-    @endif
-</div>
+                   
 
-<!-- Include Extension Applications Table -->
-@include('ma.study_leave.study_leave_extensions_table')
+                    <style>
+                        .table th {
+                            border-top: none;
+                            font-weight: 600;
+                            color: #495057;
+                        }
 
-<!-- Include Progress Reports Table -->
-@include('ma.study_leave.study_leave_progress_reports_table')
+                        .table td {
+                            vertical-align: middle;
+                        }
 
-<style>
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
+                        .badge {
+                            font-size: 0.75rem;
+                        }
 
-.table td {
-    vertical-align: middle;
-}
-
-.badge {
-    font-size: 0.75rem;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
-}
-</style> 
+                        .btn-sm {
+                            padding: 0.25rem 0.75rem;
+                            font-size: 0.875rem;
+                        }
+                    </style>
                 </div>
             </section>
         </div>
@@ -171,4 +175,5 @@
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 </body>
-</html> 
+
+</html>
