@@ -28,7 +28,7 @@
                 <span class="brand-text font-weight-light">MA Dashboard</span>
             </a>
             <!-- Sidebar -->
-            @php($pageName = 'Study Leave')
+            @php($pageName ='Study Leave Extensions')
             @include('ma.partials.sidebar')
         </aside>
 

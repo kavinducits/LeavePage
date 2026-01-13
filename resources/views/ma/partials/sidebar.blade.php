@@ -39,7 +39,7 @@
                             </a>
                         </li>
                          <li class="nav-item">
-                            <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave') ? ' active' : '' }}">
+                            <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
                                 <p>Study Leave Progress</p>
                             </a>
