@@ -22,7 +22,7 @@
                 @endif
             </div>
            
-            @include('hod.study_leave.study_leave_progress_reports_index')
+            @include('hod.study_leave.study_leave_progress_reports_table')
         </div>
     </section>
 </div>

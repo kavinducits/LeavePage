@@ -318,7 +318,8 @@ class HODController extends Controller
             ->get();
             
 
-        return view('hod.study_leave_progress_report_dashboard', compact('progressReportApplications'));
+       return view('hod.study_leave_progress_report_dashboard', compact('progressReportApplications'));
+       
     }
 
     public function show($id)
