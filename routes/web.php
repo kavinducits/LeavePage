@@ -38,9 +38,12 @@ Route::get('/MApage/progressReport/file/{filename}', [MAController::class, 'serv
 Route::get('/HODpage', [HODController::class, 'leave_index'])->name('hod.index');//remove
 Route::get('/HODpage/leave', [HODController::class, 'leave_index'])->name('hod.leave.index');
 Route::get('/HODpage/studyLeave', [HODController::class, 'study_leave_index'])->name('hod.study.leave.index');
+Route::get('/HODpage/studyLeaveExtensions', [HODController::class, 'study_leave_extenstions'])->name('hod.study.leave.extensions');
+Route::get('/HODpage/studyLeaveProgress', [HODController::class, 'study_leave_progress_reports'])->name('hod.study.leave.progress');
 Route::get('/HODpage/{id}', [HODController::class, 'show'])->name('hod.show');
 Route::post('/HODpage/{id}/approve', [HODController::class, 'approve'])->name('hod.approve');
 Route::post('/HODpage/{id}/return', [HODController::class, 'return'])->name('hod.return');
+
 
 // Dean/Registrar routes (no authentication required)
 Route::get('/Deanpage', [DeanController::class, 'leave_index'])->name('dean.index');

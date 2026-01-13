@@ -16,6 +16,18 @@
                                 <p>Study Leaves</p>
                             </a>
                         </li>
+                         <li class="nav-item">
+                            <a href="{{ route('hod.study.leave.extensions') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Extensions') ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-stream"></i>
+                                <p>Study Leave Extensions</p>
+                            </a>
+                        </li>
+                         <li class="nav-item">
+                            <a href="{{ route('hod.study.leave.progress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-stream"></i>
+                                <p>Study Leave Progress</p>
+                            </a>
+                        </li>
                        
                     </ul>
                 </nav>
