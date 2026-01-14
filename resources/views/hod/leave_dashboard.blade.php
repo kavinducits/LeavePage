@@ -6,6 +6,8 @@
     </a>
 @endsection
 @section('sidebar')
+<!-- Sidebar -->
+    @php($pageName = 'Applications')
     @include('hod.partials.sidebar')
 @endsection
 
