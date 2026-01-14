@@ -200,6 +200,41 @@ class DeanController extends Controller
 
         return view('dean.study_leave_dashboard', compact('studyLeaveApplications', 'extensionApplications'));
     }
+     public function study_leave_extensions()
+    {
+        // Get faculty IDs for this Dean
+        $facultyIds = $this->getDeanFaculties();
+
+
+
+        // Get study leave extension applications for Dean review from assigned faculties
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.status_id', 6) // Processing Dean (status_id = 6)
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->orderByDesc('study_leave_extensions.created_at')
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('dean.study_leave_extenstions_dashboard', compact('extensionApplications'));
+    }
 
     public function show($id)
     {

@@ -49,6 +49,7 @@ Route::post('/HODpage/{id}/return', [HODController::class, 'return'])->name('hod
 Route::get('/Deanpage', [DeanController::class, 'leave_index'])->name('dean.index');
 Route::get('/Deanpage/leave', [DeanController::class, 'leave_index'])->name('dean.leave.index');
 Route::get('/Deanpage/studyLeave', [DeanController::class, 'study_leave_index'])->name('dean.study.leave.index');
+Route::get('/Deanpage/studyLeaveExtensions', [DeanController::class, 'study_leave_extensions'])->name('dean.study.leave.extensions');
 Route::get('/Deanpage/{id}', [DeanController::class, 'show'])->name('dean.show');
 Route::post('/Deanpage/{id}/recommend', [DeanController::class, 'recommend'])->name('dean.recommend');
 

@@ -21,10 +21,9 @@
                         </div>
                     @endif
                 </div>
-                <!-- Study Leave Applications Table -->
-                @include('dean.study_leave.study_leave_table')
 
-                
+                <!-- Study Leave Extension Applications Table -->
+                @include('dean.study_leave.study_leave_extensions_table')
             </div>
         </section>
     </div>
