@@ -6,7 +6,10 @@
     </a>
 @endsection
 @section('sidebar')
+<!-- Sidebar -->
+    @php($pageName = 'Study Leave')
     @include('hod.partials.sidebar')
+    
 @endsection
 
 @section('main-content')
