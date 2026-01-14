@@ -64,6 +64,7 @@ Route::post('/Deanpage/extension/{extension_id}/return', [DeanController::class,
 Route::get('/VCpage', [VCController::class, 'leave_index'])->name('vc.index');
 Route::get('/VCpage/leave', [VCController::class, 'leave_index'])->name('vc.leave.index');
 Route::get('/VCpage/studyLeave', [VCController::class, 'study_leave_index'])->name('vc.study.leave.index');
+Route::get('/VCpage/studyLeaveExtensions', [VCController::class, 'study_leave_extenstions'])->name('vc.study.leave.extensions');
 Route::get('/VCpage/{id}', [VCController::class, 'show'])->name('vc.show');
 Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name('vc.recommend');
 

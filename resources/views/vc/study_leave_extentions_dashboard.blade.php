@@ -7,11 +7,11 @@
 @endsection
 @section('sidebar')
 <!-- Sidebar -->
-    @php($pageName = 'Study Leave')
+    @php($pageName = 'Study Leave Extensions')
     @include('vc.partials.sidebar')
 @endsection
 
 @section('main-content')
-    @include('vc.study_leave_index')
+    @include('vc.study_leave.study_leave_extensions_index')
 
 @endsection
