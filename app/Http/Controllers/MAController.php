@@ -12,6 +12,7 @@ class MAController extends Controller
 {
     // Hardcoded MA user ID - change this to switch to a different MA
     private const MA_USER_ID = 10390; //15097 for testing 
+    PRIVATE const ACADEMIC_ESTABLISHMENT_DEPARTMENT_ID = 5003;
 
     public function index()
     {
@@ -218,7 +219,7 @@ class MAController extends Controller
         DB::table('leave_details')
             ->where('id', $id)
             ->update([
-                'status_id' => 5, // Processing HOD
+                'status_id' => 9, // Processing HOD
                 'ma_empno' => self::MA_USER_ID, // Record which MA processed this
                 'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()
@@ -657,7 +658,7 @@ class MAController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->where('employees.employee_no', $draft_study_leave->employee_no)
+            //->where('employees.employee_no', $draft_study_leave->employee_no)
             ->select(
                 'employees.employee_no as empno',
                 'employees.nic',
@@ -677,6 +678,7 @@ class MAController extends Controller
         }
 
         // Fetch Department Head details for the application's department
+        /*
         $departmentHead = null;
                     if ($draft_study_leave && isset($draft_study_leave->department_id)) {
                         $departmentHead = DB::table('department_heads')
@@ -695,6 +697,29 @@ class MAController extends Controller
                 )
                 ->first();
         }
+*/
+$academic_establishmnet_department_id = self::ACADEMIC_ESTABLISHMENT_DEPARTMENT_ID;
+ $departmentHead = null;
+// dd($academic_establishmnet_department_id);
+                    if ($draft_study_leave && isset($draft_study_leave->department_id)) {
+                        $departmentHead = DB::table('department_heads')
+                ->Join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions','department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $academic_establishmnet_department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+            dd($departmentHead);
+        }
+        dd($departmentHead);
 
         // Decide which blade to use and readonly status
         $readonly = false;
