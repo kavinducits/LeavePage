@@ -3,27 +3,22 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                         
-                        <li class="nav-item">
-                            <a href="{{ route('hod.leave.index') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Applications') ? ' active' : '' }}">
-                                <i class="nav-icon fas fa-list"></i>
-                                <p>Leaves</p>
-                            </a>
-                        </li>
+                        
                         
                          <li class="nav-item">
-                            <a href="{{ route('hod.study.leave.index') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave') ? ' active' : '' }}">
+                            <a href="{{ route('hodacademicestablishment.studyLeave') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave') ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
                                 <p>Study Leaves</p>
                             </a>
                         </li>
                          <li class="nav-item">
-                            <a href="{{ route('hod.study.leave.extensions') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Extensions') ? ' active' : '' }}">
+                            <a href="{{ route('hodacademicestablishment.studyLeaveExtensions') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Extensions') ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
                                 <p>Study Leave Extensions</p>
                             </a>
                         </li>
                          <li class="nav-item">
-                            <a href="{{ route('hod.study.leave.progress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
+                            <a href="{{ route('hodacademicestablishment.studyLeaveProgress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
                                 <p>Study Leave Progress</p>
                             </a>

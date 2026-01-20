@@ -11,6 +11,7 @@ use App\Http\Controllers\VCController;
 use App\Http\Controllers\StudyLeaveController;
 use App\Http\Controllers\StudyLeaveExtensionController;
 use App\Http\Controllers\StudyLeaveProgressReportsController;
+use App\Http\Controllers\HODAcademicEstablishmentController;
 
 
 // Login routes
@@ -218,3 +219,8 @@ Route::get('/dashboard/study-leave-status', [MAController::class, 'studyLeaveSta
 Route::get('/MApage/{id}/hod', [MAController::class, 'showHod'])->name('ma.show.hod');
 Route::get('/MApage/{id}/dean', [MAController::class, 'showDean'])->name('ma.show.dean');
 Route::get('/MApage/{id}/vc', [MAController::class, 'showVc'])->name('ma.show.vc');
+
+// HOD Academic Establishment routes
+Route::get('/HODAcademicEstablishment/study-leave', [HODAcademicEstablishmentController::class, 'study_leave'])->name('hodacademicestablishment.studyLeave');
+Route::get('/HODAcademicEstablishment/study-leave-extensions', [HODAcademicEstablishmentController::class, 'study_leave_extenstions'])->name('hodacademicestablishment.studyLeaveExtensions');
+Route::get('/HODAcademicEstablishment/study-leave-progress', [HODAcademicEstablishmentController::class, 'study_leave_progress_reports'])->name('hodacademicestablishment.studyLeaveProgress');

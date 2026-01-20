@@ -8,9 +8,9 @@
 @section('sidebar')
 <!-- Sidebar -->
     @php($pageName = 'Study Leave Progress')
-    @include('hod.partials.sidebar')
+    @include('hod_academic_establishment.partials.sidebar')
 @endsection
 
 @section('main-content')
-    @include('hod.study_leave.study_leave_progress_reports_index')
+    @include('hod_academic_establishment.study_leave.study_leave_progress_reports_index')
 @endsection
