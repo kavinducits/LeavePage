@@ -147,17 +147,19 @@
                 <!-- Show new application section when no active draft -->
                 @if(isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste)
                     <div class="new-application-section">
+                        @if(false){
                         <div class="mb-3">
                             <label for="academic-year" class="form-label fw-semibold text-maroon">
                                 <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
                             </label>
                             <select class="form-select" id="academic-year" name="academic_year">
-                                <option value="">Choose Academic Year...</option>
+                                <option value="">Choose Academic Years..</option>
                                 @foreach($academicYears as $year)
                                     <option value="{{ $year }}">{{ $year }}</option>
                                 @endforeach
                             </select>
                         </div>
+                    }    @endif
                         <a href="#" class="d-inline-block text-decoration-none" id="new-application-button" onclick="startNewApplication(event)">
                             <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
                                 <i class="bi bi-journal-plus"></i>
