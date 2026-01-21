@@ -3,100 +3,107 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
+    <style>
+        .text-warning {
+            --bs-text-opacity: 1;
+            color: rgb(16 16 15) !important;
+        }
 
-    .text-warning {
-    --bs-text-opacity: 1;
-    color: rgb(16 16 15) !important;
-    }
-    
-    .active-draft-alert {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        border: 2px solid;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
-    }
+        .active-draft-alert {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        }
 
-    .active-draft-item {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%) !important;
-        border: 2px solid !important;
-        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3) !important;
-        animation: pulse-warning 2s infinite;
-    }
+        .active-draft-item {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%) !important;
+            border: 2px solid !important;
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3) !important;
+            animation: pulse-warning 2s infinite;
+        }
 
-    @keyframes pulse-warning {
-        0% { box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3); }
-        50% { box-shadow: 0 6px 12px rgba(255, 193, 7, 0.5); }
-        100% { box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3); }
-    }
+        @keyframes pulse-warning {
+            0% {
+                box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+            }
 
-    .draft-action-buttons {
-        margin: 2rem 0;
-    }
+            50% {
+                box-shadow: 0 6px 12px rgba(255, 193, 7, 0.5);
+            }
 
-    .draft-action-item {
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
+            100% {
+                box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+            }
+        }
 
-    .draft-action-item:hover {
-        transform: translateY(-2px);
-        text-decoration: none;
-    }
-
-    .draft-action-icon {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        font-size: 2.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: all 0.3s ease;
-    }
-
-    .draft-action-item:first-child .draft-action-icon {
-        background: #fff3cd;
-        border: 2px solid #ffc107;
-        color: #856404;
-    }
-
-    .draft-action-item:first-child:hover .draft-action-icon {
-        background: #ffc107;
-        color: #212529;
-        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
-    }
-
-    .draft-action-item:last-child .draft-action-icon {
-        background: #f8d7da;
-        border: 2px solid #dc3545;
-        color: #721c24;
-    }
-
-    .draft-action-item:last-child:hover .draft-action-icon {
-        background: #dc3545;
-        color: white;
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-    }
-
-    @media (max-width: 768px) {
         .draft-action-buttons {
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem !important;
-            margin: 1rem 0;
+            margin: 2rem 0;
         }
 
         .draft-action-item {
-            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-    }
-</style>
+
+        .draft-action-item:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .draft-action-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            font-size: 2.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .draft-action-item:first-child .draft-action-icon {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+
+        .draft-action-item:first-child:hover .draft-action-icon {
+            background: #ffc107;
+            color: #212529;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .draft-action-item:last-child .draft-action-icon {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+
+        .draft-action-item:last-child:hover .draft-action-icon {
+            background: #dc3545;
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .draft-action-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 2rem !important;
+                margin: 1rem 0;
+            }
+
+            .draft-action-item {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
     <div class="container py-4">
         <h3 class="mb-4 fw-bold text-center text-maroon dashboard-header">
             <i class="fas fa-file-alt me-2 icon-gold"></i>New Study Leave Applications
         </h3>
 
         <!-- Flash Messages -->
-        @if(session('info'))
+        @if (session('info'))
             <div class="alert alert-info alert-dismissible fade show" role="alert">
                 <i class="fas fa-info-circle me-2"></i>
                 {{ session('info') }}
@@ -106,12 +113,12 @@
 
         <!-- New Application -->
         <div class="mb-4 text-center">
-            @if($hasActiveDraft)
+            @if ($hasActiveDraft)
                 <!-- Show draft continuation options when user has an active draft -->
                 @php
                     $activeDraft = $drafts;
                 @endphp
-                @if($activeDraft)
+                @if ($activeDraft)
                     <div class="text-center mb-3">
                         <p class="text-muted mb-2">
                             <i class="fas fa-info-circle me-1"></i>
@@ -119,21 +126,25 @@
                         </p>
                     </div>
                     <div class="d-flex justify-content-center gap-4 draft-action-buttons flex-wrap">
-                        <a href="{{ route('StudyLeave.continue.draft', $activeDraft->id) }}" class="d-inline-block text-decoration-none draft-action-item">
+                        <a href="{{ route('StudyLeave.continue.draft', $activeDraft->id) }}"
+                            class="d-inline-block text-decoration-none draft-action-item">
                             <div class="draft-action-icon d-flex align-items-center justify-content-center mx-auto mb-2">
                                 <i class="bi bi-pencil-square"></i>
                             </div>
                             <div class="text-center">
                                 <span class="fw-semibold text-maroon">Continue Draft</span><br>
-                                <small class="text-muted">{{ $activeDraft-> reference_no?? 'N/A' }}</small>
+                                <small class="text-muted">{{ $activeDraft->reference_no ?? 'N/A' }}</small>
                             </div>
                         </a>
 
-                        <form action="{{ route('StudyLeave.DeleteDraft', $activeDraft->id) }}" method="POST" class="d-inline-block">
+                        <form action="{{ route('StudyLeave.DeleteDraft', $activeDraft->id) }}" method="POST"
+                            class="d-inline-block">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn p-0 border-0 bg-transparent draft-action-item" onclick="return confirm('Are you sure you want to delete this draft and start a new application?')">
-                                <div class="draft-action-icon d-flex align-items-center justify-content-center mx-auto mb-2">
+                            <button type="submit" class="btn p-0 border-0 bg-transparent draft-action-item"
+                                onclick="return confirm('Are you sure you want to delete this draft and start a new application?')">
+                                <div
+                                    class="draft-action-icon d-flex align-items-center justify-content-center mx-auto mb-2">
                                     <i class="bi bi-trash"></i>
                                 </div>
                                 <div class="text-center">
@@ -145,22 +156,25 @@
                 @endif
             @else
                 <!-- Show new application section when no active draft -->
-                @if(isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste)
+                @if (isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste)
                     <div class="new-application-section">
-                        @if(false){
-                        <div class="mb-3">
-                            <label for="academic-year" class="form-label fw-semibold text-maroon">
-                                <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
-                            </label>
-                            <select class="form-select" id="academic-year" name="academic_year">
-                                <option value="">Choose Academic Years..</option>
-                                @foreach($academicYears as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    }    @endif
-                        <a href="#" class="d-inline-block text-decoration-none" id="new-application-button" onclick="startNewApplication(event)">
+                        @if (false)
+                            { <!-- tempory dissable the academic year selection -->
+                            <div class="mb-3">
+                                <label for="academic-year" class="form-label fw-semibold text-maroon">
+                                    <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
+                                </label>
+                                <select class="form-select" id="academic-year" name="academic_year">
+                                    <option value="">Choose Academic Year..</option>
+                                    @foreach ($academicYears as $year)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            }
+                        @endif
+                        <a href="#" class="d-inline-block text-decoration-none" id="new-application-button"
+                            onclick="startNewApplication(event)">
                             <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
                                 <i class="bi bi-journal-plus"></i>
                             </div>
@@ -171,8 +185,8 @@
             @endif
         </div>
 
-       
-        
+
+
 
         <!-- Previous Leaves -->
         <div class="mb-4">
@@ -195,16 +209,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            
-                                   @php
-                                $iteration=0;
-                            @endphp
-                            
-                                @forelse(($previousLeaves ?? [])->sortByDesc('id') as $leave)
+
                                 @php
-                               
-                                $iteration=$iteration+1;
-                            @endphp
+                                    $iteration = 0;
+                                @endphp
+
+                                @forelse(($previousLeaves ?? [])->sortByDesc('id') as $leave)
+                                    @php
+
+                                        $iteration = $iteration + 1;
+                                    @endphp
                                     <tr class="hoverable-row">
                                         <td class="text-center">
                                             {{ optional($leave->created_at) ? \Carbon\Carbon::parse($leave->created_at)->format('Y-m-d') : '' }}
@@ -223,14 +237,13 @@
                                                 } elseif ($statusValue == 3) {
                                                     $status = 'Return';
                                                     $badgeClass = 'bg-warning text-dark';
-                                                    
                                                 } else {
                                                     $status = 'Pending';
                                                     $badgeClass = 'bg-secondary';
                                                 }
                                             @endphp
                                             <span class="badge {{ $badgeClass }}">{{ $status }}</span>
-                                            
+
                                         </td>
                                         <td class="text-center">
                                             @php
@@ -239,33 +252,37 @@
                                                 $leaveFrom = \Carbon\Carbon::parse($leave->study_leave_from);
                                                 $leaveTo = \Carbon\Carbon::parse($leave->study_leave_to);
                                                 $today = \Carbon\Carbon::parse($currentDate);
-                                                
+
                                                 // Calculate total duration to check 3-year limit
                                                 $originalDuration = $leaveFrom->diffInDays($leaveTo);
                                                 $totalExtensionDays = $leave->total_extension_days ?? 0;
                                                 $totalDurationDays = $originalDuration + $totalExtensionDays;
                                                 $threeYearsInDays = 3 * 365; // 1095 days
                                                 $canExtendByDuration = $totalDurationDays < $threeYearsInDays;
-                                                
+
                                                 // Check if leave is in progress (between start and end date)
-                                                $isInProgress = $today->greaterThanOrEqualTo($leaveFrom) && $today->lessThanOrEqualTo($leaveTo);
-                                                
+                                                $isInProgress =
+                                                    $today->greaterThanOrEqualTo($leaveFrom) &&
+                                                    $today->lessThanOrEqualTo($leaveTo);
+
                                                 // Check if leave has ended
                                                 $hasEnded = $today->greaterThan($leaveTo);
-                                                $isBeforeThreeMonthsToEnd =$today->lessThan($leaveTo->copy()->subMonths(3));
+                                                $isBeforeThreeMonthsToEnd = $today->lessThan(
+                                                    $leaveTo->copy()->subMonths(3),
+                                                );
                                                 // Check if leave ended within last 3 months
                                                 $threeMonthsAfterEnd = $leaveTo->copy()->addMonths(3);
-                                               // $isWithinThreeMonths = $hasEnded && $today->lessThanOrEqualTo($threeMonthsAfterEnd);
-                                                $isWithinThreeMonths = $today->greaterThan($leaveTo->copy()->subMonths(3)) && $today->lessThanOrEqualTo($leaveTo);
-                                                
+                                                // $isWithinThreeMonths = $hasEnded && $today->lessThanOrEqualTo($threeMonthsAfterEnd);
+                                                $isWithinThreeMonths =
+                                                    $today->greaterThan($leaveTo->copy()->subMonths(3)) &&
+                                                    $today->lessThanOrEqualTo($leaveTo);
+
                                                 // Check if beyond 3 months after end
-                                               // $isBeyondThreeMonths = $hasEnded && $today->greaterThan($threeMonthsAfterEnd);
-                                               //$isBeyondEnd = $hasEnded && $today->greaterThan($threeMonthsAfterEnd);
+                                                // $isBeyondThreeMonths = $hasEnded && $today->greaterThan($threeMonthsAfterEnd);
+                                                //$isBeyondEnd = $hasEnded && $today->greaterThan($threeMonthsAfterEnd);
 
-                                               // $isBeforeThreeMonthsToEnd =$today->lessThan($leaveTo->copy()->subMonths(3));
+                                                // $isBeforeThreeMonthsToEnd =$today->lessThan($leaveTo->copy()->subMonths(3));
 
-                                               
-                                                
                                                 // Determine which buttons to show
                                                 $showView = false;
                                                 $showEdit = false;
@@ -292,7 +309,8 @@
                                                     }
                                                 } else {
                                                     // No extension - use original study leave logic
-                                                    if ($statusValue == 1) { // Approved
+                                                    if ($statusValue == 1) {
+                                                        // Approved
                                                         if ($isInProgress && $isBeforeThreeMonthsToEnd) {
                                                             // During leave period: show Progress, View, Extend (if under 3 years)
                                                             $showProgress = true;
@@ -306,55 +324,51 @@
                                                             // After leave ended (beyond 3 months): show View only
                                                             $showView = true;
                                                         }
-                                                    } elseif ($statusValue == 3) { // Returned by MA
+                                                    } elseif ($statusValue == 3) {
+                                                        // Returned by MA
                                                         $showView = true;
                                                         $showEdit = true;
                                                     }
                                                 }
                                             @endphp
-                                            
+
                                             <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                                @if($showView)
-                                                    <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}" 
-                                                       class="btn btn-sm btn-info" 
-                                                       title="View Details">
+                                                @if ($showView)
+                                                    <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}"
+                                                        class="btn btn-sm btn-info" title="View Details">
                                                         <i class="fas fa-eye"></i> View
                                                     </a>
                                                 @endif
-                                                
-                                                @if($showEdit)
-                                                    <a href="{{ route('StudyLeave.show.editeForm', $leave->id) }}" 
-                                                       class="btn btn-sm btn-warning" 
-                                                       title="Edit Application">
+
+                                                @if ($showEdit)
+                                                    <a href="{{ route('StudyLeave.show.editeForm', $leave->id) }}"
+                                                        class="btn btn-sm btn-warning" title="Edit Application">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
                                                 @endif
-                                                
-                                                @if($showExtend)
-                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}" 
-                                                       class="btn btn-sm btn-success" 
-                                                       title="Request Extension">
+
+                                                @if ($showExtend)
+                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}"
+                                                        class="btn btn-sm btn-success" title="Request Extension">
                                                         <i class="fas fa-calendar-plus"></i> Extend
                                                     </a>
                                                 @endif
-                                                
-                                                @if($showReturnedExtend)
-                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}" 
-                                                       class="btn btn-sm btn-warning" 
-                                                       title="Resubmit Returned Extension">
+
+                                                @if ($showReturnedExtend)
+                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}"
+                                                        class="btn btn-sm btn-warning" title="Resubmit Returned Extension">
                                                         <i class="fas fa-redo"></i> Return Extend
                                                     </a>
                                                 @endif
-                                                
-                                                @if($showProgress)
-                                                    <a href="{{ route('StudyLeave.progressReports.show', $leave->id) }}" 
-                                                       class="btn btn-sm btn-primary" 
-                                                       title="Submit Progress Reports">
+
+                                                @if ($showProgress)
+                                                    <a href="{{ route('StudyLeave.progressReports.show', $leave->id) }}"
+                                                        class="btn btn-sm btn-primary" title="Submit Progress Reports">
                                                         <i class="fas fa-chart-line"></i> Progress
                                                     </a>
                                                 @endif
-                                                
-                                                @if(!$showView && !$showEdit && !$showExtend && !$showProgress && !$showReturnedExtend)
+
+                                                @if (!$showView && !$showEdit && !$showExtend && !$showProgress && !$showReturnedExtend)
                                                     <button class="btn btn-sm btn-secondary" disabled>
                                                         No Actions
                                                     </button>
@@ -369,11 +383,11 @@
                                 @endforelse
 
 
-                              
-                            
-                           
-                        </tbody>
-                    </table>
+
+
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -382,68 +396,75 @@
 @endsection
 
 <style>
-.card-header {
-    background: #f8fafc !important;
-}
-.hoverable-row:hover {
-    background-color: #fbeed7 !important;
-    transition: background 0.2s;
-}
-.table th {
-    font-weight: 600;
-    color: #2d2d2d;
-    background: #f8fafc;
-    vertical-align: middle;
-}
-.table td {
-    color: #3a3a3a;
-    vertical-align: middle;
-}
-.table-responsive {
-    overflow-x: auto;
-}
-@media (max-width: 768px) {
-    .table {
-        font-size: 0.875rem;
+    .card-header {
+        background: #f8fafc !important;
     }
-    .btn-sm {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
+
+    .hoverable-row:hover {
+        background-color: #fbeed7 !important;
+        transition: background 0.2s;
     }
-}
+
+    .table th {
+        font-weight: 600;
+        color: #2d2d2d;
+        background: #f8fafc;
+        vertical-align: middle;
+    }
+
+    .table td {
+        color: #3a3a3a;
+        vertical-align: middle;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+        .table {
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+    }
+
     .new-app-icon {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: #f0f6ff;
-    border: 2px solid #0d6efd;
-    font-size: 2.5rem;
-    color: #0d6efd;
-    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
-}
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: #f0f6ff;
+        border: 2px solid #0d6efd;
+        font-size: 2.5rem;
+        color: #0d6efd;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.08);
+    }
 
-.new-application-section {
-    max-width: 400px;
-    margin: 0 auto;
-}
+    .new-application-section {
+        max-width: 400px;
+        margin: 0 auto;
+    }
 
-.new-application-section .form-select {
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
+    .new-application-section .form-select {
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
 
-.new-application-section .form-select:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
+    .new-application-section .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
 
-.new-application-section .form-label {
-    font-size: 1.1rem;
-    margin-bottom: 0.75rem;
-}
+    .new-application-section .form-label {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
 </style>
 
 <!-- SweetAlert2 CDN -->
@@ -462,9 +483,10 @@
         toggleIcon.classList.replace('bi-dash', 'bi-plus');
     });
 
-   
+
     function startNewApplication(event) {
         event.preventDefault();
+        /*
 
         const academicYear = document.getElementById('academic-year').value;
 
@@ -486,11 +508,13 @@
             });
             return false;
         }
+            */
+           console.log("Starting new application without academic year selection.");
 
         // Create and submit a POST form to the StudyLeave.store route
         const form = document.createElement('form');
         form.method = 'POST';
-        form.setAttribute('action', '{{ route("StudyLeave.store") }}');
+        form.setAttribute('action', '{{ route('StudyLeave.store') }}');
 
         // CSRF token
         const tokenInput = document.createElement('input');
@@ -500,11 +524,13 @@
         form.appendChild(tokenInput);
 
         // academic_year input
+        /*
         const yearInput = document.createElement('input');
         yearInput.type = 'hidden';
         yearInput.name = 'academic_year';
         yearInput.value = academicYear;
         form.appendChild(yearInput);
+        */
 
         document.body.appendChild(form);
         form.submit();

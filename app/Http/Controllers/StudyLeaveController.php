@@ -116,10 +116,12 @@ class StudyLeaveController extends Controller
      */
     public function storeStudyLeave(Request $request)
     {
+        /*
 
         $academicYear = $request->input('academic_year');
         // Store the academic year in session or pass it to the next step as needed
         session(['study_leave' => ['academic_year' => $academicYear]]);
+        */
 
         return redirect()->route('StudyLeave.BasicInfo.create');
     }
