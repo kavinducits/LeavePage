@@ -173,6 +173,7 @@ class HODAcademicEstablishmentController extends Controller
      public function approveStudyLeave(Request $request, $id)
     {
         // Validate the HOD review inputs
+       
         
 
         // Get department IDs for this HOD

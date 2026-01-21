@@ -6,7 +6,6 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\MAController;
 use App\Http\Controllers\HODController;
 use App\Http\Controllers\DeanController;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 use App\Http\Controllers\VCController;
 use App\Http\Controllers\StudyLeaveController;
 use App\Http\Controllers\StudyLeaveExtensionController;
@@ -225,3 +224,5 @@ Route::get('/HODAcademicEstablishment/study-leave', [HODAcademicEstablishmentCon
 Route::get('/HODAcademicEstablishment/study-leave-extensions', [HODAcademicEstablishmentController::class, 'study_leave_extenstions'])->name('hodacademicestablishment.studyLeaveExtensions');
 Route::get('/HODAcademicEstablishment/study-leave-progress', [HODAcademicEstablishmentController::class, 'study_leave_progress_reports'])->name('hodacademicestablishment.studyLeaveProgress');
 Route::get('/HODAcademicEstablishment/study-leave/view/{id}', [HODAcademicEstablishmentController::class, 'showStudyLeaveApplication'])->name('hodacademicestablishment.studyLeave.view');
+Route::post('/HODAcademicEstablishment/study-leave/view/{id}/approve', [HODAcademicEstablishmentController::class, 'approveStudyLeave'])->name('hodacademicestablishment.studyLeave.approve');
+

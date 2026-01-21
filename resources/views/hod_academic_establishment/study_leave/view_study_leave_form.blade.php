@@ -34,10 +34,10 @@
         @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
 
         <!-- HOD Review Section -->
-        <form action="{{ route('hod.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="hodReviewForm">
+        <form action="{{ route('hodacademicestablishment.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="hodReviewForm">
             @csrf
 
-            @include('hod_academic_establishment.study_leave.study_leave_hod_review_section', ['readonly' => false])
+            @include('hod_academic_establishment.study_leave.study_leave_hod_academic_establishment_review_section', ['readonly' => false])
 
 
 
@@ -51,7 +51,7 @@
 
                         <div class="text-end">
                             <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
-                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Dean
+                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to HOD Academic Establishment
                             </button>
 
                             @if (isset($departmentHead))
@@ -72,7 +72,7 @@
                                 <div class="card mt-2 border-warning" style="min-width: 280px;">
                                     <div class="card-body py-2">
                                         <div class="text-danger">
-                                            <strong>No active Dean found</strong>
+                                            <strong>No active HOD found</strong>
                                             <div class="text-muted small">Please contact administrator.</div>
                                         </div>
                                     </div>
