@@ -37,7 +37,7 @@
         <form action="{{ route('hod.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="hodReviewForm">
             @csrf
 
-            @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => false])
+            @include('hod_academic_establishment.study_leave.study_leave_hod_review_section', ['readonly' => false])
 
 
 
@@ -54,16 +54,16 @@
                                 <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Dean
                             </button>
 
-                            @if (isset($deanInfo))
+                            @if (isset($departmentHead))
                                 <div class="card mt-2" style="min-width: 280px;">
                                     <div class="card-body py-2">
                                         <div class="d-flex align-items-center">
                                             <strong>Forward to,&nbsp;</strong>
                                             <div>
                                                 <div class="fw-semibold">
-                                                    {{ $deanInfo->title ?? 'Dean' }}&nbsp;{{ $deanInfo->initials ?? '' }}&nbsp;{{ $deanInfo->last_name ?? '' }}
+                                                    {{ $departmentHead->head_title ?? 'Head' }}&nbsp;{{ $departmentHead->head_name ?? '' }}
                                                 </div>
-                                                <div class="text-muted small">{{ $deanInfo->faculty_name ?? '' }}</div>
+                                                <div class="text-muted small">{{ $departmentHead->faculty_name ?? '' }}</div>
                                             </div>
                                         </div>
                                     </div>

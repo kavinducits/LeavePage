@@ -57,7 +57,7 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('hod.view.studyLeave', $application->id) }}"
+                                        <a href="{{ route('hodacademicestablishment.studyLeave.view', $application->id) }}"
                                             class="btn btn-sm btn-outline-dark" title="View Details">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>

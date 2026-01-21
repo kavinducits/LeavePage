@@ -224,3 +224,4 @@ Route::get('/MApage/{id}/vc', [MAController::class, 'showVc'])->name('ma.show.vc
 Route::get('/HODAcademicEstablishment/study-leave', [HODAcademicEstablishmentController::class, 'study_leave'])->name('hodacademicestablishment.studyLeave');
 Route::get('/HODAcademicEstablishment/study-leave-extensions', [HODAcademicEstablishmentController::class, 'study_leave_extenstions'])->name('hodacademicestablishment.studyLeaveExtensions');
 Route::get('/HODAcademicEstablishment/study-leave-progress', [HODAcademicEstablishmentController::class, 'study_leave_progress_reports'])->name('hodacademicestablishment.studyLeaveProgress');
+Route::get('/HODAcademicEstablishment/study-leave/view/{id}', [HODAcademicEstablishmentController::class, 'showStudyLeaveApplication'])->name('hodacademicestablishment.studyLeave.view');
