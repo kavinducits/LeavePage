@@ -36,7 +36,7 @@ class HODAcademicEstablishmentController extends Controller
     {
        // dd('here');
         // Get department IDs for this HOD
-        $departmentIds = $this->getHodDepartments();
+       // $departmentIds = $this->getHodDepartments();
 
       
         // Get all study leave applications for HOD review from assigned departments
@@ -46,7 +46,7 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
             ->where('study_leaves.status_id', 9) // Processing HOD Academic Establishment (status_id = 9)
-            ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
+            //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
                 'study_leaves.id',
@@ -60,6 +60,7 @@ class HODAcademicEstablishmentController extends Controller
                 'employees.department_id'
             )
             ->get();
+           
            
 
         return view('hod_academic_establishment.study_leave_dashboard', compact('studyLeaveApplications'));
