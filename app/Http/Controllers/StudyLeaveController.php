@@ -16,6 +16,8 @@ class StudyLeaveController extends Controller
 {
 
 
+
+
     /**
      * Show the form for creating a basic information .
      * Calling Route: StudyLeave.create
@@ -34,7 +36,8 @@ class StudyLeaveController extends Controller
         $returnLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 3);
         $rejectLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 2);
 
-        $previousLeaves = $approvedLeaves->merge($returnLeaves)->merge($rejectLeaves);
+        //$previousLeaves = $approvedLeaves->merge($returnLeaves)->merge($rejectLeaves);
+        $previousLeaves = $this->getStudyLeaves(session('empno'));
         $drafts = StudyLeave::where('empno', session('empno'))
             ->where('is_draft', true)
             ->first();
@@ -223,6 +226,12 @@ class StudyLeaveController extends Controller
         }
         return;
     }
+    public function getAllStudyLeaves($empno)
+    {
+        //$empno = session('empno');
+         return StudyLeave::where('empno', $empno)
+            ->first();
+    }
 
     /**
      * Show the form for creating study leave details.
@@ -231,12 +240,13 @@ class StudyLeaveController extends Controller
 
     public function createDetails()
     {
+        
         $readonly = false;
 
         $empno = session('study_leave.employee_no') ?? session('empno');
 
         $draft_study_leave =$this->getStudyLeaveDraft($empno);
-
+       
         $totalDaysStydyLeave = $this->calculateTotalStudyLeaveDays($empno);
 
         return view('StudyLeave.createDetails', compact('draft_study_leave', 'readonly', 'totalDaysStydyLeave'));
