@@ -237,8 +237,24 @@
                                                 } elseif ($statusValue == 3) {
                                                     $status = 'Return';
                                                     $badgeClass = 'bg-warning text-dark';
-                                                } else {
-                                                    $status = 'Pending';
+                                                } elseif( $statusValue == 4) {
+                                                    $status = 'Processing MA';
+                                                    $badgeClass = 'bg-secondary';
+                                                }
+                                                elseif( $statusValue == 5) {
+                                                    $status = 'Processing HOD';
+                                                    $badgeClass = 'bg-secondary';
+                                                }
+                                                elseif( $statusValue == 6) {
+                                                    $status = 'Processing Dean';
+                                                    $badgeClass = 'bg-secondary';
+                                                }
+                                                elseif( $statusValue == 7) {
+                                                    $status = 'Processing VC';
+                                                    $badgeClass = 'bg-secondary';
+                                                }
+                                                 elseif( $statusValue == 9) {
+                                                    $status = 'Processing Registrar';
                                                     $badgeClass = 'bg-secondary';
                                                 }
                                             @endphp
@@ -369,9 +385,10 @@
                                                 @endif
 
                                                 @if (!$showView && !$showEdit && !$showExtend && !$showProgress && !$showReturnedExtend)
-                                                    <button class="btn btn-sm btn-secondary" disabled>
-                                                        No Actions
-                                                    </button>
+                                                     <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}"
+                                                        class="btn btn-sm btn-info" title="View Details">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
                                                 @endif
                                             </div>
                                         </td>
