@@ -156,32 +156,32 @@
                 @endif
             @else
                 <!-- Show new application section when no active draft -->
-                @if (isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste)
-                    <div class="new-application-section">
-                        @if (false)
-                            { <!-- tempory dissable the academic year selection -->
-                            <div class="mb-3">
-                                <label for="academic-year" class="form-label fw-semibold text-maroon">
-                                    <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
-                                </label>
-                                <select class="form-select" id="academic-year" name="academic_year">
-                                    <option value="">Choose Academic Year..</option>
-                                    @foreach ($academicYears as $year)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            }
-                        @endif
-                        <a href="#" class="d-inline-block text-decoration-none" id="new-application-button"
-                            onclick="startNewApplication(event)">
-                            <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
-                                <i class="bi bi-journal-plus"></i>
-                            </div>
-                            <div><span class="fw-semibold text-maroon">Start a New Application</span></div>
-                        </a>
-                    </div>
-                @endif
+
+                <div class="new-application-section">
+                    @if (false)
+                        { <!-- tempory dissable the academic year selection -->
+                        <div class="mb-3">
+                            <label for="academic-year" class="form-label fw-semibold text-maroon">
+                                <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
+                            </label>
+                            <select class="form-select" id="academic-year" name="academic_year">
+                                <option value="">Choose Academic Year..</option>
+                                @foreach ($academicYears as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        }
+                    @endif
+                    <a href="#" class="d-inline-block text-decoration-none" id="new-application-button"
+                        onclick="startNewApplication(event, {{ $hasActiveDraft ? 'true' : 'false' }}, {{ isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste ? 'true' : 'false' }})">
+                        <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
+                            <i class="bi bi-journal-plus"></i>
+                        </div>
+                        <div><span class="fw-semibold text-maroon">Start a New Application</span></div>
+                    </a>
+                </div>
+
             @endif
         </div>
 
@@ -484,10 +484,46 @@
     });
 
 
-    function startNewApplication(event) {
+    function startNewApplication(event, hasActiveDraft = false, isEnableStudyLeaveRequiste = true) {
         event.preventDefault();
-        /*
 
+        // Check if there's an active draft
+        if (hasActiveDraft) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Active Draft Exists',
+                text: 'You already have an active draft. Please continue with the existing draft or delete it before starting a new application.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
+            return false;
+        }
+
+        // Check if user is allowed to start a new study leave application
+        if (!isEnableStudyLeaveRequiste) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Application Not Allowed',
+                text: 'You are not allowed to start a new study leave application since your previous study leave request application is processing.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#ffc107',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
+            return false;
+        }
+
+        /*
         const academicYear = document.getElementById('academic-year').value;
 
         if (!academicYear) {
@@ -509,7 +545,7 @@
             return false;
         }
             */
-           console.log("Starting new application without academic year selection.");
+        console.log("Starting new application without academic year selection.");
 
         // Create and submit a POST form to the StudyLeave.store route
         const form = document.createElement('form');
