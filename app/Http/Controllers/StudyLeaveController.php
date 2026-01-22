@@ -1073,10 +1073,16 @@ class StudyLeaveController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Prepare process status information for stages display
+        $processStatus = [
+            'current_status_id' => $draft_study_leave->status_id ?? 4,
+            'status_name' => $draft_study_leave->status ?? 'Processing MA',
+        ];
+
         // Decide which blade to use and readonly status
         $readonly = true;
        
-        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions'));
+        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions', 'processStatus'));
     }
 
     public function continueDraft($id)

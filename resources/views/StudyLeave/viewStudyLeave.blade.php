@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<div>
+    @include('StudyLeave.study_leave.process_stages')
+</div>
+
 <div class="container">
+    
     <div class="row justify-content-center">
+        
         <div class="col-md-11">
             
             <div>
@@ -11,6 +17,9 @@
                     View Study Leave Application
                 </h2>
             </div>
+
+            <!-- Process Stages Section -->
+           
 
             <!-- Extension History Section (Top) -->
             @if(isset($extensions) && $extensions->count() > 0){
