@@ -71,21 +71,7 @@
                             <h2 class="mb-0 fw-bold">Pending Study Leave Applications</h2>
                             <div class="text-muted">Applications Pending Review </div>
                         </div>
-
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('success') }}
-                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-                            </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session('error') }}
-                                <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-                            </div>
-                        @endif
-
+                       
                         <div class="card">
                             <div class="card-header bg-primary text-white fw-semibold">
                                 <i class="fas fa-list me-2"></i> Submitted Applications
