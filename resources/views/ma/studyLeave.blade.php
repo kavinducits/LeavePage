@@ -41,6 +41,31 @@
             <section class="content">
                 <div class="container-fluid">
 
+                    <!-- Return Success Modal -->
+                    <div class="modal fade" id="returnSuccessModal" tabindex="-1" aria-labelledby="returnSuccessModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg">
+                                <div class="modal-body text-center p-5">
+                                    <div class="mb-4">
+                                        <i class="fas fa-undo-alt text-warning" style="font-size: 4rem;"></i>
+                                    </div>
+                                    <h3 class="fw-bold text-warning mb-3">Application Returned Successfully!</h3>
+                                    <p class="text-muted mb-2">The study leave application has been returned to the user for corrections.</p>
+                                    @if(session('returned_reference'))
+                                        <p class="mb-3">
+                                            <strong>Reference Number:</strong> 
+                                            <span class="badge bg-primary fs-6">{{ session('returned_reference') }}</span>
+                                        </p>
+                                    @endif
+                                    <p class="text-muted small mb-4">The user will be notified and can make the necessary changes before resubmitting.</p>
+                                    <button type="button" class="btn btn-warning px-5 py-2 rounded-pill fw-semibold" data-bs-dismiss="modal">
+                                        <i class="fas fa-check me-2"></i>OK
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="container py-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2 class="mb-0 fw-bold">Pending Study Leave Applications</h2>
@@ -174,6 +199,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    
+    <!-- Show return success modal if session flag is set -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('show_return_modal'))
+                // Use Bootstrap 4 modal
+                $('#returnSuccessModal').modal('show');
+            @endif
+        });
+    </script>
 </body>
 
 </html>

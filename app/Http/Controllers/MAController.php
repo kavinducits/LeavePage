@@ -857,7 +857,10 @@ $academic_establishmnet_department_id = self::ACADEMIC_ESTABLISHMENT_DEPARTMENT_
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Study Leave Application returned to user successfully.');
+        return redirect()->route('ma.studyleave')
+            ->with('success', 'Study Leave Application returned to user successfully.')
+            ->with('show_return_modal', true)
+            ->with('returned_reference', $application->reference_no);
     }
 
     /**

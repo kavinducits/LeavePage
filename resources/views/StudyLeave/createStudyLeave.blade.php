@@ -287,6 +287,56 @@
             </div>
         </div>
 
+        <!-- Returned Application Alert Modal -->
+        @php
+            $hasReturnedApplication = false;
+            $returnedApplication = null;
+            if(isset($previousLeaves)) {
+                foreach($previousLeaves as $leave) {
+                    if($leave->status_id == 3) {
+                        $hasReturnedApplication = true;
+                        $returnedApplication = $leave;
+                        break;
+                    }
+                }
+            }
+        @endphp
+
+        @if($hasReturnedApplication && $returnedApplication)
+        <div class="modal fade" id="returnedAppModal" tabindex="-1" aria-labelledby="returnedAppModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                        </div>
+                        <h3 class="fw-bold text-warning mb-3">Application Returned</h3>
+                        <p class="text-muted mb-2">Your study leave application has been returned for corrections.</p>
+                        <p class="mb-3">
+                            <strong>Reference Number:</strong> 
+                            <span class="badge bg-primary fs-6">{{ $returnedApplication->reference_no }}</span>
+                        </p>
+                        @if($returnedApplication->ma_remarks)
+                            <div class="alert alert-warning text-start mb-4">
+                                <strong><i class="fas fa-comment-dots me-2"></i>Remarks:</strong>
+                                <p class="mb-0 mt-2" style="white-space: pre-wrap;">{{ $returnedApplication->ma_remarks }}</p>
+                            </div>
+                        @endif
+                        <p class="text-muted small mb-4">Please review the remarks and make necessary corrections before resubmitting your application.</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{{ route('StudyLeave.show.editeForm', $returnedApplication->id) }}" class="btn btn-warning px-4 py-2 rounded-pill fw-semibold">
+                                <i class="fas fa-edit me-2"></i>Edit Application
+                            </a>
+                            <button type="button" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <h3 class="mb-4 fw-bold text-center text-maroon dashboard-header">
             <i class="fas fa-file-alt me-2 icon-gold"></i>New Study Leave Applications
         </h3>
@@ -606,6 +656,12 @@
             @if(session('show_success_modal'))
                 const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                 successModal.show();
+            @endif
+            
+            // Show returned application modal if user has a returned application
+            @if($hasReturnedApplication && $returnedApplication)
+                const returnedAppModal = new bootstrap.Modal(document.getElementById('returnedAppModal'));
+                returnedAppModal.show();
             @endif
         });
     </script>
