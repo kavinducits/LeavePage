@@ -613,12 +613,21 @@ class StudyLeaveController extends Controller
                 'reference_no' => $this->generateReferenceNumber(),
 
             ]);
+            
+            // Store reference number for display in success message
+            $referenceNo = $draft->reference_no;
+        } else {
+            return redirect()->route('StudyLeave.create')->with('error', 'No draft application found to submit.');
         }
 
         // Clear the session data after successful submission
         $request->session()->forget('study_leave');
 
-        return redirect()->route('StudyLeave.create')->with('success', 'Study leave application submitted successfully! Your application is now under review.');
+        // Set session flags for success popup
+        return redirect()->route('StudyLeave.create')
+            ->with('success', 'Study leave application submitted successfully! Your application is now under review.')
+            ->with('show_success_modal', true)
+            ->with('reference_number', $referenceNo);
     }
 
 
