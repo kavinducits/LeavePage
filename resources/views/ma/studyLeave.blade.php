@@ -58,7 +58,7 @@
                                         </p>
                                     @endif
                                     <p class="text-muted small mb-4">The user will be notified and can make the necessary changes before resubmitting.</p>
-                                    <button type="button" class="btn btn-warning px-5 py-2 rounded-pill fw-semibold" data-bs-dismiss="modal">
+                                    <button type="button" class="btn btn-warning px-5 py-2 rounded-pill fw-semibold" data-dismiss="modal">
                                         <i class="fas fa-check me-2"></i>OK
                                     </button>
                                 </div>

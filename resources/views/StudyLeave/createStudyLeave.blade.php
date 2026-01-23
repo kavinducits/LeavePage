@@ -316,7 +316,7 @@
                             <strong>Reference Number:</strong> 
                             <span class="badge bg-primary fs-6">{{ $returnedApplication->reference_no }}</span>
                         </p>
-                        @if($returnedApplication->ma_remarks)
+                        @if(isset($returnedApplication->ma_remarks) && !empty($returnedApplication->ma_remarks))
                             <div class="alert alert-warning text-start mb-4">
                                 <strong><i class="fas fa-comment-dots me-2"></i>Remarks:</strong>
                                 <p class="mb-0 mt-2" style="white-space: pre-wrap;">{{ $returnedApplication->ma_remarks }}</p>
