@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div>
+<div class="d-flex justify-content-center">
     @include('StudyLeave.study_leave.process_stages')
 </div>
 

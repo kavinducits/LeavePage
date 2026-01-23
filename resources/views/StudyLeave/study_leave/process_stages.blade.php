@@ -11,6 +11,7 @@
                     @php
                         $stages = [
                             ['id' => 4, 'name' => 'MA Review', 'icon' => 'fa-user-tie'],
+                            ['id' => 9, 'name' => 'Registrar Academic Establishment', 'icon' => 'fa-user-shield'],
                             ['id' => 5, 'name' => 'HOD Review', 'icon' => 'fa-user-check'],
                             ['id' => 6, 'name' => 'Dean Review', 'icon' => 'fa-user-graduate'],
                             ['id' => 7, 'name' => 'VC Approval', 'icon' => 'fa-stamp'],
@@ -30,19 +31,15 @@
                             $isPending = false;
                             
                             if ($isReturned) {
-                                // If returned, show all as inactive except returned status
                                 $isCompleted = false;
                                 $isCurrent = false;
                                 $isPending = true;
                             } elseif ($isEditing) {
-                                // If editing, show all as inactive
                                 $isCompleted = false;
                                 $isCurrent = false;
                                 $isPending = true;
                             } else {
-                                // Normal flow
                                 if ($currentStatusId == 1) {
-                                    // If approved, all stages are completed
                                     $isCompleted = true;
                                 } elseif ($stage['id'] < $currentStatusId) {
                                     $isCompleted = true;
@@ -116,7 +113,7 @@
         position: relative;
         overflow-x: auto;
         overflow-y: hidden;
-        padding: 1rem 0;
+        padding: 0.5rem 0;
         width: 100%;
     }
     
@@ -136,6 +133,7 @@
     
     .process-stages-container .card-body {
         overflow-x: auto;
+        padding: 1.5rem !important;
     }
     
     .stage-item {
@@ -152,35 +150,35 @@
         align-items: center;
         text-align: center;
         flex-shrink: 0;
-        width: 140px;
+        width: 120px;
         position: relative;
         z-index: 2;
     }
     
     .stage-icon {
-        width: 60px;
-        height: 60px;
+        width: 55px;
+        height: 55px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         position: relative;
         z-index: 2;
         transition: all 0.3s ease;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.6rem;
     }
     
     .stage-item.completed .stage-icon {
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         color: white;
-        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
     }
     
     .stage-item.current .stage-icon {
         background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
         color: white;
-        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
+        box-shadow: 0 3px 8px rgba(255, 193, 7, 0.5);
         animation: pulse-stage 2s infinite;
     }
     
@@ -192,18 +190,18 @@
     
     @keyframes pulse-stage {
         0%, 100% {
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
+            box-shadow: 0 3px 8px rgba(255, 193, 7, 0.5);
         }
         50% {
-            box-shadow: 0 4px 20px rgba(255, 193, 7, 0.8);
+            box-shadow: 0 3px 12px rgba(255, 193, 7, 0.8);
         }
     }
     
     .stage-connector {
         height: 4px;
-        width: 80px;
+        width: 70px;
         position: relative;
-        top: -35px;
+        top: -32px;
         z-index: 1;
         flex-shrink: 0;
     }
@@ -222,11 +220,12 @@
     
     .stage-name {
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: #2d2d2d;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.35rem;
         white-space: normal;
         word-wrap: break-word;
+        line-height: 1.3;
     }
     
     .stage-status {
@@ -244,269 +243,51 @@
     /* Responsive Design */
     @media (max-width: 992px) {
         .stage-content {
-            width: 120px;
+            width: 90px;
         }
         
         .stage-icon {
-            width: 50px;
-            height: 50px;
-            font-size: 1.25rem;
-        }
-        
-        .stage-connector {
-            width: 60px;
-            top: -30px;
-        }
-        
-        .stage-name {
-            font-size: 0.85rem;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .stage-content {
-            width: 100px;
-        }
-        
-        .stage-icon {
-            width: 45px;
-            height: 45px;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
         }
         
         .stage-connector {
             width: 50px;
-            top: -27px;
-            height: 3px;
+            top: -25px;
         }
         
         .stage-name {
-            font-size: 0.8rem;
-        }
-        
-        .stage-status {
             font-size: 0.7rem;
         }
     }
     
-    /* Alert styling */
-    .alert {
-        border-radius: 8px;
-        border-left: 4px solid;
-    }
-    
-    .alert-warning {
-        border-left-color: #ffc107;
-        background-color: #fff3cd;
-    }
-    
-    .alert-info {
-        border-left-color: #0dcaf0;
-        background-color: #cff4fc;
-    }
-</style>
-
-                
-                {{-- Special Status Indicators --}}
-                @if($isReturned)
-                    <div class="alert alert-warning mt-3 mb-0 d-flex align-items-center">
-                        <i class="fas fa-undo-alt me-2"></i>
-                        <div>
-                            <strong>Application Returned</strong>
-                            <p class="mb-0 small">This application has been returned for corrections.</p>
-                        </div>
-                    </div>
-                @elseif($isEditing)
-                    <div class="alert alert-info mt-3 mb-0 d-flex align-items-center">
-                        <i class="fas fa-edit me-2"></i>
-                        <div>
-                            <strong>Editing Mode</strong>
-                            <p class="mb-0 small">This application is currently being edited.</p>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    .process-stages-container {
-        margin-top: 1rem;
-    }
-    
-    .stages-wrapper {
-        position: relative;
-    }
-    
-        overflow-x: auto;
-        padding: 1rem 0;
-    }
-    
-    .stages-timeline {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: space-between;
-        min-width: 100%;
-        gap: 0;
-    }
-    
-    .stage-item {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        flex: 1;
-        position: relative;
-    }
-    
-    .stage-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        flex-shrink: 0;
-        min-width: 120px;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .stage-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        position: relative;
-        z-index: 2;
-        transition: all 0.3s ease;
-        margin-bottom: 0.75rem;
-    }
-    
-    .stage-item.completed .stage-icon {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-    }
-    
-    .stage-item.current .stage-icon {
-        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
-        animation: pulse-stage 2s infinite;
-    }
-    
-    .stage-item.pending .stage-icon {
-        background: #e9ecef;
-        color: #6c757d;
-        border: 2px solid #dee2e6;
-    }
-    
-    @keyframes pulse-stage {
-        0%, 100% {
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
-        }
-        50% {
-            box-shadow: 0 4px 20px rgba(255, 193, 7, 0.8);
-        }
-    }
-    
-    .stage-connector {
-        height: 4px;
-        flex: 1;
-        position: relative;
-        top: -35px;
-        z-index: 1;
-        margin: 0 -10px;
-    }
-    
-    .stage-connector.completed {
-        background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
-    }
-    
-    .stage-connector.current {
-        background: linear-gradient(90deg, #ffc107 0%, #e9ecef 100%);
-    }
-    
-    .stage-connector.pending {
-        background: #e9ecef;
-    }
-    
-    .stage-name {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #2d2d2d;
-        margin-bottom: 0.5rem;
-        white-space: nowrap;
-    }
-    
-    .stage-status {
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        white-space: nowrap;
-    }
-    
-    .stage-item.pending .stage-name {
-        color: #6c757d;
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 992px) {
-        .stages-timeline {
-            min-width: 800px;
-        }
-        
-        .stage-content {
-            min-width: 100px;
-        }
-        
-        .stage-icon {
-            width: 50px;
-            height: 50px;
-            font-size: 1.25rem;
-        }
-        
-        .stage-connector {
-            top: -30px;
-        }
-        
-        .stage-name {
-            font-size: 0.85rem;
-        }
-    }
-    
     @media (max-width: 768px) {
-        .stages-timeline {
-            min-width: 700px;
-        }
-        
         .stage-content {
-            min-width: 90px;
+            width: 80px;
         }
         
         .stage-icon {
-            width: 45px;
-            height: 45px;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
         }
         
         .stage-connector {
-            top: -27px;
-            height: 3px;
+            width: 40px;
+            top: -22px;
+            height: 2px;
         }
         
         .stage-name {
-            font-size: 0.8rem;
+            font-size: 0.65rem;
         }
         
         .stage-status {
-            font-size: 0.7
+            font-size: 0.6rem;
+        }
+    }
     
     /* Alert styling */
     .alert {
