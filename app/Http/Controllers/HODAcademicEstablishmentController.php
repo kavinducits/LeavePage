@@ -41,11 +41,12 @@ class HODAcademicEstablishmentController extends Controller
       
         // Get all study leave applications for HOD review from assigned departments
         $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
-            ->where('study_leaves.status_id', 9) // Processing HOD Academic Establishment (status_id = 9)
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_approvals.status_id', 9) // Processing HOD Academic Establishment (status_id = 9)
             //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -75,6 +76,7 @@ class HODAcademicEstablishmentController extends Controller
        
         // Fetch the study leave application with all necessary details
         $draft_study_leave = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -83,8 +85,8 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
-            ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 9) // Processing HOD
+            ->where('study_leave_approvals.study_leave_id', $id)
+            ->where('study_leave_approvals.status_id', 9) // Processing HOD
             //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->select(
                 'study_leaves.*',
