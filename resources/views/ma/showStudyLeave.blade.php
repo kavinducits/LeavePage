@@ -15,6 +15,10 @@
 </head>
 <body class="hold-transition sidebar-mini">
   
+    @php
+        $statusId = $draft_study_leave->approval_status_id ?? null;
+    @endphp
+
     <div class="wrapper">
         <!-- Navbar -->
         @include('ma.partials.navbar')
@@ -57,8 +61,23 @@
                   
                     
                   
-                    <!-- Action Section -->
-                    @if(empty($readonly) || !$readonly)
+                    <!-- Review Section based on Status -->
+                    @if($statusId == 3)
+                        <!-- Status: Editing (Returned to User) -->
+                        <div class="alert alert-warning mt-4">
+                            <i class="fas fa-undo me-2"></i>
+                            <strong>Application Returned to User</strong>
+                            <p class="mb-0 mt-2">This application has been returned to the user for corrections.</p>
+                        </div>
+                    @elseif($statusId == 5)
+                        <!-- Status: Processing HOD Academic Establishment -->
+                        <div class="alert alert-success mt-4">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            <strong>Application Forwarded</strong>
+                            <p class="mb-0 mt-2">This application has been forwarded to HOD Academic Establishment for review.</p>
+                        </div>
+                    @elseif($statusId == 4)
+                        <!-- Status: Processing MA - Show Action Section -->
                         <div class="card">
                             <div class="card-header bg-dark text-white fw-semibold">
                                 <i class="fas fa-tasks me-2"></i>Review Actions
@@ -118,6 +137,7 @@
                             </div>
                         </div>
                     @else
+                        <!-- Other statuses - Read-only view -->
                         <div class="alert alert-info mt-4">
                             <i class="fas fa-eye"></i> This application is in a different workflow stage. You have read-only access.
                         </div>
@@ -137,6 +157,7 @@
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
+    @if($statusId == 4)
     <script>
         // Form validation and submission handling
         document.getElementById('approveForm').addEventListener('submit', function(e) {
@@ -221,6 +242,7 @@
             }
         });
     </script>
+    @endif
       <style>
                         /* Override AdminLTE dark theme styles for summary layout */
                    

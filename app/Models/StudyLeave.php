@@ -66,4 +66,12 @@ class StudyLeave extends Model
     {
         return $this->hasMany(StudyLeaveProgressReports::class, 'study_leave_id');
     }
+
+    /**
+     * Get the approval record for the study leave
+     */
+    public function studyLeaveApproval()
+    {
+        return $this->hasOne(StudyLeaveApproval::class, 'study_leave_id');
+    }
 }

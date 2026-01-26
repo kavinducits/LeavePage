@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\OtherLeavesDetail;
 use App\Models\LeaveRequestDetail;
 use App\Models\StudyLeave;
+use App\Models\StudyLeaveApproval;
 use App\Models\StudyLeaveExtension;
 use PHPUnit\Framework\Constraint\Count;
 
@@ -606,6 +607,15 @@ class StudyLeaveController extends Controller
             ->where('is_draft', true)
             ->first();
 
+        // Create approval record with MA as first approver
+        StudyLeaveApproval::create([
+            'study_leave_id' => $draft->id,
+            'status_id' => 4, // Pending
+            
+        ]);
+       
+    
+
         if ($draft) {
             $draft->update([
                 'is_draft' => false,
@@ -613,6 +623,7 @@ class StudyLeaveController extends Controller
                 'reference_no' => $this->generateReferenceNumber(),
 
             ]);
+            
             
             // Store reference number for display in success message
             $referenceNo = $draft->reference_no;
@@ -706,6 +717,7 @@ class StudyLeaveController extends Controller
 
         // Fetch employee info from the database with latest extension status and total duration
         $previousLeaves = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
             ->where('empno', $emp_no)
             ->select(
                 'study_leaves.id', 
@@ -715,13 +727,13 @@ class StudyLeaveController extends Controller
                 'study_leave_to', 
                 'leave_payment_type', 
                 'study_leaves.created_at', 
-                'study_leaves.status_id', 
+                'study_leave_approvals.status_id', 
                 'statuses.status', 
                 'reference_no',
                 'latest_extensions.extension_status_id',
                 DB::raw('COALESCE(extension_durations.total_extension_days, 0) as total_extension_days')
             )
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->leftJoin(DB::raw('(SELECT study_leave_id, status_id as extension_status_id FROM study_leave_extensions WHERE id IN (SELECT MAX(id) FROM study_leave_extensions GROUP BY study_leave_id)) as latest_extensions'), 'study_leaves.id', '=', 'latest_extensions.study_leave_id')
             ->leftJoin(DB::raw('(SELECT study_leave_id, SUM(DATEDIFF(new_end_date, old_end_date)) as total_extension_days FROM study_leave_extensions WHERE status_id = 1 GROUP BY study_leave_id) as extension_durations'), 'study_leaves.id', '=', 'extension_durations.study_leave_id')
             ->get();
@@ -979,7 +991,12 @@ class StudyLeaveController extends Controller
 
         // Update study leave with validated data
        
-        $studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
+       // $studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
+    //$studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
+
+        // Update the study_leave_approvals table
+        StudyLeaveApproval::where('study_leave_id', $id)
+            ->update(['status_id' => 4,'is_draft' => false]);
 
         return redirect()->route('StudyLeave.create')->with('success', 'Study leave application updated successfully.');
     }
