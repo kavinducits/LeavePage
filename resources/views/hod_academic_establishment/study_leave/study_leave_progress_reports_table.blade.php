@@ -55,7 +55,7 @@
                                         <span class="badge bg-info">{{ $application->status }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('hod.show.studyleave.progressreport', $application->progress_report_id) }}"
+                                        <a href="{{ route('hodacademicestablishment.studyLeaveProgress.view', $application->progress_report_id) }}"
                                             class="btn btn-sm btn-outline-dark" title="View Progress Report">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>

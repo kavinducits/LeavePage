@@ -22,4 +22,12 @@ class StudyLeaveProgressReports extends Model
     {
         return $this->belongsTo(StudyLeave::class, 'study_leave_id');
     }
+
+    /**
+     * Get the approval for this progress report
+     */
+    public function approval()
+    {
+        return $this->hasOne(StudyLeaveProgressReportsApproval::class, 'study_leave_progress_report_id');
+    }
 }

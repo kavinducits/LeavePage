@@ -155,6 +155,7 @@ Route::get('/HODDashboard/extension/{extension_id}', [HODController::class, 'sho
 Route::POST('/HODDashboard/extension/{extension_id}/approve', [HODController::class, 'approveExtension'])->name('hod.extension.approve');
 Route::POST('/HODDashboard/extension/{extension_id}/return', [HODController::class, 'returnExtension'])->name('hod.extension.return');
 Route::get('/HODDashboard/progressreport/{progress_report_id}', [HODController::class, 'showProgressReport'])->name('hod.show.studyleave.progressreport');
+Route::post('/HODDashboard/progressreport/{progress_report_id}/submit', [HODController::class, 'submitProgressReportReview'])->name('hod.progressreport.submit');
 
 
 
@@ -225,6 +226,10 @@ Route::get('/HODAcademicEstablishment', [HODAcademicEstablishmentController::cla
 Route::get('/HODAcademicEstablishment/study-leave', [HODAcademicEstablishmentController::class, 'study_leave'])->name('hodacademicestablishment.studyLeave');
 Route::get('/HODAcademicEstablishment/study-leave-extensions', [HODAcademicEstablishmentController::class, 'study_leave_extenstions'])->name('hodacademicestablishment.studyLeaveExtensions');
 Route::get('/HODAcademicEstablishment/study-leave-progress', [HODAcademicEstablishmentController::class, 'study_leave_progress_reports'])->name('hodacademicestablishment.studyLeaveProgress');
+Route::get('/HODAcademicEstablishment/study-leave-progress/view/{id}', [HODAcademicEstablishmentController::class, 'showProgressReport'])->name('hodacademicestablishment.studyLeaveProgress.view');
+Route::post('/HODAcademicEstablishment/study-leave-progress/view/{id}/submit', [HODAcademicEstablishmentController::class, 'submitProgressReportReview'])->name('hodacademicestablishment.progressreport.submit');
+Route::post('/HODAcademicEstablishment/study-leave-progress/view/{id}/approve', [HODAcademicEstablishmentController::class, 'approveProgressReport'])->name('hodacademicestablishment.progressreport.approve');
+Route::post('/HODAcademicEstablishment/study-leave-progress/view/{id}/return', [HODAcademicEstablishmentController::class, 'returnProgressReport'])->name('hodacademicestablishment.progressreport.return');
 Route::get('/HODAcademicEstablishment/study-leave/view/{id}', [HODAcademicEstablishmentController::class, 'showStudyLeaveApplication'])->name('hodacademicestablishment.studyLeave.view');
 Route::post('/HODAcademicEstablishment/study-leave/view/{id}/approve', [HODAcademicEstablishmentController::class, 'approveStudyLeave'])->name('hodacademicestablishment.studyLeave.approve');
 

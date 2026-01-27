@@ -188,70 +188,8 @@
         </div>
     </div>
 
-    <!-- Action Section -->
-    <div class="card">
-        <div class="card-header bg-dark text-white fw-semibold">
-            <i class="fas fa-tasks me-2"></i>Review Actions
-        </div>
-        <div class="card-body">
-            <div class="mb-3">
-                <label for="actionRemark" class="form-label fw-semibold">HOD Remarks</label>
-                <textarea class="form-control" id="actionRemark" name="remark" rows="4"
-                    placeholder="Add your comments or remarks about this progress report"></textarea>
-                <div id="remarkError" class="form-text text-danger" style="display: none;">
-                    Remarks are required when approve a progress report.
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-start">
-                <form id="returnForm"
-                    action="{{ route('ma.progressreport.return', $progressReport->progress_report_id) }}"
-                    method="POST" class="d-inline">
-                    @csrf
-                    <input type="hidden" id="returnRemarkInput" name="remark" value="">
-
-                </form>
-
-                <div class="text-right">
-                    <form id="approveForm"
-                        action="{{ route('ma.progressreport.approve', $progressReport->progress_report_id) }}"
-                        method="POST" class="d-inline">
-                        @csrf
-                        <input type="hidden" id="approveRemarkInput" name="remark" value="">
-                        <button type="submit" class="btn btn-success btn-lg"
-                            {{ empty($departmentHead) ? 'disabled' : '' }}>
-                            <i class="fas fa-forward me-2"></i>Approve
-                        </button>
-                    </form>
-
-                    @if (isset($departmentHead))
-                        <div class="card mt-2" style="min-width: 260px;">
-                            <div class="card-body py-2">
-                                <div class="d-flex align-items-center">
-                                    <strong>Forward to,&nbsp;</strong>
-                                    <div>
-                                        <div class="fw-semibold">
-                                            {{ $departmentHead->head_title ?? 'Head' }}&nbsp;{{ $departmentHead->head_name ?? '' }}
-                                        </div>
-                                        <div class="text-muted small">{{ $departmentHead->head_position ?? '' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <div class="card mt-2 border-warning" style="min-width: 260px;">
-                            <div class="card-body py-2">
-                                <div class="text-danger">
-                                    <strong>No active Department Head</strong>
-                                    <div class="text-muted small">Forwarding is disabled until a head is active.</div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-        <!-- </div>-->
+    <!-- Include Review Actions Section -->
+    @include('hod_academic_establishment.study_leave.progress_report_review_actions')
 
     </div>
 </section>
@@ -268,51 +206,6 @@
 <!-- AdminLTE App -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-<script>
-    // Form validation and submission handling
-    document.getElementById('approveForm').addEventListener('submit', function(e) {
-        const remarkValue = document.getElementById('actionRemark').value.trim();
-        document.getElementById('approveRemarkInput').value = remarkValue;
-
-        clearRemarkError();
-
-        if (!confirm('Are you sure you want to forward this progress report to the Department Head?')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    document.getElementById('returnForm').addEventListener('submit', function(e) {
-        const remarkValue = document.getElementById('actionRemark').value.trim();
-
-        clearRemarkError();
-
-        if (remarkValue === '') {
-            e.preventDefault();
-            showRemarkError();
-            return false;
-        }
-
-        document.getElementById('returnRemarkInput').value = remarkValue;
-
-        if (!confirm('Are you sure you want to return this progress report to the user?')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    function showRemarkError() {
-        document.getElementById('remarkError').style.display = 'block';
-        document.getElementById('actionRemark').classList.add('is-invalid');
-    }
-
-    function clearRemarkError() {
-        document.getElementById('remarkError').style.display = 'none';
-        document.getElementById('actionRemark').classList.remove('is-invalid');
-    }
-
-    document.getElementById('actionRemark').addEventListener('input', clearRemarkError);
-</script>
 </body>
 
 </html>

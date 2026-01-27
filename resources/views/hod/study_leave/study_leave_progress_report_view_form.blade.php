@@ -254,6 +254,10 @@
         <!-- </div>-->
 
     </div>
+
+    <!-- Include Review Actions Section -->
+    @include('hod.study_leave.progress_report_review_actions')
+
 </section>
 </div>
 

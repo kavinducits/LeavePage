@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\StudyLeave;
 use App\Models\StudyLeaveExtension;
+use App\Models\StudyLeaveProgressReportsApproval;
 
 class MAController extends Controller
 {
@@ -1260,7 +1261,15 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Progress report forwarded to HOD successfully.');
+        // Update approval record - forward to HOD Academic Establishment
+        StudyLeaveProgressReportsApproval::where('study_leave_progress_report_id', $progress_report_id)
+            ->update([
+                'ma_empno' => self::MA_USER_ID,
+                'approval_status_id' => 9, // Processing HOD Academic Establishment
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave')->with('success', 'Progress report forwarded to HOD Academic Establishment successfully.');
     }
 
     /**
@@ -1299,6 +1308,13 @@ class MAController extends Controller
             ->update([
                 'status_id' => 3, // Returned
                 'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        // Update ma_empno in approval record
+        StudyLeaveProgressReportsApproval::where('study_leave_progress_report_id', $progress_report_id)
+            ->update([
+                'ma_empno' => self::MA_USER_ID,
                 'updated_at' => now()
             ]);
 

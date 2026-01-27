@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\StudyLeaveProgressReports;
+use App\Models\StudyLeaveProgressReportsApproval;
 use App\Models\StudyLeave;
 use App\Models\StudyLeaveExtension;
 use Illuminate\Http\Request;
@@ -191,7 +192,7 @@ class StudyLeaveProgressReportsController extends Controller
             }
 
             // Create new progress report record
-            StudyLeaveProgressReports::create([
+            $progressReport = StudyLeaveProgressReports::create([
                 'study_leave_id' => $studyLeaveId,
                 'due_date' => $request->input('due_date'),
                 'submitted_date' => Carbon::now()->format('Y-m-d'),
@@ -200,8 +201,14 @@ class StudyLeaveProgressReportsController extends Controller
                 'status_id' => 4, // Status 4 as per requirement
             ]);
 
+            // Create approval record and forward to MA (status_id = 4: Processing MA)
+            StudyLeaveProgressReportsApproval::create([
+                'study_leave_progress_report_id' => $progressReport->id,
+                'approval_status_id' => 4, // Processing MA
+            ]);
+
             return redirect()->route('StudyLeave.progressReports.show', $studyLeave->id)
-                ->with('success', 'Progress report uploaded successfully!');
+                ->with('success', 'Progress report uploaded successfully and forwarded to MA!');
         }
 
         return redirect()->back()->with('error', 'Failed to upload progress report. Please ensure you selected a valid PDF file.');

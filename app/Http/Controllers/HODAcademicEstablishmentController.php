@@ -61,6 +61,8 @@ class HODAcademicEstablishmentController extends Controller
                 'employees.department_id'
             )
             ->get();
+
+          
            
            
 
@@ -255,12 +257,13 @@ class HODAcademicEstablishmentController extends Controller
         // Get study leave progress report applications for HOD review from assigned departments
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_progress_reports.status_id', 5) // Processing HOD (status_id = 5)
-            ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
+            ->where('study_leave_progress_reports_approval.approval_status_id', 9) // Forwarded to HOD Academic Establishment
+            //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leave_progress_reports.submitted_date')
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
@@ -278,5 +281,256 @@ class HODAcademicEstablishmentController extends Controller
 
        return view('hod_academic_establishment.study_leave_progress_report_dashboard', compact('progressReportApplications'));
        
+    }
+
+    /**
+     * Show progress report details for HOD review
+     */
+    public function showProgressReport($progress_report_id)
+    {
+        
+        $hodEmpNo = self::HOD_EMP_NO;
+        $departmentIds = $this->getHodDepartments();
+
+        // Fetch the progress report with related study leave and employee details
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 9) // Ensure HOD has access
+            //->whereIn('employees.department_id', $departmentIds)
+            ->select(
+                'study_leave_progress_reports.*',
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.*',
+                'study_leaves.scholarship_source as scholarship_source',
+                'study_leaves.scholarship_amount as scholarship_amount',
+                'study_leaves.project_name as project_name',
+                'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
+                'study_leaves.nominee_admin_empno as nominee_admin_empno',
+                'study_leaves.nominee_other_empno as nominee_other_empno',
+                'study_leaves.self_funding_declaration as self_funding_declaration',
+                'study_leaves.placement_letter as placement_letter',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'departments.id as department_id',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status'
+            )
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('error', 'Progress report not found.');
+        }
+
+        $draft_study_leave = $progressReport;
+
+        // Fetch all approved progress reports for this study leave (status_id = 1)
+        $approvedReports = DB::table('study_leave_progress_reports')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.study_leave_id', $progressReport->study_leave_id)
+            ->where('study_leave_progress_reports.status_id', 1) // Approved status
+            ->where('study_leave_progress_reports.id', '!=', $progress_report_id) // Exclude current report
+            ->select(
+                'study_leave_progress_reports.id',
+                'study_leave_progress_reports.due_date',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.document_path',
+                'statuses.status'
+            )
+            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->get();
+
+        // Prepare user object for the view
+        $user = (object) [
+            'empno' => $progressReport->employee_no,
+            'name_with_initials' => $progressReport->name_with_initials,
+            'email' => $progressReport->email,
+            'department' => $progressReport->department,
+            'faculty' => $progressReport->faculty,
+            'designation' => $progressReport->designation
+        ];
+
+        // Get department head information using study_leave_id
+        $departmentHead = null;
+        if ($progressReport->department_id) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions', 'department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $progressReport->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+        $readonly = false;
+
+        return view('hod_academic_establishment.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave', 'departmentHead'));
+    }
+
+    /**
+     * Submit progress report review (approve or return) by HOD Academic Establishment (acting as Registrar)
+     */
+    public function submitProgressReportReview(Request $request, $progress_report_id)
+    {
+        $request->validate([
+            'approval_decision' => 'required|in:approved,not_approved',
+            'remark' => 'nullable|string|max:1000',
+        ]);
+
+        // If not approved, remarks are required
+        if ($request->approval_decision === 'not_approved' && empty(trim($request->remark))) {
+            return redirect()->back()->with('error', 'Remarks are required when returning a progress report.');
+        }
+
+        $hodEmpNo = self::HOD_EMP_NO;
+        $departmentIds = $this->getHodDepartments();
+
+        // Verify the progress report
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 9)
+            //->whereIn('employees.department_id', $departmentIds)
+            ->select('study_leave_progress_reports.*')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('error', 'Progress report not found.');
+        }
+
+            // Approve the progress report
+            DB::table('study_leave_progress_reports_approval')
+                ->where('study_leave_progress_report_id', $progress_report_id)
+                ->update([
+                    'registrar_empno' => $hodEmpNo,
+                    'registrar_approval_status' => 1, // Approved
+                    'registrar_remarks' => $request->remark,
+                    'approval_status_id' => 5, // Approved
+                    'updated_at' => now()
+                ]);
+
+
+            return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('success', 'Progress report approved successfully.');
+      
+    }
+
+    /**
+     * Approve progress report by HOD Academic Establishment (acting as Registrar)
+     */
+    public function approveProgressReport(Request $request, $progress_report_id)
+    {
+        $request->validate([
+            'remark' => 'nullable|string|max:1000',
+        ]);
+
+        $hodEmpNo = self::HOD_EMP_NO;
+        $departmentIds = $this->getHodDepartments();
+
+        // Verify the progress report
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 9)
+            //->whereIn('employees.department_id', $departmentIds)
+            ->select('study_leave_progress_reports.*')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('error', 'Progress report not found.');
+        }
+
+        // Update approval record - approve as registrar
+        DB::table('study_leave_progress_reports_approval')
+            ->where('study_leave_progress_report_id', $progress_report_id)
+            ->update([
+                'registrar_empno' => $hodEmpNo,
+                'registrar_approval_status' => 1, // Approved
+                'registrar_remarks' => $request->remark,
+                'approval_status_id' => 1, // Approved
+                'updated_at' => now()
+            ]);
+
+        // Update progress report status to Approved
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
+            ->update([
+                'status_id' => 1, // Approved
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('success', 'Progress report approved successfully.');
+    }
+
+    /**
+     * Return progress report to MA
+     */
+    public function returnProgressReport(Request $request, $progress_report_id)
+    {
+        $request->validate([
+            'remark' => 'required|string|max:1000',
+        ], [
+            'remark.required' => 'Remarks are required when returning a progress report.'
+        ]);
+
+        $hodEmpNo = self::HOD_EMP_NO;
+        $departmentIds = $this->getHodDepartments();
+
+        // Verify the progress report
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 9)
+            //->whereIn('employees.department_id', $departmentIds)
+            ->select('study_leave_progress_reports.*')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('error', 'Progress report not found.');
+        }
+
+        // Update approval record - return to MA
+        DB::table('study_leave_progress_reports_approval')
+            ->where('study_leave_progress_report_id', $progress_report_id)
+            ->update([
+                'registrar_empno' => $hodEmpNo,
+                'registrar_approval_status' => 2, // Not Approved / Returned
+                'registrar_not_approve_reason' => $request->remark,
+                'registrar_remarks' => $request->remark,
+                'approval_status_id' => 4, // Return to MA (Processing MA)
+                'updated_at' => now()
+            ]);
+
+        // Update progress report status to Processing MA
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
+            ->update([
+                'status_id' => 4, // Processing MA
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('success', 'Progress report returned to MA successfully.');
     }
 }
