@@ -39,11 +39,12 @@ class VCController extends Controller
         // Get all study leave applications for VC review (status_id = 7)
         // Filter by employees.main_branch_id = 52
         $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
-            ->where('study_leaves.status_id', 7) // Processing VC
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_approvals.status_id', 7) // Processing VC
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -120,11 +121,12 @@ class VCController extends Controller
         // Get all study leave applications for VC review (status_id = 7)
         // Filter by employees.main_branch_id = 52
         $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
-            ->where('study_leaves.status_id', 7) // Processing VC
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_approvals.status_id', 7) // Processing VC
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -327,19 +329,35 @@ class VCController extends Controller
     {
         // Fetch study leave application with main_branch_id filtering
         $draft_study_leave = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
             ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 7) // Processing VC
+            ->where('study_leave_approvals.status_id', 7) // Processing VC
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->select(
                 'study_leaves.*',
+                'study_leave_approvals.registrar_empno',
+                'study_leave_approvals.registrar_recommendation',
+                'study_leave_approvals.registrar_not_recommend_reason',
+                'study_leave_approvals.registrar_remarks',
+                'study_leave_approvals.hod_empno',
+                'study_leave_approvals.hod_adequate_staff_available',
+                'study_leave_approvals.hod_teaching_covered',
+                'study_leave_approvals.hod_service_period',
+                'study_leave_approvals.hod_recommend',
+                'study_leave_approvals.hod_not_recommend_reason',
+                'study_leave_approvals.hod_remarks',
+                'study_leave_approvals.dean_empno',
+                'study_leave_approvals.dean_leave_recommendation_status',
+                'study_leave_approvals.dean_not_recommended_reason',
+                'study_leave_approvals.dean_remarks',
                 'employees.employee_no as employee_no',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'employees.email',
@@ -387,11 +405,12 @@ class VCController extends Controller
 
         // Verify the application belongs to employees with main_branch_id = 52
         $application = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 7) // Processing VC
+            ->where('study_leave_approvals.status_id', 7) // Processing VC
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
-            ->select('study_leaves.*')
+            ->select('study_leaves.*', 'study_leave_approvals.id as approval_id')
             ->first();
 
         if (!$application) {
@@ -405,8 +424,8 @@ class VCController extends Controller
         else {
            $stauts_id = 2; // Rejected or sent back for corrections
         }
-        DB::table('study_leaves')
-            ->where('id', $id)
+        DB::table('study_leave_approvals')
+            ->where('id', $application->approval_id)
             ->update([
                 'status_id' => $stauts_id, // Approved (final approval by VC)
                 'vc_empno' => self::VC_EMP_NO,
@@ -414,7 +433,6 @@ class VCController extends Controller
                 'vc_council_covering_approval_status' => $request->vc_approved_council,
                 'vc_not_approve_reason' => $request->vc_not_approve_reason,
                 'vc_remarks' => $request->vc_remarks,
-               // 'vc_reviewed_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]);
           

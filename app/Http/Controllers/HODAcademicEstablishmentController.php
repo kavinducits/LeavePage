@@ -174,38 +174,42 @@ class HODAcademicEstablishmentController extends Controller
 
      public function approveStudyLeave(Request $request, $id)
     {
-        // Validate the HOD review inputs
-       
-        
+        // Validate the Academic Establishment HOD review inputs
+        //dd($request->all());
+        $request->validate([
+            'registrar_recommendation' => 'nullable|string|in:yes,no',
+            'registrar_not_recommend_reason' => 'required_if:registrar_recommendation,no|string|nullable',
+            'registrar_remarks' => 'nullable|string|max:1000',
+        ]);
 
-        // Get department IDs for this HOD
-        $departmentIds = $this->getHodDepartments();
+        $hodEmpNo = self::HOD_EMP_NO;
 
-        // Verify the application belongs to this HOD's departments
+        // Verify the application exists and is in the correct status
         $application = DB::table('study_leaves')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 9) // Processing HOD
-            //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
-            ->select('study_leaves.*')
+            ->where('study_leave_approvals.status_id', 9) // Processing Academic Establishment HOD
+            ->select('study_leaves.*', 'study_leave_approvals.id as approval_id')
             ->first();
 
         if (!$application) {
-            return redirect()->route('hod.show.studyleaves')->with('error', 'Application not found or not accessible.');
+            return redirect()->route('hodacademicestablishment.studyLeave')->with('error', 'Application not found or not accessible.');
         }
 
-        // Update the study leave application with HOD review
-        DB::table('study_leaves')
-            ->where('id', $id)
+        // Update the study_leave_approvals table with Academic Establishment HOD details
+        DB::table('study_leave_approvals')
+            ->where('study_leave_id', $id)
             ->update([
-                'status_id' => 5 // Processing Dean (forward to Department HOD)
-               
+                'status_id' => 5, // Processing Department HOD (forward to applicant's department HOD)
+                'registrar_empno' => $hodEmpNo,
+                'registrar_recommendation' => $request->registrar_recommendation,
+                'registrar_not_recommend_reason' => $request->registrar_not_recommend_reason,
+                'registrar_remarks' => $request->registrar_remarks,
+                'updated_at' => now()
             ]);
           
-        return redirect()->route('hod.index')->with('success', 'Study Leave Application reviewed and forwarded to Dean successfully.');
+        return redirect()->route('hodacademicestablishment.studyLeave')->with('success', 'Study Leave Application reviewed and forwarded to Department HOD successfully.');
     }
-  
-
 
      public function study_leave_extenstions()
     {

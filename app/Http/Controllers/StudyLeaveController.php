@@ -25,6 +25,10 @@ class StudyLeaveController extends Controller
      */
     public function createStudyLeave()
     {
+        // Check if user is logged in
+        if (!session('empno')) {
+            return redirect()->route('login')->with('error', 'Please login to continue.');
+        }
 
         $currentDate = date('Y-m-d');
 
@@ -138,10 +142,18 @@ class StudyLeaveController extends Controller
     {
         $readonly = false;
 
-       $user = $this->getUserBasicInfo(session('study_leave.employee_no') ?? session('empno'));
+        // Check if user is logged in
+        $empno = session('study_leave.employee_no') ?? session('empno');
+        
+        if (!$empno) {
+            return redirect()->route('login')->with('error', 'Please login to continue.');
+        }
 
-        if (!$user)
-            abort(404, 'User not found');
+        $user = $this->getUserBasicInfo($empno);
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Employee record not found. Please contact administrator.');
+        }
 
       
         return view('StudyLeave.createBasicInfo', compact('user',  'readonly'));

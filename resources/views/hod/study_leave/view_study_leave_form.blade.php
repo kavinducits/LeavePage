@@ -32,7 +32,7 @@
         @include('StudyLeave.basic_info_form', ['readonly' => true])
         @include('StudyLeave.details_form', ['readonly' => true])
         @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
-        @include('HOD_Academic_Establishment.study_leave.study_leave_hod_academic_establishment_review_section', ['readonly' => true])
+        @include('hod_academic_establishment.study_leave.study_leave_hod_academic_establishment_review_section', ['readonly' => true])
 
         <!-- HOD Review Section -->
         <form action="{{ route('hod.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="hodReviewForm">

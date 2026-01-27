@@ -67,11 +67,12 @@ class HODController extends Controller
 
         // Get all study leave applications for HOD review from assigned departments
         $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
-            ->where('study_leaves.status_id', 5) // Processing HOD (status_id = 5)
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_approvals.status_id', 5) // Processing HOD (status_id = 5)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -181,11 +182,12 @@ class HODController extends Controller
 
         // Get all study leave applications for HOD review from assigned departments
         $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
-            ->where('study_leaves.status_id', 5) // Processing HOD (status_id = 5)
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_approvals.status_id', 5) // Processing HOD (status_id = 5)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -489,11 +491,12 @@ class HODController extends Controller
         // Get all study leave applications for HOD review from assigned departments
         // Connection: HOD_EMP_NO -> department_heads -> department_id -> employees -> employee_no -> study_leaves
         $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
-            ->where('study_leaves.status_id', 5) // Processing HOD (status_id = 5)
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_approvals.status_id', 5) // Processing HOD (status_id = 5)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -521,6 +524,7 @@ class HODController extends Controller
        
         // Fetch the study leave application with all necessary details
         $draft_study_leave = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -530,7 +534,7 @@ class HODController extends Controller
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
             ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 5) // Processing HOD
+            ->where('study_leave_approvals.status_id', 5) // Processing HOD
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->select(
                 'study_leaves.*',
@@ -548,7 +552,11 @@ class HODController extends Controller
                 DB::raw("CONCAT(admin_nominee_t.initials, ' ', admin_nominee_t.last_name) as admin_nominee_name"),
                 'study_leaves.nominee_other_empno as other_nominee_emp_no',
                 DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
-                'departments.id as department_id'
+                'departments.id as department_id',
+                // Deputy Registrar Review data from study_leave_approvals
+                'study_leave_approvals.registrar_recommendation',
+                'study_leave_approvals.registrar_not_recommend_reason',
+                'study_leave_approvals.registrar_remarks'
                 
             )
             ->first();
@@ -790,20 +798,21 @@ class HODController extends Controller
 
         // Verify the application belongs to this HOD's departments
         $application = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 5) // Processing HOD
+            ->where('study_leave_approvals.status_id', 5) // Processing Department HOD
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
-            ->select('study_leaves.*')
+            ->select('study_leaves.*', 'study_leave_approvals.id as approval_id')
             ->first();
 
         if (!$application) {
             return redirect()->route('hod.show.studyleaves')->with('error', 'Application not found or not accessible.');
         }
 
-        // Update the study leave application with HOD review
-        DB::table('study_leaves')
-            ->where('id', $id)
+        // Update the study_leave_approvals table with Department HOD review
+        DB::table('study_leave_approvals')
+            ->where('study_leave_id', $id)
             ->update([
                 'status_id' => 6, // Processing Dean (forward to Dean)
                 'hod_empno' => self::HOD_EMP_NO,

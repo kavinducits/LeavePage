@@ -32,7 +32,9 @@ class StudyLeaveProgressReportsController extends Controller
 
         // Get existing progress reports
         $progress_reports = StudyLeaveProgressReports::where('study_leave_id', $study_leave->id)
-            ->orderBy('due_date', 'asc')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->select('study_leave_progress_reports.*', 'statuses.status as status_name')
             ->get();
 
         // Calculate if user can upload next report
@@ -158,7 +160,7 @@ class StudyLeaveProgressReportsController extends Controller
     public function uploadProgressReport(Request $request, $study_leave_id)
     {
         $request->validate([
-            'progress_report' => 'required|file|mimes:pdf|max:10240',
+            'progress_report' => 'required|file|mimetypes:application/pdf,application/x-pdf,application/acrobat,text/pdf,text/x-pdf|max:10240',
             'remark' => 'nullable|string|max:1000',
             'due_date' => 'required|date',
         ]);
@@ -171,7 +173,7 @@ class StudyLeaveProgressReportsController extends Controller
         }
 
         // Handle file upload
-        if ($request->hasFile('progress_report')) {
+        if ($request->hasFile('progress_report') && $request->file('progress_report')->isValid()) {
             $file = $request->file('progress_report');
             $empno = $studyLeave->empno;
             $studyLeaveId = $studyLeave->id;
@@ -180,8 +182,13 @@ class StudyLeaveProgressReportsController extends Controller
             // Generate filename: empno_studyleaveid_timestamp_progress_report.pdf
             $filename = $empno . '_' . $studyLeaveId . '_' . $timestamp . '_progress_report.pdf';
             
-            // Store the file in storage/app/study_leave_documents/study_leave_progress_report
-            $path = $file->storeAs('study_leave_documents/study_leave_progress_report', $filename);
+            // Store the file in storage/app/private/study_leave_documents/study_leave_progress_report
+            $path = $file->storeAs('study_leave_documents/study_leave_progress_report', $filename, 'local');
+
+            // Verify the file was stored
+            if (!$path) {
+                return redirect()->back()->with('error', 'Failed to save the progress report file.');
+            }
 
             // Create new progress report record
             StudyLeaveProgressReports::create([
@@ -190,14 +197,44 @@ class StudyLeaveProgressReportsController extends Controller
                 'submitted_date' => Carbon::now()->format('Y-m-d'),
                 'document_path' => $path,
                 'remark' => $request->input('remark'),
-                'status_id' => 4, // Status 3 as per requirement
+                'status_id' => 4, // Status 4 as per requirement
             ]);
 
             return redirect()->route('StudyLeave.progressReports.show', $studyLeave->id)
                 ->with('success', 'Progress report uploaded successfully!');
         }
 
-        return redirect()->back()->with('error', 'Failed to upload progress report.');
+        return redirect()->back()->with('error', 'Failed to upload progress report. Please ensure you selected a valid PDF file.');
+    }
+
+    /**
+     * Delete a returned progress report
+     */
+    public function deleteProgressReport($id)
+    {
+        $progressReport = StudyLeaveProgressReports::findOrFail($id);
+        $studyLeave = StudyLeave::findOrFail($progressReport->study_leave_id);
+
+        // Check authorization
+        if ($studyLeave->empno != session('empno')) {
+            return redirect()->back()->with('error', 'Unauthorized access.');
+        }
+
+        // Only allow deletion of returned reports (status_id = 3)
+        if ($progressReport->status_id != 3) {
+            return redirect()->back()->with('error', 'Only returned progress reports can be deleted.');
+        }
+
+        // Delete the file from storage
+        if ($progressReport->document_path && Storage::disk('local')->exists($progressReport->document_path)) {
+            Storage::disk('local')->delete($progressReport->document_path);
+        }
+
+        // Delete the database record
+        $progressReport->delete();
+
+        return redirect()->route('StudyLeave.progressReports.show', $studyLeave->id)
+            ->with('success', 'Progress report deleted successfully. You can now upload a new report.');
     }
 
     /**

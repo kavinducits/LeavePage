@@ -32,6 +32,7 @@
     @include('StudyLeave.basic_info_form', ['readonly' => true])
     @include('StudyLeave.details_form', ['readonly' => true])
     @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
+    @include('hod_academic_establishment.study_leave.study_leave_hod_academic_establishment_review_section', ['readonly' => true])
     @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => true])
 
     <!-- Dean Review Section -->

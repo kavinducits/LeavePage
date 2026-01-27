@@ -4,6 +4,34 @@
 
 <div class="container-fluid px-4 py-3">
 
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Upload Failed:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -93,8 +121,30 @@
                                     </td>
                                     <td>{{ $dueDate->format('d M Y') }}</td>
                                     <td>
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle me-1"></i>Submitted
+                                        @php
+                                            // Determine badge color based on status_id
+                                            $badgeClass = 'bg-secondary';
+                                            $icon = 'fa-clock';
+                                            
+                                            if($report->status_id == 1) { // Approved
+                                                $badgeClass = 'bg-success';
+                                                $icon = 'fa-check-circle';
+                                            } elseif($report->status_id == 2) { // Rejected
+                                                $badgeClass = 'bg-danger';
+                                                $icon = 'fa-times-circle';
+                                            } elseif($report->status_id == 3) { // Returned
+                                                $badgeClass = 'bg-warning text-dark';
+                                                $icon = 'fa-undo';
+                                            } elseif($report->status_id == 4) { // Processing MA
+                                                $badgeClass = 'bg-info';
+                                                $icon = 'fa-spinner';
+                                            } elseif(in_array($report->status_id, [5, 6, 7, 9])) { // Processing at different levels
+                                                $badgeClass = 'bg-primary';
+                                                $icon = 'fa-hourglass-half';
+                                            }
+                                        @endphp
+                                        <span class="badge {{ $badgeClass }}">
+                                            <i class="fas {{ $icon }} me-1"></i>{{ $report->status_name ?? 'Submitted' }}
                                         </span>
                                     </td>
                                     <td>
@@ -111,10 +161,22 @@
                                         @if($report->remark)
                                             <button type="button" 
                                                     class="btn btn-sm btn-outline-secondary" 
-                                                    data-bs-toggle="tooltip" 
-                                                    title="{{ $report->remark }}">
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#remarksModal{{ $report->id }}">
                                                 <i class="fas fa-comment"></i> Remarks
                                             </button>
+                                        @endif
+                                        @if($report->status_id == 3)
+                                            <form action="{{ route('StudyLeave.progressReport.delete', $report->id) }}" 
+                                                  method="POST" 
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to delete this progress report? You will need to upload a new one.')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash me-1"></i> Delete & Re-upload
+                                                </button>
+                                            </form>
                                         @endif
                                     </td>
                                 </tr>
@@ -198,6 +260,46 @@
 
 </div>
 
+<!-- Remarks Modals -->
+@if($progress_reports->count() > 0)
+    @foreach($progress_reports as $report)
+        @if($report->remark)
+            <div class="modal fade" id="remarksModal{{ $report->id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-maroon text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-comment me-2"></i>Progress Report Remarks
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Report Period:</strong> 
+                                @php
+                                    $dueDate = \Carbon\Carbon::parse($report->due_date);
+                                    $periodStart = $dueDate->copy()->subMonths(6);
+                                @endphp
+                                {{ $periodStart->format('M Y') }} - {{ $dueDate->format('M Y') }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">MA Remarks:</label>
+                                <div class="p-3 bg-light border rounded" style="white-space: pre-wrap;">{{ $report->remark }}</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
+@endif
+
 <!-- Upload New Report Modal -->
 @if($canUploadNext && $nextDueDate)
     @php
@@ -236,20 +338,12 @@
                             <input type="file" 
                                    name="progress_report" 
                                    class="form-control" 
-                                   accept=".pdf"
+                                   accept=".pdf,application/pdf"
                                    required>
                             <small class="text-muted">Only PDF files are allowed (Max: 10MB)</small>
-                        </div>
-
-                        <!-- Remarks -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                Remarks/Comments (Optional)
-                            </label>
-                            <textarea name="remark" 
-                                      class="form-control" 
-                                      rows="4" 
-                                      placeholder="Enter any remarks or comments about this progress report..."></textarea>
+                            @error('progress_report')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

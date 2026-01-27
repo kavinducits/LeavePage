@@ -68,14 +68,34 @@
 
                     <div class="container py-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="mb-0 fw-bold">Pending Study Leave Applications</h2>
-                            <div class="text-muted">Applications Pending Review </div>
+                            <h2 class="mb-0 fw-bold">Study Leave Applications</h2>
+                            <div class="text-muted">
+                                <i class="fas fa-clock mr-1"></i>
+                                Last updated: {{ now()->format('M d, Y h:i A') }}
+                            </div>
                         </div>
+
+                        <!-- Statistics Cards -->
+                        @include('ma.study_leave.statistics_cards', ['statistics' => $statistics])
                        
                         <div class="card">
-                            <div class="card-header bg-primary text-white fw-semibold">
-                                <i class="fas fa-list me-2"></i> Submitted Applications
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="card-title mb-0">
+                                    <i class="fas fa-graduation-cap mr-2"></i>
+                                    Study Leave Applications
+                                    <span class="badge badge-light ml-2">{{ $statistics['pending'] ?? 0 }}</span>
+                                </h3>
                             </div>
+
+                            <!-- Filter and Sort Component -->
+                            @include('ma.study_leave.filter_sort', [
+                                'action' => route('ma.studyleave'),
+                                'search' => $search ?? null,
+                                'sortBy' => $sortBy ?? 'applied_date',
+                                'sortOrder' => $sortOrder ?? 'desc',
+                                'totalResults' => $studyLeaveApplications->count()
+                            ])
+
                             <div class="card-body p-0">
                                 @if ($studyLeaveApplications->count() > 0)
                                     <div class="table-responsive">
@@ -135,9 +155,16 @@
                                         <div class="text-muted mb-3">
                                             <i class="fas fa-inbox fa-3x"></i>
                                         </div>
-                                        <h5 class="text-muted">No Applications Pending</h5>
-                                        <p class="text-muted">There are no applications currently waiting for review.
-                                        </p>
+                                        @if($search ?? false)
+                                            <h5 class="text-muted">No Results Found</h5>
+                                            <p class="text-muted">No applications match your search criteria.</p>
+                                            <a href="{{ route('ma.studyleave') }}" class="btn btn-primary">
+                                                <i class="fas fa-arrow-left me-2"></i>Back to All Applications
+                                            </a>
+                                        @else
+                                            <h5 class="text-muted">No Applications Pending</h5>
+                                            <p class="text-muted">There are no applications currently waiting for review.</p>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -145,7 +172,13 @@
 
                         @if ($studyLeaveApplications->count() > 0)
                             <div class="mt-3 text-muted text-center">
-                                <small>Total Applications: {{ $studyLeaveApplications->count() }}</small>
+                                <small>
+                                    @if($search ?? false)
+                                        <i class="fas fa-filter"></i> Found {{ $studyLeaveApplications->count() }} matching application(s)
+                                    @else
+                                        <i class="fas fa-list"></i> Total Applications: {{ $studyLeaveApplications->count() }}
+                                    @endif
+                                </small>
                             </div>
                         @endif
                     </div>

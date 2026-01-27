@@ -142,6 +142,7 @@ Route::POST('/StudyLeave/view/{id}/extend', [StudyLeaveExtensionController::clas
 // Progress Reports Routes
 Route::get('/StudyLeave/view/{id}/progress-reports', [StudyLeaveProgressReportsController::class, 'showProgressReports'])->name('StudyLeave.progressReports.show');
 Route::POST('/StudyLeave/{study_leave_id}/progress-report/upload', [StudyLeaveProgressReportsController::class, 'uploadProgressReport'])->name('StudyLeave.progressReport.upload');
+Route::DELETE('/StudyLeave/progress-report/{id}/delete', [StudyLeaveProgressReportsController::class, 'deleteProgressReport'])->name('StudyLeave.progressReport.delete');
 Route::get('/StudyLeave/progress-report/files/{filename}', [StudyLeaveProgressReportsController::class, 'serveProgressReportFile'])->name('StudyLeave.serveProgressReport');
 
 Route::get('/StudyLeave/draft/{id}/continue', [StudyLeaveController::class, 'continueDraft'])->name('StudyLeave.continue.draft');
