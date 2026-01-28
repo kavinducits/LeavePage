@@ -22,6 +22,13 @@
                                 <p>Study Leaves Extenstions</p>
                             </a>
                         </li>
+                        
+                        <li class="nav-item">
+                            <a href="{{ route('dean.study.leave.progress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-file-alt"></i>
+                                <p>Study Leave Progress Reports</p>
+                            </a>
+                        </li>
                        
                     </ul>
                 </nav>

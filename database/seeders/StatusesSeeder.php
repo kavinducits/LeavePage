@@ -17,6 +17,8 @@ class StatusesSeeder extends Seeder
             ['stat_id' => 6, 'status' => 'Processing Dean'],
             ['stat_id' => 7, 'status' => 'Processing VC'],
             ['stat_id' => 8, 'status' => 'VC Checked'],
+            ['stat_id' => 9, 'status' => 'Processing HOD Academic Establishment'],
+            ['stat_id' => 10, 'status' => 'Processing Registrar'],
         ];
 
         foreach ($statuses as $status) {

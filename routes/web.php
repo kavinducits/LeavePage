@@ -50,6 +50,7 @@ Route::get('/Deanpage', [DeanController::class, 'leave_index'])->name('dean.inde
 Route::get('/Deanpage/leave', [DeanController::class, 'leave_index'])->name('dean.leave.index');
 Route::get('/Deanpage/studyLeave', [DeanController::class, 'study_leave_index'])->name('dean.study.leave.index');
 Route::get('/Deanpage/studyLeaveExtensions', [DeanController::class, 'study_leave_extensions'])->name('dean.study.leave.extensions');
+Route::get('/Deanpage/studyLeaveProgress', [DeanController::class, 'study_leave_progress_reports'])->name('dean.study.leave.progress');
 Route::get('/Deanpage/{id}', [DeanController::class, 'show'])->name('dean.show');
 Route::post('/Deanpage/{id}/recommend', [DeanController::class, 'recommend'])->name('dean.recommend');
 
@@ -60,11 +61,16 @@ Route::get('/Deanpage/extension/{extension_id}', [DeanController::class, 'showEx
 Route::post('/Deanpage/extension/{extension_id}/approve', [DeanController::class, 'approveExtension'])->name('dean.extension.approve');
 Route::post('/Deanpage/extension/{extension_id}/return', [DeanController::class, 'returnExtension'])->name('dean.extension.return');
 
+// Dean Progress Report routes
+Route::get('/Deanpage/progressreport/{progress_report_id}', [DeanController::class, 'showProgressReport'])->name('dean.show.studyleave.progressreport');
+Route::post('/Deanpage/progressreport/{progress_report_id}/submit', [DeanController::class, 'submitProgressReportReview'])->name('dean.progressreport.submit');
+
 // VC routes (no authentication required)
 Route::get('/VCpage', [VCController::class, 'leave_index'])->name('vc.index');
 Route::get('/VCpage/leave', [VCController::class, 'leave_index'])->name('vc.leave.index');
 Route::get('/VCpage/studyLeave', [VCController::class, 'study_leave_index'])->name('vc.study.leave.index');
 Route::get('/VCpage/studyLeaveExtensions', [VCController::class, 'study_leave_extenstions'])->name('vc.study.leave.extensions');
+Route::get('/VCpage/studyLeaveProgress', [VCController::class, 'study_leave_progress_reports'])->name('vc.study.leave.progress');
 Route::get('/VCpage/{id}', [VCController::class, 'show'])->name('vc.show');
 Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name('vc.recommend');
 
@@ -76,6 +82,10 @@ Route::post('/VCpage/studyleave/view/{id}/approve', [VCController::class, 'appro
 Route::get('/VCpage/extension/{extension_id}', [VCController::class, 'showExtension'])->name('vc.show.extension');
 Route::post('/VCpage/extension/{extension_id}/approve', [VCController::class, 'approveExtension'])->name('vc.extension.approve');
 Route::post('/VCpage/extension/{extension_id}/return', [VCController::class, 'returnExtension'])->name('vc.extension.return');
+
+// VC Progress Report routes
+Route::get('/VCpage/progressreport/{progress_report_id}', [VCController::class, 'showProgressReport'])->name('vc.show.studyleave.progressreport');
+Route::post('/VCpage/progressreport/{progress_report_id}/submit', [VCController::class, 'submitProgressReportReview'])->name('vc.progressreport.submit');
 
 //Study Leave routes (no authentication required)
 //Route::get('/StudyLeave', [StudyLeaveController::class, 'create'])->name('StudyLeave.create');
@@ -232,4 +242,7 @@ Route::post('/HODAcademicEstablishment/study-leave-progress/view/{id}/approve', 
 Route::post('/HODAcademicEstablishment/study-leave-progress/view/{id}/return', [HODAcademicEstablishmentController::class, 'returnProgressReport'])->name('hodacademicestablishment.progressreport.return');
 Route::get('/HODAcademicEstablishment/study-leave/view/{id}', [HODAcademicEstablishmentController::class, 'showStudyLeaveApplication'])->name('hodacademicestablishment.studyLeave.view');
 Route::post('/HODAcademicEstablishment/study-leave/view/{id}/approve', [HODAcademicEstablishmentController::class, 'approveStudyLeave'])->name('hodacademicestablishment.studyLeave.approve');
+Route::get('/HODAcademicEstablishment/extension/{extension_id}', [HODAcademicEstablishmentController::class, 'showExtension'])->name('hodacademicestablishment.show.extension');
+Route::post('/HODAcademicEstablishment/extension/{extension_id}/forward', [HODAcademicEstablishmentController::class, 'forwardExtension'])->name('hodacademicestablishment.extension.forward');
+Route::post('/HODAcademicEstablishment/extension/{extension_id}/return', [HODAcademicEstablishmentController::class, 'returnExtension'])->name('hodacademicestablishment.extension.return');
 

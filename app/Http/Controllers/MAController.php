@@ -1068,17 +1068,17 @@ class MAController extends Controller
             $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
         }
 
-        // Update status to Processing HOD (status_id = 5)
+        // Update status to Processing HOD Academic Establishment/Registrar (status_id = 10)
         DB::table('study_leave_extensions')
             ->where('id', $extension_id)
             ->update([
-                'status_id' => 5, // Processing HOD
+                'status_id' => 10, // Processing HOD Academic Establishment/Registrar
                 'ma_empno' => self::MA_USER_ID,
                 'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Extension request forwarded to HOD successfully.');
+        return redirect()->route('ma.studyleave')->with('success', 'Extension request forwarded to HOD Academic Establishment successfully.');
     }
 
     /**

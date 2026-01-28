@@ -284,6 +284,150 @@ class HODAcademicEstablishmentController extends Controller
     }
 
     /**
+     * Show extension details for HOD Academic Establishment review
+     */
+    public function showExtension($extension_id)
+    {
+        $hodEmpNo = self::HOD_EMP_NO;
+
+        // Fetch the extension with related study leave and employee details
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 10) // Processing HOD Academic Establishment
+            ->select(
+                'study_leave_extensions.*',
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.*',
+                'study_leaves.id as study_leave_id',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'departments.id as department_id',
+                'faculties.faculty_name as faculty',
+                'designations.designation_name as designation',
+                'statuses.status'
+            )
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('hodacademicestablishment.studyLeaveExtensions')->with('error', 'Extension not found.');
+        }
+
+        $draft_study_leave = $extension;
+
+        // Get department head information
+        $departmentHead = null;
+        if ($extension->department_id) {
+            $departmentHead = DB::table('department_heads')
+                ->join('employees', 'department_heads.emp_no', '=', 'employees.employee_no')
+                ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
+                ->leftJoin('categories as head_positions', 'department_heads.head_position', '=', 'head_positions.id')
+                ->where('department_heads.department_id', $extension->department_id)
+                ->where('department_heads.active_status', 1)
+                ->select(
+                    'department_heads.emp_no as head_emp_no',
+                    DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as head_name"),
+                    'categories.category_name as head_title',
+                    'categories.id as head_title_id',
+                    'head_positions.category_name as head_position',
+                    'head_positions.id as head_position_id'
+                )
+                ->first();
+        }
+
+        // Prepare user object for the view
+        $user = (object) [
+            'empno' => $extension->employee_no,
+            'name_with_initials' => $extension->name_with_initials,
+            'email' => $extension->email,
+            'department' => $extension->department,
+            'faculty' => $extension->faculty,
+            'designation' => $extension->designation
+        ];
+
+        $readonly = false;
+
+        return view('hod_academic_establishment.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'departmentHead'));
+    }
+
+    /**
+     * Forward extension to Department HOD (approve at HOD Academic Establishment level)
+     */
+    public function forwardExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'registrar_remarks' => 'nullable|string|max:1000',
+        ]);
+
+        $hodEmpNo = self::HOD_EMP_NO;
+
+        // Verify the extension exists and is in the correct status
+        $extension = DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->where('status_id', 10) // Processing HOD Academic Establishment
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('hodacademicestablishment.studyLeaveExtensions')->with('error', 'Extension not found.');
+        }
+
+        // Update the extension - forward to Department HOD (status_id = 5)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 5, // Processing Department HOD
+                'registrar_empno' => $hodEmpNo,
+                'registrar_remarks' => $request->registrar_remarks,
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('hodacademicestablishment.studyLeaveExtensions')->with('success', 'Extension forwarded to Department HOD successfully.');
+    }
+
+    /**
+     * Return extension to MA
+     */
+    public function returnExtension(Request $request, $extension_id)
+    {
+        $request->validate([
+            'registrar_remarks' => 'required|string|max:1000',
+        ], [
+            'registrar_remarks.required' => 'Remarks are required when returning an extension.'
+        ]);
+
+        $hodEmpNo = self::HOD_EMP_NO;
+
+        // Verify the extension exists and is in the correct status
+        $extension = DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->where('status_id', 10) // Processing HOD Academic Establishment
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('hodacademicestablishment.studyLeaveExtensions')->with('error', 'Extension not found.');
+        }
+
+        // Update the extension - return to MA (status_id = 4)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'status_id' => 4, // Return to MA
+                'registrar_empno' => $hodEmpNo,
+                'registrar_remarks' => $request->registrar_remarks,
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('hodacademicestablishment.studyLeaveExtensions')->with('success', 'Extension returned to MA successfully.');
+    }
+
+    /**
      * Show progress report details for HOD review
      */
     public function showProgressReport($progress_report_id)

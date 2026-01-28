@@ -9,7 +9,7 @@
                 </h2>
                 <p class="text-muted mb-0">Reference No: {{ $extension->reference_no }}</p>
             </div>
-            <a href="{{ route('hod.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('hodacademicestablishment.studyLeaveExtensions') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
             </a>
         </div>
@@ -135,58 +135,23 @@
             </div>
         </div>
 
-        <!-- HOD Review Section -->
-        <form action="{{ route('hod.extension.approve', $extension->extension_id) }}" method="POST" id="hodReviewForm">
+        <!-- HOD Academic Establishment Review Section -->
+        <form action="{{ route('hodacademicestablishment.extension.forward', $extension->extension_id) }}" method="POST" id="hodReviewForm">
             @csrf
 
             <div class="card mt-4">
                 <div class="card-header card-header-dark text-white fw-semibold">
-                    <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
+                    <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
                 </div>
                 <div class="card-body">
 
-                    <!-- Question - Recommendation -->
+                    <!-- Remarks -->
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">
-                            Extension is recommended
-                            <span class="text-danger">*</span>
+                        <label for="registrar_remarks" class="form-label fw-semibold">
+                            Remarks
                         </label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="hod_recommend" id="recommendYes"
-                                value="yes" required>
-                            <label class="form-check-label" for="recommendYes">
-                                Yes
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="hod_recommend" id="recommendNo"
-                                value="no" required>
-                            <label class="form-check-label" for="recommendNo">
-                                No
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Conditional: If not recommended -->
-                    <div class="mb-4" id="notRecommendReasonDiv" style="display: none;">
-                        <label for="hod_not_recommend_reason" class="form-label fw-semibold">
-                            If not recommended, please give reasons
-                            <span class="text-danger">*</span>
-                        </label>
-                        <textarea class="form-control" id="hod_not_recommend_reason" name="hod_not_recommend_reason" rows="4"
-                            placeholder="Please provide detailed reasons for not recommending this extension"></textarea>
-                        <div class="invalid-feedback">
-                            Please provide reasons for not recommending.
-                        </div>
-                    </div>
-
-                    <!-- Any other remarks -->
-                    <div class="mb-4">
-                        <label for="hod_remarks" class="form-label fw-semibold">
-                            Any other remarks
-                        </label>
-                        <textarea class="form-control" id="hod_remarks" name="hod_remarks" rows="3"
-                            placeholder="Add any additional comments or remarks (optional)"></textarea>
+                        <textarea class="form-control" id="registrar_remarks" name="registrar_remarks" rows="3"
+                            placeholder="Add any comments or remarks (optional)"></textarea>
                     </div>
 
                 </div>
@@ -204,20 +169,20 @@
 
                         <div class="text-end">
                             <button type="submit" class="btn btn-success btn-lg" id="submitBtn"
-                                {{ empty($deanInfo) ? 'disabled' : '' }}>
-                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Dean
+                                {{ empty($departmentHead) ? 'disabled' : '' }}>
+                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Department HOD
                             </button>
 
-                            @if (isset($deanInfo))
+                            @if (isset($departmentHead))
                                 <div class="card mt-2" style="min-width: 280px;">
                                     <div class="card-body py-2">
                                         <div class="d-flex align-items-center">
                                             <strong>Forward to,&nbsp;</strong>
                                             <div>
                                                 <div class="fw-semibold">
-                                                    {{ $deanInfo->title ?? 'Dean' }}&nbsp;{{ $deanInfo->initials ?? '' }}&nbsp;{{ $deanInfo->last_name ?? '' }}
+                                                    {{ $departmentHead->head_title ?? 'HOD' }}&nbsp;{{ $departmentHead->head_name ?? '' }}
                                                 </div>
-                                                <div class="text-muted small">{{ $deanInfo->faculty_name ?? '' }}</div>
+                                                <div class="text-muted small">{{ $departmentHead->head_position ?? 'Head of Department' }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -226,8 +191,8 @@
                                 <div class="card mt-2 border-warning" style="min-width: 280px;">
                                     <div class="card-body py-2">
                                         <div class="text-danger">
-                                            <strong>No active Dean found</strong>
-                                            <div class="text-muted small">Forwarding is disabled until a Dean is active.
+                                            <strong>No active Department Head found</strong>
+                                            <div class="text-muted small">Forwarding is disabled until a Department Head is active.
                                             </div>
                                         </div>
                                     </div>
@@ -244,12 +209,12 @@
     <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{{ route('hod.extension.return', $extension->extension_id) }}" method="POST"
+                <form action="{{ route('hodacademicestablishment.extension.return', $extension->extension_id) }}" method="POST"
                     id="returnForm">
                     @csrf
                     <div class="modal-header bg-danger text-white">
                         <h5 class="modal-title" id="returnModalLabel">
-                            <i class="fas fa-undo me-2"></i>Return Extension Request to User
+                            <i class="fas fa-undo me-2"></i>Return Extension Request to MA
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
@@ -257,13 +222,13 @@
                     <div class="modal-body">
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle me-2"></i>
-                            This extension request will be returned to the employee for revision.
+                            This extension request will be returned to MA for revision.
                         </div>
                         <div class="mb-3">
                             <label for="returnRemarks" class="form-label fw-semibold">
                                 Remarks <span class="text-danger">*</span>
                             </label>
-                            <textarea class="form-control" id="returnRemarks" name="hod_remarks" rows="4"
+                            <textarea class="form-control" id="returnRemarks" name="registrar_remarks" rows="4"
                                 placeholder="Please provide reasons for returning this extension request" required></textarea>
                             <div class="invalid-feedback">
                                 Remarks are required when returning an extension request.
@@ -273,7 +238,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-undo me-2"></i>Return to User
+                            <i class="fas fa-undo me-2"></i>Return to MA
                         </button>
                     </div>
                 </form>
@@ -314,42 +279,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Show/hide not recommend reason field
-            const recommendRadios = document.querySelectorAll('input[name="hod_recommend"]');
-            const notRecommendDiv = document.getElementById('notRecommendReasonDiv');
-            const notRecommendTextarea = document.getElementById('hod_not_recommend_reason');
-
-            recommendRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'no') {
-                        notRecommendDiv.style.display = 'block';
-                        notRecommendDiv.classList.add('show');
-                        notRecommendTextarea.required = true;
-                    } else {
-                        notRecommendDiv.style.display = 'none';
-                        notRecommendDiv.classList.remove('show');
-                        notRecommendTextarea.required = false;
-                        notRecommendTextarea.value = '';
-                    }
-                });
-            });
-
             // Form validation
             const hodReviewForm = document.getElementById('hodReviewForm');
             hodReviewForm.addEventListener('submit', function(e) {
-                const recommendValue = document.querySelector('input[name="hod_recommend"]:checked')?.value;
-
-                if (recommendValue === 'no') {
-                    const reason = notRecommendTextarea.value.trim();
-                    if (reason === '') {
-                        e.preventDefault();
-                        notRecommendTextarea.classList.add('is-invalid');
-                        notRecommendTextarea.focus();
-                        return false;
-                    }
-                }
-
-                if (!confirm('Are you sure you want to submit this review and forward to Dean?')) {
+                if (!confirm('Are you sure you want to submit this review and forward to Department HOD?')) {
                     e.preventDefault();
                     return false;
                 }
@@ -366,17 +299,13 @@
                     return false;
                 }
 
-                if (!confirm('Are you sure you want to return this extension request to the user?')) {
+                if (!confirm('Are you sure you want to return this extension request to MA?')) {
                     e.preventDefault();
                     return false;
                 }
             });
 
             // Clear invalid state on input
-            notRecommendTextarea.addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-            });
-
             document.getElementById('returnRemarks').addEventListener('input', function() {
                 this.classList.remove('is-invalid');
             });

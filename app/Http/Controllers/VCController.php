@@ -201,6 +201,38 @@ class VCController extends Controller
         return view('vc.study_leave_extentions_dashboard', compact( 'extensionApplications'));
     }
 
+    /**
+     * Get study leave progress reports for VC review
+     */
+    public function study_leave_progress_reports()
+    {
+        // Get study leave progress report applications for VC review
+        $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports_approval.approval_status_id', 7) // Processing VC (status_id = 7)
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('vc.study_leave_progress_report_dashboard', compact('progressReportApplications'));
+    }
+
 
     public function show($id)
     {
@@ -609,5 +641,169 @@ class VCController extends Controller
             ]);
 
         return redirect()->route('vc.index')->with('success', 'Extension request returned to employee.');
+    }
+
+    /**
+     * Show progress report for VC review
+     */
+    public function showProgressReport($progress_report_id)
+    {
+        // Fetch the progress report with related study leave and employee details
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 7) // Processing VC
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->select(
+                'study_leave_progress_reports.*',
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.*',
+                'study_leaves.scholarship_source as scholarship_source',
+                'study_leaves.scholarship_amount as scholarship_amount',
+                'study_leaves.project_name as project_name',
+                'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
+                'study_leaves.nominee_admin_empno as nominee_admin_empno',
+                'study_leaves.nominee_other_empno as nominee_other_empno',
+                'study_leaves.self_funding_declaration as self_funding_declaration',
+                'study_leaves.placement_letter as placement_letter',
+                'employees.employee_no as employee_no',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'employees.email',
+                'departments.department_name as department',
+                'departments.id as department_id',
+                'faculties.faculty_name as faculty',
+                'faculties.id as faculty_id',
+                'designations.designation_name as designation',
+                'statuses.status',
+                // HOD review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.hod_empno',
+                'study_leave_progress_reports_approval.hod_approval_status',
+                'study_leave_progress_reports_approval.hod_remarks',
+                // Dean review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.dean_empno',
+                'study_leave_progress_reports_approval.dean_approval_status',
+                'study_leave_progress_reports_approval.dean_remarks'
+            )
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('vc.index')->with('error', 'Progress report not found.');
+        }
+
+        $draft_study_leave = $progressReport;
+
+        // Fetch all approved progress reports for this study leave (status_id = 1)
+        $approvedReports = DB::table('study_leave_progress_reports')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.study_leave_id', $progressReport->study_leave_id)
+            ->where('study_leave_progress_reports.status_id', 1) // Approved status
+            ->where('study_leave_progress_reports.id', '!=', $progress_report_id) // Exclude current report
+            ->select(
+                'study_leave_progress_reports.id',
+                'study_leave_progress_reports.due_date',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.document_path',
+                'statuses.status'
+            )
+            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->get();
+
+        // Prepare user object for the view
+        $user = (object) [
+            'empno' => $progressReport->employee_no,
+            'name_with_initials' => $progressReport->name_with_initials,
+            'email' => $progressReport->email,
+            'department' => $progressReport->department,
+            'faculty' => $progressReport->faculty,
+            'designation' => $progressReport->designation
+        ];
+
+        $readonly = false;
+
+        return view('vc.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave'));
+    }
+
+    /**
+     * Submit progress report review (approve or return) by VC
+     */
+    public function submitProgressReportReview(Request $request, $progress_report_id)
+    {
+        $request->validate([
+            'approval_decision' => 'required|in:approved,not_approved',
+            'remark' => 'nullable|string|max:1000',
+        ]);
+
+        // If not approved, remarks are required
+        if ($request->approval_decision === 'not_approved' && empty(trim($request->remark))) {
+            return redirect()->back()->with('error', 'Remarks are required when returning a progress report.');
+        }
+
+        $vcEmpNo = self::VC_EMP_NO;
+
+        // Verify the progress report
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 7) // Processing VC
+            ->where('employees.main_branch_id', 52)
+            ->select('study_leave_progress_reports.*')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('vc.index')->with('error', 'Progress report not found.');
+        }
+
+        if ($request->approval_decision === 'approved') {
+            // Approve (final approval)
+            DB::table('study_leave_progress_reports_approval')
+                ->where('study_leave_progress_report_id', $progress_report_id)
+                ->update([
+                    'vc_empno' => $vcEmpNo,
+                    'vc_approval_status' => 1, // Approved
+                    'vc_remarks' => $request->remark,
+                    'approval_status_id' => 1, // Final Approved
+                    'updated_at' => Carbon::now()
+                ]);
+
+            // Update progress report status to Approved
+            DB::table('study_leave_progress_reports')
+                ->where('id', $progress_report_id)
+                ->update([
+                    'status_id' => 1, // Approved
+                    'updated_at' => Carbon::now()
+                ]);
+
+            return redirect()->route('vc.index')->with('success', 'Progress report approved successfully.');
+        } else {
+            // Return to Dean (not approved)
+            DB::table('study_leave_progress_reports_approval')
+                ->where('study_leave_progress_report_id', $progress_report_id)
+                ->update([
+                    'vc_empno' => $vcEmpNo,
+                    'vc_approval_status' => 2, // Not Approved / Returned
+                    'vc_not_approve_reason' => $request->remark,
+                    'vc_remarks' => $request->remark,
+                    'approval_status_id' => 6, // Return to Dean
+                    'updated_at' => Carbon::now()
+                ]);
+
+            // Update progress report status to Processing Dean
+            DB::table('study_leave_progress_reports')
+                ->where('id', $progress_report_id)
+                ->update([
+                    'status_id' => 6, // Processing Dean
+                    'updated_at' => Carbon::now()
+                ]);
+
+            return redirect()->route('vc.index')->with('success', 'Progress report returned to Dean successfully.');
+        }
     }
 } 
