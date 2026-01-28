@@ -185,7 +185,10 @@
                         @php
                             // Log the next due date and related information to browser console
                             if ($nextDueDate) {
-                                echo "<script>console.log('Next Due Date:', '" . $nextDueDate->format('Y-m-d H:i:s') . "');</script>";
+                                $nextDueDateFormatted = $nextDueDate instanceof \Carbon\Carbon 
+                                    ? $nextDueDate->format('Y-m-d H:i:s') 
+                                    : \Carbon\Carbon::parse($nextDueDate)->format('Y-m-d H:i:s');
+                                echo "<script>console.log('Next Due Date:', '" . $nextDueDateFormatted . "');</script>";
                             } else {
                                 echo "<script>console.log('Next Due Date:', null);</script>";
                             }

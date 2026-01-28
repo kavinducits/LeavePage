@@ -216,7 +216,7 @@ class HODAcademicEstablishmentController extends Controller
      public function study_leave_extenstions()
     {
         // Get department IDs for this HOD
-        $departmentIds = $this->getHodDepartments();
+        //$departmentIds = $this->getHodDepartments();
 
         // Get study leave extension applications for HOD review from assigned departments
         $extensionApplications = DB::table('study_leave_extensions')
@@ -225,8 +225,8 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions.status_id', 6) // Processing HOD Academic Establishment (status_id = 6)
-            ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
+            ->where('study_leave_extensions.status_id', 9) // Processing HOD Academic Establishment (status_id = 9)
+            //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -299,7 +299,7 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions.status_id', 10) // Processing HOD Academic Establishment
+            ->where('study_leave_extensions.status_id', 9) // Processing HOD Academic Establishment
             ->select(
                 'study_leave_extensions.*',
                 'study_leave_extensions.id as extension_id',
@@ -352,9 +352,24 @@ class HODAcademicEstablishmentController extends Controller
             'designation' => $extension->designation
         ];
 
+        // Calculate duration for display
+        $durationDays = 0;
+        $durationMonths = 0;
+        
+        if ($extension->old_end_date && $extension->new_end_date) {
+            $oldDate = $extension->old_end_date instanceof \Carbon\Carbon 
+                ? $extension->old_end_date 
+                : \Carbon\Carbon::parse($extension->old_end_date);
+            $newDate = $extension->new_end_date instanceof \Carbon\Carbon 
+                ? $extension->new_end_date 
+                : \Carbon\Carbon::parse($extension->new_end_date);
+            $durationDays = $oldDate->diffInDays($newDate);
+            $durationMonths = round($durationDays / 30, 1);
+        }
+
         $readonly = false;
 
-        return view('hod_academic_establishment.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'departmentHead'));
+        return view('hod_academic_establishment.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'departmentHead', 'durationDays', 'durationMonths'));
     }
 
     /**
@@ -371,7 +386,7 @@ class HODAcademicEstablishmentController extends Controller
         // Verify the extension exists and is in the correct status
         $extension = DB::table('study_leave_extensions')
             ->where('id', $extension_id)
-            ->where('status_id', 10) // Processing HOD Academic Establishment
+            ->where('status_id', 9) // Processing HOD Academic Establishment
             ->first();
 
         if (!$extension) {
@@ -407,7 +422,7 @@ class HODAcademicEstablishmentController extends Controller
         // Verify the extension exists and is in the correct status
         $extension = DB::table('study_leave_extensions')
             ->where('id', $extension_id)
-            ->where('status_id', 10) // Processing HOD Academic Establishment
+            ->where('status_id', 9) // Processing HOD Academic Establishment
             ->first();
 
         if (!$extension) {

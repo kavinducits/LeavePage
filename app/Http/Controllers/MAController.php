@@ -1068,11 +1068,11 @@ class MAController extends Controller
             $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
         }
 
-        // Update status to Processing HOD Academic Establishment/Registrar (status_id = 10)
+        // Update status to Processing HOD Academic Establishment/Registrar (status_id = 9)
         DB::table('study_leave_extensions')
             ->where('id', $extension_id)
             ->update([
-                'status_id' => 10, // Processing HOD Academic Establishment/Registrar
+                'status_id' => 9, // Processing HOD Academic Establishment/Registrar
                 'ma_empno' => self::MA_USER_ID,
                 'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()

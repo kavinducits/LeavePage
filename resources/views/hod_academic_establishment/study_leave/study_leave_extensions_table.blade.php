@@ -69,7 +69,7 @@
                                         <span class="badge {{ $statusBadge }}">{{ $statusText }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('hod.show.extension', $extension->extension_id) }}"
+                                        <a href="{{ route('hodacademicestablishment.show.extension', $extension->extension_id) }}"
                                             class="btn btn-sm btn-outline-dark" title="View Extension Request">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>

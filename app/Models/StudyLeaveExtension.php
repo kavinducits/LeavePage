@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class StudyLeaveExtension extends Model
 {
     //
-    protected$fillable = [
+    protected $fillable = [
         'study_leave_id',
         'old_end_date',
         'new_end_date',
@@ -21,6 +21,8 @@ class StudyLeaveExtension extends Model
         'loan_handling',
         'ma_empno',
         'ma_remarks',
+        'registrar_empno',
+        'registrar_remarks',
         'hod_empno',
         'hod_adequate_staff_available',
         'hod_teaching_covered',
@@ -33,9 +35,9 @@ class StudyLeaveExtension extends Model
         'dean_remark',
         'dean_not_recommended_reason',
         'vc_empno',
-         'vc_recommend' ,
-                'vc_not_recommend_reason', 
-                'vc_remarks',
+        'vc_recommend',
+        'vc_not_recommend_reason',
+        'vc_remarks',
         'status_id',
     ];
 }
