@@ -27,7 +27,7 @@
                         </thead>
                         <tbody>
                             @foreach ($extensionApplications as $extension)
-                                <tr class="hoverable-row">
+                                <tr>
                                     <td class="px-3">
                                         <span class="fw-semibold text-dark">{{ $extension->reference_no }}</span>
                                         <div class="text-muted small">

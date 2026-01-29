@@ -148,6 +148,7 @@ Route::post('/StudyLeave/view/{id}/edite', [StudyLeaveController::class, 'editeS
 Route::post('/StudyLeave/view/{id}/edite/update', [StudyLeaveController::class, 'updateEditeStudyLeave'])->name('StudyLeave.update.edite.application');
 Route::get('/StudyLeave/view/{id}/extend', [StudyLeaveExtensionController::class, 'showStudyLeaveExtensionForm'])->name('StudyLeave.show.extensionForm');
 Route::POST('/StudyLeave/view/{id}/extend', [StudyLeaveExtensionController::class, 'storeStudyLeaveExtension'])->name('StudyLeave.store.extension');
+Route::PUT('/StudyLeave/extension/{id}/update', [StudyLeaveExtensionController::class, 'updateStudyLeaveExtension'])->name('StudyLeave.update.extension');
 
 // Progress Reports Routes
 Route::get('/StudyLeave/view/{id}/progress-reports', [StudyLeaveProgressReportsController::class, 'showProgressReports'])->name('StudyLeave.progressReports.show');

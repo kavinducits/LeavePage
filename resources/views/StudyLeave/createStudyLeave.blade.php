@@ -619,7 +619,7 @@
                                                 @if ($showProgress)
                                                     <a href="{{ route('StudyLeave.progressReports.show', $leave->id) }}"
                                                         class="btn btn-sm btn-primary" title="Submit Progress Reports">
-                                                        <i class="fas fa-chart-line"></i> Progress
+                                                        <i class="fas fa-chart-line"></i> Progress Reports
                                                     </a>
                                                 @endif
 

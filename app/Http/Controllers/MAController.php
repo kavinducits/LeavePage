@@ -590,7 +590,7 @@ class MAController extends Controller
             ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->where(function($query) {
                 $query->where('statuses.status', 'Processing MA')
-                      ->orWhereNull('study_leave_extensions.status_id');
+                      ->orWhereNotNull('study_leave_extensions.ma_empno');
             })
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
@@ -619,13 +619,18 @@ class MAController extends Controller
 
          $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
-            ->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
-            ->where('statuses.status', 'Processing MA') // Filter for MA Processing status
+            //->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
+            //->where('statuses.status', 'Processing MA') // Filter for MA Processing status
+            ->where(function($query) {
+                $query->where('statuses.status', 'Processing MA')
+                      ->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
+            })
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leaves.id as study_leave_id',

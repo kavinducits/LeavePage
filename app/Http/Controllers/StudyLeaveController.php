@@ -1106,10 +1106,35 @@ class StudyLeaveController extends Controller
                 ->first();
         }
 
-        // Get extensions for this study leave
+        // Get extensions for this study leave with status information
         $extensions = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
-            ->orderBy('created_at', 'desc')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->select('study_leave_extensions.*', 'statuses.status')
+            ->orderBy('study_leave_extensions.created_at', 'desc')
             ->get();
+
+        // Check for pending extension requests (status not approved or rejected)
+        $hasPendingExtension = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
+            ->whereNotIn('status_id', [1, 2]) // Not approved (1) or rejected (2)
+            ->exists();
+
+        // Calculate if extension is allowed
+        $study_leave = StudyLeave::findOrFail($id);
+        $extensionController = new StudyLeaveExtensionController();
+        $totalDurationDays = $extensionController->calculateTotalStudyLeaveDays($study_leave->empno);
+        $threeYearsInDays = 3 * 365;
+        $canExtend = $totalDurationDays < $threeYearsInDays && !$hasPendingExtension;
+        $remainingDays = $threeYearsInDays - $totalDurationDays;
+
+        // Get the last approved extension to determine the new start date
+        $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $id)
+            ->where('status_id', 1) // Only approved extensions
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        $extensionStartDate = $lastApprovedExtension 
+            ? $lastApprovedExtension->new_end_date 
+            : $study_leave->study_leave_to;
 
         // Prepare process status information for stages display
         $processStatus = [
@@ -1120,7 +1145,7 @@ class StudyLeaveController extends Controller
         // Decide which blade to use and readonly status
         $readonly = true;
        
-        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions', 'processStatus'));
+        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions', 'processStatus', 'study_leave', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'hasPendingExtension'));
     }
 
     public function continueDraft($id)

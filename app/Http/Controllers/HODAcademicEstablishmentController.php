@@ -213,10 +213,15 @@ class HODAcademicEstablishmentController extends Controller
         return redirect()->route('hodacademicestablishment.studyLeave')->with('success', 'Study Leave Application reviewed and forwarded to Department HOD successfully.');
     }
 
-     public function study_leave_extenstions()
+     public function study_leave_extenstions(Request $request)
     {
         // Get department IDs for this HOD
         //$departmentIds = $this->getHodDepartments();
+
+        // Get search and sort parameters
+        $search = $request->input('search');
+        $sortBy = $request->input('sort_by', 'extension_applied_date');
+        $sortOrder = $request->input('sort_order', 'desc');
 
         // Get study leave extension applications for HOD review from assigned departments
         $extensionApplications = DB::table('study_leave_extensions')
@@ -227,7 +232,16 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.status_id', 9) // Processing HOD Academic Establishment (status_id = 9)
             //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
-            ->orderByDesc('study_leave_extensions.created_at')
+            ->when($search, function ($query, $search) {
+                return $query->where(function($q) use ($search) {
+                    $q->where('study_leaves.reference_no', 'LIKE', "%{$search}%")
+                      ->orWhere('employees.employee_no', 'LIKE', "%{$search}%")
+                      ->orWhere(DB::raw("CONCAT(employees.initials, ' ', employees.last_name)"), 'LIKE', "%{$search}%")
+                      ->orWhere('departments.department_name', 'LIKE', "%{$search}%")
+                      ->orWhere('faculties.faculty_name', 'LIKE', "%{$search}%")
+                      ->orWhere('statuses.status', 'LIKE', "%{$search}%");
+                });
+            })
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leaves.id as study_leave_id',
@@ -241,11 +255,23 @@ class HODAcademicEstablishmentController extends Controller
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions.created_at as extension_applied_date',
                 'statuses.status as status'
-            )
-            ->get();
+            );
 
+        // Apply sorting
+        $validSortColumns = ['extension_applied_date', 'reference_no', 'empno', 'name_with_initials', 'department', 'faculty', 'status'];
+        if (in_array($sortBy, $validSortColumns)) {
+            if ($sortBy === 'extension_applied_date') {
+                $extensionApplications = $extensionApplications->orderBy('study_leave_extensions.created_at', $sortOrder);
+            } else {
+                $extensionApplications = $extensionApplications->orderBy($sortBy, $sortOrder);
+            }
+        } else {
+            $extensionApplications = $extensionApplications->orderByDesc('study_leave_extensions.created_at');
+        }
 
-        return view('hod_academic_establishment.study_leave_extensions_dashboard', compact( 'extensionApplications'));
+        $extensionApplications = $extensionApplications->get();
+
+        return view('hod_academic_establishment.study_leave_extensions_dashboard', compact('extensionApplications', 'search', 'sortBy', 'sortOrder'));
     }
      public function study_leave_progress_reports()
     {

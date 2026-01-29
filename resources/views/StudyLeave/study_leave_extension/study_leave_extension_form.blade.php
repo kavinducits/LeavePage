@@ -22,7 +22,14 @@
         </div>
     @endif
 
-    @if (!$canExtend)
+    @if(isset($hasPendingExtension) && $hasPendingExtension)
+        <div class="alert alert-warning fw-semibold">
+            <i class="fas fa-hourglass-half me-2"></i>
+            <strong>Pending Extension Request:</strong> You already have an extension request pending approval. You cannot submit a new extension request until the current one is processed.
+        </div>
+    @endif
+
+    @if (!$canExtend && (!isset($hasPendingExtension) || !$hasPendingExtension))
         <div class="alert alert-danger fw-semibold">
             <i class="fas fa-exclamation-triangle me-2"></i>
             <strong>Extension Not Allowed:</strong> The total study leave duration (including approved extensions) has reached or exceeded the 3-year limit.
@@ -30,7 +37,7 @@
         </div>
     @endif
 
-    @if ($canExtend && $remainingDays < 365)
+    @if ($canExtend && $remainingDays < 365 && (!isset($hasPendingExtension) || !$hasPendingExtension))
         <div class="alert alert-warning fw-semibold">
             <i class="fas fa-info-circle me-2"></i>
             <strong>Notice:</strong> You have {{ round($remainingDays / 30, 1) }} months ({{ $remainingDays }} days) remaining before reaching the 3-year limit.
@@ -73,19 +80,24 @@
                             <div class="col-md-6">
                                 <label class="form-label">From </label>
                                 <input type="date" name="old_end_date" id="old_end_date" class="form-control" 
-                                       value="{{optional($study_leave)->study_leave_to ?? ''}}" 
+                                       value="{{ $extensionStartDate ?? optional($study_leave)->study_leave_to ?? '' }}" 
                                        min="{{ date('Y-m-d') }}" 
                                        readonly required>
                                 <div class="invalid-feedback">
                                     Please select a valid start date.
                                 </div>
+                                @if(isset($extensionStartDate) && $extensionStartDate != $study_leave->study_leave_to)
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle"></i> Start date based on previous approved extension end date
+                                    </small>
+                                @endif
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">To <span class="text-danger">*</span></label>
                                 <input type="date" name="new_end_date" id="new_end_date" class="form-control" 
                                        value=''
-                                       min="{{ date('Y-m-d') }}" 
+                                       min="{{ $extensionStartDate ?? optional($study_leave)->study_leave_to ?? date('Y-m-d') }}" 
                                        required 
                                        {{ ($readonly ?? true) || !$canExtend ? 'readonly' : '' }}>
                                 <div class="invalid-feedback">

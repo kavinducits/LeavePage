@@ -64,11 +64,27 @@ class StudyLeaveExtensionController extends Controller
         $totalDurationDays = $this->calculateTotalStudyLeaveDays($study_leave->empno);
         $threeYearsInDays = 3 * 365; // 1095 days
         
-        $canExtend = $totalDurationDays < $threeYearsInDays;
+        // Check for pending extension requests (status not approved or rejected)
+        $hasPendingExtension = StudyLeaveExtension::where('study_leave_id', $id)
+            ->whereNotIn('status_id', [1, 2]) // Not approved (1) or rejected (2)
+            ->exists();
+        
+        $canExtend = $totalDurationDays < $threeYearsInDays && !$hasPendingExtension;
         $remainingDays = $threeYearsInDays - $totalDurationDays;
 
+        // Get the last approved extension to determine the new start date
+        $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $id)
+            ->where('status_id', 1) // Only approved extensions
+            ->orderBy('created_at', 'desc')
+            ->first();
         
-        return view('StudyLeave.study_leave_extension.study_leave_extension_form', compact('study_leave', 'readonly', 'canExtend', 'totalDurationDays', 'remainingDays'));
+        // If there's an approved extension, use its new_end_date as the start date
+        // Otherwise, use the original study leave end date
+        $extensionStartDate = $lastApprovedExtension 
+            ? $lastApprovedExtension->new_end_date 
+            : $study_leave->study_leave_to;
+        
+        return view('StudyLeave.study_leave_extension.study_leave_extension_form', compact('study_leave', 'readonly', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'hasPendingExtension'));
 
 
     }
@@ -196,6 +212,47 @@ class StudyLeaveExtensionController extends Controller
         }
     }
 
+    /**
+     * Update an existing study leave extension (resubmit)
+     */
+    public function updateStudyLeaveExtension(Request $request, $id)
+    {
+        // Find the extension
+        $extension = StudyLeaveExtension::findOrFail($id);
+        
+        // Validate the incoming request data
+        $rules = [
+            'old_end_date' => 'required|date',
+            'new_end_date' => 'required|date|after_or_equal:old_end_date',
+            'reason_for_extension' => 'required|string|max:2000',
+        ];
+        
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $validatedData = $validator->validated();
+        
+        try {
+            // Update the extension
+            $extension->old_end_date = $validatedData['old_end_date'];
+            $extension->new_end_date = $validatedData['new_end_date'];
+            $extension->reason_for_extension = $validatedData['reason_for_extension'];
+            $extension->status_id = 4; // Reset to pending status
+            $extension->save();
+            
+            return redirect()->route('StudyLeave.show.studyLeave', ['id' => $extension->study_leave_id])
+                ->with('success', 'Extension resubmitted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to resubmit extension. Please try again.'])
+                ->withInput();
+        }
+    }
 
 
 }

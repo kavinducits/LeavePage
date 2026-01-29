@@ -27,7 +27,7 @@
                         </thead>
                         <tbody>
                             @foreach ($extensionApplications as $extension)
-                                <tr class="hoverable-row">
+                                <tr>
                                     <td class="px-3">
                                         <span class="fw-semibold text-dark">{{ $extension->reference_no }}</span>
                                         <div class="text-muted small">
@@ -98,12 +98,126 @@
     @endif
 </div>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Custom JavaScript for Search and Sort -->
+<script>
+    $(document).ready(function() {
+        // Auto-submit form when sort options change
+        $('#sort_by, #sort_order').change(function() {
+            $(this).closest('form').submit();
+        });
+
+        // Enter key search
+        $('#search').keypress(function(e) {
+            if (e.which == 13) {
+                $(this).closest('form').submit();
+                return false;
+            }
+        });
+
+        // Clear search when clear button is clicked
+        $('.btn-secondary').click(function(e) {
+            e.preventDefault();
+            $('#search').val('');
+            $('#sort_by').val('extension_applied_date');
+            $('#sort_order').val('desc');
+            window.location.href = '{{ request()->url() }}';
+        });
+    });
+</script>
+
 <style>
+    .info-box {
+        box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+        border-radius: .25rem;
+        background: #fff;
+        display: flex;
+        margin-bottom: 1rem;
+        min-height: 80px;
+        padding: .5rem;
+        position: relative;
+    }
+
+    .info-box-icon {
+        border-radius: .25rem;
+        align-items: center;
+        display: flex;
+        font-size: 1.875rem;
+        justify-content: center;
+        text-align: center;
+        width: 70px;
+    }
+
+    .info-box-icon > i {
+        color: rgba(0,0,0,.15);
+    }
+
+    .bg-info .info-box-icon > i {
+        color: rgba(255,255,255,.6);
+    }
+
+    .bg-warning .info-box-icon > i {
+        color: rgba(255,255,255,.6);
+    }
+
+    .bg-success .info-box-icon > i {
+        color: rgba(255,255,255,.6);
+    }
+
+    .bg-primary .info-box-icon > i {
+        color: rgba(255,255,255,.6);
+    }
+
+    .info-box-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1.2;
+        flex: 1;
+        padding: 0 10px;
+    }
+
+    .info-box-number {
+        display: block;
+        font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    .info-box-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .search-sort-section {
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+
+    .search-results-info {
+        font-size: 0.9rem;
+    }
+
+    .card-tools {
+        float: right;
+    }
+
     .hoverable-row:hover {
         background-color: #f8f9fa;
     }
 
     .table th {
+        background-color: #f8f9fa;
         border-top: none;
         font-weight: 600;
         color: #495057;
@@ -128,3 +242,4 @@
         border-color: #212529;
     }
 </style>
+
