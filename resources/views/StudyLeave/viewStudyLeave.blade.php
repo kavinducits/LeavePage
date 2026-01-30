@@ -22,10 +22,14 @@
            
 
             <!-- Extension History Section (Top) -->
-            @if(isset($extensions) && $extensions->count() > 0){
+            @if((isset($extensions) && $extensions->count() > 0 )|| true)
+            
             @include('StudyLeave.study_leave_extension.extension_history')
-            }
+            
             @endif
+
+            <!-- Progress Reports History Section -->
+            @include('StudyLeave.study_leave_progress_reports.progress_reports_history')
 
             <form method="POST" class="my-4">
                 @csrf

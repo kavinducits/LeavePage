@@ -1113,13 +1113,31 @@ class StudyLeaveController extends Controller
             ->orderBy('study_leave_extensions.created_at', 'desc')
             ->get();
 
+        // Calculate if extension is allowed
+        $study_leave = StudyLeave::findOrFail($id);
+
+        // Get progress reports for this study leave with status information
+        $progressReports = \App\Models\StudyLeaveProgressReports::where('study_leave_id', $id)
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->select('study_leave_progress_reports.*', 'statuses.status')
+            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->get();
+
+        // Check for pending progress report (status not approved or rejected)
+        $hasPendingProgressReport = \App\Models\StudyLeaveProgressReports::where('study_leave_id', $id)
+            ->whereNotIn('status_id', [1, 2]) // Not approved (1) or rejected (2)
+            ->where('submitted_date', '!=', null)
+            ->exists();
+
+        // Calculate if user can upload next progress report
+        $canUploadProgressReport = $this->canUploadProgressReport($study_leave, $progressReports);
+        $nextProgressReportDueDate = $this->calculateNextProgressReportDueDate($study_leave, $progressReports);
+
         // Check for pending extension requests (status not approved or rejected)
         $hasPendingExtension = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
             ->whereNotIn('status_id', [1, 2]) // Not approved (1) or rejected (2)
             ->exists();
 
-        // Calculate if extension is allowed
-        $study_leave = StudyLeave::findOrFail($id);
         $extensionController = new StudyLeaveExtensionController();
         $totalDurationDays = $extensionController->calculateTotalStudyLeaveDays($study_leave->empno);
         $threeYearsInDays = 3 * 365;
@@ -1145,7 +1163,7 @@ class StudyLeaveController extends Controller
         // Decide which blade to use and readonly status
         $readonly = true;
        
-        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions', 'processStatus', 'study_leave', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'hasPendingExtension'));
+        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions', 'progressReports', 'processStatus', 'study_leave', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'hasPendingExtension', 'canUploadProgressReport', 'hasPendingProgressReport', 'nextProgressReportDueDate'));
     }
 
     public function continueDraft($id)
@@ -1263,6 +1281,87 @@ class StudyLeaveController extends Controller
         }
 
         return $years;
+    }
+
+    /**
+     * Check if user can upload next progress report
+     */
+    private function canUploadProgressReport($study_leave, $progressReports)
+    {
+        $today = \Carbon\Carbon::now();
+        $leaveStart = \Carbon\Carbon::parse($study_leave->study_leave_from);
+        
+        // Get the actual end date (considering extensions)
+        $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $study_leave->id)
+            ->where('status_id', 1)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        $leaveEnd = $lastApprovedExtension 
+            ? \Carbon\Carbon::parse($lastApprovedExtension->new_end_date)
+            : \Carbon\Carbon::parse($study_leave->study_leave_to);
+
+        // Can't upload if study leave hasn't started
+        if ($today->lessThan($leaveStart)) {
+            return false;
+        }
+
+        // Can't upload if study leave has ended
+        if ($today->greaterThan($leaveEnd)) {
+            return false;
+        }
+
+        // Check for pending reports (submitted but not approved/rejected)
+        $hasPendingReport = $progressReports->filter(function($report) {
+            return !in_array($report->status_id, [1, 2]) && $report->submitted_date != null;
+        })->count() > 0;
+
+        if ($hasPendingReport) {
+            return false;
+        }
+
+        // If no reports yet, can upload first one (after 6 months)
+        if ($progressReports->count() == 0) {
+            $sixMonthsFromStart = $leaveStart->copy()->addMonths(6);
+            return $today->greaterThanOrEqualTo($sixMonthsFromStart);
+        }
+
+        // Get the last submitted or approved report
+        $lastReport = $progressReports->sortByDesc('due_date')->first();
+        
+        if (!$lastReport) {
+            return true;
+        }
+
+        // Check if at least 6 months have passed since last report's due date
+        $lastDueDate = \Carbon\Carbon::parse($lastReport->due_date);
+        $sixMonthsAfterLast = $lastDueDate->copy()->addMonths(6);
+        
+        return $today->greaterThanOrEqualTo($sixMonthsAfterLast);
+    }
+
+    /**
+     * Calculate the next progress report due date
+     */
+    private function calculateNextProgressReportDueDate($study_leave, $progressReports)
+    {
+        $leaveStart = \Carbon\Carbon::parse($study_leave->study_leave_from);
+        
+        // If no reports yet, first report is due 6 months after start
+        if ($progressReports->count() == 0) {
+            return $leaveStart->copy()->addMonths(6)->format('Y-m-d');
+        }
+
+        // Get the last report
+        $lastReport = $progressReports->sortByDesc('due_date')->first();
+        
+        if (!$lastReport) {
+            return $leaveStart->copy()->addMonths(6)->format('Y-m-d');
+        }
+
+        // Next report is due 6 months after last report's due date
+        $lastDueDate = \Carbon\Carbon::parse($lastReport->due_date);
+        return $lastDueDate->copy()->addMonths(6)->format('Y-m-d');
     }
 
     
