@@ -41,6 +41,9 @@
                                 $dueDate = \Carbon\Carbon::parse($report->due_date);
                                 $submittedDate = $report->submitted_date ? \Carbon\Carbon::parse($report->submitted_date) : null;
                                 
+                                // Calculate period start (6 months before due date)
+                                $periodStart = $dueDate->copy()->subMonths(6);
+                                
                                 // Calculate submission status
                                 $submissionStatus = '';
                                 $submissionBadge = '';
@@ -90,6 +93,10 @@
                                 <td>
                                     <i class="fas fa-calendar-alt text-muted me-1"></i>
                                     {{ $dueDate->format('d M Y') }}
+                                    <br>
+                                    <small class="text-muted">
+                                        {{ $periodStart->format('M Y') }} - {{ $dueDate->format('M Y') }}
+                                    </small>
                                 </td>
                                 <td>
                                     @if($submittedDate)
@@ -352,23 +359,29 @@
                             <strong>Study Leave Reference:</strong> {{ $study_leave->reference_no ?? 'N/A' }}
                         </div>
 
+                        @php
+                            $nextDueDate = isset($nextProgressReportDueDate) && $nextProgressReportDueDate ? \Carbon\Carbon::parse($nextProgressReportDueDate) : null;
+                            $periodStart = $nextDueDate ? $nextDueDate->copy()->subMonths(6) : null;
+                        @endphp
+
+                        @if($nextDueDate)
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Report Period:</strong> 
+                                {{ $periodStart->format('d M Y') }} - {{ $nextDueDate->format('d M Y') }}
+                                <br>
+                                <strong>Due Date:</strong> {{ $nextDueDate->format('d M Y') }}
+                            </div>
+                        @endif
+
+                        <input type="hidden" name="due_date" value="{{ $nextProgressReportDueDate ?? '' }}">
+
                         <div class="card mb-3">
                             <div class="card-header bg-light">
                                 <strong><i class="fas fa-file-upload me-2"></i>Progress Report Details</strong>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3">
-                                    <!-- Due Date -->
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Due Date: <span class="text-danger">*</span></label>
-                                        <input type="date" 
-                                               name="due_date"
-                                               class="form-control" 
-                                               value="{{ $nextProgressReportDueDate ?? '' }}" 
-                                               readonly
-                                               required>
-                                        <small class="text-muted">Progress reports are due every 6 months</small>
-                                    </div>
 
                                     <!-- Remarks -->
                                     <div class="col-12">

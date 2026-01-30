@@ -614,7 +614,7 @@ class HODAcademicEstablishmentController extends Controller
                 ]);
 
 
-            return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('success', 'Progress report approved successfully.');
+            return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('success', 'Progress report approved and forwarded to HOD successfully.');
       
     }
 

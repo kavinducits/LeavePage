@@ -59,3 +59,47 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+
+  @if ($showExtend)
+                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}"
+                                                        class="btn btn-sm btn-success" title="Request Extension">
+                                                        <i class="fas fa-calendar-plus"></i> Extend
+                                                    </a>
+                                                @endif
+
+
+
+                                                
+                                                @if ($showExtend)
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-success" 
+                                                        title="Request Extension"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#addExtensionModal{{ $leave->id }}">
+                                                        <i class="fas fa-calendar-plus"></i> Extend
+                                                    </button>
+                                                @endif
+
+                                               
+
+                                                @if ($showReturnedExtend)
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-warning" 
+                                                        title="Resubmit Returned Extension"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#resubmitExtensionModal{{ $leave->id }}">
+                                                        <i class="fas fa-redo"></i> Return Extend
+                                                    </button>
+                                                @endif
+
+                                                @if ($showProgress)
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-primary" 
+                                                        title="Submit Progress Reports"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#uploadProgressReportModal{{ $leave->id }}">
+                                                        <i class="fas fa-chart-line"></i> Progress Reports
+                                                    </button>
+                                                @endif

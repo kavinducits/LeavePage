@@ -15,3 +15,19 @@
 @section('main-content')
     @include('hod.study_leave.study_leave_index')
 @endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+            // Show success modal
+            $('#successModal').modal('show');
+        @endif
+        
+        @if(session('error'))
+            // Show error modal
+            $('#errorModal').modal('show');
+        @endif
+    });
+</script>
+@endsection

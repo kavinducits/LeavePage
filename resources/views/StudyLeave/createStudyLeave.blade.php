@@ -602,26 +602,6 @@
                                                     </a>
                                                 @endif
 
-                                                @if ($showExtend)
-                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}"
-                                                        class="btn btn-sm btn-success" title="Request Extension">
-                                                        <i class="fas fa-calendar-plus"></i> Extend
-                                                    </a>
-                                                @endif
-
-                                                @if ($showReturnedExtend)
-                                                    <a href="{{ route('StudyLeave.show.extensionForm', $leave->id) }}"
-                                                        class="btn btn-sm btn-warning" title="Resubmit Returned Extension">
-                                                        <i class="fas fa-redo"></i> Return Extend
-                                                    </a>
-                                                @endif
-
-                                                @if ($showProgress)
-                                                    <a href="{{ route('StudyLeave.progressReports.show', $leave->id) }}"
-                                                        class="btn btn-sm btn-primary" title="Submit Progress Reports">
-                                                        <i class="fas fa-chart-line"></i> Progress Reports
-                                                    </a>
-                                                @endif
 
                                                 @if (!$showView && !$showEdit && !$showExtend && !$showProgress && !$showReturnedExtend)
                                                      <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}"
@@ -649,6 +629,425 @@
             </div>
         </div>
     </div>
+
+    <!-- Progress Report Upload Modals -->
+    @if(isset($previousLeaves))
+        @foreach($previousLeaves as $leave)
+            @php
+                $statusValue = $leave->status_id ?? 0;
+                $extensionStatus = $leave->extension_status_id ?? null;
+                $leaveFrom = \Carbon\Carbon::parse($leave->study_leave_from);
+                $leaveTo = \Carbon\Carbon::parse($leave->study_leave_to);
+                $today = \Carbon\Carbon::parse($currentDate);
+                
+                $isInProgress = $today->greaterThanOrEqualTo($leaveFrom) && $today->lessThanOrEqualTo($leaveTo);
+                $hasEnded = $today->greaterThan($leaveTo);
+                $isBeforeThreeMonthsToEnd = $today->lessThan($leaveTo->copy()->subMonths(3));
+                $isWithinThreeMonths = $today->greaterThan($leaveTo->copy()->subMonths(3)) && $today->lessThanOrEqualTo($leaveTo);
+                
+                $showProgressModal = false;
+                if ($extensionStatus !== null) {
+                    if (in_array($extensionStatus, [1, 2, 3, 4, 5, 6, 7, 8])) {
+                        $showProgressModal = true;
+                    }
+                } else {
+                    if ($statusValue == 1 && ($isInProgress || $isWithinThreeMonths || $hasEnded)) {
+                        $showProgressModal = true;
+                    }
+                }
+                
+                // Get progress report data from controller
+                $progressData = isset($leaveProgressData[$leave->id]) ? $leaveProgressData[$leave->id] : null;
+                $canUploadProgressReport = $progressData['canUpload'] ?? false;
+                $hasPendingProgressReport = $progressData['hasPending'] ?? false;
+                $nextProgressReportDueDate = $progressData['nextDueDate'] ?? null;
+                
+                // Calculate period for display
+                $nextDueDate = $nextProgressReportDueDate ? \Carbon\Carbon::parse($nextProgressReportDueDate) : null;
+                $periodStart = $nextDueDate ? $nextDueDate->copy()->subMonths(6) : null;
+            @endphp
+            
+            @if($showProgressModal)
+            <div class="modal fade" id="uploadProgressReportModal{{ $leave->id }}" tabindex="-1" aria-labelledby="uploadProgressReportModalLabel{{ $leave->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #800020; color: white;">
+                            <h5 class="modal-title" id="uploadProgressReportModalLabel{{ $leave->id }}">
+                                <i class="fas fa-upload me-2"></i>Upload Progress Report
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if($hasPendingProgressReport)
+                                <div class="alert alert-warning fw-semibold">
+                                    <i class="fas fa-hourglass-half me-2"></i>
+                                    <strong>Pending Progress Report:</strong> You already have a progress report pending approval. You cannot submit a new progress report until the current one is processed.
+                                </div>
+                            @endif
+
+                            @if(!$canUploadProgressReport && !$hasPendingProgressReport)
+                                <div class="alert alert-danger fw-semibold">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Upload Not Allowed:</strong> You cannot upload a progress report at this time. Please ensure:
+                                    <ul class="mb-0 mt-2">
+                                        <li>Your study leave period has started</li>
+                                        <li>At least 6 months have passed since the last report</li>
+                                        <li>You are within 3 months after study leave end date</li>
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('StudyLeave.progressReport.upload', ['study_leave_id' => $leave->id]) }}" 
+                                  method="POST" 
+                                  enctype="multipart/form-data" 
+                                  class="needs-validation" 
+                                  novalidate>
+                                @csrf
+
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Study Leave Reference:</strong> {{ $leave->reference_no ?? 'N/A' }}
+                                </div>
+
+                                @if($nextDueDate)
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Report Period:</strong> 
+                                        {{ $periodStart->format('d M Y') }} - {{ $nextDueDate->format('d M Y') }}
+                                        <br>
+                                        <strong>Due Date:</strong> {{ $nextDueDate->format('d M Y') }}
+                                    </div>
+                                @endif
+
+                                <input type="hidden" name="due_date" value="{{ $nextProgressReportDueDate ?? '' }}">
+
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <strong><i class="fas fa-file-upload me-2"></i>Progress Report Details</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <!-- Remarks -->
+                                            <div class="col-12">
+                                                <label for="remark{{ $leave->id }}" class="form-label fw-semibold">
+                                                    Remarks/Notes
+                                                </label>
+                                                <textarea name="remark" 
+                                                          id="remark{{ $leave->id }}" 
+                                                          class="form-control" 
+                                                          rows="4" 
+                                                          placeholder="Enter any remarks or notes about this progress report"
+                                                          {{ (!$canUploadProgressReport || $hasPendingProgressReport) ? 'readonly' : '' }}></textarea>
+                                            </div>
+
+                                            <!-- Document Upload -->
+                                            <div class="col-12">
+                                                <label for="progress_report{{ $leave->id }}" class="form-label fw-semibold">
+                                                    Upload Progress Report Document (PDF Only) <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="file" 
+                                                       name="progress_report" 
+                                                       id="progress_report{{ $leave->id }}" 
+                                                       class="form-control" 
+                                                       accept=".pdf,application/pdf" 
+                                                       required
+                                                       {{ (!$canUploadProgressReport || $hasPendingProgressReport) ? 'disabled' : '' }}>
+                                                <small class="text-muted">Accepted format: PDF only (Max size: 10MB)</small>
+                                                <div class="invalid-feedback">
+                                                    Please upload a PDF document.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('StudyLeave.progressReports.show', $leave->id) }}" class="btn btn-info">
+                                        <i class="fas fa-history me-2"></i>View All Reports
+                                    </a>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-2"></i>Cancel
+                                        </button>
+                                        @if($hasPendingProgressReport)
+                                            <button type="button" class="btn btn-warning" disabled>
+                                                <i class="fas fa-hourglass-half me-2"></i>Pending Report Exists
+                                            </button>
+                                        @elseif($canUploadProgressReport)
+                                            <button type="submit" class="btn btn-primary" style="background-color: #800020; border-color: #800020;">
+                                                <i class="fas fa-paper-plane me-2"></i>Upload Progress Report
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                <i class="fas fa-ban me-2"></i>Upload Not Allowed
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+        @endforeach
+    @endif
+
+    <!-- Extension Request Modals -->
+    @if(isset($previousLeaves))
+        @foreach($previousLeaves as $leave)
+            @php
+                $statusValue = $leave->status_id ?? 0;
+                $extensionStatus = $leave->extension_status_id ?? null;
+                $leaveFrom = \Carbon\Carbon::parse($leave->study_leave_from);
+                $leaveTo = \Carbon\Carbon::parse($leave->study_leave_to);
+                $today = \Carbon\Carbon::parse($currentDate);
+                
+                // Calculate extension data
+                $originalDuration = $leaveFrom->diffInDays($leaveTo);
+                $totalExtensionDays = $leave->total_extension_days ?? 0;
+                $totalDurationDays = $originalDuration + $totalExtensionDays;
+                $threeYearsInDays = 3 * 365;
+                $canExtendByDuration = $totalDurationDays < $threeYearsInDays;
+                $remainingDays = $threeYearsInDays - $totalDurationDays;
+                
+                // Get the last approved extension to determine start date
+                $lastApprovedExtension = \App\Models\StudyLeaveExtension::where('study_leave_id', $leave->id)
+                    ->where('status_id', 1)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                
+                $extensionStartDate = $lastApprovedExtension 
+                    ? $lastApprovedExtension->new_end_date 
+                    : $leave->study_leave_to;
+                
+                // Check for pending extension
+                $hasPendingExtension = \App\Models\StudyLeaveExtension::where('study_leave_id', $leave->id)
+                    ->whereNotIn('status_id', [1, 2])
+                    ->exists();
+                
+                // Check for returned extension
+                $returnedExtension = \App\Models\StudyLeaveExtension::where('study_leave_id', $leave->id)
+                    ->where('status_id', 3)
+                    ->first();
+                
+                $showAddExtensionModal = $statusValue == 1 && $canExtendByDuration && !$hasPendingExtension;
+                $showResubmitExtensionModal = $returnedExtension !== null;
+            @endphp
+            
+            <!-- Add New Extension Modal -->
+            @if($showAddExtensionModal)
+            <div class="modal fade" id="addExtensionModal{{ $leave->id }}" tabindex="-1" aria-labelledby="addExtensionModalLabel{{ $leave->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #800020; color: white;">
+                            <h5 class="modal-title" id="addExtensionModalLabel{{ $leave->id }}">
+                                <i class="fas fa-calendar-plus me-2"></i>Request for Study Leave Extension
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if($canExtendByDuration && $remainingDays < 365)
+                                <div class="alert alert-warning fw-semibold">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Notice:</strong> You have {{ round($remainingDays / 30, 1) }} months ({{ $remainingDays }} days) remaining before reaching the 3-year limit.
+                                    <br><small>Current total: {{ round($totalDurationDays / 365, 2) }} years | Maximum: 3 years</small>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('StudyLeave.store.extension', ['id' => $leave->id]) }}" 
+                                  method="POST" 
+                                  enctype="multipart/form-data" 
+                                  class="needs-validation" 
+                                  novalidate>
+                                @csrf
+
+                                <div class="card mb-3">
+                                    <div class="card-header" style="background-color: #800020; color: white;">
+                                        <i class="fas fa-user me-2"></i>Details of the Study Leave Extension - Reference No: {{ $leave->reference_no ?? 'N/A' }}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <!-- Period of Study Leave Requested -->
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">Period of Study Leave Requested <span class="text-danger">*</span></label>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">From</label>
+                                                        <input type="date" 
+                                                               name="old_end_date" 
+                                                               class="form-control" 
+                                                               value="{{ $extensionStartDate }}" 
+                                                               readonly 
+                                                               required>
+                                                        <div class="invalid-feedback">
+                                                            Please select a valid start date.
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">To <span class="text-danger">*</span></label>
+                                                        <input type="date" 
+                                                               name="new_end_date" 
+                                                               class="form-control" 
+                                                               value=""
+                                                               min="{{ $extensionStartDate }}" 
+                                                               required>
+                                                        <div class="invalid-feedback">
+                                                            Please select a valid end date (must be after start date).
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Reason for Extension -->
+                                            <div class="col-12">
+                                                <label for="reason_for_extension{{ $leave->id }}" class="form-label fw-semibold">
+                                                    Reason for Extension <span class="text-danger">*</span>
+                                                </label>
+                                                <textarea name="reason_for_extension" 
+                                                          id="reason_for_extension{{ $leave->id }}" 
+                                                          class="form-control" 
+                                                          rows="4" 
+                                                          placeholder="Enter reason for requesting extension" 
+                                                          required></textarea>
+                                                <div class="invalid-feedback">
+                                                    Please provide a reason for the extension.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}" class="btn btn-info">
+                                        <i class="fas fa-eye me-2"></i>View Study Leave Details
+                                    </a>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-2"></i>Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" style="background-color: #800020; border-color: #800020;">
+                                            <i class="fas fa-paper-plane me-2"></i>Submit Extension Request
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Resubmit Extension Modal -->
+            @if($showResubmitExtensionModal)
+            <div class="modal fade" id="resubmitExtensionModal{{ $leave->id }}" tabindex="-1" aria-labelledby="resubmitExtensionModalLabel{{ $leave->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color: #800020; color: white;">
+                            <h5 class="modal-title" id="resubmitExtensionModalLabel{{ $leave->id }}">
+                                <i class="fas fa-redo me-2"></i>Resubmit Study Leave Extension
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="alert alert-info fw-semibold mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note:</strong> This extension request was returned for revision. Please update the details below and resubmit.
+                            </div>
+
+                            @if($returnedExtension->ma_remarks)
+                                <div class="alert alert-warning mb-3">
+                                    <strong><i class="fas fa-comment-dots me-2"></i>Remarks:</strong>
+                                    <p class="mb-0 mt-2" style="white-space: pre-wrap;">{{ $returnedExtension->ma_remarks }}</p>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('StudyLeave.update.extension', ['id' => $returnedExtension->id]) }}" 
+                                  method="POST" 
+                                  enctype="multipart/form-data" 
+                                  class="needs-validation" 
+                                  novalidate>
+                                @csrf
+                                @method('PUT')
+
+                                <div class="card mb-3">
+                                    <div class="card-header" style="background-color: #800020; color: white;">
+                                        <i class="fas fa-user me-2"></i>Extension Details - Reference No: {{ $leave->reference_no ?? 'N/A' }}
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <!-- Period of Study Leave Requested -->
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">Period of Study Leave Extension <span class="text-danger">*</span></label>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">From</label>
+                                                        <input type="date" 
+                                                               name="old_end_date" 
+                                                               class="form-control" 
+                                                               value="{{ $returnedExtension->old_end_date }}" 
+                                                               readonly 
+                                                               required>
+                                                        <div class="invalid-feedback">
+                                                            Please select a valid start date.
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">To <span class="text-danger">*</span></label>
+                                                        <input type="date" 
+                                                               name="new_end_date" 
+                                                               class="form-control" 
+                                                               value="{{ $returnedExtension->new_end_date }}"
+                                                               min="{{ $returnedExtension->old_end_date }}" 
+                                                               required>
+                                                        <div class="invalid-feedback">
+                                                            Please select a valid end date (must be after start date).
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Reason for Extension -->
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">
+                                                    Reason for Extension <span class="text-danger">*</span>
+                                                </label>
+                                                <textarea name="reason_for_extension" 
+                                                          class="form-control" 
+                                                          rows="4" 
+                                                          placeholder="Enter reason for requesting extension" 
+                                                          required>{{ $returnedExtension->reason_for_extension }}</textarea>
+                                                <div class="invalid-feedback">
+                                                    Please provide a reason for the extension.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ route('StudyLeave.show.studyLeave', $leave->id) }}" class="btn btn-info">
+                                        <i class="fas fa-eye me-2"></i>View Study Leave Details
+                                    </a>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-2"></i>Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" style="background-color: #800020; border-color: #800020;">
+                                            <i class="fas fa-paper-plane me-2"></i>Resubmit Extension Request
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+        @endforeach
+    @endif
 
     <!-- JavaScript for Success Modal -->
     <script>

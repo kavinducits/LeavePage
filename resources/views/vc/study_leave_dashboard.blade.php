@@ -15,3 +15,16 @@
     @include('vc.study_leave_index')
 
 @endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+            $('#successModal').modal('show');
+        @endif
+        @if(session('error'))
+            $('#errorModal').modal('show');
+        @endif
+    });
+</script>
+@endsection

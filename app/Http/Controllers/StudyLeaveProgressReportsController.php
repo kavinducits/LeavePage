@@ -109,7 +109,7 @@ class StudyLeaveProgressReportsController extends Controller
             ->first();
 
         if ($extensions) {
-            return $extensions->new_end_date;
+            return Carbon::parse($extensions->new_end_date);
         }
         else {
             return null;
@@ -135,7 +135,7 @@ class StudyLeaveProgressReportsController extends Controller
         // If no reports yet, first due date is 6 months from start
         if ($progress_reports->count() == 0) {
             if($leaveStart->copy()->addMonths(6)->greaterThan($leaveEnd)) {
-                return $leaveEnd;
+                return Carbon::parse($leaveEnd);
             }
             else{
                 return $leaveStart->copy()->addMonths(6);
@@ -149,7 +149,7 @@ class StudyLeaveProgressReportsController extends Controller
 
         // Don't set due date beyond leave end date
         if ($nextDueDate->greaterThan($leaveEnd)) {
-            return $leaveEnd;
+            return Carbon::parse($leaveEnd);
         }
 
         return $nextDueDate;
@@ -207,7 +207,7 @@ class StudyLeaveProgressReportsController extends Controller
                 'approval_status_id' => 4, // Processing MA
             ]);
 
-            return redirect()->route('StudyLeave.progressReports.show', $studyLeave->id)
+            return redirect()->route('StudyLeave.show.studyLeave', $studyLeave->id)
                 ->with('success', 'Progress report uploaded successfully and forwarded to MA!');
         }
 

@@ -506,7 +506,7 @@ class DeanController extends Controller
                 'updated_at' => now()
             ]);
           
-        return redirect()->route('dean.index')->with('success', 'Study Leave Application reviewed and forwarded to VC successfully.');
+        return redirect()->route('dean.study.leave.index')->with('success', 'Study Leave Application reviewed and forwarded to VC successfully.');
     }
 
     /**

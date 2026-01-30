@@ -5,46 +5,6 @@
         <div class="text-muted">Extension Requests for Review</div>
     </div>
 
-    <!-- Info boxes -->
-    <div class="row mb-4">
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box">
-                <span class="info-box-icon bg-info"><i class="fas fa-calendar-plus"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Total Extensions</span>
-                    <span class="info-box-number">{{ $extensionApplications->count() ?? 0 }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box">
-                <span class="info-box-icon bg-warning"><i class="fas fa-clock"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Pending Review</span>
-                    <span class="info-box-number">{{ isset($extensionApplications) ? $extensionApplications->where('status', 'Processing MA')->count() : 0 }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box">
-                <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Reviewed</span>
-                    <span class="info-box-number">{{ isset($extensionApplications) ? $extensionApplications->whereNotIn('status', ['Processing MA'])->count() : 0 }}</span>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="info-box">
-                <span class="info-box-icon bg-primary"><i class="fas fa-calendar"></i></span>
-                <div class="info-box-content">
-                    <span class="info-box-text">Today</span>
-                    <span class="info-box-number">{{ isset($extensionApplications) ? $extensionApplications->where('extension_applied_date', '>=', now()->startOfDay())->count() : 0 }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="card">
         <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-calendar-plus me-2"></i> Extension Requests

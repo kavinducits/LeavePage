@@ -83,6 +83,50 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="nominee_teaching_destination" name="nominee_teaching_destination" value="{{ old('nominee_teaching_destination', $draft_study_leave->nominee_teaching_destination ?? '') }}">
+                                
+                                @if(!($readonly ?? true))
+                                <!-- Consent Letter Section for Teaching -->
+                                <div class="mt-3 p-3 bg-light border rounded">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="form-label fw-semibold mb-0">
+                                            <i class="fas fa-file-pdf text-danger me-2"></i>Consent Letter
+                                        </label>
+                                        <a href="{{ route('StudyLeave.consentLetter.download') }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-download me-1"></i>Download Template
+                                        </a>
+                                    </div>
+                                    <input type="file" class="form-control" 
+                                           id="consent_letter_teaching" 
+                                           name="consent_letter_teaching" 
+                                           accept="application/pdf">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle"></i> Upload signed consent letter (PDF only)
+                                    </small>
+                                    @if(isset($draft_study_leave->consent_letter_teaching_path) && $draft_study_leave->consent_letter_teaching_path)
+                                        <div class="mt-2 d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-secondary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#previewTeachingModal">
+                                                <i class="fas fa-eye me-1"></i>Preview Uploaded Letter
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="removeConsentLetter('teaching', {{ $draft_study_leave->id }})">
+                                                <i class="fas fa-trash me-1"></i>Remove
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                                @else
+                                @if(isset($draft_study_leave->consent_letter_teaching_path) && $draft_study_leave->consent_letter_teaching_path)
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-secondary" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#previewTeachingModal">
+                                            <i class="fas fa-eye me-1"></i>Preview Consent Letter
+                                        </button>
+                                    </div>
+                                @endif
+                                @endif
                             </div>
 
                             <!-- Nominee Person For Administrative Work -->
@@ -151,6 +195,50 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="nominee_admin_destination" name="nominee_admin_destination" value="{{ old('nominee_admin_destination', $draft_study_leave->nominee_admin_destination ?? '') }}">    
+                                
+                                @if(!($readonly ?? true))
+                                <!-- Consent Letter Section for Administrative -->
+                                <div class="mt-3 p-3 bg-light border rounded">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="form-label fw-semibold mb-0">
+                                            <i class="fas fa-file-pdf text-danger me-2"></i>Consent Letter
+                                        </label>
+                                        <a href="{{ route('StudyLeave.consentLetter.download') }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-download me-1"></i>Download Template
+                                        </a>
+                                    </div>
+                                    <input type="file" class="form-control" 
+                                           id="consent_letter_admin" 
+                                           name="consent_letter_admin" 
+                                           accept="application/pdf">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle"></i> Upload signed consent letter (PDF only)
+                                    </small>
+                                    @if(isset($draft_study_leave->consent_letter_admin_path) && $draft_study_leave->consent_letter_admin_path)
+                                        <div class="mt-2 d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-secondary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#previewAdminModal">
+                                                <i class="fas fa-eye me-1"></i>Preview Uploaded Letter
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="removeConsentLetter('administrative', {{ $draft_study_leave->id }})">
+                                                <i class="fas fa-trash me-1"></i>Remove
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                                @else
+                                @if(isset($draft_study_leave->consent_letter_admin_path) && $draft_study_leave->consent_letter_admin_path)
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-secondary" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#previewAdminModal">
+                                            <i class="fas fa-eye me-1"></i>Preview Consent Letter
+                                        </button>
+                                    </div>
+                                @endif
+                                @endif
                             </div>
 
                             <!--  Nominee Person For Other Work -->
@@ -220,6 +308,49 @@
                                 </div>
                                 <input type="hidden" id="nominee_other_destination" name="nominee_other_destination" value="{{ old('nominee_other_destination', $draft_study_leave->nominee_other_destination ?? '') }}">
                                
+                                @if(!($readonly ?? true))
+                                <!-- Consent Letter Section for Other -->
+                                <div class="mt-3 p-3 bg-light border rounded">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label class="form-label fw-semibold mb-0">
+                                            <i class="fas fa-file-pdf text-danger me-2"></i>Consent Letter
+                                        </label>
+                                        <a href="{{ route('StudyLeave.consentLetter.download') }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-download me-1"></i>Download Template
+                                        </a>
+                                    </div>
+                                    <input type="file" class="form-control" 
+                                           id="consent_letter_other" 
+                                           name="consent_letter_other" 
+                                           accept="application/pdf">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle"></i> Upload signed consent letter (PDF only)
+                                    </small>
+                                    @if(isset($draft_study_leave->consent_letter_other_path) && $draft_study_leave->consent_letter_other_path)
+                                        <div class="mt-2 d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-secondary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#previewOtherModal">
+                                                <i class="fas fa-eye me-1"></i>Preview Uploaded Letter
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="removeConsentLetter('other', {{ $draft_study_leave->id }})">
+                                                <i class="fas fa-trash me-1"></i>Remove
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                                @else
+                                @if(isset($draft_study_leave->consent_letter_other_path) && $draft_study_leave->consent_letter_other_path)
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-secondary" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#previewOtherModal">
+                                            <i class="fas fa-eye me-1"></i>Preview Consent Letter
+                                        </button>
+                                    </div>
+                                @endif
+                                @endif
                             </div>
                           
                         
@@ -678,3 +809,144 @@ $(document).ready(function () {
     });
 });
 </script>
+
+<script>
+function removeConsentLetter(type, studyLeaveId) {
+    if (confirm('Are you sure you want to remove this consent letter? This action cannot be undone.')) {
+        // Show loading state
+        const button = event.target.closest('button');
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+        
+        // Send delete request
+        fetch(`/StudyLeave/consent-letter/remove/${type}/${studyLeaveId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload the page to show updated state
+                window.location.reload();
+            } else {
+                alert(data.message || 'Failed to remove consent letter.');
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while removing the consent letter.');
+            button.disabled = false;
+            button.innerHTML = originalHtml;
+        });
+    }
+}
+</script>
+
+<!-- Preview Modals for Consent Letters -->
+@if(isset($draft_study_leave))
+    <!-- Teaching Consent Letter Preview Modal -->
+    @if(isset($draft_study_leave->consent_letter_teaching_path) && $draft_study_leave->consent_letter_teaching_path)
+    <div class="modal fade" id="previewTeachingModal" tabindex="-1" aria-labelledby="previewTeachingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewTeachingModalLabel">
+                        <i class="fas fa-file-pdf text-danger me-2"></i>Teaching Nominee - Consent Letter
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ route('StudyLeave.consentLetter.view', ['type' => 'teaching', 'id' => $draft_study_leave->id]) }}" 
+                            style="width: 100%; height: 80vh; border: none;"
+                            onerror="this.style.display='none'; document.getElementById('teaching-error').style.display='block';">
+                    </iframe>
+                    <div id="teaching-error" style="display: none; padding: 20px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 48px;"></i>
+                        <p class="mt-3">Unable to preview PDF. <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'teaching', 'id' => $draft_study_leave->id]) }}" target="_blank">Click here to open in new tab</a></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'teaching', 'id' => $draft_study_leave->id]) }}" 
+                       class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i>Open in New Tab
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Administrative Consent Letter Preview Modal -->
+    @if(isset($draft_study_leave->consent_letter_admin_path) && $draft_study_leave->consent_letter_admin_path)
+    <div class="modal fade" id="previewAdminModal" tabindex="-1" aria-labelledby="previewAdminModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewAdminModalLabel">
+                        <i class="fas fa-file-pdf text-danger me-2"></i>Administrative Nominee - Consent Letter
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ route('StudyLeave.consentLetter.view', ['type' => 'administrative', 'id' => $draft_study_leave->id]) }}" 
+                            style="width: 100%; height: 80vh; border: none;"
+                            onerror="this.style.display='none'; document.getElementById('admin-error').style.display='block';">
+                    </iframe>
+                    <div id="admin-error" style="display: none; padding: 20px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 48px;"></i>
+                        <p class="mt-3">Unable to preview PDF. <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'administrative', 'id' => $draft_study_leave->id]) }}" target="_blank">Click here to open in new tab</a></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'administrative', 'id' => $draft_study_leave->id]) }}" 
+                       class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i>Open in New Tab
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Other Consent Letter Preview Modal -->
+    @if(isset($draft_study_leave->consent_letter_other_path) && $draft_study_leave->consent_letter_other_path)
+    <div class="modal fade" id="previewOtherModal" tabindex="-1" aria-labelledby="previewOtherModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewOtherModalLabel">
+                        <i class="fas fa-file-pdf text-danger me-2"></i>Other Work Nominee - Consent Letter
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ route('StudyLeave.consentLetter.view', ['type' => 'other', 'id' => $draft_study_leave->id]) }}" 
+                            style="width: 100%; height: 80vh; border: none;"
+                            onerror="this.style.display='none'; document.getElementById('other-error').style.display='block';">
+                    </iframe>
+                    <div id="other-error" style="display: none; padding: 20px; text-align: center;">
+                        <i class="fas fa-exclamation-triangle text-warning" style="font-size: 48px;"></i>
+                        <p class="mt-3">Unable to preview PDF. <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'other', 'id' => $draft_study_leave->id]) }}" target="_blank">Click here to open in new tab</a></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'other', 'id' => $draft_study_leave->id]) }}" 
+                       class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i>Open in New Tab
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+@endif

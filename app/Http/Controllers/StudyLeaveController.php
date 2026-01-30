@@ -77,7 +77,31 @@ class StudyLeaveController extends Controller
 
         $academicYears = $this->academicYears();
 
-        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate', 'academicYears'));
+        // Calculate progress report data for each leave
+        $leaveProgressData = [];
+        if ($previousLeaves) {
+            foreach ($previousLeaves as $leave) {
+                $progressReports = \App\Models\StudyLeaveProgressReports::where('study_leave_id', $leave->id)
+                    ->orderBy('due_date', 'asc')
+                    ->get();
+                
+                $hasPendingProgressReport = \App\Models\StudyLeaveProgressReports::where('study_leave_id', $leave->id)
+                    ->whereNotIn('status_id', [1, 2])
+                    ->where('submitted_date', '!=', null)
+                    ->exists();
+                
+                $canUpload = $this->canUploadProgressReport($leave, $progressReports);
+                $nextDueDate = $this->calculateNextProgressReportDueDate($leave, $progressReports);
+                
+                $leaveProgressData[$leave->id] = [
+                    'canUpload' => $canUpload,
+                    'hasPending' => $hasPendingProgressReport,
+                    'nextDueDate' => $nextDueDate
+                ];
+            }
+        }
+
+        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate', 'academicYears', 'leaveProgressData'));
     }
 
     /**
@@ -478,9 +502,14 @@ class StudyLeaveController extends Controller
         $draft_study_leave = StudyLeave::where('empno', $empno)
             ->where('is_draft', true)
             ->select(
+                "id",
+                "empno",
                 "nominee_teaching_empno",
                 "nominee_admin_empno",
-                "nominee_other_empno"
+                "nominee_other_empno",
+                "consent_letter_teaching_path",
+                "consent_letter_admin_path",
+                "consent_letter_other_path"
             )
             ->first();
 
@@ -508,6 +537,9 @@ class StudyLeaveController extends Controller
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',
+            'consent_letter_teaching' => 'nullable|file|mimes:pdf|max:5120',
+            'consent_letter_admin' => 'nullable|file|mimes:pdf|max:5120',
+            'consent_letter_other' => 'nullable|file|mimes:pdf|max:5120',
         ]);
 
         // Validate that each employee number exists
@@ -526,7 +558,14 @@ class StudyLeaveController extends Controller
             }
         }
 
-        session(['study_leave' => array_merge(session('study_leave', []), $validatedData)]);
+        // Store only non-file data in session (exclude uploaded files)
+        $sessionData = [
+            'nominee_teaching_empno' => $validatedData['nominee_teaching_empno'],
+            'nominee_admin_empno' => $validatedData['nominee_admin_empno'],
+            'nominee_other_empno' => $validatedData['nominee_other_empno'],
+        ];
+        session(['study_leave' => array_merge(session('study_leave', []), $sessionData)]);
+        
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
         $empno = session('study_leave.employee_no') ?? session('empno');
@@ -535,14 +574,47 @@ class StudyLeaveController extends Controller
             ->first();
 
         if ($draft) {
-            // Update existing draft
-            $draft->update([
+            // Prepare update data
+            $updateData = [
                 'nominee_teaching_empno' => $validatedData['nominee_teaching_empno'],
                 'nominee_admin_empno' => $validatedData['nominee_admin_empno'],
                 'nominee_other_empno' => $validatedData['nominee_other_empno'],
                 'current_step' => 3,
                 'is_draft' => true,
-            ]);
+            ];
+
+            // Handle consent letter uploads
+            $consentLetters = [
+                'teaching' => ['file' => 'consent_letter_teaching', 'path_field' => 'consent_letter_teaching_path'],
+                'administrative' => ['file' => 'consent_letter_admin', 'path_field' => 'consent_letter_admin_path'],
+                'other' => ['file' => 'consent_letter_other', 'path_field' => 'consent_letter_other_path']
+            ];
+
+            foreach ($consentLetters as $type => $config) {
+                if ($request->hasFile($config['file'])) {
+                    $file = $request->file($config['file']);
+                    
+                    // Delete old file if exists
+                    if ($draft->{$config['path_field']}) {
+                        Storage::delete($draft->{$config['path_field']});
+                    }
+                    
+                    // Generate filename: empno_id_referenceNo_type.pdf
+                    $filename = $empno . '_' . $draft->id . '_' . $draft->reference_no . '_' . $type . '.pdf';
+                    
+                    // Store in private directory
+                    $path = $file->storeAs(
+                        'study_leave_documents/consent_letters_nominators/' . $type,
+                        $filename,
+                        'private'
+                    );
+                    
+                    $updateData[$config['path_field']] = $path;
+                }
+            }
+
+            // Update existing draft
+            $draft->update($updateData);
         }
     }
    
@@ -1306,8 +1378,9 @@ class StudyLeaveController extends Controller
             return false;
         }
 
-        // Can't upload if study leave has ended
-        if ($today->greaterThan($leaveEnd)) {
+        // Allow uploads during the leave period and within 3 months after it ends
+        $threeMonthsAfterEnd = $leaveEnd->copy()->addMonths(3);
+        if ($today->greaterThan($threeMonthsAfterEnd)) {
             return false;
         }
 
@@ -1320,24 +1393,26 @@ class StudyLeaveController extends Controller
             return false;
         }
 
-        // If no reports yet, can upload first one (after 6 months)
-        if ($progressReports->count() == 0) {
-            $sixMonthsFromStart = $leaveStart->copy()->addMonths(6);
-            return $today->greaterThanOrEqualTo($sixMonthsFromStart);
-        }
-
-        // Get the last submitted or approved report
-        $lastReport = $progressReports->sortByDesc('due_date')->first();
+        // Calculate which 6-month period we're currently in
+        $monthsSinceStart = $leaveStart->diffInMonths($today);
+        $currentPeriod = floor($monthsSinceStart / 6) + 1; // Period 1, 2, 3, etc.
         
-        if (!$lastReport) {
-            return true;
-        }
-
-        // Check if at least 6 months have passed since last report's due date
-        $lastDueDate = \Carbon\Carbon::parse($lastReport->due_date);
-        $sixMonthsAfterLast = $lastDueDate->copy()->addMonths(6);
+        // Calculate the due date for the current period
+        $currentPeriodDueDate = $leaveStart->copy()->addMonths($currentPeriod * 6);
         
-        return $today->greaterThanOrEqualTo($sixMonthsAfterLast);
+        // If current period's due date is beyond leave end, use leave end date
+        if ($currentPeriodDueDate->greaterThan($leaveEnd)) {
+            $currentPeriodDueDate = $leaveEnd;
+        }
+        
+        // Check if a report already exists for the current period
+        $currentPeriodReport = $progressReports->filter(function($report) use ($currentPeriodDueDate) {
+            $reportDueDate = \Carbon\Carbon::parse($report->due_date);
+            return $reportDueDate->isSameDay($currentPeriodDueDate);
+        })->first();
+        
+        // Can upload if no report exists for current period
+        return $currentPeriodReport === null;
     }
 
     /**
@@ -1345,23 +1420,173 @@ class StudyLeaveController extends Controller
      */
     private function calculateNextProgressReportDueDate($study_leave, $progressReports)
     {
+        $today = \Carbon\Carbon::now();
         $leaveStart = \Carbon\Carbon::parse($study_leave->study_leave_from);
         
-        // If no reports yet, first report is due 6 months after start
-        if ($progressReports->count() == 0) {
-            return $leaveStart->copy()->addMonths(6)->format('Y-m-d');
-        }
-
-        // Get the last report
-        $lastReport = $progressReports->sortByDesc('due_date')->first();
+        // Get the actual end date (considering extensions)
+        $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $study_leave->id)
+            ->where('status_id', 1)
+            ->orderBy('created_at', 'desc')
+            ->first();
         
-        if (!$lastReport) {
-            return $leaveStart->copy()->addMonths(6)->format('Y-m-d');
-        }
+        $leaveEnd = $lastApprovedExtension 
+            ? \Carbon\Carbon::parse($lastApprovedExtension->new_end_date)
+            : \Carbon\Carbon::parse($study_leave->study_leave_to);
 
-        // Next report is due 6 months after last report's due date
-        $lastDueDate = \Carbon\Carbon::parse($lastReport->due_date);
-        return $lastDueDate->copy()->addMonths(6)->format('Y-m-d');
+        // Calculate which 6-month period we're currently in
+        $monthsSinceStart = $leaveStart->diffInMonths($today);
+        $currentPeriod = floor($monthsSinceStart / 6) + 1; // Period 1, 2, 3, etc.
+        
+        // Calculate the due date for the current period
+        $currentPeriodDueDate = $leaveStart->copy()->addMonths($currentPeriod * 6);
+        
+        // If current period's due date is beyond leave end, use leave end date
+        if ($currentPeriodDueDate->greaterThan($leaveEnd)) {
+            $currentPeriodDueDate = $leaveEnd;
+        }
+        
+        return $currentPeriodDueDate->format('Y-m-d');
+    }
+
+    /**
+     * Download consent letter template
+     */
+    public function downloadConsentLetterTemplate()
+    {
+        $filePath = storage_path('app/public/consent_letter_nomination/Consent_Letter_for_Nomination.pdf');
+        
+        if (!file_exists($filePath)) {
+            return back()->with('error', 'Consent letter template not found.');
+        }
+        
+        return response()->download($filePath, 'Consent_Letter_for_Nomination.pdf');
+    }
+
+    /**
+     * View uploaded consent letter
+     */
+    public function viewConsentLetter($type, $id)
+    {
+        // Get authenticated user's employee number from session
+        $userEmpNo = session('empno');
+        
+        if (!$userEmpNo) {
+            abort(403, 'Unauthorized access. Please login.');
+        }
+        
+        // Find the study leave record
+        $studyLeave = StudyLeave::findOrFail($id);
+        
+        // Verify the user owns this study leave (check both empno fields)
+        $sessionStudyLeaveEmpNo = session('study_leave.employee_no');
+        if ($studyLeave->empno !== $userEmpNo && $studyLeave->empno !== $sessionStudyLeaveEmpNo) {
+            abort(403, 'Unauthorized access to this document.');
+        }
+        
+        // Determine which path to use based on type
+        $pathField = '';
+        switch ($type) {
+            case 'teaching':
+                $pathField = 'consent_letter_teaching_path';
+                break;
+            case 'administrative':
+                $pathField = 'consent_letter_admin_path';
+                break;
+            case 'other':
+                $pathField = 'consent_letter_other_path';
+                break;
+            default:
+                abort(404, 'Invalid consent letter type.');
+        }
+        
+        // Get the file path
+        $filePath = $studyLeave->$pathField;
+        
+        if (!$filePath) {
+            abort(404, 'Consent letter not found.');
+        }
+        
+        // Get the full path to the file
+        $fullPath = Storage::disk('private')->path($filePath);
+        
+        if (!file_exists($fullPath)) {
+            abort(404, 'Consent letter file does not exist.');
+        }
+        
+        // Return the file for viewing in browser
+        return response()->file($fullPath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="consent_letter_' . $type . '.pdf"'
+        ]);
+    }
+
+    /**
+     * Remove uploaded consent letter
+     */
+    public function removeConsentLetter($type, $id)
+    {
+        // Get authenticated user's employee number from session
+        $userEmpNo = session('empno');
+        
+        if (!$userEmpNo) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized access. Please login.'], 403);
+        }
+        
+        // Find the study leave record
+        $studyLeave = StudyLeave::findOrFail($id);
+        
+        // Verify the user owns this study leave - check multiple session possibilities
+        $sessionStudyLeaveEmpNo = session('study_leave.employee_no');
+        $isOwner = ($studyLeave->empno === $userEmpNo) || 
+                   ($studyLeave->empno === $sessionStudyLeaveEmpNo) ||
+                   ($sessionStudyLeaveEmpNo === $userEmpNo);
+        
+        if (!$isOwner) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Unauthorized access to this document.',
+                'debug' => [
+                    'studyLeave_empno' => $studyLeave->empno,
+                    'session_empno' => $userEmpNo,
+                    'session_study_leave_empno' => $sessionStudyLeaveEmpNo
+                ]
+            ], 403);
+        }
+        
+        // Determine which path field to use based on type
+        $pathField = '';
+        switch ($type) {
+            case 'teaching':
+                $pathField = 'consent_letter_teaching_path';
+                break;
+            case 'administrative':
+                $pathField = 'consent_letter_admin_path';
+                break;
+            case 'other':
+                $pathField = 'consent_letter_other_path';
+                break;
+            default:
+                return response()->json(['success' => false, 'message' => 'Invalid consent letter type.'], 400);
+        }
+        
+        // Get the file path
+        $filePath = $studyLeave->$pathField;
+        
+        if ($filePath) {
+            // Delete the file from storage
+            if (Storage::disk('private')->exists($filePath)) {
+                Storage::disk('private')->delete($filePath);
+            }
+            
+            // Update database to remove the path
+            $studyLeave->update([
+                $pathField => null
+            ]);
+            
+            return response()->json(['success' => true, 'message' => 'Consent letter removed successfully.']);
+        }
+        
+        return response()->json(['success' => false, 'message' => 'Consent letter not found.'], 404);
     }
 
     

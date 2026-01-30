@@ -41,6 +41,46 @@
             <section class="content">
                 <div class="container-fluid">
 
+                    <!-- Success Modal -->
+                    @if(session('success'))
+                    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg">
+                                <div class="modal-body text-center p-5">
+                                    <div class="mb-4">
+                                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                                    </div>
+                                    <h3 class="fw-bold text-success mb-3">Success!</h3>
+                                    <p class="text-muted mb-4">{{ session('success') }}</p>
+                                    <button type="button" class="btn btn-success px-5 py-2 rounded-pill fw-semibold" data-dismiss="modal">
+                                        <i class="fas fa-check me-2"></i>OK
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Error Modal -->
+                    @if(session('error'))
+                    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg">
+                                <div class="modal-body text-center p-5">
+                                    <div class="mb-4">
+                                        <i class="fas fa-exclamation-circle text-danger" style="font-size: 4rem;"></i>
+                                    </div>
+                                    <h3 class="fw-bold text-danger mb-3">Error</h3>
+                                    <p class="text-muted mb-4">{{ session('error') }}</p>
+                                    <button type="button" class="btn btn-danger px-5 py-2 rounded-pill fw-semibold" data-dismiss="modal">
+                                        <i class="fas fa-times me-2"></i>Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Return Success Modal -->
                     <div class="modal fade" id="returnSuccessModal" tabindex="-1" aria-labelledby="returnSuccessModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
@@ -74,9 +114,6 @@
                                 Last updated: {{ now()->format('M d, Y h:i A') }}
                             </div>
                         </div>
-
-                        <!-- Statistics Cards -->
-                        @include('ma.study_leave.statistics_cards', ['statistics' => $statistics])
                        
                         <div class="card">
                             <div class="card-header bg-primary text-white">
@@ -225,6 +262,16 @@
             @if(session('show_return_modal'))
                 // Use Bootstrap 4 modal
                 $('#returnSuccessModal').modal('show');
+            @endif
+            
+            @if(session('success'))
+                // Show success modal
+                $('#successModal').modal('show');
+            @endif
+            
+            @if(session('error'))
+                // Show error modal
+                $('#errorModal').modal('show');
             @endif
         });
     </script>

@@ -425,6 +425,7 @@ class HODController extends Controller
 
     public function approve(Request $request, $id)
     {
+       
         $request->validate([
             'hod_adequate_staff' => 'required|boolean',
             'hod_teaching_covered' => 'required|boolean',
@@ -480,7 +481,8 @@ class HODController extends Controller
             ]);
 
         $msg = $request->hod_recommend ? 'Application forwarded to Dean.' : 'Application not recommended.';
-        return redirect()->route('hod.index')->with('success', $msg);
+      
+        return redirect()->route('hod.study.leave.index')->with('success', $msg);
     }
 
     public function showStudyLeaves()
@@ -827,7 +829,7 @@ class HODController extends Controller
                 'updated_at' => now()
             ]);
           
-        return redirect()->route('hod.index')->with('success', 'Study Leave Application reviewed and forwarded to Dean successfully.');
+        return redirect()->route('hod.study.leave.index')->with('success', 'Study Leave Application reviewed and forwarded to Dean successfully.');
     }
 
     public function showProgressReport($progress_report_id)

@@ -182,7 +182,7 @@ class StudyLeaveExtensionController extends Controller
         if (!$creationSuccess) {
             return redirect()->back()->withErrors(['error' => 'Failed to submit study leave extension. Please try again.'])->withInput();
         }
-        return redirect()->route('StudyLeave.create')->with('success', 'Study leave extension submitted successfully!');
+        return redirect()->route('StudyLeave.show.studyLeave', $id)->with('success', 'Study leave extension submitted successfully!');
     }
 
 

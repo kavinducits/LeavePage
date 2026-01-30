@@ -111,6 +111,11 @@ Route::get('/StudyLeave/WorkCoveringPersons', [StudyLeaveController::class, 'cre
 Route::post('/StudyLeave/WorkCoveringPersons', [StudyLeaveController::class, 'storeWorkCoveringPersons'])->name('StudyLeave.WorkCoveringPersons.store');
 Route::post('/StudyLeave/WorkCoveringPersons/exit', [StudyLeaveController::class, 'exiteWorkCoveringPersons'])->name('StudyLeave.WorkCoveringPersons.exit');
 
+// Consent Letter Routes
+Route::get('/StudyLeave/consent-letter/download', [StudyLeaveController::class, 'downloadConsentLetterTemplate'])->name('StudyLeave.consentLetter.download');
+Route::get('/StudyLeave/consent-letter/view/{type}/{id}', [StudyLeaveController::class, 'viewConsentLetter'])->name('StudyLeave.consentLetter.view');
+Route::delete('/StudyLeave/consent-letter/remove/{type}/{id}', [StudyLeaveController::class, 'removeConsentLetter'])->name('StudyLeave.consentLetter.remove');
+
 //Handling of
 Route::get('/StudyLeave/Handeling', [StudyLeaveController::class, 'createHandeling'])->name('StudyLeave.Handeling.create');
 Route::post('/StudyLeave/Handeling', [StudyLeaveController::class, 'storeHandeling'])->name('StudyLeave.Handeling.store');
