@@ -7,19 +7,7 @@
             <div class="container py-4">
 
 
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <!-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> -->
-                    </div>
-                @endif
+               
             </div>
            
             @include('hod.study_leave.study_leave_extensions_table')
@@ -60,3 +48,42 @@
         font-size: 0.875rem;
     }
 </style>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Show SweetAlert popup for success messages
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: "{{ session('success') }}",
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#28a745',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        });
+    @endif
+
+    // Show SweetAlert popup for error messages
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: "{{ session('error') }}",
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d33',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        });
+    @endif
+</script>

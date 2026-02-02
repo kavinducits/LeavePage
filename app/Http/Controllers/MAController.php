@@ -511,6 +511,7 @@ class MAController extends Controller
             ->where('study_leaves.is_draft', false) // Only non-draft applications
             ->where(function($q) {
                 $q->where('study_leave_approvals.status_id', 4) // Processing MA (status_id = 4)
+                  ->orWhere('study_leave_approvals.status_id', 8) // VC Checked - awaiting council approval
                   ->orWhereNotNull('study_leave_approvals.ma_empno') // Or MA has processed it
                   ->orWhereNull('study_leave_approvals.id'); // Or no approval record yet (newly submitted)
             });
@@ -629,6 +630,7 @@ class MAController extends Controller
             //->where('statuses.status', 'Processing MA') // Filter for MA Processing status
             ->where(function($query) {
                 $query->where('statuses.status', 'Processing MA')
+                      ->orWhere('statuses.status', 'Editing') // Include reports returned to user
                       ->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
             })
             ->select(
@@ -1140,6 +1142,7 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
@@ -1149,6 +1152,7 @@ class MAController extends Controller
             ->select(
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
+                'study_leave_progress_reports_approval.approval_status_id',
                 'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
@@ -1323,7 +1327,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Progress report returned to user successfully.');
+        return redirect()->route('ma.studyleave')->with('success', 'Progress report returned to user successfully. User can now remove and re-upload the progress report.');
     }
 
      public function serveProgressReportFile($filename)
@@ -1371,6 +1375,58 @@ class MAController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . basename($filename) . '"'
         ]);
+    }
+
+    /**
+     * Approve study leave with council approval
+     */
+    public function approveWithCouncil(Request $request, $id)
+    {
+        $request->validate([
+            'ma_council_approval' => 'required|in:yes,no',
+            'ma_council_remarks' => 'nullable|string|max:1000',
+        ]);
+
+        $maUserId = self::MA_USER_ID;
+
+        // Verify the application is in VC checked status (status_id = 8)
+        $application = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->where('study_leaves.id', $id)
+            ->where('study_leave_approvals.status_id', 8) // VC Checked
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leaves.*', 'study_leave_approvals.id as approval_id')
+            ->first();
+
+        if (!$application) {
+            return redirect()->route('ma.studyleave')->with('error', 'Application not found or not in the correct status.');
+        }
+
+        // Prepare remarks with timestamp
+        $newRemark = '';
+        if ($request->ma_council_remarks) {
+            $timestamp = now()->format('Y-m-d H:i:s');
+            $newRemark = "\n\n[MA Council Approval - " . $timestamp . "]\n" . $request->ma_council_remarks;
+        }
+
+        // Update with council approval - if approved, set status to 1 (Approved)
+        $statusId = $request->ma_council_approval === 'yes' ? 1 : 2; // 1 = Approved, 2 = Not Approved
+
+        DB::table('study_leave_approvals')
+            ->where('id', $application->approval_id)
+            ->update([
+                'status_id' => $statusId,
+                'vc_council_covering_approval_status' => $request->ma_council_approval,
+                'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
+                'updated_at' => now()
+            ]);
+
+        $message = $request->ma_council_approval === 'yes' 
+            ? 'Study leave application approved by council successfully.' 
+            : 'Study leave application not approved by council.';
+
+        return redirect()->route('ma.studyleave')->with('success', $message);
     }
    
     

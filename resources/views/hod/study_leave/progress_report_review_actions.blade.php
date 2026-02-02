@@ -4,25 +4,25 @@
         <i class="fas fa-tasks me-2"></i>Review Actions
     </div>
     <div class="card-body">
-        <!-- HOD Approval Radio Buttons -->
+        <!-- HOD Recommendation Radio Buttons -->
         <div class="mb-4">
-            <label class="form-label fw-semibold">HOD Approval Decision <span class="text-danger">*</span></label>
+            <label class="form-label fw-semibold">HOD Recommendation <span class="text-danger">*</span></label>
             <div class="d-flex gap-4">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="approval_decision" id="approvalYes" value="approved" required>
                     <label class="form-check-label" for="approvalYes">
-                        <i class="fas fa-check-circle text-success me-1"></i> Yes - Approve
+                        <i class="fas fa-check-circle text-success me-1"></i> Recommend
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="approval_decision" id="approvalNo" value="not_approved" required>
                     <label class="form-check-label" for="approvalNo">
-                        <i class="fas fa-times-circle text-danger me-1"></i> No - Return to Registrar
+                        <i class="fas fa-times-circle text-danger me-1"></i> Not Recommend
                     </label>
                 </div>
             </div>
             <div id="approvalError" class="form-text text-danger" style="display: none;">
-                Please select an approval decision.
+                Please select a recommendation.
             </div>
         </div>
 
@@ -31,30 +31,48 @@
             <textarea class="form-control" id="actionRemark" name="remark" rows="4"
                 placeholder="Add your comments or remarks about this progress report"></textarea>
             <div id="remarkError" class="form-text text-danger" style="display: none;">
-                Remarks are required when returning a progress report.
+                Remarks are required when not recommending a progress report.
             </div>
         </div>
 
-        @if (isset($deanInfo))
-            <div class="alert alert-info">
-                <strong><i class="fas fa-info-circle me-2"></i>Forward to:</strong>
-                <div class="mt-2">
-                    <strong>{{ $deanInfo->dean_title ?? 'Dean' }} {{ $deanInfo->dean_name ?? '' }}</strong>
-                </div>
-            </div>
-        @endif
-
         <div class="d-flex justify-content-end align-items-start">
-            <form id="submitForm"
-                action="{{ route('hod.progressreport.submit', $progressReport->progress_report_id) }}"
-                method="POST" class="d-inline">
-                @csrf
-                <input type="hidden" id="approvalDecisionInput" name="approval_decision" value="">
-                <input type="hidden" id="remarkInput" name="remark" value="">
-                <button type="button" onclick="submitHODForm()" class="btn btn-primary btn-lg">
-                    <i class="fas fa-paper-plane me-2"></i>Submit Review
-                </button>
-            </form>
+            <div class="text-right">
+                <form id="submitForm"
+                    action="{{ route('hod.progressreport.submit', $progressReport->progress_report_id) }}"
+                    method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" id="approvalDecisionInput" name="approval_decision" value="">
+                    <input type="hidden" id="remarkInput" name="remark" value="">
+                    <button type="button" onclick="submitHODForm()" class="btn btn-success btn-lg" {{ empty($deanInfo) ? 'disabled' : '' }}>
+                        <i class="fas fa-forward me-2"></i>Forward to Dean
+                    </button>
+                </form>
+
+                @if (isset($deanInfo))
+                    <div class="card mt-2" style="min-width: 260px;">
+                        <div class="card-body py-2">
+                            <div class="d-flex align-items-center">
+                                <strong>Forward to,&nbsp;</strong>
+                                <div>
+                                    <div class="fw-semibold">
+                                        {{ $deanInfo->dean_title ?? 'Dean' }}&nbsp;{{ $deanInfo->dean_name ?? '' }}
+                                    </div>
+                                    <div class="text-muted small">{{ $deanInfo->dean_position ?? '' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="card mt-2 border-warning" style="min-width: 260px;">
+                        <div class="card-body py-2">
+                            <div class="text-danger">
+                                <strong>No active Faculty Dean</strong>
+                                <div class="text-muted small">Forwarding is disabled until a dean is active.</div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -67,13 +85,13 @@
 
         clearErrors();
 
-        // Check if approval decision is selected
+        // Check if recommendation is selected
         if (!approvalDecision) {
             showApprovalError();
             return false;
         }
 
-        // If returning to Registrar (not approved), remarks are required
+        // If not recommending, remarks are required
         if (approvalDecision.value === 'not_approved' && remarkValue === '') {
             showRemarkError();
             return false;
@@ -84,7 +102,7 @@
         document.getElementById('remarkInput').value = remarkValue;
 
         // Confirm submission
-        const action = approvalDecision.value === 'approved' ? 'approve and forward to Dean' : 'return to Registrar';
+        const action = approvalDecision.value === 'approved' ? 'recommend and forward to Dean' : 'not recommend';
         if (confirm(`Are you sure you want to ${action} this progress report?`)) {
             document.getElementById('submitForm').submit();
         }

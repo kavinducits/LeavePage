@@ -643,7 +643,7 @@ class DeanController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('dean.index')->with('success', 'Extension request forwarded to VC successfully.');
+        return redirect()->route('dean.study.leave.extensions')->with('success', 'Extension has been successfully forwarded from Faculty Dean to Vice Chancellor.');
     }
 
     /**
@@ -836,7 +836,7 @@ class DeanController extends Controller
                     'updated_at' => now()
                 ]);
 
-            return redirect()->route('dean.index')->with('success', 'Progress report approved and forwarded to VC successfully.');
+            return redirect()->route('dean.study.leave.progress')->with('success', 'Progress report approved and forwarded to VC successfully.');
         } else {
             // Return to HOD (not approved)
             DB::table('study_leave_progress_reports_approval')

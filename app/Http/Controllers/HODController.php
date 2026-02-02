@@ -741,7 +741,7 @@ class HODController extends Controller
             ]);
            
 
-        return redirect()->route('hod.index')->with('success', 'Extension request forwarded to Dean successfully.');
+        return redirect()->route('hod.study.leave.extensions')->with('success', 'Extension has been successfully forwarded from Department HOD to Faculty Dean.');
     }
 
     /**
@@ -988,7 +988,7 @@ class HODController extends Controller
                     'updated_at' => now()
                 ]);
 
-            return redirect()->route('hod.index')->with('success', 'Progress report approved and forwarded to Dean successfully.');
+            return redirect()->route('hod.study.leave.progress')->with('success', 'Progress report approved and forwarded to Dean successfully.');
         } else {
             // Return to Registrar (not approved)
             DB::table('study_leave_progress_reports_approval')
@@ -1010,7 +1010,7 @@ class HODController extends Controller
                     'updated_at' => now()
                 ]);
 
-            return redirect()->route('hod.index')->with('success', 'Progress report returned to Registrar successfully.');
+            return redirect()->route('hod.study.leave.progress')->with('success', 'Progress report returned to Registrar successfully.');
         }
     }
 }

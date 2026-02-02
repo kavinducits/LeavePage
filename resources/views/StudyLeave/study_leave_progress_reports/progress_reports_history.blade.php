@@ -218,7 +218,25 @@
                                             </div>
 
                                             <!-- Remarks -->
-                                            @if($report->remark)
+                                            @if($report->status_id == 3)
+                                                <!-- Show return message for returned reports -->
+                                                <div class="alert alert-warning mb-3">
+                                                    <h6 class="alert-heading mb-2">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>Report Returned by MA
+                                                    </h6>
+                                                    <p class="mb-0">This progress report has been returned by the Management Assistant. Please review the remarks below, make necessary corrections, and re-upload the document.</p>
+                                                </div>
+                                                @if($report->remark)
+                                                    <div class="card mb-3 border-warning">
+                                                        <div class="card-header bg-warning">
+                                                            <strong><i class="fas fa-comment-dots me-2"></i>Return Remarks from MA</strong>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <p class="mb-0" style="white-space: pre-wrap;">{{ $report->remark }}</p>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @elseif($report->remark)
                                                 <div class="card mb-3">
                                                     <div class="card-header bg-light">
                                                         <strong><i class="fas fa-comment me-2"></i>Remarks</strong>
@@ -241,6 +259,32 @@
                                                            class="btn btn-primary">
                                                             <i class="fas fa-download me-2"></i>Download/View Document
                                                         </a>
+                                                        
+                                                        @if($report->status_id == 3)
+                                                            <!-- Show Remove & Re-upload button for Returned reports -->
+                                                            <button type="button" 
+                                                                    class="btn btn-warning ms-2"
+                                                                    onclick="removeAndReupload({{ $report->id }})">
+                                                                <i class="fas fa-sync-alt me-2"></i>Remove & Re-upload
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @elseif($report->status_id == 3)
+                                                <!-- Show upload button for Returned reports without document -->
+                                                <div class="card mb-3 border-warning">
+                                                    <div class="card-header bg-warning">
+                                                        <strong><i class="fas fa-exclamation-triangle me-2"></i>Action Required</strong>
+                                                    </div>
+                                                    <div class="card-body text-center">
+                                                        <p class="text-danger mb-3">This report was returned. Please upload a new progress report document.</p>
+                                                        <button type="button" 
+                                                                class="btn btn-success"
+                                                                data-bs-dismiss="modal"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#reuploadProgressReportModal{{ $report->id }}">
+                                                            <i class="fas fa-upload me-2"></i>Upload New Document
+                                                        </button>
                                                     </div>
                                                 </div>
                                             @endif
@@ -293,6 +337,77 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Reupload Progress Report Modal (for returned reports) -->
+                            @if($report->status_id == 3)
+                                <div class="modal fade" id="reuploadProgressReportModal{{ $report->id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background-color: #800020; color: white;">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-upload me-2"></i>Re-upload Progress Report - Report #{{ $index + 1 }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form action="{{ route('StudyLeave.progressReport.reupload', ['report_id' => $report->id]) }}" 
+                                                  method="POST" 
+                                                  enctype="multipart/form-data" 
+                                                  id="reupload-form-{{ $report->id }}"
+                                                  class="needs-validation" 
+                                                  novalidate>
+                                                @csrf
+                                                <div class="modal-body">
+                                                    <div class="alert alert-warning">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        <strong>Report Returned:</strong> {{ $report->remark ?? 'Please upload a revised document.' }}
+                                                    </div>
+
+                                                    <div class="alert alert-light border">
+                                                        <strong>Due Date:</strong> {{ $dueDate->format('d M Y') }}<br>
+                                                        <strong>Original Submission:</strong> {{ $submittedDate ? $submittedDate->format('d M Y') : 'N/A' }}
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="document{{ $report->id }}" class="form-label fw-bold">
+                                                            Upload New Document <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="file" 
+                                                               class="form-control" 
+                                                               id="document{{ $report->id }}" 
+                                                               name="document" 
+                                                               accept=".pdf" 
+                                                               required>
+                                                        <div class="form-text">
+                                                            <i class="fas fa-info-circle me-1"></i>
+                                                            PDF only, Maximum 10MB
+                                                        </div>
+                                                        <div class="invalid-feedback">
+                                                            Please select a PDF document.
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="reupload_notes{{ $report->id }}" class="form-label fw-bold">
+                                                            Notes (Optional)
+                                                        </label>
+                                                        <textarea class="form-control" 
+                                                                  id="reupload_notes{{ $report->id }}" 
+                                                                  name="notes" 
+                                                                  rows="3" 
+                                                                  placeholder="Add any notes about changes made..."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-upload me-2"></i>Upload Document
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -461,6 +576,18 @@
             }, false);
         }
 
+        // Form validation for all reupload forms
+        const reuploadForms = document.querySelectorAll('[id^="reupload-form-"]');
+        reuploadForms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
         // File size validation
         const fileInputs = document.querySelectorAll('input[type="file"][accept*=".pdf"]');
         fileInputs.forEach(function(input) {
@@ -473,6 +600,66 @@
             });
         });
     });
+
+    // Function to handle remove and reupload
+    function removeAndReupload(reportId) {
+        Swal.fire({
+            title: 'Remove Existing Document?',
+            text: "This will remove your current progress report document. You'll need to upload a new one.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, remove it',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Removing document...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Submit form to remove document
+                fetch(`{{ url('studyleave/progressreport/remove') }}/${reportId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Document Removed',
+                            text: 'You can now upload a new document.',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to remove document'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while removing the document'
+                    });
+                });
+            }
+        });
+    }
 </script>
 
 <style>

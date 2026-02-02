@@ -430,8 +430,7 @@ class VCController extends Controller
         // Validate the VC review inputs
         $request->validate([
             'vc_recommend_committee' => 'required|string',
-            'vc_approved_council' => 'required|string',
-            'vc_not_approve_reason' => 'required_if:vc_approved_council,no|string|nullable',
+            'vc_not_approve_reason' => 'required_if:vc_recommend_committee,no|string|nullable',
             'vc_remarks' => 'nullable|string',
         ]);
 
@@ -459,7 +458,7 @@ class VCController extends Controller
         DB::table('study_leave_approvals')
             ->where('id', $application->approval_id)
             ->update([
-                'status_id' => $stauts_id, // Approved (final approval by VC)
+                'status_id' => 8, // VC checked status
                 'vc_empno' => self::VC_EMP_NO,
                 'vc_recommend_submit_to_committee' => $request->vc_recommend_committee,
                 'vc_council_covering_approval_status' => $request->vc_approved_council,
@@ -598,7 +597,7 @@ class VCController extends Controller
                 'updated_at' => Carbon::now()
             ]);
 
-        return redirect()->route('vc.index')->with('success', 'Extension request approved successfully.');
+        return redirect()->route('vc.study.leave.extensions')->with('success', 'Extension has been successfully approved by Vice Chancellor.');
     }
 
     /**
@@ -781,7 +780,7 @@ class VCController extends Controller
                     'updated_at' => Carbon::now()
                 ]);
 
-            return redirect()->route('vc.index')->with('success', 'Progress report approved successfully.');
+            return redirect()->route('vc.study.leave.progress')->with('success', 'Progress report approved successfully.');
         } else {
             // Return to Dean (not approved)
             DB::table('study_leave_progress_reports_approval')
@@ -803,7 +802,7 @@ class VCController extends Controller
                     'updated_at' => Carbon::now()
                 ]);
 
-            return redirect()->route('vc.index')->with('success', 'Progress report returned to Dean successfully.');
+            return redirect()->route('vc.study.leave.progress')->with('success', 'Progress report returned to Dean successfully.');
         }
     }
 } 

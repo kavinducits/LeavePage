@@ -429,7 +429,7 @@ class HODAcademicEstablishmentController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('hodacademicestablishment.studyLeaveExtensions')->with('success', 'Extension forwarded to Department HOD successfully.');
+        return redirect()->route('hodacademicestablishment.studyLeaveExtensions')->with('success', 'Extension has been successfully forwarded from HOD Academic Establishment to Department HOD.');
     }
 
     /**

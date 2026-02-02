@@ -36,7 +36,7 @@ return new class extends Migration
              $table->text('hod_remarks')->nullable();
             $table->string('dean_leave_recommendation_status')->nullable();
             $table->string('dean_empno')->nullable();
-            $table->string('dean_remark')->nullable();
+            $table->text('dean_remark')->nullable();
             $table->text('dean_not_recommended_reason')->nullable();
             $table->string('vc_empno')->nullable();
             $table->string('vc_recommend')->nullable();

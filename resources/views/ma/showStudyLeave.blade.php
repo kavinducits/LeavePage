@@ -136,6 +136,55 @@
                                 </div>
                             </div>
                         </div>
+                    @elseif($statusId == 8)
+                        <!-- Status: VC Checked - Awaiting Council Approval -->
+                        <div class="card">
+                            <div class="card-header bg-primary text-white fw-semibold">
+                                <i class="fas fa-gavel me-2"></i>Council Approval Required
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info mb-4">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>VC Recommendation Completed</strong>
+                                    <p class="mb-0 mt-2">This application has been reviewed by the VC and requires council approval decision.</p>
+                                </div>
+
+                                <form id="councilApprovalForm" action="{{ route('ma.studyleave.council.approve', $draft_study_leave->id) }}" method="POST">
+                                    @csrf
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label fw-semibold">
+                                            Council Approval Decision
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="ma_council_approval" id="councilApprovalYes" value="yes" required>
+                                            <label class="form-check-label" for="councilApprovalYes">
+                                                <i class="fas fa-check-circle text-success me-1"></i> Approved by Council
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="ma_council_approval" id="councilApprovalNo" value="no" required>
+                                            <label class="form-check-label" for="councilApprovalNo">
+                                                <i class="fas fa-times-circle text-danger me-1"></i> Not Approved by Council
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="councilRemarks" class="form-label fw-semibold">Remarks (Optional)</label>
+                                        <textarea class="form-control" id="councilRemarks" name="ma_council_remarks" rows="3"
+                                                  placeholder="Add any comments regarding the council's decision"></textarea>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-paper-plane me-2"></i>Submit Council Decision
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     @else
                         <!-- Other statuses - Read-only view -->
                         <div class="alert alert-info mt-4">
@@ -239,6 +288,32 @@
         document.getElementById('actionRemark').addEventListener('input', function() {
             if (this.value.trim()) {
                 clearRemarkError();
+            }
+        });
+    </script>
+    @endif
+
+    @if($statusId == 8)
+    <script>
+        // Council approval form submission handling
+        document.getElementById('councilApprovalForm').addEventListener('submit', function(e) {
+            const approvalYes = document.getElementById('councilApprovalYes');
+            const approvalNo = document.getElementById('councilApprovalNo');
+            
+            // Check if at least one radio is selected
+            if (!approvalYes.checked && !approvalNo.checked) {
+                e.preventDefault();
+                alert('Please select a council approval decision (Approved or Not Approved).');
+                return;
+            }
+
+            // Confirm action
+            const confirmMessage = approvalYes.checked 
+                ? 'Are you sure you want to mark this application as APPROVED by Council? This will finalize the approval process.' 
+                : 'Are you sure you want to mark this application as NOT APPROVED by Council?';
+            
+            if (!confirm(confirmMessage)) {
+                e.preventDefault();
             }
         });
     </script>

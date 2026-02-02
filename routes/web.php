@@ -28,6 +28,7 @@ Route::get('/MAPage', [MAController::class, 'index'])->name('ma.index.alt'); // 
 Route::get('/MApage/studyLeaveExtensions', [MAController::class, 'showStudyLeaveExtensionsPage'])->name('ma.studyleave.extensions');
 Route::get('/MApage/studyLeaveProgress', [MAController::class, 'studyLeaveProgressReportsPage'])->name('ma.studyleave.progress');
 Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'returnStudyLeave'])->name('ma.studyleave.return');
+Route::POST('/MApage/studyLeave/view/{id}/council-approve', [MAController::class, 'approveWithCouncil'])->name('ma.studyleave.council.approve');
 Route::get('/MApage/{id}', [MAController::class, 'show'])->name('ma.show');
 Route::post('/MApage/{id}/approve', [MAController::class, 'approve'])->name('ma.approve');
 Route::post('/MApage/{id}/return', [MAController::class, 'return'])->name('ma.return');
@@ -160,6 +161,8 @@ Route::get('/StudyLeave/view/{id}/progress-reports', [StudyLeaveProgressReportsC
 Route::POST('/StudyLeave/{study_leave_id}/progress-report/upload', [StudyLeaveProgressReportsController::class, 'uploadProgressReport'])->name('StudyLeave.progressReport.upload');
 Route::DELETE('/StudyLeave/progress-report/{id}/delete', [StudyLeaveProgressReportsController::class, 'deleteProgressReport'])->name('StudyLeave.progressReport.delete');
 Route::get('/StudyLeave/progress-report/files/{filename}', [StudyLeaveProgressReportsController::class, 'serveProgressReportFile'])->name('StudyLeave.serveProgressReport');
+Route::POST('/studyleave/progressreport/remove/{report_id}', [StudyLeaveProgressReportsController::class, 'removeProgressReportDocument'])->name('StudyLeave.progressReport.remove');
+Route::POST('/studyleave/progressreport/reupload/{report_id}', [StudyLeaveProgressReportsController::class, 'reuploadProgressReport'])->name('StudyLeave.progressReport.reupload');
 
 Route::get('/StudyLeave/draft/{id}/continue', [StudyLeaveController::class, 'continueDraft'])->name('StudyLeave.continue.draft');
 

@@ -206,11 +206,11 @@
                                     data-bs-target="#collapseDetails" aria-expanded="false"
                                     aria-controls="collapseDetails">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    <strong>More Details - Original Study Leave Application</strong>
+                                    <span class="small">More Details - Original Study Leave Application</span>
                                 </button>
                             </h2>
                             <div id="collapseDetails" class="accordion-collapse collapse"
-                                aria-labelledby="headingDetails" data-bs-parent="#detailsAccordion">
+                                aria-labelledby="headingDetails">
                                 <div class="accordion-body">
                                     <form method="POST" class="my-4">
                                         @csrf
@@ -228,57 +228,58 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <!-- Action Section -->
-                <div class="card">
-                    <div class="card-header bg-dark text-white fw-semibold">
-                        <i class="fas fa-tasks me-2"></i>Review Actions
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="actionRemark" class="form-label fw-semibold">MA Remarks</label>
-                            <textarea class="form-control" id="actionRemark" name="remark" rows="4"
-                                placeholder="Add your comments or remarks about this progress report"></textarea>
-                            <div id="remarkError" class="form-text text-danger" style="display: none;">
-                                Remarks are required when returning a progress report.
-                            </div>
+                    @if($progressReport->approval_status_id != 3 && $progressReport->approval_status_id != 1)
+                    <div class="card mb-4">
+                        <div class="card-header bg-dark text-white fw-semibold">
+                            <i class="fas fa-tasks me-2"></i>Review Actions
                         </div>
+                        <div class="card-body">
+                            <!-- Normal review actions when not in editing state -->
+                            <div class="mb-3">
+                                <label for="actionRemark" class="form-label fw-semibold">MA Remarks</label>
+                                <textarea class="form-control" id="actionRemark" name="remark" rows="4"
+                                    placeholder="Add your comments or remarks about this progress report"></textarea>
+                                <div id="remarkError" class="form-text text-danger" style="display: none;">
+                                    Remarks are required when returning a progress report.
+                                </div>
+                            </div>
 
-                        <div class="d-flex justify-content-between align-items-start">
-                            <form id="returnForm"
-                                action="{{ route('ma.progressreport.return', $progressReport->progress_report_id) }}"
-                                method="POST" class="d-inline">
-                                @csrf
-                                <input type="hidden" id="returnRemarkInput" name="remark" value="">
-                                <button type="submit" class="btn btn-danger btn-lg">
-                                    <i class="fas fa-undo me-2"></i>Return to User
-                                </button>
-                            </form>
-
-                            <div class="text-right">
-                                <form id="approveForm"
-                                    action="{{ route('ma.progressreport.approve', $progressReport->progress_report_id) }}"
+                            <div class="d-flex justify-content-between align-items-start">
+                                <form id="returnForm"
+                                    action="{{ route('ma.progressreport.return', $progressReport->progress_report_id) }}"
                                     method="POST" class="d-inline">
                                     @csrf
-                                    <input type="hidden" id="approveRemarkInput" name="remark" value="">
-                                    <button type="submit" class="btn btn-success btn-lg"
-                                        {{ empty($departmentHead) ? 'disabled' : '' }}>
-                                        <i class="fas fa-forward me-2"></i>Forward to HOD
+                                    <input type="hidden" id="returnRemarkInput" name="remark" value="">
+                                    <button type="submit" class="btn btn-danger btn-lg">
+                                        <i class="fas fa-undo me-2"></i>Return to User
                                     </button>
                                 </form>
 
-                                @if (isset($departmentHead))
-                                    <div class="card mt-2" style="min-width: 260px;">
-                                        <div class="card-body py-2">
-                                            <div class="d-flex align-items-center">
-                                                <strong>Forward to,&nbsp;</strong>
-                                                <div>
-                                                    <div class="fw-semibold">
-                                                        {{ $departmentHead->head_title ?? 'Head' }}&nbsp;{{ $departmentHead->head_name ?? '' }}
-                                                    </div>
-                                                    <div class="text-muted small">
-                                                        {{ $departmentHead->head_position ?? '' }}</div>
+                                <div class="text-right">
+                                    <form id="approveForm"
+                                        action="{{ route('ma.progressreport.approve', $progressReport->progress_report_id) }}"
+                                        method="POST" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" id="approveRemarkInput" name="remark" value="">
+                                        <button type="submit" class="btn btn-success btn-lg"
+                                            {{ empty($departmentHead) ? 'disabled' : '' }}>
+                                            <i class="fas fa-forward me-2"></i>Forward to HOD
+                                        </button>
+                                    </form>
+
+                                    @if (isset($departmentHead))
+                                        <div class="card mt-2" style="min-width: 260px;">
+                                            <div class="card-body py-2">
+                                                <div class="d-flex align-items-center">
+                                                    <strong>Forward to,&nbsp;</strong>
+                                                    <div>
+                                                        <div class="fw-semibold">
+                                                            {{ $departmentHead->head_title ?? 'Head' }}&nbsp;{{ $departmentHead->head_name ?? '' }}
+                                                        </div>
+                                                        <div class="text-muted small">
+                                                            {{ $departmentHead->head_position ?? '' }}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -297,8 +298,7 @@
                             </div>
                         </div>
                     </div>
-
-                   
+                    @endif
 
                 </div>
             </section>

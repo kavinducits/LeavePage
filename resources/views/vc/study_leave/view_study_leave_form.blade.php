@@ -68,36 +68,14 @@
                         </div>
                     </div>
 
-                    <!-- Question 2 - Approved by Council -->
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">
-                            Approved by Council?
-                            <span class="text-danger">*</span>
-                        </label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="vc_approved_council"
-                                id="approvedCouncilYes" value="yes" required>
-                            <label class="form-check-label" for="approvedCouncilYes">
-                                Yes
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="vc_approved_council" id="approvedCouncilNo"
-                                value="no" required>
-                            <label class="form-check-label" for="approvedCouncilNo">
-                                No
-                            </label>
-                        </div>
-                    </div>
-
                     <!-- Conditional: If not approved -->
                     <div class="mb-4" id="notApproveReasonDiv" style="display: none;">
                         <label for="vc_not_approve_reason" class="form-label fw-semibold">
-                            If not approved, please give reasons
+                            If not recommended, please give reasons
                             <span class="text-danger">*</span>
                         </label>
                         <textarea class="form-control" id="vc_not_approve_reason" name="vc_not_approve_reason" rows="4"
-                            placeholder="Please provide detailed reasons for not approving this leave"></textarea>
+                            placeholder="Please provide detailed reasons for not recommending this leave"></textarea>
                         <div class="invalid-feedback">
                             Please provide reasons for not approving.
                         </div>
@@ -190,15 +168,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const approvedCouncilYes = document.getElementById('approvedCouncilYes');
-            const approvedCouncilNo = document.getElementById('approvedCouncilNo');
+            const recommendCommitteeYes = document.getElementById('recommendCommitteeYes');
+            const recommendCommitteeNo = document.getElementById('recommendCommitteeNo');
             const notApproveReasonDiv = document.getElementById('notApproveReasonDiv');
             const notApproveReasonTextarea = document.getElementById('vc_not_approve_reason');
             const form = document.getElementById('vcReviewForm');
 
-            // Show/hide reason textarea based on council approval
+            // Show/hide reason textarea based on recommendation
             function toggleReasonField() {
-                if (approvedCouncilNo.checked) {
+                if (recommendCommitteeNo.checked) {
                     notApproveReasonDiv.style.display = 'block';
                     notApproveReasonTextarea.setAttribute('required', 'required');
                 } else {
@@ -209,31 +187,31 @@
                 }
             }
 
-            approvedCouncilYes.addEventListener('change', toggleReasonField);
-            approvedCouncilNo.addEventListener('change', toggleReasonField);
+            recommendCommitteeYes.addEventListener('change', toggleReasonField);
+            recommendCommitteeNo.addEventListener('change', toggleReasonField);
 
             // Form validation
             form.addEventListener('submit', function(e) {
                 let isValid = true;
 
                 // Check if "No" is selected and reason is empty
-                if (approvedCouncilNo.checked) {
+                if (recommendCommitteeNo.checked) {
                     const reasonValue = notApproveReasonTextarea.value.trim();
                     if (!reasonValue) {
                         e.preventDefault();
                         notApproveReasonTextarea.classList.add('is-invalid');
                         notApproveReasonTextarea.focus();
                         isValid = false;
-                        alert('Please provide reasons for not approving this leave.');
+                        alert('Please provide reasons for not recommending this leave.');
                         return;
                     }
                 }
 
                 // Confirm submission
                 if (isValid) {
-                    const confirmMessage = approvedCouncilYes.checked ?
-                        'Are you sure you want to approve this study leave application? This is the final decision.' :
-                        'Are you sure you want to reject this study leave application?';
+                    const confirmMessage = recommendCommitteeYes.checked ?
+                        'Are you sure you want to recommend this study leave application to the committee?' :
+                        'Are you sure you want to not recommend this study leave application?';
 
                     if (!confirm(confirmMessage)) {
                         e.preventDefault();

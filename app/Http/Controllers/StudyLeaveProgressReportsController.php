@@ -8,6 +8,7 @@ use App\Models\StudyLeave;
 use App\Models\StudyLeaveExtension;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class StudyLeaveProgressReportsController extends Controller
@@ -277,5 +278,132 @@ class StudyLeaveProgressReportsController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . basename($filename) . '"'
         ]);
+    }
+
+    /**
+     * Remove progress report document (for returned reports)
+     */
+    public function removeProgressReportDocument($report_id)
+    {
+        // Get the progress report
+        $progressReport = StudyLeaveProgressReports::findOrFail($report_id);
+        
+        // Get associated study leave
+        $studyLeave = StudyLeave::find($progressReport->study_leave_id);
+        
+        // Authorization check
+        if ($studyLeave->empno != session('empno')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access.'
+            ], 403);
+        }
+
+        // Only allow removal of returned reports (status_id = 3)
+        if ($progressReport->status_id != 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only returned progress reports can have their documents removed.'
+            ], 400);
+        }
+
+        // Delete the file from storage
+        if ($progressReport->document_path && Storage::disk('local')->exists($progressReport->document_path)) {
+            Storage::disk('local')->delete($progressReport->document_path);
+        }
+
+        // Clear the document path
+        $progressReport->document_path = null;
+        $progressReport->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Document removed successfully. You can now upload a new document.'
+        ]);
+    }
+
+    /**
+     * Re-upload progress report document (for returned reports)
+     */
+    public function reuploadProgressReport(Request $request, $report_id)
+    {
+        // Validate request
+        $request->validate([
+            'document' => 'required|file|mimetypes:application/pdf,application/x-pdf,application/acrobat,text/pdf,text/x-pdf|max:10240',
+            'notes' => 'nullable|string|max:1000'
+        ]);
+
+        // Get the progress report
+        $progressReport = StudyLeaveProgressReports::findOrFail($report_id);
+        
+        // Get associated study leave
+        $studyLeave = StudyLeave::find($progressReport->study_leave_id);
+        
+        // Authorization check
+        if ($studyLeave->empno != session('empno')) {
+            return redirect()->back()->with('error', 'Unauthorized access.');
+        }
+
+        // Only allow reupload of returned reports (status_id = 3)
+        if ($progressReport->status_id != 3) {
+            return redirect()->back()->with('error', 'Only returned progress reports can be re-uploaded.');
+        }
+
+        try {
+            // Delete old document if exists
+            if ($progressReport->document_path && Storage::disk('local')->exists($progressReport->document_path)) {
+                Storage::disk('local')->delete($progressReport->document_path);
+            }
+
+            // Upload new document with validation
+            if ($request->hasFile('document') && $request->file('document')->isValid()) {
+                $file = $request->file('document');
+                $empno = $studyLeave->empno;
+                $timestamp = time();
+                
+                // Generate filename: empno_studyleaveid_timestamp_progress_report.pdf
+                $filename = $empno . '_' . $studyLeave->id . '_' . $timestamp . '_progress_report.pdf';
+                
+                // Store the file in storage/app/study_leave_documents/study_leave_progress_report
+                $path = $file->storeAs('study_leave_documents/study_leave_progress_report', $filename, 'local');
+
+                // Verify the file was stored
+                if (!$path) {
+                    return redirect()->back()->with('error', 'Failed to save the progress report file.');
+                }
+
+                // Prepare the new remark
+                $timestamp_remark = now()->format('Y-m-d');
+                $newRemark = "\n\n[Resubmitted - " . $timestamp_remark . "]\n";
+                if ($request->notes) {
+                    $newRemark .= $request->notes;
+                } else {
+                    $newRemark .= "Document re-uploaded after corrections.";
+                }
+
+                // Update progress report
+                $progressReport->document_path = $path;
+                $progressReport->status_id = 4; // Status 4 = Processing MA
+                $progressReport->remark = DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')");
+                $progressReport->submitted_date = Carbon::now()->format('Y-m-d');
+                $progressReport->updated_at = now();
+                $progressReport->save();
+
+                // Update approval record to forward back to MA
+                StudyLeaveProgressReportsApproval::where('study_leave_progress_report_id', $progressReport->id)
+                    ->update([
+                        'approval_status_id' => 4, // Processing MA
+                        'updated_at' => now()
+                    ]);
+
+                return redirect()->route('StudyLeave.show.studyLeave', $studyLeave->id)
+                    ->with('success', 'Progress report re-uploaded successfully and forwarded to MA for review!');
+            }
+
+            return redirect()->back()->with('error', 'Failed to upload progress report. Please ensure you selected a valid PDF file.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to upload document: ' . $e->getMessage());
+        }
     }
 }

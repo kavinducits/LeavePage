@@ -45,6 +45,7 @@
                                             <input type="text" name="email" class="form-control" value="{{ $user->email }}" readonly>
                                         </div>
                                         
+                </div>
             </div>
         </div>
 

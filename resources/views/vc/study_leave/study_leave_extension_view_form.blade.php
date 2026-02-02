@@ -119,8 +119,7 @@
                         <strong>More Details - Original Study Leave Application</strong>
                     </button>
                 </h2>
-                <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails"
-                    data-bs-parent="#detailsAccordion">
+                <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails">
                     <div class="accordion-body">
                         <!-- Include study leave forms with readonly -->
                         @php

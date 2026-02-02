@@ -140,11 +140,11 @@
                                     data-bs-target="#collapseDetails" aria-expanded="false"
                                     aria-controls="collapseDetails">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    <strong>More Details - Original Study Leave Application</strong>
+                                    <span class="small">More Details - Original Study Leave Application</span>
                                 </button>
                             </h2>
                             <div id="collapseDetails" class="accordion-collapse collapse"
-                                aria-labelledby="headingDetails" data-bs-parent="#detailsAccordion">
+                                aria-labelledby="headingDetails">
                                 <div class="accordion-body">
                                     <form method="POST" class="my-4">
                                         @csrf
@@ -164,7 +164,7 @@
                     </div>
 
                     <!-- Action Section -->
-
+                    @if($extension->extension_status_id != 3 && $extension->extension_status_id != 1)
                     <div class="card">
                         <div class="card-header bg-dark text-white fw-semibold">
                             <i class="fas fa-tasks me-2"></i>Review Actions
@@ -232,6 +232,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                 </div>
             </section>

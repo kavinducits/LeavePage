@@ -726,7 +726,13 @@ $(document).ready(function () {
     });
     
     // Validation for employee lookup - ensure employee is found before submission
+    // Only validate forms that are not readonly
     $('form').on('submit', function(e) {
+        // Skip validation for readonly forms (e.g., in view/accordion mode)
+        @if($readonly ?? false)
+            return true;
+        @endif
+        
         let isValid = true;
         let firstInvalidField = null;
         
