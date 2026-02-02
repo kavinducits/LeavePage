@@ -9,6 +9,9 @@ class DeanController extends Controller
 {
     // Hardcoded Dean employee number - change this to switch to a different Dean
     private const DEAN_EMP_NO = 5045; // Dean for faculty 1 (has leave applications)
+    
+    // Hardcoded VC employee number - same as VCController
+    private const VC_EMP_NO = 1001; // Example VC emp_no
 
     /**
      * Get faculty IDs for the current Dean
@@ -728,6 +731,11 @@ class DeanController extends Controller
                 'faculties.id as faculty_id',
                 'designations.designation_name as designation',
                 'statuses.status',
+                // Registrar review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.registrar_empno',
+                'study_leave_progress_reports_approval.registrar_approval_status',
+                'study_leave_progress_reports_approval.registrar_not_approve_reason',
+                'study_leave_progress_reports_approval.registrar_remarks',
                 // HOD review data from study_leave_progress_reports_approval
                 'study_leave_progress_reports_approval.hod_empno',
                 'study_leave_progress_reports_approval.hod_approval_status',
@@ -768,9 +776,10 @@ class DeanController extends Controller
         ];
 
         // Get VC information for forwarding
+        $vcEmpNo = self::VC_EMP_NO;
         $vcInfo = DB::table('employees')
             ->leftJoin('categories', 'employees.title_id', '=', 'categories.id')
-            ->where('employees.designation_id', 1) // VC designation ID (adjust if needed)
+            ->where('employees.employee_no', $vcEmpNo)
             ->select(
                 'employees.employee_no as vc_emp_no',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as vc_name"),

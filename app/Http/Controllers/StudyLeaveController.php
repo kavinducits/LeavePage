@@ -1226,10 +1226,25 @@ class StudyLeaveController extends Controller
             ? $lastApprovedExtension->new_end_date 
             : $study_leave->study_leave_to;
 
-        // Prepare process status information for stages display
+        // Prepare process status information for stages display with approval tracking
+        // Fetch the approval details from study_leave_approvals table
+        $approvalDetails = StudyLeaveApproval::where('study_leave_id', $id)->first();
+        
+        // Use status_id from study_leave_approvals table for accurate tracking
+        $currentStatusId = $approvalDetails->status_id ?? $draft_study_leave->status_id ?? 4;
+        
         $processStatus = [
-            'current_status_id' => $draft_study_leave->status_id ?? 4,
+            'current_status_id' => $currentStatusId,
             'status_name' => $draft_study_leave->status ?? 'Processing MA',
+            'ma_empno' => $approvalDetails->ma_empno ?? null,
+            'registrar_empno' => $approvalDetails->registrar_empno ?? null,
+            'hod_empno' => $approvalDetails->hod_empno ?? null,
+            'dean_empno' => $approvalDetails->dean_empno ?? null,
+            'vc_empno' => $approvalDetails->vc_empno ?? null,
+            'registrar_recommendation' => $approvalDetails->registrar_recommendation ?? null,
+            'hod_recommend' => $approvalDetails->hod_recommend ?? null,
+            'dean_leave_recommendation_status' => $approvalDetails->dean_leave_recommendation_status ?? null,
+            'vc_recommend_submit_to_committee' => $approvalDetails->vc_recommend_submit_to_committee ?? null,
         ];
 
         // Decide which blade to use and readonly status
@@ -1469,6 +1484,7 @@ class StudyLeaveController extends Controller
     {
         // Get authenticated user's employee number from session
         $userEmpNo = session('empno');
+       
         
         if (!$userEmpNo) {
             abort(403, 'Unauthorized access. Please login.');
@@ -1477,12 +1493,18 @@ class StudyLeaveController extends Controller
         // Find the study leave record
         $studyLeave = StudyLeave::findOrFail($id);
         
+        
         // Verify the user owns this study leave (check both empno fields)
         $sessionStudyLeaveEmpNo = session('study_leave.employee_no');
+        /*
         if ($studyLeave->empno !== $userEmpNo && $studyLeave->empno !== $sessionStudyLeaveEmpNo) {
             abort(403, 'Unauthorized access to this document.');
         }
-        
+        */
+      //dd($studyLeave->empno, strval($userEmpNo), $sessionStudyLeaveEmpNo);
+        if ($studyLeave->empno !== strval($userEmpNo)) {
+            abort(403, 'Unauthorized access to this document.');
+        }
         // Determine which path to use based on type
         $pathField = '';
         switch ($type) {

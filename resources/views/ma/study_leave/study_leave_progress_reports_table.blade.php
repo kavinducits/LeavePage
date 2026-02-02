@@ -9,10 +9,7 @@
             <i class="fas fa-file-alt me-2"></i>Submitted Progress Reports
             <span class="badge badge-light ml-2">{{ isset($progressReportApplications) ? $progressReportApplications->where('status', 'Processing MA')->count() : 0 }}</span>
             <div class="card-tools float-right">
-                <span class="text-white">
-                    <i class="fas fa-clock mr-1"></i>
-                    Last updated: {{ now()->format('M d, Y h:i A') }}
-                </span>
+               
             </div>
         </div>
         
@@ -136,7 +133,21 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-info">{{ $application->status }}</span>
+                                        @php
+                                            $statusBadge = 'bg-warning';
+                                            $statusText = $application->status ?? 'Processing MA';
+                                            
+                                            if(stripos($statusText, 'approved') !== false) {
+                                                $statusBadge = 'bg-success';
+                                            } elseif(stripos($statusText, 'rejected') !== false || stripos($statusText, 'not approved') !== false) {
+                                                $statusBadge = 'bg-danger';
+                                            } elseif(stripos($statusText, 'returned') !== false) {
+                                                $statusBadge = 'bg-info';
+                                            } elseif(stripos($statusText, 'processing') !== false) {
+                                                $statusBadge = 'bg-warning';
+                                            }
+                                        @endphp
+                                        <span class="badge {{ $statusBadge }}">{{ $statusText }}</span>
                                     </td>
                                     <td class="text-center">
                                         <a href="{{ route('ma.show.studyleave.progressreport', $application->progress_report_id) }}" 

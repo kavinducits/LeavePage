@@ -254,10 +254,10 @@
                                                         <strong><i class="fas fa-file-pdf me-2"></i>Attached Document</strong>
                                                     </div>
                                                     <div class="card-body text-center">
-                                                        <a href="{{ Storage::url($report->document_path) }}" 
-                                                           target="_blank" 
-                                                           class="btn btn-primary">
-                                                            <i class="fas fa-download me-2"></i>Download/View Document
+                                                        <a href="{{ route('StudyLeave.serveProgressReport', ['filename' => basename($report->document_path)]) }}" 
+                                                            target="_blank" 
+                                                            class="btn btn-primary">
+                                                             <i class="fas fa-download me-2"></i>Download/View Document
                                                         </a>
                                                         
                                                         @if($report->status_id == 3)

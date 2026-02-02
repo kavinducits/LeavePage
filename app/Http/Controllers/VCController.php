@@ -680,6 +680,11 @@ class VCController extends Controller
                 'faculties.id as faculty_id',
                 'designations.designation_name as designation',
                 'statuses.status',
+                // Registrar review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.registrar_empno',
+                'study_leave_progress_reports_approval.registrar_approval_status',
+                'study_leave_progress_reports_approval.registrar_not_approve_reason',
+                'study_leave_progress_reports_approval.registrar_remarks',
                 // HOD review data from study_leave_progress_reports_approval
                 'study_leave_progress_reports_approval.hod_empno',
                 'study_leave_progress_reports_approval.hod_approval_status',
@@ -723,9 +728,21 @@ class VCController extends Controller
             'designation' => $progressReport->designation
         ];
 
+        // Get VC name
+        $vcEmpNo = self::VC_EMP_NO;
+        $vcInfo = DB::table('employees')
+            ->where('employee_no', $vcEmpNo)
+            ->select(
+                DB::raw("CONCAT(initials, ' ', last_name) as vc_name"),
+                'employee_no as vc_empno'
+            )
+            ->first();
+
+        $vcName = $vcInfo ? $vcInfo->vc_name : 'Vice Chancellor';
+
         $readonly = false;
 
-        return view('vc.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave'));
+        return view('vc.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave', 'vcName'));
     }
 
     /**

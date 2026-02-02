@@ -44,7 +44,7 @@
             </div>
         @endif
 
-        <div class="d-flex justify-content-end align-items-start">
+        <div class="d-flex flex-column align-items-end">
             <form id="submitForm"
                 action="{{ route('dean.progressreport.submit', $progressReport->progress_report_id) }}"
                 method="POST" class="d-inline">
@@ -55,6 +55,18 @@
                     <i class="fas fa-paper-plane me-2"></i>Submit Review
                 </button>
             </form>
+            <div class="mt-3">
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-user me-1"></i>
+                    <strong>
+                        @if (isset($vcInfo) && $vcInfo->vc_name)
+                            {{ $vcInfo->vc_title ?? 'Vice Chancellor' }} {{ $vcInfo->vc_name }}
+                        @else
+                            Vice Chancellor
+                        @endif
+                    </strong>
+                </p>
+            </div>
         </div>
     </div>
 </div>

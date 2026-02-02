@@ -9,19 +9,22 @@
             <div class="stages-wrapper" style="overflow-x: auto; overflow-y: hidden; width: 100%;">
                 <div class="stages-timeline">
                     @php
+                        // Define the stages with their corresponding status_id and employee tracking field
                         $stages = [
-                            ['id' => 4, 'name' => 'MA Review', 'icon' => 'fa-user-tie'],
-                            ['id' => 9, 'name' => 'Registrar Academic Establishment', 'icon' => 'fa-user-shield'],
-                            ['id' => 5, 'name' => 'HOD Review', 'icon' => 'fa-user-check'],
-                            ['id' => 6, 'name' => 'Dean Review', 'icon' => 'fa-user-graduate'],
-                            ['id' => 7, 'name' => 'VC Approval', 'icon' => 'fa-stamp'],
-                            ['id' => 8, 'name' => 'Final Processing', 'icon' => 'fa-clipboard-check'],
-                            ['id' => 1, 'name' => 'Approved', 'icon' => 'fa-check-circle']
+                            ['id' => 4, 'name' => 'MA Review', 'icon' => 'fa-user-tie', 'empno_field' => 'ma_empno'],
+                            ['id' => 9, 'name' => 'Registrar Review', 'icon' => 'fa-user-shield', 'empno_field' => 'registrar_empno', 'approval_field' => 'registrar_recommendation'],
+                            ['id' => 5, 'name' => 'HOD Review', 'icon' => 'fa-user-check', 'empno_field' => 'hod_empno', 'approval_field' => 'hod_recommend'],
+                            ['id' => 6, 'name' => 'Dean Review', 'icon' => 'fa-user-graduate', 'empno_field' => 'dean_empno', 'approval_field' => 'dean_leave_recommendation_status'],
+                            ['id' => 7, 'name' => 'VC Approval', 'icon' => 'fa-stamp', 'empno_field' => 'vc_empno', 'approval_field' => 'vc_recommend_submit_to_committee'],
+                            ['id' => 8, 'name' => 'Council Approval', 'icon' => 'fa-clipboard-check', 'empno_field' => null],
+                            ['id' => 1, 'name' => 'Approved', 'icon' => 'fa-check-circle', 'empno_field' => null]
                         ];
                         
+                        // Get current status from study_leave_approvals table
                         $currentStatusId = $processStatus['current_status_id'] ?? 4;
-                        $isReturned = $currentStatusId == 2;
-                        $isEditing = $currentStatusId == 3;
+                        $isReturned = $currentStatusId == 2; // Returned status
+                        $isEditing = $currentStatusId == 3;  // Editing status
+                        $isRejected = $currentStatusId == 10; // Not approved status
                     @endphp
                     
                     @foreach($stages as $index => $stage)
@@ -29,23 +32,57 @@
                             $isCompleted = false;
                             $isCurrent = false;
                             $isPending = false;
+                            $approvedBy = null;
+                            $approvalStatus = null;
                             
-                            if ($isReturned) {
+                            // Check if this stage has been completed by checking employee number
+                            if (isset($stage['empno_field']) && !empty($processStatus[$stage['empno_field']])) {
+                                $approvedBy = $processStatus[$stage['empno_field']];
+                                
+                                // Check approval status if field exists
+                                if (isset($stage['approval_field']) && isset($processStatus[$stage['approval_field']])) {
+                                    $approvalStatus = $processStatus[$stage['approval_field']];
+                                }
+                            }
+                            
+                            // Handle special statuses
+                            if ($isReturned || $isEditing) {
+                                // All stages are pending when returned or editing
                                 $isCompleted = false;
                                 $isCurrent = false;
                                 $isPending = true;
-                            } elseif ($isEditing) {
+                            } elseif ($isRejected) {
+                                // Show which stage rejected the application
                                 $isCompleted = false;
                                 $isCurrent = false;
                                 $isPending = true;
+                            } elseif ($currentStatusId == 1) {
+                                // Application is fully approved - all stages completed (green)
+                                $isCompleted = true;
+                                $isCurrent = false;
+                                $isPending = false;
                             } else {
-                                if ($currentStatusId == 1) {
-                                    $isCompleted = true;
-                                } elseif ($stage['id'] < $currentStatusId) {
+                                // Track completion based on employee number presence and status_id
+                                if ($stage['id'] == 8) {
+                                    // Council Approval stage
+                                    if ($currentStatusId == 8) {
+                                        // Status is 8 (VC Checked) - Council Approval is in progress
+                                        $isCurrent = true;
+                                    } else {
+                                        // Not yet reached Council stage
+                                        $isPending = true;
+                                    }
+                                } elseif ($stage['id'] == 1) {
+                                    // Final Approved stage - always pending unless status_id = 1
+                                    $isPending = true;
+                                } elseif ($approvedBy) {
+                                    // Stage is completed if employee number exists (for MA, Registrar, HOD, Dean, VC)
                                     $isCompleted = true;
                                 } elseif ($stage['id'] == $currentStatusId) {
+                                    // Current processing stage
                                     $isCurrent = true;
                                 } else {
+                                    // Future stages are pending
                                     $isPending = true;
                                 }
                             }
@@ -63,6 +100,11 @@
                                     @if($isCompleted)
                                         <i class="fas fa-check-circle text-success me-1"></i>
                                         <span class="text-success small">Completed</span>
+                                        @if($approvedBy)
+                                            <div class="small text-muted mt-1">
+                                                <i class="fas fa-user me-1"></i>{{ $approvedBy }}
+                                            </div>
+                                        @endif
                                     @elseif($isCurrent)
                                         <i class="fas fa-spinner fa-pulse text-warning me-1"></i>
                                         <span class="text-warning small">In Progress</span>
@@ -85,7 +127,7 @@
                         <i class="fas fa-undo-alt me-2"></i>
                         <div>
                             <strong>Application Returned</strong>
-                            <p class="mb-0 small">This application has been returned for corrections.</p>
+                            <p class="mb-0 small">This application has been returned for corrections. Current Status: {{ $processStatus['status_name'] ?? 'Returned' }}</p>
                         </div>
                     </div>
                 @elseif($isEditing)
@@ -94,6 +136,22 @@
                         <div>
                             <strong>Editing Mode</strong>
                             <p class="mb-0 small">This application is currently being edited.</p>
+                        </div>
+                    </div>
+                @elseif($isRejected)
+                    <div class="alert alert-danger mt-3 mb-0 d-flex align-items-center">
+                        <i class="fas fa-times-circle me-2"></i>
+                        <div>
+                            <strong>Application Not Approved</strong>
+                            <p class="mb-0 small">This application was not approved. Status: {{ $processStatus['status_name'] ?? 'Not Approved' }}</p>
+                        </div>
+                    </div>
+                @elseif($currentStatusId != 1)
+                    <div class="alert alert-info mt-3 mb-0 d-flex align-items-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <div>
+                            <strong>Current Status</strong>
+                            <p class="mb-0 small">{{ $processStatus['status_name'] ?? 'In Progress' }}</p>
                         </div>
                     </div>
                 @endif
@@ -156,17 +214,17 @@
     }
     
     .stage-icon {
-        width: 55px;
-        height: 55px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.4rem;
+        font-size: 1.1rem;
         position: relative;
         z-index: 2;
         transition: all 0.3s ease;
-        margin-bottom: 0.6rem;
+        margin-bottom: 0.5rem;
     }
     
     .stage-item.completed .stage-icon {
@@ -198,10 +256,10 @@
     }
     
     .stage-connector {
-        height: 4px;
+        height: 3px;
         width: 70px;
         position: relative;
-        top: -32px;
+        top: -27px;
         z-index: 1;
         flex-shrink: 0;
     }
@@ -220,12 +278,12 @@
     
     .stage-name {
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         color: #2d2d2d;
-        margin-bottom: 0.35rem;
+        margin-bottom: 0.3rem;
         white-space: normal;
         word-wrap: break-word;
-        line-height: 1.3;
+        line-height: 1.2;
     }
     
     .stage-status {

@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-end align-items-start">
+        <div class="d-flex flex-column align-items-end">
             <form id="submitForm"
                 action="{{ route('vc.progressreport.submit', $progressReport->progress_report_id) }}"
                 method="POST" class="d-inline">
@@ -53,6 +53,7 @@
                     <i class="fas fa-paper-plane me-2"></i>Submit Review
                 </button>
             </form>
+            
         </div>
     </div>
 </div>

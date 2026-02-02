@@ -873,7 +873,12 @@ class HODController extends Controller
                 'faculties.faculty_name as faculty',
                 'faculties.id as faculty_id',
                 'designations.designation_name as designation',
-                'statuses.status'
+                'statuses.status',
+                // Registrar review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.registrar_empno',
+                'study_leave_progress_reports_approval.registrar_approval_status',
+                'study_leave_progress_reports_approval.registrar_not_approve_reason',
+                'study_leave_progress_reports_approval.registrar_remarks'
             )
             ->first();
 

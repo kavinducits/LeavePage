@@ -74,10 +74,10 @@
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #800000 0%, #a52a2a 100%);
+    background: linear-gradient(135deg, #e8e8e8 0%, #d3d3d3 100%);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    padding: 15px 20px;
+    padding: 6px 20px;
     animation: slideDown 0.4s ease-out;
 }
 
@@ -101,7 +101,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 6px;
     position: relative;
 }
 
@@ -116,69 +116,69 @@
 }
 
 .step-circle {
-    width: 45px;
-    height: 45px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    border: 3px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    color: white;
-    font-size: 18px;
+    color: #666;
+    font-size: 14px;
     transition: all 0.3s ease;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .progress-step.active .step-circle {
-    background: white;
-    border-color: white;
-    color: #800000;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
     transform: scale(1.1);
 }
 
 .progress-step.completed .step-circle {
-    background: #f0f404;
-    border-color: #f0f404;
-    color: #800000;
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
 }
 
 .step-label {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    color: #666;
     font-weight: 500;
     text-align: center;
     max-width: 120px;
-    line-height: 1.3;
+    line-height: 1.1;
     transition: all 0.3s ease;
 }
 
 .progress-step.active .step-label {
-    color: white;
+    color: #0d6efd;
     font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: none;
 }
 
 .progress-line {
     flex: 1;
     height: 3px;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.15);
     position: relative;
     margin: 0 10px;
-    margin-bottom: 53px; /* Align with circles */
+    margin-bottom: 36px; /* Align with circles */
     transition: all 0.5s ease;
 }
 
 .progress-line.completed {
-    background: #cadb0a;
+    background: #28a745;
 }
 
 .progress-bar-track {
     width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.2);
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;
     position: relative;
@@ -186,7 +186,7 @@
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #d2d816 0%, #dbcd0d 100%);
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
     border-radius: 10px;
     transition: width 0.5s ease;
     box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
@@ -194,7 +194,7 @@
 
 /* Add spacing for the fixed progress bar */
 body {
-    padding-top: 140px !important;
+    padding-top: 85px !important;
 }
 
 /* Responsive Design */

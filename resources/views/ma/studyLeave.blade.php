@@ -110,8 +110,8 @@
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2 class="mb-0 fw-bold">Study Leave Applications</h2>
                             <div class="text-muted">
-                                <i class="fas fa-clock mr-1"></i>
-                                Last updated: {{ now()->format('M d, Y h:i A') }}
+                               
+                               Requests for Study Leave
                             </div>
                         </div>
                        
@@ -173,8 +173,8 @@
                                                             </div>
                                                         </td>
                                                         <td>
-                                                            <span
-                                                                class="badge bg-warning">{{ $application->status }}</span>
+                                                            
+                                                            <span class="badge bg-warning">{{ $application->status }}</span>
                                                         </td>
                                                         <td class="text-center">
                                                             <a href="{{ route('ma.show.studyleave', $application->id) }}"

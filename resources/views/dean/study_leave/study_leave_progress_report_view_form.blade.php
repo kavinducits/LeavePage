@@ -113,6 +113,75 @@
             </div>
         </div>
 
+        <!-- Registrar Review Section (Disabled/Read-only for Dean) -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation (For Information)
+            </div>
+            <div class="card-body bg-light">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> This section shows the Registrar's review. You cannot modify these fields.
+                </div>
+
+                @if ($progressReport->registrar_approval_status)
+                    <!-- Recommendation -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            Leave is recommended
+                        </label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="registrar_recommendation_disabled" value="yes" 
+                                {{ $progressReport->registrar_approval_status == 1 ? 'checked' : '' }} disabled>
+                            <label class="form-check-label text-muted">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="registrar_recommendation_disabled" value="no" 
+                                {{ $progressReport->registrar_approval_status == 2 ? 'checked' : '' }} disabled>
+                            <label class="form-check-label text-muted">
+                                No
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- If not recommended -->
+                    @if ($progressReport->registrar_not_approve_reason)
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Reason for not recommending
+                            </label>
+                            <div class="card bg-white">
+                                <div class="card-body">
+                                    <p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->registrar_not_approve_reason }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Any other remarks -->
+                    @if ($progressReport->registrar_remarks)
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Registrar Remarks
+                            </label>
+                            <div class="card bg-white">
+                                <div class="card-body">
+                                    <p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->registrar_remarks }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @else
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Registrar has not yet reviewed this progress report.
+                    </div>
+                @endif
+            </div>
+        </div>
+
         <!-- HOD Review Section -->
         @if(isset($progressReport->hod_remarks) || isset($progressReport->hod_approval_status))
         <div class="card mb-4 shadow-sm">

@@ -10,10 +10,7 @@
             <i class="fas fa-calendar-plus me-2"></i> Extension Requests
             <span class="badge badge-light ml-2">{{ isset($extensionApplications) ? $extensionApplications->where('status', 'Processing MA')->count() : 0 }}</span>
             <div class="card-tools float-right">
-                <span class="text-white">
-                    <i class="fas fa-clock mr-1"></i>
-                    Last updated: {{ now()->format('M d, Y h:i A') }}
-                </span>
+               
             </div>
         </div>
         
@@ -161,7 +158,7 @@
                                     </td>
                                     <td class="text-center">
                                         <a href="{{ route('ma.show.extension', $extension->extension_id) }}" 
-                                           class="btn btn-sm btn-outline-success"
+                                           class="btn btn-sm btn-outline-primary"
                                            title="View Extension Request">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
