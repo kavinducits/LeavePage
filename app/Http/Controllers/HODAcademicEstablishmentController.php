@@ -47,6 +47,7 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_approvals.status_id', 9) // Processing HOD Academic Establishment (status_id = 9)
+            ->where('study_leaves.is_draft', false)
             //->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -57,6 +58,18 @@ class HODAcademicEstablishmentController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'study_leaves.created_at as applied_date',
+                'statuses.status',
+                'employees.department_id'
+            )
+            ->groupBy(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                'employees.initials',
+                'employees.last_name',
+                'departments.department_name',
+                'faculties.faculty_name',
+                'study_leaves.created_at',
                 'statuses.status',
                 'employees.department_id'
             )
@@ -83,7 +96,7 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')

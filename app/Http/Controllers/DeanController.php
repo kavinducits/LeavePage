@@ -74,6 +74,7 @@ class DeanController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_approvals.status_id', 6) // Processing Dean
+            ->where('study_leaves.is_draft', false)
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -86,6 +87,7 @@ class DeanController extends Controller
                 'study_leaves.created_at as applied_date',
                 'statuses.status'
             )
+            ->distinct()
             ->get();
 
         // Get study leave extension applications for Dean review from assigned faculties

@@ -45,6 +45,7 @@ class VCController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_approvals.status_id', 7) // Processing VC
+            ->where('study_leaves.is_draft', false)
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -57,6 +58,7 @@ class VCController extends Controller
                 'study_leaves.created_at as applied_date',
                 'statuses.status'
             )
+            ->distinct()
             ->get();
 
         // Get study leave extension applications for VC review

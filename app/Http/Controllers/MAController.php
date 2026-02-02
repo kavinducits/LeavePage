@@ -557,6 +557,18 @@ class MAController extends Controller
                 'study_leave_approvals.status_id as approval_status_id',
                 DB::raw("COALESCE(statuses.status, 'Pending') as status")
             )
+            ->groupBy(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'employees.employee_no',
+                'employees.initials',
+                'employees.last_name',
+                'departments.department_name',
+                'faculties.faculty_name',
+                'study_leaves.created_at',
+                'study_leave_approvals.status_id',
+                'statuses.status'
+            )
             ->get();
 
         // Calculate statistics
@@ -811,9 +823,11 @@ class MAController extends Controller
     public function calculateTotalStudyLeaveDays($emp_no)
     {
         $totalDays = 0;
-        $previousLeaves=StudyLeave::where('empno', $emp_no)
-        ->where('is_draft', false)
-        ->where('status_id', 1)
+        $previousLeaves = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            ->where('study_leaves.empno', $emp_no)
+            ->where('study_leave_approvals.is_draft', false)
+            ->where('study_leave_approvals.status_id', 1)
         ->select('study_leave_from','study_leave_to');
 
         if($previousLeaves->count() > 0){

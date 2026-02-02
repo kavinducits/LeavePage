@@ -73,6 +73,7 @@ class HODController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_approvals.status_id', 5) // Processing HOD (status_id = 5)
+            ->where('study_leaves.is_draft', false)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -83,6 +84,18 @@ class HODController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'study_leaves.created_at as applied_date',
+                'statuses.status',
+                'employees.department_id'
+            )
+            ->groupBy(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                'employees.initials',
+                'employees.last_name',
+                'departments.department_name',
+                'faculties.faculty_name',
+                'study_leaves.created_at',
                 'statuses.status',
                 'employees.department_id'
             )
@@ -188,6 +201,7 @@ class HODController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_approvals.status_id', 5) // Processing HOD (status_id = 5)
+            ->where('study_leaves.is_draft', false)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -198,6 +212,18 @@ class HODController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'study_leaves.created_at as applied_date',
+                'statuses.status',
+                'employees.department_id'
+            )
+            ->groupBy(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                'employees.initials',
+                'employees.last_name',
+                'departments.department_name',
+                'faculties.faculty_name',
+                'study_leaves.created_at',
                 'statuses.status',
                 'employees.department_id'
             )
@@ -501,6 +527,7 @@ class HODController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_approvals.status_id', 5) // Processing HOD (status_id = 5)
+            ->where('study_leaves.is_draft', false)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -511,6 +538,18 @@ class HODController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'study_leaves.created_at as applied_date',
+                'statuses.status',
+                'employees.department_id'
+            )
+            ->groupBy(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                'employees.initials',
+                'employees.last_name',
+                'departments.department_name',
+                'faculties.faculty_name',
+                'study_leaves.created_at',
                 'statuses.status',
                 'employees.department_id'
             )
