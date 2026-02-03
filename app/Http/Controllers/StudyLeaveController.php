@@ -52,19 +52,23 @@ class StudyLeaveController extends Controller
         }
 
         $approvedLeavesCount = StudyLeave::where('empno', session('empno'))
-            ->where('status_id', 1)
-            ->where('is_draft', false)
+            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
+            ->where('study_leave_approvals.status_id', 1)
+            ->where('study_leaves.is_draft', false)
             ->select(
-                DB::raw('COUNT("id") as approved_count')
+                DB::raw('COUNT("study_leaves.id") as approved_count')
 
             )
             ->first();
+        //dd($approvedLeavesCount);
         $approvedLeavesInProgress = StudyLeave::where('empno', session('empno'))
-            ->where('status_id', 1)
-            ->where('is_draft', false)
+            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
+            ->where('study_leave_approvals.status_id', 1)
+            ->where('study_leaves.is_draft', false)
 
-            ->whereDate('study_leave_to', '>=', $currentDate)
+            ->whereDate('study_leaves.study_leave_to', '>=', $currentDate)
             ->count();
+       
         $allStudyLeavesCount = StudyLeave::where('empno', session('empno'))
             ->select(
                 DB::raw('COUNT("id") as total_count')
@@ -111,9 +115,10 @@ class StudyLeaveController extends Controller
     {
         $totalDays = 0;
         $previousLeaves = StudyLeave::where('empno', $emp_no)
-            ->where('is_draft', false)
-            ->where('status_id', 1)
-            ->select('study_leave_from', 'study_leave_to');
+             ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
+            ->where('study_leave_approvals.status_id', 1)
+            ->where('study_leaves.is_draft', false)
+            ->select('study_leaves.study_leave_from as study_leave_from', 'study_leaves.study_leave_to as study_leave_to');
 
         if ($previousLeaves->count() > 0) {
             foreach ($previousLeaves->get() as $leave) {
@@ -700,7 +705,7 @@ class StudyLeaveController extends Controller
         if ($draft) {
             $draft->update([
                 'is_draft' => false,
-               'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
+              // 'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
                 'reference_no' => $this->generateReferenceNumber(),
 
             ]);
@@ -808,7 +813,7 @@ class StudyLeaveController extends Controller
                 'study_leave_to',
                 'leave_payment_type',
                 'study_leaves.created_at',
-                'study_leave_approvals.status_id',
+                'study_leave_approvals.status_id as status_id',
                 'statuses.status',
                 'reference_no',
                 'latest_extensions.extension_status_id',
@@ -978,6 +983,7 @@ class StudyLeaveController extends Controller
     {
         // Validate the incoming request data
         //
+      
 
 
 
@@ -1120,12 +1126,14 @@ class StudyLeaveController extends Controller
 
         // Get the specific study leave application with all details
         // Only show if the employee is assigned to this specific MA
+       // dd($id);
         $draft_study_leave = DB::table('study_leaves')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leaves.id', $id)
             ->select(
                 'study_leaves.*',
@@ -1150,6 +1158,8 @@ class StudyLeaveController extends Controller
 
             )
             ->first();
+
+           
 
         if (!$draft_study_leave) {
             return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
