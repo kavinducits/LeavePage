@@ -11,11 +11,14 @@
         
         <div class="col-md-11">
             
-            <div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0 fw-bold text-maroon dashboard-header">
                     <i class="fas fa-file-alt me-2 icon-gold"></i>
                     View Study Leave Application
                 </h2>
+                <a href="{{ route('StudyLeave.create') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
             </div>
 
             <!-- Process Stages Section -->
@@ -38,10 +41,6 @@
                 @include('StudyLeave.details_form', ['readonly' => true])
                 @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
              
-                
-                <div class="form-group mt-4 mb-3 d-flex justify-content-center">
-                    <a href="{{ route('StudyLeave.create') }}" class="btn btn-primary btn-lg">Back</a>
-                </div>
             </form>
         </div>
     </div>
