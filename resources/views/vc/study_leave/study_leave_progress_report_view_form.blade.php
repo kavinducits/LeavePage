@@ -299,7 +299,7 @@
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>More Details - Original Study Leave Application</strong>
+                        <span class="accordion-details-text">More Details - Original Study Leave Application</span>
                     </button>
                 </h2>
                 <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails"

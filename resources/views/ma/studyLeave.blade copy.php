@@ -14,8 +14,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -126,6 +124,15 @@
                                 </h3>
                             </div>
 
+                            <!-- Filter and Sort Component -->
+                            @include('ma.study_leave.filter_sort', [
+                                'action' => route('ma.studyleave'),
+                                'search' => $search ?? null,
+                                'sortBy' => $sortBy ?? 'applied_date',
+                                'sortOrder' => $sortOrder ?? 'desc',
+                                'totalResults' => $studyLeaveApplications->count()
+                            ])
+
                             <div class="card-body p-0">
                                 @if ($studyLeaveApplications->count() > 0)
                                     <div class="table-responsive">
@@ -185,8 +192,16 @@
                                         <div class="text-muted mb-3">
                                             <i class="fas fa-inbox fa-3x"></i>
                                         </div>
-                                        <h5 class="text-muted">No Applications Pending</h5>
-                                        <p class="text-muted">There are no applications currently waiting for review.</p>
+                                        @if($search ?? false)
+                                            <h5 class="text-muted">No Results Found</h5>
+                                            <p class="text-muted">No applications match your search criteria.</p>
+                                            <a href="{{ route('ma.studyleave') }}" class="btn btn-primary">
+                                                <i class="fas fa-arrow-left me-2"></i>Back to All Applications
+                                            </a>
+                                        @else
+                                            <h5 class="text-muted">No Applications Pending</h5>
+                                            <p class="text-muted">There are no applications currently waiting for review.</p>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
@@ -195,7 +210,11 @@
                         @if ($studyLeaveApplications->count() > 0)
                             <div class="mt-3 text-muted text-center">
                                 <small>
-                                    <i class="fas fa-list"></i> Total Applications: {{ $studyLeaveApplications->count() }}
+                                    @if($search ?? false)
+                                        <i class="fas fa-filter"></i> Found {{ $studyLeaveApplications->count() }} matching application(s)
+                                    @else
+                                        <i class="fas fa-list"></i> Total Applications: {{ $studyLeaveApplications->count() }}
+                                    @endif
                                 </small>
                             </div>
                         @endif
@@ -234,38 +253,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     
     <!-- Show return success modal if session flag is set -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize DataTables
-            $('.table').DataTable({
-                "pageLength": 10,
-                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                "order": [[5, "desc"]], // Sort by Applied Date column (index 5) descending
-                "language": {
-                    "search": "Search:",
-                    "lengthMenu": "Show _MENU_ entries",
-                    "info": "Showing _START_ to _END_ of _TOTAL_ applications",
-                    "infoEmpty": "Showing 0 to 0 of 0 applications",
-                    "infoFiltered": "(filtered from _MAX_ total applications)",
-                    "paginate": {
-                        "first": "First",
-                        "last": "Last",
-                        "next": "Next",
-                        "previous": "Previous"
-                    }
-                },
-                "columnDefs": [
-                    { "orderable": false, "targets": 7 } // Disable sorting on Actions column
-                ]
-            });
-
             @if(session('show_return_modal'))
                 // Use Bootstrap 4 modal
                 $('#returnSuccessModal').modal('show');

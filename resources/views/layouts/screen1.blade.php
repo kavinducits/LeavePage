@@ -16,6 +16,18 @@
     body {
         padding-top: 60px; /* or whatever your header height is */
     }
+    .accordion-button.collapsed:hover {
+        background-color: #e8f4f8;
+        color: #0056b3;
+        transition: all 0.3s ease;
+    }
+    .accordion-button.collapsed:hover i {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+    .accordion-details-text {
+        font-size: 0.8rem;
+    }
 </style>
 
 </head>

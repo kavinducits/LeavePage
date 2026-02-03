@@ -9,7 +9,7 @@
                 </h2>
                 <p class="text-muted mb-0">Reference No: {{ $draft_study_leave->reference_no }}</p>
             </div>
-            <a href="{{ route('hod.show.studyleaves') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('hodacademicestablishment.studyLeave') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
             </a>
         </div>
@@ -45,7 +45,7 @@
             <div class="card mt-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ route('hod.show.studyleaves') }}" class="btn btn-outline-secondary btn-lg">
+                        <a href="{{ route('hodacademicestablishment.studyLeave') }}" class="btn btn-outline-secondary btn-lg">
                             <i class="fas fa-times me-2"></i>Cancel
                         </a>
 

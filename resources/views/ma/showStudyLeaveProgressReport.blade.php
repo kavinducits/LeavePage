@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -75,8 +77,60 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    
+    <!-- Initialize DataTables -->
+    <script>
+        $(document).ready(function() {
+            // Wait a bit for DOM to fully render
+            setTimeout(function() {
+                console.log('Checking for tables...');
+                console.log('jQuery loaded:', typeof $ !== 'undefined');
+                console.log('DataTables loaded:', typeof $.fn.DataTable !== 'undefined');
+                console.log('All tables:', $('table').length);
+                console.log('Table with class "table":', $('.table').length);
+                console.log('Table in responsive div:', $('.table-responsive table').length);
+                
+                var $table = $('.table-responsive table.table');
+                
+                if ($table.length > 0 && typeof $.fn.DataTable !== 'undefined') {
+                    console.log('Initializing DataTables...');
+                    $table.DataTable({
+                        "pageLength": 10,
+                        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                        "order": [[5, "desc"]], // Sort by Applied Date column (index 5) descending
+                        "language": {
+                            "search": "Search:",
+                            "lengthMenu": "Show _MENU_ entries",
+                            "info": "Showing _START_ to _END_ of _TOTAL_ progress reports",
+                            "infoEmpty": "Showing 0 to 0 of 0 progress reports",
+                            "infoFiltered": "(filtered from _MAX_ total reports)",
+                            "paginate": {
+                                "first": "First",
+                                "last": "Last",
+                                "next": "Next",
+                                "previous": "Previous"
+                            }
+                        },
+                        "columnDefs": [
+                            { "orderable": false, "targets": 7 } // Disable sorting on Actions column
+                        ]
+                    });
+                    console.log('DataTables initialized successfully');
+                } else {
+                    console.error('Cannot initialize DataTables:', {
+                        tableFound: $table.length,
+                        dataTablesLoaded: typeof $.fn.DataTable !== 'undefined'
+                    });
+                    console.log('Note: If table count is 0, check if $progressReportApplications has data');
+                }
+            }, 100);
+        });
+    </script>
 </body>
 
 </html>

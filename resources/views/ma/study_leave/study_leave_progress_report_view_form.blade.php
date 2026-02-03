@@ -14,6 +14,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .accordion-button.collapsed:hover {
+            background-color: #e8f4f8;
+            color: #0056b3;
+            transition: all 0.3s ease;
+        }
+        .accordion-button.collapsed:hover i {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+        .accordion-details-text {
+            font-size: 0.8rem;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -28,7 +42,7 @@
                 <span class="brand-text font-weight-light">MA Dashboard</span>
             </a>
             <!-- Sidebar -->
-            @php $pageName = 'Study Leave' @endphp
+            @php $pageName = 'Study Leave Progress' @endphp
             @include('ma.partials.sidebar')
         </aside>
 
@@ -206,7 +220,7 @@
                                     data-bs-target="#collapseDetails" aria-expanded="false"
                                     aria-controls="collapseDetails">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    <span class="small">More Details - Original Study Leave Application</span>
+                                    <span class="accordion-details-text">More Details - Original Study Leave Application</span>
                                 </button>
                             </h2>
                             <div id="collapseDetails" class="accordion-collapse collapse"
