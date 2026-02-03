@@ -231,6 +231,7 @@ class MAController extends Controller
 
     public function return(Request $request, $id)
     {
+        
         $request->validate([
             'remark' => 'required|string|max:1000',
         ], [
@@ -898,6 +899,7 @@ class MAController extends Controller
 
     public function returnStudyLeave(Request $request, $id)
     {
+       // dd('returnStudyLeave function called');
         
         $request->validate([
             'remark' => 'required|string|max:1000',
@@ -908,9 +910,10 @@ class MAController extends Controller
         $maUserId = self::MA_USER_ID;
 
         $application = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id' )
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 4) // Processing MA
+            ->where('study_leave_approvals.status_id', 4) // Processing MA
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select('study_leaves.*')
             ->first();
