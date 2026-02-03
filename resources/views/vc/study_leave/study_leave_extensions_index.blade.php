@@ -1,11 +1,16 @@
-<!-- Study Leave Extension Applications Table -->
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold text-dark">
-            <i class="fas fa-calendar-plus me-2  text-primary"></i>Study Leave Extension Applications
-        </h2>
-        <div class="text-muted">Extension Requests for VC Review</div>
-    </div>
+<!-- Content Wrapper -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Study Leave Extension Applications Table -->
+            <div class="container py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0 fw-bold text-dark">
+                        <i class="fas fa-calendar-plus me-2  text-primary"></i>Study Leave Extension Applications
+                    </h2>
+                    <div class="text-muted">Extension Requests for VC Review</div>
+                </div>
 
     <div class="card">
         <div class="card-header card-header-maroon fw-semibold">
@@ -102,6 +107,9 @@
             <small>Total Extension Requests: {{ $extensionApplications->count() }}</small>
         </div>
     @endif
+</div>
+        </div>
+    </section>
 </div>
 
 <!-- SweetAlert2 CDN -->
