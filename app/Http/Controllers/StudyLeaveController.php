@@ -917,11 +917,12 @@ class StudyLeaveController extends Controller
         // Get the specific study leave application with all details
         // Only show if the employee is assigned to this specific MA
         $draft_study_leave = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leaves.id', $id)
             ->select(
                 'study_leaves.*',
