@@ -96,9 +96,10 @@ class StudyLeaveExtensionController extends Controller
     {
         $totalDays = 0;
         $previousLeaves=StudyLeave::where('empno', $emp_no)
-        ->where('is_draft', false)
-        ->where('status_id', 1)
-        ->select('study_leave_from','study_leave_to');
+        ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
+        ->where('study_leaves.is_draft', false)
+        ->where('study_leave_approvals.status_id', 1)
+        ->select('study_leaves.study_leave_from','study_leaves.study_leave_to');
 
         if($previousLeaves->count() > 0){
             foreach($previousLeaves->get() as $leave){
