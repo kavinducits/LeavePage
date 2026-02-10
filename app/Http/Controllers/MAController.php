@@ -655,12 +655,13 @@ class MAController extends Controller
          $maUserId = self::MA_USER_ID;
 
          $statusApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
-            ->join('statuses', 'statuses.stat_id', '=', 'study_leaves.status_id') // adjusted to status_id
+            ->join('statuses', 'statuses.stat_id', '=', 'study_leave_approvals.status_id') // adjusted to status_id
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->whereBetween('study_leaves.status_id', [4, 8])
+            ->whereBetween('study_leave_approvals.status_id', [4, 8])
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -670,7 +671,7 @@ class MAController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'employees.created_at as applied_date',
-                'study_leaves.status_id as status_id'
+                'study_leave_approvals.status_id as status_id'
             )
             ->get();
 
@@ -813,9 +814,10 @@ class MAController extends Controller
     {
         $totalDays = 0;
         $previousLeaves=StudyLeave::where('empno', $emp_no)
-        ->where('is_draft', false)
-        ->where('status_id', 1)
-        ->select('study_leave_from','study_leave_to');
+        ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
+        ->where('study_leave_approvals.is_draft', false)
+        ->where('study_leave_approvals.status_id', 1)
+        ->select('study_leaves.study_leave_from as study_leave_from','study_leaves.study_leave_to as study_leave_to');
 
         if($previousLeaves->count() > 0){
             foreach($previousLeaves->get() as $leave){
