@@ -261,7 +261,7 @@ class StudyLeaveController extends Controller
                 'empno' => session('empno'),
                 'is_draft' => true,
                 'current_step' => 1,
-                'academic_year' => $academicYear,
+                //'academic_year' => $academicYear,
             ]);
         }
         return;
@@ -943,7 +943,7 @@ class StudyLeaveController extends Controller
                 'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
                 'study_leaves.nominee_admin_empno as nominee_admin_empno',
                 'study_leaves.nominee_other_empno as nominee_other_empno',
-                'study_leaves.ma_remarks as ma_remarks',
+                'study_leave_approvals.ma_remarks as ma_remarks',
 
             )
             ->first();
@@ -1155,7 +1155,7 @@ class StudyLeaveController extends Controller
                 'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
                 'study_leaves.nominee_admin_empno as nominee_admin_empno',
                 'study_leaves.nominee_other_empno as nominee_other_empno',
-                'study_leaves.ma_remarks as ma_remarks',
+                'study_leave_approvals.ma_remarks as ma_remarks',
 
             )
             ->first();
