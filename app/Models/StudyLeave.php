@@ -10,7 +10,7 @@ class StudyLeave extends Model
    protected $fillable = [
     'reference_no',
         'empno',
-        'academic_year',
+        //'academic_year',
         'passport_no',
         'passport_validity',
         'leave_type',
@@ -37,8 +37,9 @@ class StudyLeave extends Model
         'consent_letter_other_path',
         'library_and_property_handling',
         'loan_handling',
-        'ma_empno',
-        'hod_empno',
+        //'ma_empno',
+       // 'hod_empno',
+       /*
         'hod_staff_adequacy_recommendation',
         'hod_teaching_coverage_recommendation',
         'hod_one_year_service_verification',
@@ -54,11 +55,12 @@ class StudyLeave extends Model
         'dean_empno',
         'dean_remarks',
         'status_id',
+        */
         'is_draft',
         'self_funding_declaration',
         'placement_letter',
-        'is_completed',
-        'ma_remarks',
+        //'is_completed',
+        //'ma_remarks',
         'current_step',
     ];
 
