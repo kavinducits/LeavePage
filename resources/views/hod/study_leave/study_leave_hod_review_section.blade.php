@@ -15,8 +15,8 @@
              </label>
              <div class="form-check">
                  <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="adequateStaffYes"
-                     value="yes"
-                     {{ isset($draft_study_leave->hod_adequate_staff_available) && $draft_study_leave->hod_adequate_staff_available == 'yes' ? 'checked' : '' }}
+                     value="1"
+                     {{ isset($draft_study_leave->hod_adequate_staff_available) && $draft_study_leave->hod_adequate_staff_available == 1 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="adequateStaffYes">
                      Yes
@@ -24,8 +24,8 @@
              </div>
              <div class="form-check">
                  <input class="form-check-input" type="radio" name="hod_adequate_staff_available" id="adequateStaffNo"
-                     value="no"
-                     {{ isset($draft_study_leave->hod_adequate_staff_available) && $draft_study_leave->hod_adequate_staff_available == 'no' ? 'checked' : '' }}
+                     value="0"
+                     {{ isset($draft_study_leave->hod_adequate_staff_available) && $draft_study_leave->hod_adequate_staff_available !== null && $draft_study_leave->hod_adequate_staff_available == 0 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="adequateStaffNo">
                      No
@@ -42,8 +42,8 @@
              </label>
              <div class="form-check">
                  <input class="form-check-input" type="radio" name="hod_teaching_covered" id="teachingCoveredYes"
-                     value="yes"
-                     {{ isset($draft_study_leave->hod_teaching_covered) && $draft_study_leave->hod_teaching_covered == 'yes' ? 'checked' : '' }}
+                     value="1"
+                     {{ isset($draft_study_leave->hod_teaching_covered) && $draft_study_leave->hod_teaching_covered == 1 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="teachingCoveredYes">
                      Yes
@@ -51,8 +51,8 @@
              </div>
              <div class="form-check">
                  <input class="form-check-input" type="radio" name="hod_teaching_covered" id="teachingCoveredNo"
-                     value="no"
-                     {{ isset($draft_study_leave->hod_teaching_covered) && $draft_study_leave->hod_teaching_covered == 'no' ? 'checked' : '' }}
+                     value="0"
+                     {{ isset($draft_study_leave->hod_teaching_covered) && $draft_study_leave->hod_teaching_covered !== null && $draft_study_leave->hod_teaching_covered == 0 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="teachingCoveredNo">
                      No
@@ -68,8 +68,8 @@
              </label>
              <div class="form-check">
                  <input class="form-check-input" type="radio" name="hod_service_period" id="servicePeriodYes"
-                     value="yes"
-                     {{ isset($draft_study_leave->hod_service_period) && $draft_study_leave->hod_service_period == 'yes' ? 'checked' : '' }}
+                     value="1"
+                     {{ isset($draft_study_leave->hod_service_period) && $draft_study_leave->hod_service_period == 1 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="servicePeriodYes">
                      Yes
@@ -77,8 +77,8 @@
              </div>
              <div class="form-check">
                  <input class="form-check-input" type="radio" name="hod_service_period" id="servicePeriodNo"
-                     value="no"
-                     {{ isset($draft_study_leave->hod_service_period) && $draft_study_leave->hod_service_period == 'no' ? 'checked' : '' }}
+                     value="0"
+                     {{ isset($draft_study_leave->hod_service_period) && $draft_study_leave->hod_service_period !== null && $draft_study_leave->hod_service_period == 0 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="servicePeriodNo">
                      No
@@ -93,16 +93,16 @@
                  <span class="text-danger">*</span>
              </label>
              <div class="form-check">
-                 <input class="form-check-input" type="radio" name="hod_recommend" id="recommendYes" value="yes"
-                     {{ isset($draft_study_leave->hod_recommend) && $draft_study_leave->hod_recommend == 'yes' ? 'checked' : '' }}
+                 <input class="form-check-input" type="radio" name="hod_recommend" id="recommendYes" value="1"
+                     {{ isset($draft_study_leave->hod_recommend) && $draft_study_leave->hod_recommend == 1 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="recommendYes">
                      Yes
                  </label>
              </div>
              <div class="form-check">
-                 <input class="form-check-input" type="radio" name="hod_recommend" id="recommendNo" value="no"
-                     {{ isset($draft_study_leave->hod_recommend) && $draft_study_leave->hod_recommend == 'no' ? 'checked' : '' }}
+                 <input class="form-check-input" type="radio" name="hod_recommend" id="recommendNo" value="0"
+                     {{ isset($draft_study_leave->hod_recommend) && $draft_study_leave->hod_recommend !== null && $draft_study_leave->hod_recommend == 0 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="recommendNo">
                      No
@@ -112,7 +112,7 @@
 
          <!-- Conditional: If not recommended -->
          <div class="mb-4" id="notRecommendReasonDiv"
-             style="display: {{ optional($draft_study_leave)->hod_recommend == 'no' || optional($draft_study_leave)->hod_not_recommend_reason ? 'block' : 'none' }};">
+             style="display: {{ (optional($draft_study_leave)->hod_recommend !== null && optional($draft_study_leave)->hod_recommend == 0) || optional($draft_study_leave)->hod_not_recommend_reason ? 'block' : 'none' }};">
              <label for="hod_not_recommend_reason" class="form-label fw-semibold">
                  If not recommended, please give reasons
                  <span class="text-danger">*</span>

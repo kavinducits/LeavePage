@@ -705,8 +705,8 @@ class HODController extends Controller
     public function approveExtension(Request $request, $extension_id)
     {
         $request->validate([
-            'hod_recommend' => 'required|string',
-            'hod_not_recommend_reason' => 'required_if:hod_recommend,no|string|nullable',
+            'hod_recommend' => 'required|integer|in:0,1',
+            'hod_not_recommend_reason' => 'required_if:hod_recommend,0|string|nullable',
             'hod_remarks' => 'nullable|string',
         ]);
 
@@ -789,11 +789,11 @@ class HODController extends Controller
     {
         // Validate the HOD review inputs
         $request->validate([
-            'hod_adequate_staff_available' => 'required|string',
-            'hod_teaching_covered' => 'required|string',
-            'hod_service_period' => 'required|string',
-            'hod_recommend' => 'required|string',
-            'hod_not_recommend_reason' => 'required_if:hod_recommend,no|string|nullable',
+            'hod_adequate_staff_available' => 'required|integer|in:0,1',
+            'hod_teaching_covered' => 'required|integer|in:0,1',
+            'hod_service_period' => 'required|integer|in:0,1',
+            'hod_recommend' => 'required|integer|in:0,1',
+            'hod_not_recommend_reason' => 'required_if:hod_recommend,0|string|nullable',
             'hod_remarks' => 'nullable|string',
         ]);
 

@@ -174,13 +174,13 @@
                         <span class="text-danger">*</span>
                     </label>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendYes" value="yes" required>
+                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendYes" value="1" required>
                         <label class="form-check-label" for="recommendYes">
                             Yes
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendNo" value="no" required>
+                        <input class="form-check-input" type="radio" name="dean_recommend" id="recommendNo" value="0" required>
                         <label class="form-check-label" for="recommendNo">
                             No
                         </label>
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     recommendRadios.forEach(radio => {
         radio.addEventListener('change', function() {
-            if (this.value === 'no') {
+            if (this.value === '0') {
                 notRecommendDiv.style.display = 'block';
                 notRecommendDiv.classList.add('show');
                 notRecommendTextarea.required = true;
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
     deanReviewForm.addEventListener('submit', function(e) {
         const recommendValue = document.querySelector('input[name="dean_recommend"]:checked')?.value;
         
-        if (recommendValue === 'no') {
+        if (recommendValue === '0') {
             const reason = notRecommendTextarea.value.trim();
             if (reason === '') {
                 e.preventDefault();

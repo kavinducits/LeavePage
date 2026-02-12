@@ -173,12 +173,12 @@
                 <!-- Air Passage Request -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Air Passage Request</label>
-                    <input type="text" class="form-control" value="{{ ucfirst($application->air_passage_request ?? '') }}" readonly>
+                    <input type="text" class="form-control" value="{{ ($application->air_passage_request ?? '') == '1' ? 'Yes' : (($application->air_passage_request ?? '') == '0' ? 'No' : '') }}" readonly>
                 </div>
                 <!-- Warm Cloth Allowance -->
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Warm Cloth Allowance Request</label>
-                    <input type="text" class="form-control" value="{{ ucfirst($application->warm_cloth_allowance_request ?? '') }}" readonly>
+                    <input type="text" class="form-control" value="{{ ($application->warm_cloth_allowance_request ?? '') == '1' ? 'Yes' : (($application->warm_cloth_allowance_request ?? '') == '0' ? 'No' : '') }}" readonly>
                 </div>
             </div>
         </div>

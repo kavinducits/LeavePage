@@ -429,8 +429,9 @@ class VCController extends Controller
     {
         // Validate the VC review inputs
         $request->validate([
-            'vc_recommend_committee' => 'required|string',
-            'vc_not_approve_reason' => 'required_if:vc_recommend_committee,no|string|nullable',
+            'vc_recommend_committee' => 'required|integer|in:0,1',
+            'vc_approved_council' => 'required|integer|in:0,1',
+            'vc_not_approve_reason' => 'required_if:vc_recommend_committee,0|string|nullable',
             'vc_remarks' => 'nullable|string',
         ]);
 
@@ -449,7 +450,7 @@ class VCController extends Controller
         }
 
         // Update the study leave application with VC review
-        if($request->vc_approved_council === 'yes' && $request->vc_recommend_committee === 'yes') {
+        if($request->vc_approved_council == 1 && $request->vc_recommend_committee == 1) {
            $stauts_id = 1; // Approved
         }
         else {
@@ -551,8 +552,8 @@ class VCController extends Controller
     public function approveExtension(Request $request, $extension_id)
     {
         $request->validate([
-            'vc_recommend' => 'required|string',
-            'vc_not_recommend_reason' => 'required_if:vc_recommend,no|string|nullable',
+            'vc_recommend' => 'required|integer|in:0,1',
+            'vc_not_recommend_reason' => 'required_if:vc_recommend,0|string|nullable',
             'vc_remarks' => 'nullable|string',
         ]);
 
@@ -571,9 +572,9 @@ class VCController extends Controller
 
         // Prepare VC remarks
         $vcRemarks = "VC Review:\n";
-        $vcRemarks .= "- Recommendation: " . ucfirst($request->vc_recommend) . "\n";
+        $vcRemarks .= "- Recommendation: " . ($request->vc_recommend == 1 ? 'Yes' : 'No') . "\n";
         
-        if ($request->vc_recommend === 'no' && $request->vc_not_recommend_reason) {
+        if ($request->vc_recommend == 0 && $request->vc_not_recommend_reason) {
             $vcRemarks .= "- Reason for Not Recommending: " . $request->vc_not_recommend_reason . "\n";
         }
         

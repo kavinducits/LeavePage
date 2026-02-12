@@ -463,7 +463,25 @@
                                             {{ optional($leave->created_at) ? \Carbon\Carbon::parse($leave->created_at)->format('Y-m-d') : '' }}
                                         </td>
                                         <td class="text-center fw-semibold">{{ $leave->reference_no ?? 'N/A' }}</td>
-                                        <td class="text-center">{{ $leave->leave_payment_type ?? 'Study Leave' }}</td>
+                                        <td class="text-center">
+                                            @php
+                                                $paymentType = $leave->leave_payment_type;
+                                                if ($paymentType === null) {
+                                                    $displayText = 'Select an option';
+                                                    $badgeClass = 'bg-secondary';
+                                                } elseif ($paymentType == 0) {
+                                                    $displayText = 'Without Pay';
+                                                    $badgeClass = 'bg-danger';
+                                                } elseif ($paymentType == 1) {
+                                                    $displayText = 'With Pay';
+                                                    $badgeClass = 'bg-success';
+                                                } else {
+                                                    $displayText = 'Study Leave';
+                                                    $badgeClass = 'bg-info';
+                                                }
+                                            @endphp
+                                            <span class="badge {{ $badgeClass }}">{{ $displayText }}</span>
+                                        </td>
                                         <td class="text-center">
                                             @php
                                                 $statusValue = $leave->status_id ?? 0;
@@ -490,6 +508,10 @@
                                                 }
                                                 elseif( $statusValue == 7) {
                                                     $status = 'Processing VC';
+                                                    $badgeClass = 'bg-secondary';
+                                                }
+                                                 elseif( $statusValue == 8) {
+                                                    $status = 'VC Checked';
                                                     $badgeClass = 'bg-secondary';
                                                 }
                                                  elseif( $statusValue == 9) {

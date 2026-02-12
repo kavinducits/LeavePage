@@ -25,8 +25,8 @@
                                     <td class="text-center">
                                         <select name="prev_with_pay_display" class="form-select" disabled>
                                             <option value="" @selected(optional($leave)->leave_payment_type=== '')>Select</option>
-                                            <option value="With Pay" @selected(optional($leave)->leave_payment_type === 'with Pay')>With Pay</option>
-                                            <option value="No Pay" @selected(optional($leave)->leave_payment_type === 'without Pay')>No Pay</option>
+                                            <option value="1" @selected(optional($leave)->leave_payment_type == '1')>With Pay</option>
+                                            <option value="2" @selected(optional($leave)->leave_payment_type == '2')>No Pay</option>
                                         </select>
                                         
                                     <td class="text-center">

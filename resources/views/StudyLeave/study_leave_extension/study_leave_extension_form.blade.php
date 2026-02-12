@@ -204,7 +204,7 @@
             const loanHandlingDetails = document.getElementById('loan_handling_details');
 
             function updateLoanHandlingVisibility() {
-                if (leavePaymentType.value === 'without Pay') {
+                if (leavePaymentType.value === '2') {
                     loanHandlingSection.style.display = 'block';
                     loanHandlingDetails.setAttribute('required', 'required');
                 } else {
@@ -215,7 +215,7 @@
             }
 
             function updateScholarshipVisibility() {
-                if (fundingType.value === 'scholarship') {
+                if (fundingType.value === '2') {
                     scholarshipDetails.style.display = 'block';
                     scholarshipSource.setAttribute('required', 'required');
                 } else {
@@ -228,11 +228,11 @@
             }
 
             scholarshipSource.addEventListener('change', function() {
-                if (this.value === 'agency') {
+                if (this.value === '1') {
                     scholarshipExtraDetails.style.display = 'block';
                     scholarshipAmountGroup.style.display = 'block';
                     projectNameGroup.style.display = 'none';
-                } else if (this.value === 'project') {
+                } else if (this.value === '2') {
                     scholarshipExtraDetails.style.display = 'block';
                     scholarshipAmountGroup.style.display = 'none';
                     projectNameGroup.style.display = 'block';

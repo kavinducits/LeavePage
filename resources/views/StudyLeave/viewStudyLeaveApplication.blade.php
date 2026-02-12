@@ -111,9 +111,9 @@
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type of Study Leave Requested</label>
                         <select name="leave_payment_type" class="form-select" required>
-                            <option value="" {{ $application->leave_payment_type === '' ? 'selected' : '' }}>Select an option</option>
-                            <option value="with Pay" {{ $application->leave_payment_type === 'with Pay' ? 'selected' : '' }}>With Pay</option>
-                            <option value="without Pay" {{ $application->leave_payment_type === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
+                            <option value="" {{ $application->leave_payment_type == '' ? 'selected' : '' }}>Select an option</option>
+                            <option value="1" {{ $application->leave_payment_type == '1' ? 'selected' : '' }}>With Pay</option>
+                            <option value="2" {{ $application->leave_payment_type == '2' ? 'selected' : '' }}>Without Pay</option>
                         </select>
                     </div>
                
@@ -123,8 +123,8 @@
                         <label class="form-label fw-semibold"> Funding type</label>
                         <select name="funding_type" class="form-select" >
                             <option value="" {{ $application->funding_type ?? '' ? '' : 'selected' }}>Select funding type</option>
-                            <option value="Full" {{ $application->funding_type === 'Full' ? 'selected' : '' }}>Self-Funding</option>
-                            <option value="Partial" {{ $application->funding_type === 'Partial' ? 'selected' : '' }}>Scholarship</option>
+                            <option value="1" {{ $application->funding_type == '1' ? 'selected' : '' }}>Self-Funding</option>
+                            <option value="2" {{ $application->funding_type == '2' ? 'selected' : '' }}>Scholarship</option>
                         </select>
                     </div>
                
@@ -134,8 +134,8 @@
                         <label class="form-label fw-semibold">Scholarship Source</label>
                         <select name="scholarship_source" class="form-select" >
                             <option value="" {{ empty($application->scholarship_source) ? 'selected' : '' }}>Select source</option>
-                            <option value="agency" {{ ($application->scholarship_source ?? '') === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
-                            <option value="project" {{ ($application->scholarship_source ?? '') === 'project' ? 'selected' : '' }}>Funds from a project</option>
+                            <option value="1" {{ ($application->scholarship_source ?? '') == '1' ? 'selected' : '' }}>Scholarship offering agency</option>
+                            <option value="2" {{ ($application->scholarship_source ?? '') == '2' ? 'selected' : '' }}>Funds from a project</option>
                         </select>
                     </div>
 
@@ -161,12 +161,12 @@
                     <label class="form-label fw-semibold d-inline-block me-3">Requesting Air Passage from this University?</label>
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
-                                @checked(old('air_passage_request', $application->air_passage_request ?? '') === 'yes')>
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="1"
+                                @checked(old('air_passage_request', $application->air_passage_request ?? '') == '1')>
                             <label class="form-check-label" for="air_passage_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $application->air_passage_request ?? '') === 'no')>
+                            <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="0" @checked(old('air_passage_request', $application->air_passage_request ?? '') == '0' && old('air_passage_request', $application->air_passage_request ?? '') !== '')>
                             <label class="form-check-label" for="air_passage_no">NO</label>
                         </div>
                     </div>
@@ -177,13 +177,13 @@
                     <label class="form-label fw-semibold d-inline-block me-3">Requesting Warm Cloth Allowance from this University?</label>
                     <div class="d-inline-block">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
-                                @checked(old('warm_cloth_allowance_request', $application->warm_cloth_allowance_request ?? '') === 'yes')>
+                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="1"
+                                @checked(old('warm_cloth_allowance_request', $application->warm_cloth_allowance_request ?? '') == '1')>
                             <label class="form-check-label" for="warm_cloth_yes">YES</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no"
-                                @checked(old('warm_cloth_allowance_request', $application->warm_cloth_allowance_request ?? '') === 'no')>
+                            <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="0"
+                                @checked(old('warm_cloth_allowance_request', $application->warm_cloth_allowance_request ?? '') == '0' && old('warm_cloth_allowance_request', $application->warm_cloth_allowance_request ?? '') !== '')>
                             <label class="form-check-label" for="warm_cloth_no">NO</label>
                         </div>
                     </div>
@@ -413,7 +413,7 @@
                         const selfFundingDeclaration = document.getElementById('self-funding-declaration');
                         
                         function updateSelfFundingDeclarationVisibility() {
-                            if (fundingType.value === 'Full') {
+                            if (fundingType.value === '1') {
                                 selfFundingDeclaration.style.display = 'block';
                             } else {
                                 selfFundingDeclaration.style.display = 'none';
@@ -421,7 +421,7 @@
                             }
                         }
                         
-                        // Show on page load if funding type is already 'Full'
+                        // Show on page load if funding type is already '1' (Self-Funding)
                         updateSelfFundingDeclarationVisibility();
                         
                         // Update when user changes funding type
@@ -526,7 +526,7 @@
                         const selfFundingExtra2 = document.getElementById('self-funding-extra2');
                         
                         function updateSelfFundingVisibility() {
-                            if (fundingType.value === 'Full') {
+                            if (fundingType.value === '1') {
                                 selfFundingExtra.style.display = 'block';
                                 selfFundingExtra2.style.display = 'block';
                             } else {
@@ -540,7 +540,7 @@
                             }
                         }
                         
-                        // Show fields on page load if funding type is already set to 'Full'
+                        // Show fields on page load if funding type is already set to '1' (Self-Funding)
                         updateSelfFundingVisibility();
                         
                         // Update visibility when funding type changes
@@ -557,7 +557,7 @@
                             const projectNameGroup = document.getElementById('project-name-group');
 
                             function updateScholarshipVisibility() {
-                                if (fundingType.value === 'Partial') {
+                                if (fundingType.value === '2') {
                                     scholarshipDetails.style.display = 'block';
                                     // Also trigger scholarship source visibility on page load
                                     updateScholarshipSourceVisibility();
@@ -575,10 +575,10 @@
                             function updateScholarshipSourceVisibility() {
                                 if (scholarshipSource.value) {
                                     scholarshipExtraDetails.style.display = 'block';
-                                    if (scholarshipSource.value === 'agency') {
+                                    if (scholarshipSource.value === '1') {
                                         scholarshipAmountGroup.style.display = 'block';
                                         projectNameGroup.style.display = 'none';
-                                    } else if (scholarshipSource.value === 'project') {
+                                    } else if (scholarshipSource.value === '2') {
                                         scholarshipAmountGroup.style.display = 'none';
                                         projectNameGroup.style.display = 'block';
                                     } else {
@@ -605,7 +605,7 @@
                             const scholarshipDetails = document.getElementById('scholarship-details');
 
                             fundingType.addEventListener('change', function () {
-                                if (this.value === 'Partial') {
+                                if (this.value === '2') {
                                     scholarshipDetails.style.display = 'block';
                                 } else {
                                     scholarshipDetails.style.display = 'none';

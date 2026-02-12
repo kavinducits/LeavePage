@@ -152,14 +152,14 @@
                         </label>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="hod_recommend" id="recommendYes"
-                                value="yes" required>
+                                value="1" required>
                             <label class="form-check-label" for="recommendYes">
                                 Yes
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="hod_recommend" id="recommendNo"
-                                value="no" required>
+                                value="0" required>
                             <label class="form-check-label" for="recommendNo">
                                 No
                             </label>
@@ -320,7 +320,7 @@
 
             recommendRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
-                    if (this.value === 'no') {
+                    if (this.value === '0') {
                         notRecommendDiv.style.display = 'block';
                         notRecommendDiv.classList.add('show');
                         notRecommendTextarea.required = true;
@@ -338,7 +338,7 @@
             hodReviewForm.addEventListener('submit', function(e) {
                 const recommendValue = document.querySelector('input[name="hod_recommend"]:checked')?.value;
 
-                if (recommendValue === 'no') {
+                if (recommendValue === '0') {
                     const reason = notRecommendTextarea.value.trim();
                     if (reason === '') {
                         e.preventDefault();

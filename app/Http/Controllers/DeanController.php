@@ -475,8 +475,8 @@ class DeanController extends Controller
     {
         // Validate the Dean review inputs
         $request->validate([
-            'dean_recommend' => 'required|string',
-            'dean_not_recommend_reason' => 'required_if:dean_recommend,no|string|nullable',
+            'dean_recommend' => 'required|integer|in:0,1',
+            'dean_not_recommend_reason' => 'required_if:dean_recommend,0|string|nullable',
             'dean_remarks' => 'nullable|string',
         ]);
 
@@ -598,8 +598,8 @@ class DeanController extends Controller
     public function approveExtension(Request $request, $extension_id)
     {
         $request->validate([
-            'dean_recommend' => 'required|string',
-            'dean_not_recommend_reason' => 'required_if:dean_recommend,no|string|nullable',
+            'dean_recommend' => 'required|integer|in:0,1',
+            'dean_not_recommend_reason' => 'required_if:dean_recommend,0|string|nullable',
             'dean_remarks' => 'nullable|string',
         ]);
 
@@ -621,9 +621,9 @@ class DeanController extends Controller
 
         // Prepare Dean remarks
         $deanRemarks = "Dean Review:\n";
-        $deanRemarks .= "- Recommendation: " . ucfirst($request->dean_recommend) . "\n";
+        $deanRemarks .= "- Recommendation: " . ($request->dean_recommend == 1 ? 'Yes' : 'No') . "\n";
         
-        if ($request->dean_recommend === 'no' && $request->dean_not_recommend_reason) {
+        if ($request->dean_recommend == 0 && $request->dean_not_recommend_reason) {
             $deanRemarks .= "- Reason for Not Recommending: " . $request->dean_not_recommend_reason . "\n";
         }
         

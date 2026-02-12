@@ -328,7 +328,7 @@ class StudyLeaveController extends Controller
             'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
             'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
-            'leave_payment_type' => 'required|string|max:100',
+            'leave_payment_type' => 'required|integer|in:1,2',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
@@ -336,14 +336,14 @@ class StudyLeaveController extends Controller
             'country' => 'required_if:study_location,Abroad|nullable|string|max:100',
             'field_of_study' => 'required|string|max:255',
             'study_program_details' => 'nullable|string|max:1000',
-            'funding_type' => 'required|string|max:100',
-            'scholarship_source' => 'required_if:funding_type,scholarship|string|max:1000',
-            'scholarship_amount' => 'required_if:scholarship_source,agency|nullable|numeric|min:10',
-            'project_name' => 'required_if:scholarship_source,project|nullable|string|max:255',
+            'funding_type' => 'required|integer|in:1,2',
+            'scholarship_source' => 'required_if:funding_type,2|integer|in:1,2',
+            'scholarship_amount' => 'required_if:scholarship_source,1|nullable|numeric|min:10',
+            'project_name' => 'required_if:scholarship_source,2|nullable|string|max:255',
             'any_other_details' => 'nullable|string|max:1000',
-            'air_passage_request' => 'required_if:funding_type,self|string|in:yes,no',
-            'warm_cloth_allowance_request' => 'required_if:funding_type,self|string|in:yes,no',
-            'loan_handling' => 'required_if:leave_payment_type,Without Pay|string|max:100',
+            'air_passage_request' => 'required_if:funding_type,1|integer|in:0,1',
+            'warm_cloth_allowance_request' => 'required_if:funding_type,1|integer|in:0,1',
+            'loan_handling' => 'required_if:leave_payment_type,2|string|max:100',
         );
         $empno = session('study_leave.employee_no') ?? session('empno');
 
@@ -355,7 +355,7 @@ class StudyLeaveController extends Controller
             $rules['placement_letter'] = 'required|file|mimes:pdf|max:10240';
         }
         if ($draft->self_funding_declaration == null) {
-            $rules['self_funding_declaration'] = 'required_if:funding_type,self|file|mimes:pdf|max:10240';
+            $rules['self_funding_declaration'] = 'required_if:funding_type,1|file|mimes:pdf|max:10240';
         }
 
 
@@ -992,7 +992,7 @@ class StudyLeaveController extends Controller
             'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
             'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
-            'leave_payment_type' => 'required|string|max:100',
+            'leave_payment_type' => 'required|integer|in:1,2',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
@@ -1000,14 +1000,14 @@ class StudyLeaveController extends Controller
             'country' => 'required_if:study_location,Abroad|nullable|string|max:100',
             'field_of_study' => 'required|string|max:255',
             'study_program_details' => 'nullable|string|max:1000',
-            'funding_type' => 'required|string|max:100',
-            'scholarship_source' => 'required_if:funding_type,scholarship|string|max:1000',
-            'scholarship_amount' => 'required_if:scholarship_source,agency|nullable|numeric|min:10',
-            'project_name' => 'required_if:scholarship_source,project|nullable|string|max:255',
+            'funding_type' => 'required|integer|in:1,2',
+            'scholarship_source' => 'required_if:funding_type,2|integer|in:1,2',
+            'scholarship_amount' => 'required_if:scholarship_source,1|nullable|numeric|min:10',
+            'project_name' => 'required_if:scholarship_source,2|nullable|string|max:255',
             'any_other_details' => 'nullable|string|max:1000',
-            'air_passage_request' => 'required_if:funding_type,self|string|in:yes,no',
-            'warm_cloth_allowance_request' => 'required_if:funding_type,self|string|in:yes,no',
-            'loan_handling' => 'required_if:leave_payment_type,Without Pay|string|max:100',
+            'air_passage_request' => 'required_if:funding_type,1|integer|in:0,1',
+            'warm_cloth_allowance_request' => 'required_if:funding_type,1|integer|in:0,1',
+            'loan_handling' => 'required_if:leave_payment_type,2|string|max:100',
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',
@@ -1029,7 +1029,7 @@ class StudyLeaveController extends Controller
         }
 
         if ($studyLeave->self_funding_declaration == null) {
-            $rules['self_funding_declaration'] = 'required_if:funding_type,self|file|mimes:pdf|max:10240';
+            $rules['self_funding_declaration'] = 'required_if:funding_type,1|file|mimes:pdf|max:10240';
         } else {
             $rules['self_funding_declaration'] = 'nullable|file|mimes:pdf|max:10240';
         }

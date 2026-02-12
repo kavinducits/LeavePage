@@ -54,15 +54,37 @@
                         </label>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="vc_recommend_committee"
-                                id="recommendCommitteeYes" value="yes" required>
+                                id="recommendCommitteeYes" value="1" required>
                             <label class="form-check-label" for="recommendCommitteeYes">
                                 Yes
                             </label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="vc_recommend_committee"
-                                id="recommendCommitteeNo" value="no" required>
+                                id="recommendCommitteeNo" value="0" required>
                             <label class="form-check-label" for="recommendCommitteeNo">
+                                No
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 - Council Approval Decision -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            Council Approval Decision
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="vc_approved_council"
+                                id="approvedCouncilYes" value="1" required>
+                            <label class="form-check-label" for="approvedCouncilYes">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="vc_approved_council"
+                                id="approvedCouncilNo" value="0" required>
+                            <label class="form-check-label" for="approvedCouncilNo">
                                 No
                             </label>
                         </div>

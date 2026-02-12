@@ -556,9 +556,9 @@
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
                         <select name="leave_payment_type" id="leave_payment_type" class="form-select @if(!($readonly ?? true)) @error('leave_payment_type') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) === '' ? 'selected' : '' }} >Select an option</option>
-                            <option value="with Pay" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) === 'with Pay' ? 'selected' : '' }}>With Pay</option>
-                            <option value="without Pay" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) === 'without Pay' ? 'selected' : '' }}>Without Pay</option>
+                            <option value="" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) == '' ? 'selected' : '' }} >Select an option</option>
+                            <option value="1" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) == '1' ? 'selected' : '' }}>With Pay</option>
+                            <option value="2" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) == '2' ? 'selected' : '' }}>Without Pay</option>
                         </select>
                         @if(!($readonly ?? true))
                         @error('leave_payment_type')
@@ -624,8 +624,8 @@
                         <label class="form-label fw-semibold"> Funding type <span class="text-danger">*</span></label>
                         <select name="funding_type" id="funding_type" class="form-select @if(!($readonly ?? true)) @error('funding_type') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ ($draft_study_leave->funding_type ?? old('funding_type')) ? '' : 'selected' }} disabled>Select funding type</option>
-                            <option value="self" {{ ($draft_study_leave->funding_type ?? old('funding_type')) === 'self' ? 'selected' : '' }}>Self-Funding</option>
-                            <option value="scholarship" {{ ($draft_study_leave->funding_type ?? old('funding_type')) === 'scholarship' ? 'selected' : '' }}>Scholarship</option>
+                            <option value="1" {{ ($draft_study_leave->funding_type ?? old('funding_type')) == '1' ? 'selected' : '' }}>Self-Funding</option>
+                            <option value="2" {{ ($draft_study_leave->funding_type ?? old('funding_type')) == '2' ? 'selected' : '' }}>Scholarship</option>
                         </select>
                         @if(!($readonly ?? true))
                         @error('funding_type')
@@ -658,8 +658,8 @@
                         <label class="form-label fw-semibold">Scholarship Source <span class="text-danger">*</span></label>
                         <select name="scholarship_source" id="scholarship_source" class="form-select @if(!($readonly ?? true)) @error('scholarship_source') is-invalid @enderror @endif" {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ empty($draft_study_leave->scholarship_source ?? old('scholarship_source')) ? 'selected' : '' }} disabled>Select source</option>
-                            <option value="agency" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) === 'agency' ? 'selected' : '' }}>Scholarship offering agency</option>
-                            <option value="project" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) === 'project' ? 'selected' : '' }}>Funds from a project</option>
+                            <option value="1" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) == '1' ? 'selected' : '' }}>Scholarship offering agency</option>
+                            <option value="2" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) == '2' ? 'selected' : '' }}>Funds from a project</option>
                         </select>
                         @if(!($readonly ?? true))
                         @error('scholarship_source')
@@ -765,12 +765,12 @@
                                 <label class="form-label fw-semibold d-block">Requesting Air Passage from this University? <span class="text-danger">*</span></label>
                                 <div class="d-inline-block">
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="yes"
-                                            @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'yes') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="1"
+                                            @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '1') {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="air_passage_yes">YES</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="no" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="0" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '0' && old('air_passage_request', $draft_study_leave->air_passage_request ?? '') !== '') {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="air_passage_no">NO</label>
                                     </div>
                                 </div>
@@ -784,13 +784,13 @@
                                 <label class="form-label fw-semibold d-block">Requesting Warm Cloth Allowance from this University? <span class="text-danger">*</span></label>
                                 <div class="d-inline-block">
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="yes"
-                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'yes')  {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="1"
+                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '1')  {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="warm_cloth_yes">YES</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="no"
-                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') === 'no') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="0"
+                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '0' && old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') !== '') {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="warm_cloth_no">NO</label>
                                     </div>
                                 </div>
@@ -948,7 +948,7 @@
                         const selfDeclarationRequired = document.getElementById('self-declaration-required');
                         
                         function updateSelfFundingDeclarationVisibility() {
-                            if (fundingType.value === 'self') {
+                            if (fundingType.value === '1') {
                                 selfFundingDeclaration.style.display = 'block';
                                 // Only make required if no existing file
                                 @if(empty($draft_study_leave->self_funding_declaration))
@@ -963,7 +963,7 @@
                             }
                         }
                         
-                        // Show on page load if funding type is already 'self'
+                        // Show on page load if funding type is already '1' (Self-Funding)
                         updateSelfFundingDeclarationVisibility();
                         
                         // Update when user changes funding type
@@ -1134,12 +1134,12 @@
                                 return;
                             }
                             
-                            if (leavePaymentType.value === 'without Pay') {
-                                // Show loan handling field for "without Pay"
+                            if (leavePaymentType.value === '2') {
+                                // Show loan handling field for "Without Pay" (2)
                                 loanHandlingSection.style.display = 'block';
                                 loanHandlingDetails.setAttribute('required', 'required');
                             } else {
-                                // Hide loan handling field for "with Pay" or empty
+                                // Hide loan handling field for "With Pay" (1) or empty
                                 loanHandlingSection.style.display = 'none';
                                 loanHandlingDetails.removeAttribute('required');
                                 loanHandlingDetails.value = ''; // Clear value when hidden
@@ -1207,7 +1207,7 @@
                         updateCountryField();
                         
                         function updateConditionalValidation() {
-                            if (fundingType.value === 'self') {
+                            if (fundingType.value === '1') {
                                 // Self-Funding: Show air passage and warm cloth fields
                                 selfFundingExtra.style.display = 'block';
                                 selfFundingExtra2.style.display = 'block';
@@ -1225,7 +1225,7 @@
                                 scholarshipAmount.removeAttribute('required');
                                 projectName.removeAttribute('required');
                                 
-                            } else if (fundingType.value === 'scholarship') {
+                            } else if (fundingType.value === '2') {
                                 // Scholarship: Show scholarship fields
                                 scholarshipDetails.style.display = 'block';
                                 scholarshipSource.setAttribute('required', 'required');
@@ -1261,13 +1261,13 @@
                         // Handle scholarship source changes
                         if (scholarshipSource) {
                             scholarshipSource.addEventListener('change', function() {
-                                if (this.value === 'agency') {
+                                if (this.value === '1') {
                                     scholarshipAmountGroup.style.display = 'block';
                                     projectNameGroup.style.display = 'none';
                                     scholarshipAmount.setAttribute('required', 'required');
                                     projectName.removeAttribute('required');
                                     scholarshipExtraDetails.style.display = 'block';
-                                } else if (this.value === 'project') {
+                                } else if (this.value === '2') {
                                     projectNameGroup.style.display = 'block';
                                     scholarshipAmountGroup.style.display = 'none';
                                     projectName.setAttribute('required', 'required');
@@ -1336,9 +1336,9 @@
                                 }
                             }
                             
-                            // Check loan handling if required (for "without Pay")
+                            // Check loan handling if required (for "Without Pay" = 2)
                             if (leavePaymentType && loanHandlingDetails) {
-                                if (leavePaymentType.value === 'without Pay' && !loanHandlingDetails.value) {
+                                if (leavePaymentType.value === '2' && !loanHandlingDetails.value) {
                                     loanHandlingDetails.setCustomValidity('Please select an option');
                                     isValid = false;
                                 } else {
@@ -1347,7 +1347,7 @@
                             }
                             
                             // Check air passage if required
-                            if (fundingType && fundingType.value === 'self') {
+                            if (fundingType && fundingType.value === '1') {
                                 const airPassageChecked = document.querySelector('input[name="air_passage_request"]:checked');
                                 const warmClothChecked = document.querySelector('input[name="warm_cloth_allowance_request"]:checked');
                                 
@@ -1419,7 +1419,7 @@
                             const projectNameGroup = document.getElementById('project-name-group');
 
                             function updateScholarshipVisibility() {
-                                if (fundingType.value === 'scholarship') {
+                                if (fundingType.value === '2') {
                                     scholarshipDetails.style.display = 'block';
                                     // Also trigger scholarship source visibility on page load
                                     updateScholarshipSourceVisibility();
@@ -1437,10 +1437,10 @@
                             function updateScholarshipSourceVisibility() {
                                 if (scholarshipSource.value) {
                                     scholarshipExtraDetails.style.display = 'block';
-                                    if (scholarshipSource.value === 'agency') {
+                                    if (scholarshipSource.value === '1') {
                                         scholarshipAmountGroup.style.display = 'block';
                                         projectNameGroup.style.display = 'none';
-                                    } else if (scholarshipSource.value === 'project') {
+                                    } else if (scholarshipSource.value === '2') {
                                         scholarshipAmountGroup.style.display = 'none';
                                         projectNameGroup.style.display = 'block';
                                     } else {

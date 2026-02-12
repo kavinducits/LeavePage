@@ -13,16 +13,16 @@
                  <span class="text-danger">*</span>
              </label>
              <div class="form-check">
-                 <input class="form-check-input" type="radio" name="registrar_recommendation" id="recommendYes" value="yes"
-                     {{ isset($draft_study_leave->registrar_recommendation) && $draft_study_leave->registrar_recommendation == 'yes' ? 'checked' : '' }}
+                 <input class="form-check-input" type="radio" name="registrar_recommendation" id="recommendYes" value="1"
+                     {{ isset($draft_study_leave->registrar_recommendation) && $draft_study_leave->registrar_recommendation == '1' ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="recommendYes">
                      Yes
                  </label>
              </div>
              <div class="form-check">
-                 <input class="form-check-input" type="radio" name="registrar_recommendation" id="recommendNo" value="no"
-                     {{ isset($draft_study_leave->registrar_recommendation) && $draft_study_leave->registrar_recommendation == 'no' ? 'checked' : '' }}
+                 <input class="form-check-input" type="radio" name="registrar_recommendation" id="recommendNo" value="0"
+                     {{ isset($draft_study_leave->registrar_recommendation) && $draft_study_leave->registrar_recommendation == '0' && $draft_study_leave->registrar_recommendation !== null ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
                  <label class="form-check-label" for="recommendNo">
                      No
@@ -32,7 +32,7 @@
 
          <!-- Conditional: If not recommended -->
          <div class="mb-4" id="notRecommendReasonDiv"
-             style="display: {{ optional($draft_study_leave)->registrar_recommendation == 'no' || optional($draft_study_leave)->registrar_not_recommend_reason ? 'block' : 'none' }};">
+             style="display: {{ optional($draft_study_leave)->registrar_recommendation == '0' && optional($draft_study_leave)->registrar_recommendation !== null || optional($draft_study_leave)->registrar_not_recommend_reason ? 'block' : 'none' }};">
              <label for="registrar_not_recommend_reason" class="form-label fw-semibold">
                  If not recommended, please give reasons
                  <span class="text-danger">*</span>

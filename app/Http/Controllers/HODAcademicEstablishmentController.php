@@ -179,8 +179,8 @@ class HODAcademicEstablishmentController extends Controller
         // Validate the Academic Establishment HOD review inputs
         //dd($request->all());
         $request->validate([
-            'registrar_recommendation' => 'nullable|string|in:yes,no',
-            'registrar_not_recommend_reason' => 'required_if:registrar_recommendation,no|string|nullable',
+            'registrar_recommendation' => 'nullable|integer|in:0,1',
+            'registrar_not_recommend_reason' => 'required_if:registrar_recommendation,0|string|nullable',
             'registrar_remarks' => 'nullable|string|max:1000',
         ]);
 

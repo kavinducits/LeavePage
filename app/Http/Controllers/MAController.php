@@ -1388,7 +1388,7 @@ class MAController extends Controller
     public function approveWithCouncil(Request $request, $id)
     {
         $request->validate([
-            'ma_council_approval' => 'required|in:yes,no',
+            'ma_council_approval' => 'required|in:1,0',
             'ma_council_remarks' => 'nullable|string|max:1000',
         ]);
 
@@ -1416,7 +1416,7 @@ class MAController extends Controller
         }
 
         // Update with council approval - if approved, set status to 1 (Approved)
-        $statusId = $request->ma_council_approval === 'yes' ? 1 : 2; // 1 = Approved, 2 = Not Approved
+        $statusId = $request->ma_council_approval == 1 ? 1 : 2; // 1 = Approved, 2 = Not Approved
 
         DB::table('study_leave_approvals')
             ->where('id', $application->approval_id)
@@ -1427,7 +1427,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        $message = $request->ma_council_approval === 'yes' 
+        $message = $request->ma_council_approval == 1 
             ? 'Study leave application approved by council successfully.' 
             : 'Study leave application not approved by council.';
 

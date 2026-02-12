@@ -83,13 +83,13 @@
                                         </label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio"
-                                                name="hod_adequate_staff_available" id="staff_yes" value="yes"
+                                                name="hod_adequate_staff_available" id="staff_yes" value="1"
                                                 required>
                                             <label class="form-check-label" for="staff_yes">Yes</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio"
-                                                name="hod_adequate_staff_available" id="staff_no" value="no"
+                                                name="hod_adequate_staff_available" id="staff_no" value="0"
                                                 required>
                                             <label class="form-check-label" for="staff_no">No</label>
                                         </div>
@@ -104,12 +104,12 @@
                                         </label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="hod_teaching_covered"
-                                                id="coverage_yes" value="yes" required>
+                                                id="coverage_yes" value="1" required>
                                             <label class="form-check-label" for="coverage_yes">Yes</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="hod_teaching_covered"
-                                                id="coverage_no" value="no" required>
+                                                id="coverage_no" value="0" required>
                                             <label class="form-check-label" for="coverage_no">No</label>
                                         </div>
                                     </div>
@@ -122,12 +122,12 @@
                                         </label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="hod_service_period"
-                                                id="service_yes" value="yes" required>
+                                                id="service_yes" value="1" required>
                                             <label class="form-check-label" for="service_yes">Yes</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="hod_service_period"
-                                                id="service_no" value="no" required>
+                                                id="service_no" value="0" required>
                                             <label class="form-check-label" for="service_no">No</label>
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@
                                         </label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="hod_recommend"
-                                                id="recommend_yes" value="recommended" required>
+                                                id="recommend_yes" value="1" required>
                                             <label class="form-check-label text-success fw-semibold"
                                                 for="recommend_yes">
                                                 <i class="fas fa-check-circle me-1"></i>Leave is Recommended
@@ -147,7 +147,7 @@
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="hod_recommend"
-                                                id="recommend_no" value="not_recommended" required>
+                                                id="recommend_no" value="0" required>
                                             <label class="form-check-label text-danger fw-semibold"
                                                 for="recommend_no">
                                                 <i class="fas fa-times-circle me-1"></i>Leave is Not Recommended
@@ -234,7 +234,7 @@
                                     const reasonsSection = document.getElementById('reasonsSection');
                                     const reasonsTextarea = document.getElementById('not_recommended_reasons');
 
-                                    if (this.value === 'not_recommended') {
+                                    if (this.value === '0') {
                                         reasonsSection.style.display = 'block';
                                         reasonsTextarea.required = true;
                                     } else {
@@ -254,7 +254,7 @@
                                 const reasonsTextarea = document.getElementById('not_recommended_reasons');
 
                                 // Validate reasons if not recommended
-                                if (recommendation && recommendation.value === 'not_recommended') {
+                                if (recommendation && recommendation.value === '0') {
                                     if (!reasonsTextarea.value.trim()) {
                                         reasonsTextarea.classList.add('is-invalid');
                                         reasonsTextarea.focus();

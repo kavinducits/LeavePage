@@ -11,16 +11,16 @@
                 <span class="text-danger">*</span>
             </label>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="dean_recommend" id="dean_recommendYes" value="yes" 
-                       {{ optional($draft_study_leave)->dean_leave_recommendation_status == 'yes' ? 'checked' : '' }}
+                <input class="form-check-input" type="radio" name="dean_recommend" id="dean_recommendYes" value="1" 
+                       {{ optional($draft_study_leave)->dean_leave_recommendation_status == 1 ? 'checked' : '' }}
                        {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
                 <label class="form-check-label" for="recommendYes">
                     Yes
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="dean_recommend" id="dean_recommendNo" value="no" 
-                       {{ optional($draft_study_leave)->dean_leave_recommendation_status == 'no' ? 'checked' : '' }}
+                <input class="form-check-input" type="radio" name="dean_recommend" id="dean_recommendNo" value="0" 
+                       {{ optional($draft_study_leave)->dean_leave_recommendation_status !== null && optional($draft_study_leave)->dean_leave_recommendation_status == 0 ? 'checked' : '' }}
                        {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
                 <label class="form-check-label" for="recommendNo">
                     No
@@ -29,7 +29,7 @@
         </div>
 
         <!-- Conditional: If not recommended -->
-        <div class="mb-4" id="dean_notRecommendReasonDiv" style="display: {{ optional($draft_study_leave)->dean_leave_recommendation_status == 'no' ? 'block' : 'none' }};">
+        <div class="mb-4" id="dean_notRecommendReasonDiv" style="display: {{ (optional($draft_study_leave)->dean_leave_recommendation_status !== null && optional($draft_study_leave)->dean_leave_recommendation_status == 0) ? 'block' : 'none' }};">
             <label for="dean_not_recommend_reason" class="form-label fw-semibold">
                 If not recommended, please give reasons
                 <span class="text-danger">*</span>
