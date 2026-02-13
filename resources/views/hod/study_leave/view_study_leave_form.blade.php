@@ -51,14 +51,10 @@
                         </a>
 
                         <div class="text-end">
-                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
-                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Dean
-                            </button>
-
                             @if (isset($deanInfo))
-                                <div class="card mt-2" style="min-width: 280px;">
+                                <div class="card mb-2">
                                     <div class="card-body py-2">
-                                        <div class="d-flex align-items-center">
+                                        <div class="d-flex align-items-center justify-content-end">
                                             <strong>Forward to,&nbsp;</strong>
                                             <div>
                                                 <div class="fw-semibold">
@@ -70,15 +66,18 @@
                                     </div>
                                 </div>
                             @else
-                                <div class="card mt-2 border-warning" style="min-width: 280px;">
+                                <div class="card mb-2 border-warning">
                                     <div class="card-body py-2">
-                                        <div class="text-danger">
+                                        <div class="text-danger text-end">
                                             <strong>No active Dean found</strong>
                                             <div class="text-muted small">Please contact administrator.</div>
                                         </div>
                                     </div>
                                 </div>
                             @endif
+                            <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Dean
+                            </button>
                         </div>
                     </div>
                 </div>

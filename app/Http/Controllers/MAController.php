@@ -587,12 +587,13 @@ class MAController extends Controller
          $extensionApplications = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions_approvals.study_leave_extension_id', '=', 'study_leave_extensions.id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where(function($query) {
                 $query->where('statuses.status', 'Processing MA')
-                      ->orWhereNotNull('study_leave_extensions.ma_empno');
+                      ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
             })
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
@@ -803,7 +804,6 @@ class MAController extends Controller
         $to = new \DateTime($draft_study_leave->study_leave_to);
         $interval = $from->diff($to);
         $requistedStudyLeaveDays = $interval->days + 1; // +1 to include both start and end dates
-       
 
         return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays'));
     }
@@ -822,10 +822,11 @@ class MAController extends Controller
         if($previousLeaves->count() > 0){
             foreach($previousLeaves->get() as $leave){
                 $leave_id = $leave->id;
-                $extensions = StudyLeaveExtension::where('study_leave_id', $leave_id)
-                ->where('status_id', 1)
-                ->select('new_end_date')
-                ->OrderBy('id', 'desc')
+                $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave_id)
+                ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+                ->where('study_leave_extensions_approvals.status_id', 1)
+                ->select('study_leave_extensions.new_end_date')
+                ->OrderBy('study_leave_extensions.id', 'desc')
                 ->first();
                 if($extensions){
                     $extended_end_date = $extensions->new_end_date;
@@ -973,7 +974,8 @@ class MAController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
@@ -982,8 +984,8 @@ class MAController extends Controller
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.reason_for_extension',
-                'study_leave_extensions.status_id as extension_status_id',
-                'study_leave_extensions.ma_remarks',
+                'study_leave_extensions_approvals.status_id as extension_status_id',
+                'study_leave_extensions_approvals.ma_remarks',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -1046,7 +1048,7 @@ class MAController extends Controller
         $durationMonths = round($durationDays / 30, 1);
 
         $readonly = false;
-       
+
         return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
     }
 
@@ -1057,6 +1059,8 @@ class MAController extends Controller
     {
         $request->validate([
             'remark' => 'nullable|string|max:1000',
+            'ma_recommend' => 'required|in:0,1',
+            'ma_not_recommend_reason' => 'nullable|required_if:ma_recommend,0|string|max:1000',
         ]);
 
         $maUserId = self::MA_USER_ID;
@@ -1081,11 +1085,13 @@ class MAController extends Controller
         }
 
         // Update status to Processing HOD Academic Establishment/Registrar (status_id = 9)
-        DB::table('study_leave_extensions')
-            ->where('id', $extension_id)
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 9, // Processing HOD Academic Establishment/Registrar
                 'ma_empno' => self::MA_USER_ID,
+                'ma_recommend' => $request->ma_recommend,
+                'ma_not_recommend_reason' => $request->ma_recommend == 0 ? $request->ma_not_recommend_reason : null,
                 'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()
             ]);
@@ -1124,8 +1130,8 @@ class MAController extends Controller
         $newRemark = "\n\n[MA Return - " . $timestamp . "]\n" . $request->remark;
 
         // Update status to Returned (status_id = 3)
-        DB::table('study_leave_extensions')
-            ->where('id', $extension_id)
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 3, // Returned
                 'ma_empno' => self::MA_USER_ID,

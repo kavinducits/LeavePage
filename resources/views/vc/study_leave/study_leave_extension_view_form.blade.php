@@ -95,19 +95,40 @@
             </div>
         </div>
 
-        <!-- MA Remarks (if any) -->
-        @if (!empty($extension->ma_remarks))
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white fw-semibold">
-                    <i class="fas fa-comment-dots me-2"></i>MA Remarks
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info mb-0">
-                        <div style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div>
+        <!-- MA Review & Recommendation (Read-only) -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">MA Recommendation</label>
+                    <div>
+                        @if(isset($extension->ma_recommend))
+                            @if($extension->ma_recommend == 1)
+                                <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                            @else
+                                <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                            @endif
+                        @else
+                            <span class="badge bg-secondary fs-6">Not specified</span>
+                        @endif
                     </div>
                 </div>
+                @if(isset($extension->ma_recommend) && $extension->ma_recommend == 0 && !empty($extension->ma_not_recommend_reason))
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                        <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->ma_not_recommend_reason }}</p></div></div>
+                    </div>
+                @endif
+                @if(!empty($extension->ma_remarks))
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">MA Remarks</label>
+                        <div class="alert alert-info mb-0"><div style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div></div>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
 
         <!-- Accordion for More Details -->
         <div class="accordion mb-4" id="detailsAccordion">
@@ -121,7 +142,6 @@
                 </h2>
                 <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails">
                     <div class="accordion-body">
-                        <!-- Include study leave forms with readonly -->
                         @php
                             $readonly = true;
                         @endphp
@@ -134,79 +154,110 @@
             </div>
         </div>
 
-        <!-- HOD Remarks (if any) -->
-        @if (!empty($extension->extension_hod_remarks) || !empty($extension_hod_recommend))
-            <div class="card mb-4">
-                <div class="card-header card-header-dark text-white fw-semibold">
-                    <i class="fas fa-comment-dots me-2"></i>HOD Review & Remarks
-                </div>
-                <div class="card-body">
-                    @if (!empty($extension->extension_hod_recommend))
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">HOD Recommendation</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" disabled
-                                    {{ $extension->extension_hod_recommend == 'yes' ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    Yes - Recommended
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" disabled
-                                    {{ $extension->extension_hod_recommend == 'no' ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    No - Not Recommended
-                                </label>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if (!empty($extension->hod_remarks))
-                        <div class="alert alert-secondary mb-0">
-                            <label class="text-muted small mb-1">HOD Remarks</label>
-                            <div style="white-space: pre-wrap;">{{ $extension->hod_remarks }}</div>
-                        </div>
-                    @endif
-                </div>
+        <!-- HOD Academic Establishment Review & Recommendation (Read-only) -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>HOD Academic Establishment Review & Recommendation
             </div>
-        @endif
-
-        <!-- Dean Remarks (if any) -->
-        @if (!empty($extension->extension_dean_remarks) || !empty($extension->extension_dean_recommend))
-            <div class="card mb-4">
-                <div class="card-header card-header-dark text-white fw-semibold">
-                    <i class="fas fa-comment-dots me-2"></i>Dean Review & Remarks
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">HOD Academic Establishment Recommendation</label>
+                    <div>
+                        @if(isset($extension->acad_est_head_recommend))
+                            @if($extension->acad_est_head_recommend == 1)
+                                <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                            @else
+                                <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                            @endif
+                        @else
+                            <span class="badge bg-secondary fs-6">Not specified</span>
+                        @endif
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if (!empty($extension->extension_dean_recommend))
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Dean Recommendation</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" disabled
-                                    {{ $extension->extension_dean_recommend == 'yes' ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    Yes - Recommended
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" disabled
-                                    {{ $extension->extension_dean_recommend == 'no' ? 'checked' : '' }}>
-                                <label class="form-check-label">
-                                    No - Not Recommended
-                                </label>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if (!empty($extension->dean_remarks))
-                        <div class="alert alert-secondary mb-0">
-                            <label class="text-muted small mb-1">Dean Remarks</label>
-                            <div style="white-space: pre-wrap;">{{ $extension->dean_remarks }}</div>
-                        </div>
-                    @endif
-                </div>
+                @if(isset($extension->acad_est_head_recommend) && $extension->acad_est_head_recommend == 0 && !empty($extension->acad_est_head_not_recommend_reason))
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                        <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->acad_est_head_not_recommend_reason }}</p></div></div>
+                    </div>
+                @endif
+                @if(!empty($extension->acad_est_head_remarks))
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Remarks</label>
+                        <div class="alert alert-secondary mb-0"><div style="white-space: pre-wrap;">{{ $extension->acad_est_head_remarks }}</div></div>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
+
+        <!-- HOD Review & Recommendation (Read-only) -->
+        <div class="card mb-4">
+            <div class="card-header card-header-dark text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">HOD Recommendation</label>
+                    <div>
+                        @if(isset($extension->extension_hod_recommend))
+                            @if($extension->extension_hod_recommend == 1)
+                                <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                            @else
+                                <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                            @endif
+                        @else
+                            <span class="badge bg-secondary fs-6">Not specified</span>
+                        @endif
+                    </div>
+                </div>
+                @if(isset($extension->extension_hod_recommend) && $extension->extension_hod_recommend == 0 && !empty($extension->extension_hod_not_recommend_reason))
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                        <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->extension_hod_not_recommend_reason }}</p></div></div>
+                    </div>
+                @endif
+                @if(!empty($extension->extension_hod_remarks))
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">HOD Remarks</label>
+                        <div class="alert alert-dark mb-0"><div style="white-space: pre-wrap;">{{ $extension->extension_hod_remarks }}</div></div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Dean Review & Recommendation (Read-only) -->
+        <div class="card mb-4">
+            <div class="card-header card-header-dark text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Dean Recommendation</label>
+                    <div>
+                        @if(isset($extension->extension_dean_recommend))
+                            @if($extension->extension_dean_recommend == 1)
+                                <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                            @else
+                                <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                            @endif
+                        @else
+                            <span class="badge bg-secondary fs-6">Not specified</span>
+                        @endif
+                    </div>
+                </div>
+                @if(isset($extension->extension_dean_recommend) && $extension->extension_dean_recommend == 0 && !empty($extension->extension_dean_not_recommend_reason))
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                        <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->extension_dean_not_recommend_reason }}</p></div></div>
+                    </div>
+                @endif
+                @if(!empty($extension->extension_dean_remarks))
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Dean Remarks</label>
+                        <div class="alert alert-dark mb-0"><div style="white-space: pre-wrap;">{{ $extension->extension_dean_remarks }}</div></div>
+                    </div>
+                @endif
+            </div>
+        </div>
 
         <!-- VC Review Section -->
         <form action="{{ route('vc.extension.approve', $extension->extension_id) }}" method="POST" id="vcReviewForm">
@@ -276,17 +327,16 @@
                         </button>
 
                         <div class="text-end">
-                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
-                                <i class="fas fa-check-circle me-2"></i>Approve Extension Request
-                            </button>
-
-                            <div class="card mt-2" style="min-width: 280px;">
+                            <div class="card mb-2">
                                 <div class="card-body py-2">
-                                    <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-end">
                                         <strong>Final Approval - Extension will be approved</strong>
                                     </div>
                                 </div>
                             </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn">
+                                <i class="fas fa-check-circle me-2"></i>Approve Extension Request
+                            </button>
                         </div>
                     </div>
                 </div>

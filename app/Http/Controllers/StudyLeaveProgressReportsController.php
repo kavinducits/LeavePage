@@ -92,8 +92,9 @@ class StudyLeaveProgressReportsController extends Controller
      */
     private function isExtended($study_leave_id)
     {   
-        $extensions = StudyLeaveExtension::where('study_leave_id', $study_leave_id)
-            ->whereIn('status_id', [1]) // Only approved extensions
+        $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $study_leave_id)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
             ->count();
 
         return $extensions > 0;
@@ -104,9 +105,10 @@ class StudyLeaveProgressReportsController extends Controller
 
     private function getLastExtendedEndDate($study_leave_id)
     {
-        $extensions = StudyLeaveExtension::where('study_leave_id', $study_leave_id)
-            ->whereIn('status_id', [1]) // Only approved extensions
-            ->orderBy('new_end_date', 'desc')
+        $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $study_leave_id)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
+            ->orderBy('study_leave_extensions.new_end_date', 'desc')
             ->first();
 
         if ($extensions) {

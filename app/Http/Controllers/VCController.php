@@ -65,8 +65,9 @@ class VCController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions.status_id', 7) // Processing VC (status_id = 7)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions_approvals.status_id', 7) // Processing VC (status_id = 7)
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -147,8 +148,9 @@ class VCController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions.status_id', 7) // Processing VC (status_id = 7)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions_approvals.status_id', 7) // Processing VC (status_id = 7)
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -179,8 +181,9 @@ class VCController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions.status_id', 7) // Processing VC (status_id = 7)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions_approvals.status_id', 7) // Processing VC (status_id = 7)
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -483,9 +486,10 @@ class VCController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions.status_id', 7) // Processing VC
+            ->where('study_leave_extensions_approvals.status_id', 7) // Processing VC
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -493,14 +497,21 @@ class VCController extends Controller
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.reason_for_extension',
-                'study_leave_extensions.status_id as extension_status_id',
-                'study_leave_extensions.ma_remarks',
-                'study_leave_extensions.hod_remarks as extension_hod_remarks',
-                'study_leave_extensions.hod_recommend as extension_hod_recommend',
-                'study_leave_extensions.hod_not_recommend_reason as extension_hod_not_recommend_reason',
-                'study_leave_extensions.dean_remark as extension_dean_remarks',
-                'study_leave_extensions.dean_leave_recommendation_status as extension_dean_recommend',
-                'study_leave_extensions.dean_not_recommended_reason as extension_dean_not_recommend_reason',
+                'study_leave_extensions_approvals.status_id as extension_status_id',
+                'study_leave_extensions_approvals.ma_empno',
+                'study_leave_extensions_approvals.ma_recommend',
+                'study_leave_extensions_approvals.ma_not_recommend_reason',
+                'study_leave_extensions_approvals.ma_remarks',
+                'study_leave_extensions_approvals.acad_est_head_empno',
+                'study_leave_extensions_approvals.acad_est_head_recommend',
+                'study_leave_extensions_approvals.acad_est_head_not_recommend_reason',
+                'study_leave_extensions_approvals.acad_est_head_remarks',
+                'study_leave_extensions_approvals.hod_remarks as extension_hod_remarks',
+                'study_leave_extensions_approvals.hod_recommend as extension_hod_recommend',
+                'study_leave_extensions_approvals.hod_not_recommend_reason as extension_hod_not_recommend_reason',
+                'study_leave_extensions_approvals.dean_remark as extension_dean_remarks',
+                'study_leave_extensions_approvals.dean_recommend as extension_dean_recommend',
+                'study_leave_extensions_approvals.dean_not_recommended_reason as extension_dean_not_recommend_reason',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -543,6 +554,7 @@ class VCController extends Controller
         $durationDays = $oldDate->diffInDays($newDate);
         $durationMonths = round($durationDays / 30, 1);
 //dd($extension);
+
         return view('vc.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'draft_study_leave', 'durationDays', 'durationMonths'));
     }
 
@@ -560,8 +572,9 @@ class VCController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions.status_id', 7)
+            ->where('study_leave_extensions_approvals.status_id', 7)
             ->where('employees.main_branch_id', 52)
             ->select('study_leave_extensions.*')
             ->first();
@@ -587,8 +600,8 @@ class VCController extends Controller
 
         // Update extension status to Approved (status_id = 1)
         //dd($request->all());
-        DB::table('study_leave_extensions')
-            ->where('id', $extension_id)
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 1, // Approved
                 'vc_empno' => self::VC_EMP_NO,
@@ -614,8 +627,9 @@ class VCController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions.status_id', 7)
+            ->where('study_leave_extensions_approvals.status_id', 7)
             ->where('employees.main_branch_id', 52)
             ->select('study_leave_extensions.*')
             ->first();
@@ -631,8 +645,8 @@ class VCController extends Controller
        
 
         // Update extension status to Returned (status_id = 3)
-        DB::table('study_leave_extensions')
-            ->where('id', $extension_id)
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 3, // Returned
                 'vc_empno' => self::VC_EMP_NO,

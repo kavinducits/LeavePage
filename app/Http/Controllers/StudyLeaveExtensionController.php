@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\StudyLeave;
 use App\Models\StudyLeaveExtension;
+use App\Models\StudyLeaveExtensionsApprovals;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 
 class StudyLeaveExtensionController extends Controller
@@ -17,7 +19,7 @@ class StudyLeaveExtensionController extends Controller
     public function getExtensionsByStudyLeaveId($study_leave_id)
     {
         return StudyLeaveExtension::where('study_leave_id', $study_leave_id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('study_leave_extensions.created_at', 'desc')
             ->get();
     }
 
@@ -51,7 +53,8 @@ class StudyLeaveExtensionController extends Controller
         
         // Get all approved extensions for this study leave
         $extensions = StudyLeaveExtension::where('study_leave_id', $id)
-            ->whereIn('status_id', [1]) // Only approved extensions
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->whereIn('study_leave_extensions_approvals.status_id', [1]) // Only approved extensions
             ->get();
         
         $totalExtensionDays = 0;
@@ -66,7 +69,8 @@ class StudyLeaveExtensionController extends Controller
         
         // Check for pending extension requests (status not approved or rejected)
         $hasPendingExtension = StudyLeaveExtension::where('study_leave_id', $id)
-            ->whereNotIn('status_id', [1, 2]) // Not approved (1) or rejected (2)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2]) // Not approved (1) or rejected (2)
             ->exists();
         
         $canExtend = $totalDurationDays < $threeYearsInDays && !$hasPendingExtension;
@@ -74,8 +78,9 @@ class StudyLeaveExtensionController extends Controller
 
         // Get the last approved extension to determine the new start date
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $id)
-            ->where('status_id', 1) // Only approved extensions
-            ->orderBy('created_at', 'desc')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
+            ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
         
         // If there's an approved extension, use its new_end_date as the start date
@@ -105,9 +110,10 @@ class StudyLeaveExtensionController extends Controller
             foreach($previousLeaves->get() as $leave){
                 $leave_id = $leave->id;
                 $extensions = StudyLeaveExtension::where('study_leave_id', $leave_id)
-                ->where('status_id', 1)
-                ->select('new_end_date')
-                ->OrderBy('id', 'desc')
+                ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+                ->where('study_leave_extensions_approvals.status_id', 1)
+                ->select('study_leave_extensions.new_end_date')
+                ->OrderBy('study_leave_extensions.id', 'desc')
                 ->first();
                 if($extensions){
                     $extended_end_date = $extensions->new_end_date;
@@ -138,7 +144,8 @@ class StudyLeaveExtensionController extends Controller
         
         // Get all approved extensions
         $extensions = StudyLeaveExtension::where('study_leave_id', $id)
-            ->whereIn('status_id', [1])
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->whereIn('study_leave_extensions_approvals.status_id', [1])
             ->get();
         
         $totalExtensionDays = 0;
@@ -194,6 +201,7 @@ class StudyLeaveExtensionController extends Controller
             
             // Create a new StudyLeaveExtension record
             $studyLeaveExtension = new StudyLeaveExtension();
+            $studyLeaveExtensionApprovals = new StudyLeaveExtensionsApprovals();
            
             $studyLeaveExtension->study_leave_id = $study_leave_id;
            
@@ -201,10 +209,14 @@ class StudyLeaveExtensionController extends Controller
             $studyLeaveExtension->old_end_date = $validatedData['old_end_date'];
             $studyLeaveExtension->new_end_date = $validatedData['new_end_date'];
             $studyLeaveExtension->reason_for_extension = $validatedData['reason_for_extension'];
-            $studyLeaveExtension->status_id = 4; // Pending status
+           // $studyLeaveExtension->status_id = 4; // Pending status
            
             $studyLeaveExtension->save();
           
+            $studyLeaveExtensionApprovals->study_leave_extension_id = $studyLeaveExtension->id;
+            $studyLeaveExtensionApprovals->status_id = 4; // Pending status
+
+            $studyLeaveExtensionApprovals->save();
             
             return true;
         } catch (\Exception $e) {
@@ -220,6 +232,7 @@ class StudyLeaveExtensionController extends Controller
     {
         // Find the extension
         $extension = StudyLeaveExtension::findOrFail($id);
+        $extensionApprover = StudyLeaveExtensionsApprovals::where('study_leave_extension_id', $id)->first();
         
         // Validate the incoming request data
         $rules = [
@@ -243,8 +256,12 @@ class StudyLeaveExtensionController extends Controller
             $extension->old_end_date = $validatedData['old_end_date'];
             $extension->new_end_date = $validatedData['new_end_date'];
             $extension->reason_for_extension = $validatedData['reason_for_extension'];
-            $extension->status_id = 4; // Reset to pending status
+           // $extension->status_id = 4; // Reset to pending status
             $extension->save();
+            
+            // Update the approval record to pending status
+            $extensionApprover->status_id = 4;
+            $extensionApprover->save();
             
             return redirect()->route('StudyLeave.show.studyLeave', ['id' => $extension->study_leave_id])
                 ->with('success', 'Extension resubmitted successfully!');

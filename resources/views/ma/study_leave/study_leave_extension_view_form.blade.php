@@ -167,13 +167,52 @@
                     @if($extension->extension_status_id != 3 && $extension->extension_status_id != 1)
                     <div class="card">
                         <div class="card-header bg-dark text-white fw-semibold">
-                            <i class="fas fa-tasks me-2"></i>Review Actions
+                            <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
                         </div>
                         <div class="card-body">
+                            <!-- Recommendation Radio Buttons -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    Extension is recommended
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="ma_recommend" id="maRecommendYes"
+                                        value="1" required>
+                                    <label class="form-check-label" for="maRecommendYes">
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="ma_recommend" id="maRecommendNo"
+                                        value="0" required>
+                                    <label class="form-check-label" for="maRecommendNo">
+                                        No
+                                    </label>
+                                </div>
+                                <div id="recommendError" class="form-text text-danger" style="display: none;">
+                                    Please select a recommendation.
+                                </div>
+                            </div>
+
+                            <!-- Not Recommend Reason (shown when No is selected) -->
+                            <div class="mb-4" id="maNotRecommendReasonDiv" style="display: none;">
+                                <label for="ma_not_recommend_reason" class="form-label fw-semibold">
+                                    If not recommended, please give reasons
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control" id="ma_not_recommend_reason" name="ma_not_recommend_reason" rows="4"
+                                    placeholder="Please provide detailed reasons for not recommending this extension"></textarea>
+                                <div id="notRecommendReasonError" class="form-text text-danger" style="display: none;">
+                                    Please provide reasons for not recommending.
+                                </div>
+                            </div>
+
+                            <!-- MA Remarks -->
                             <div class="mb-3">
-                                <label for="actionRemark" class="form-label fw-semibold">MA Remarks</label>
+                                <label for="actionRemark" class="form-label fw-semibold">Any other remarks</label>
                                 <textarea class="form-control" id="actionRemark" name="remark" rows="4"
-                                    placeholder="Add your comments or remarks about this extension request"></textarea>
+                                    placeholder="Add your comments or remarks about this extension request (optional)"></textarea>
                                 <div id="remarkError" class="form-text text-danger" style="display: none;">
                                     Remarks are required when returning an application.
                                 </div>
@@ -191,21 +230,10 @@
                                 </form>
 
                                 <div class="text-right">
-                                    <form id="approveForm"
-                                        action="{{ route('ma.extension.forward', $extension->extension_id) }}"
-                                        method="POST" class="d-inline">
-                                        @csrf
-                                        <input type="hidden" id="approveRemarkInput" name="remark" value="">
-                                        <button type="submit" class="btn btn-success btn-lg"
-                                            {{ empty($departmentHead) ? 'disabled' : '' }}>
-                                            <i class="fas fa-forward me-2"></i>Forward to HOD
-                                        </button>
-                                    </form>
-
                                     @if (isset($departmentHead))
-                                        <div class="card mt-2" style="min-width: 260px;">
+                                        <div class="card mb-2">
                                             <div class="card-body py-2">
-                                                <div class="d-flex align-items-center">
+                                                <div class="d-flex align-items-center justify-content-end">
                                                     <strong>Forward to,&nbsp;</strong>
                                                     <div>
                                                         <div class="fw-semibold">
@@ -218,9 +246,9 @@
                                             </div>
                                         </div>
                                     @else
-                                        <div class="card mt-2 border-warning" style="min-width: 260px;">
+                                        <div class="card mb-2 border-warning">
                                             <div class="card-body py-2">
-                                                <div class="text-danger">
+                                                <div class="text-danger text-end">
                                                     <strong>No active Department Head</strong>
                                                     <div class="text-muted small">Forwarding is disabled until a head
                                                         is active.</div>
@@ -228,6 +256,18 @@
                                             </div>
                                         </div>
                                     @endif
+                                    <form id="approveForm"
+                                        action="{{ route('ma.extension.forward', $extension->extension_id) }}"
+                                        method="POST" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" id="approveRemarkInput" name="remark" value="">
+                                        <input type="hidden" id="approveRecommendInput" name="ma_recommend" value="">
+                                        <input type="hidden" id="approveNotRecommendReasonInput" name="ma_not_recommend_reason" value="">
+                                        <button type="submit" class="btn btn-success btn-lg w-100"
+                                            {{ empty($departmentHead) ? 'disabled' : '' }}>
+                                            <i class="fas fa-forward me-2"></i>Forward to HOD
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -250,12 +290,48 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
     <script>
-        // Form validation and submission handling
+        // Show/hide not recommend reason field based on radio selection
+        document.querySelectorAll('input[name="ma_recommend"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                const notRecommendDiv = document.getElementById('maNotRecommendReasonDiv');
+                if (this.value === '0') {
+                    notRecommendDiv.style.display = 'block';
+                } else {
+                    notRecommendDiv.style.display = 'none';
+                    document.getElementById('ma_not_recommend_reason').value = '';
+                    clearNotRecommendReasonError();
+                }
+                clearRecommendError();
+            });
+        });
+
+        // Form validation and submission handling - Forward
         document.getElementById('approveForm').addEventListener('submit', function(e) {
             const remarkValue = document.getElementById('actionRemark').value.trim();
-            document.getElementById('approveRemarkInput').value = remarkValue;
+            const recommendRadio = document.querySelector('input[name="ma_recommend"]:checked');
 
-            clearRemarkError();
+            clearAllErrors();
+
+            // Validate recommendation is selected
+            if (!recommendRadio) {
+                e.preventDefault();
+                showRecommendError();
+                return false;
+            }
+
+            // If not recommended, validate reason is provided
+            if (recommendRadio.value === '0') {
+                const notRecommendReason = document.getElementById('ma_not_recommend_reason').value.trim();
+                if (notRecommendReason === '') {
+                    e.preventDefault();
+                    showNotRecommendReasonError();
+                    return false;
+                }
+                document.getElementById('approveNotRecommendReasonInput').value = notRecommendReason;
+            }
+
+            document.getElementById('approveRemarkInput').value = remarkValue;
+            document.getElementById('approveRecommendInput').value = recommendRadio.value;
 
             if (!confirm('Are you sure you want to forward this extension request to HOD?')) {
                 e.preventDefault();
@@ -263,10 +339,11 @@
             }
         });
 
+        // Return form
         document.getElementById('returnForm').addEventListener('submit', function(e) {
             const remarkValue = document.getElementById('actionRemark').value.trim();
 
-            clearRemarkError();
+            clearAllErrors();
 
             if (remarkValue === '') {
                 e.preventDefault();
@@ -292,7 +369,32 @@
             document.getElementById('actionRemark').classList.remove('is-invalid');
         }
 
+        function showRecommendError() {
+            document.getElementById('recommendError').style.display = 'block';
+        }
+
+        function clearRecommendError() {
+            document.getElementById('recommendError').style.display = 'none';
+        }
+
+        function showNotRecommendReasonError() {
+            document.getElementById('notRecommendReasonError').style.display = 'block';
+            document.getElementById('ma_not_recommend_reason').classList.add('is-invalid');
+        }
+
+        function clearNotRecommendReasonError() {
+            document.getElementById('notRecommendReasonError').style.display = 'none';
+            document.getElementById('ma_not_recommend_reason').classList.remove('is-invalid');
+        }
+
+        function clearAllErrors() {
+            clearRemarkError();
+            clearRecommendError();
+            clearNotRecommendReasonError();
+        }
+
         document.getElementById('actionRemark').addEventListener('input', clearRemarkError);
+        document.getElementById('ma_not_recommend_reason').addEventListener('input', clearNotRecommendReasonError);
     </script>
 </body>
 

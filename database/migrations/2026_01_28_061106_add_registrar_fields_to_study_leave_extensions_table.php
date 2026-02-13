@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('study_leave_extensions', function (Blueprint $table) {
-            $table->integer('registrar_empno')->nullable()->after('ma_remarks');
-            $table->text('registrar_remarks')->nullable()->after('registrar_empno');
+            $table->integer('registrar_empno')->nullable();
+            $table->text('registrar_remarks')->nullable();
         });
     }
 

@@ -272,21 +272,10 @@
                                 </form>
 
                                 <div class="text-right">
-                                    <form id="approveForm"
-                                        action="{{ route('ma.progressreport.approve', $progressReport->progress_report_id) }}"
-                                        method="POST" class="d-inline">
-                                        @csrf
-                                        <input type="hidden" id="approveRemarkInput" name="remark" value="">
-                                        <button type="submit" class="btn btn-success btn-lg"
-                                            {{ empty($departmentHead) ? 'disabled' : '' }}>
-                                            <i class="fas fa-forward me-2"></i>Forward to HOD
-                                        </button>
-                                    </form>
-
                                     @if (isset($departmentHead))
-                                        <div class="card mt-2" style="min-width: 260px;">
+                                        <div class="card mb-2">
                                             <div class="card-body py-2">
-                                                <div class="d-flex align-items-center">
+                                                <div class="d-flex align-items-center justify-content-end">
                                                     <strong>Forward to,&nbsp;</strong>
                                                     <div>
                                                         <div class="fw-semibold">
@@ -294,23 +283,33 @@
                                                         </div>
                                                         <div class="text-muted small">
                                                             {{ $departmentHead->head_position ?? '' }}</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @else
-                                    <div class="card mt-2 border-warning" style="min-width: 260px;">
-                                        <div class="card-body py-2">
-                                            <div class="text-danger">
-                                                <strong>No active Department Head</strong>
-                                                <div class="text-muted small">Forwarding is disabled until a head is
-                                                    active.</div>
+                                    @else
+                                        <div class="card mb-2 border-warning">
+                                            <div class="card-body py-2">
+                                                <div class="text-danger text-end">
+                                                    <strong>No active Department Head</strong>
+                                                    <div class="text-muted small">Forwarding is disabled until a head is
+                                                        active.</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endif
+                                    @endif
+                                    <form id="approveForm"
+                                        action="{{ route('ma.progressreport.approve', $progressReport->progress_report_id) }}"
+                                        method="POST" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" id="approveRemarkInput" name="remark" value="">
+                                        <button type="submit" class="btn btn-success btn-lg w-100"
+                                            {{ empty($departmentHead) ? 'disabled' : '' }}>
+                                            <i class="fas fa-forward me-2"></i>Forward to HOD
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
                     </div>
                     @endif
 

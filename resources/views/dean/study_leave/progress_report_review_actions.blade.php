@@ -35,38 +35,40 @@
             </div>
         </div>
 
-        @if (isset($vcInfo))
-            <div class="alert alert-info">
-                <strong><i class="fas fa-info-circle me-2"></i>Forward to:</strong>
-                <div class="mt-2">
-                    <strong>{{ $vcInfo->vc_title ?? 'Vice Chancellor' }} {{ $vcInfo->vc_name ?? '' }}</strong>
-                </div>
-            </div>
-        @endif
-
         <div class="d-flex flex-column align-items-end">
+            @if (isset($vcInfo))
+                <div class="card mb-2 w-100">
+                    <div class="card-body py-2">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <strong>Forward to,&nbsp;</strong>
+                            <div>
+                                <div class="fw-semibold">{{ $vcInfo->vc_title ?? 'Vice Chancellor' }} {{ $vcInfo->vc_name ?? '' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="card mb-2 w-100">
+                    <div class="card-body py-2">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <strong>Forward to,&nbsp;</strong>
+                            <div>
+                                <div class="fw-semibold">Vice Chancellor</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
             <form id="submitForm"
                 action="{{ route('dean.progressreport.submit', $progressReport->progress_report_id) }}"
-                method="POST" class="d-inline">
+                method="POST" class="d-inline w-100">
                 @csrf
                 <input type="hidden" id="approvalDecisionInput" name="approval_decision" value="">
                 <input type="hidden" id="remarkInput" name="remark" value="">
-                <button type="button" onclick="submitDeanForm()" class="btn btn-primary btn-lg">
+                <button type="button" onclick="submitDeanForm()" class="btn btn-primary btn-lg w-100">
                     <i class="fas fa-paper-plane me-2"></i>Submit Review
                 </button>
             </form>
-            <div class="mt-3">
-                <p class="mb-0 text-muted">
-                    <i class="fas fa-user me-1"></i>
-                    <strong>
-                        @if (isset($vcInfo) && $vcInfo->vc_name)
-                            {{ $vcInfo->vc_title ?? 'Vice Chancellor' }} {{ $vcInfo->vc_name }}
-                        @else
-                            Vice Chancellor
-                        @endif
-                    </strong>
-                </p>
-            </div>
         </div>
     </div>
 </div>

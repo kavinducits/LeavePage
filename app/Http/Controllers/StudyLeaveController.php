@@ -123,10 +123,11 @@ class StudyLeaveController extends Controller
         if ($previousLeaves->count() > 0) {
             foreach ($previousLeaves->get() as $leave) {
                 $leave_id = $leave->id;
-                $extensions = StudyLeaveExtension::where('study_leave_id', $leave_id)
-                    ->where('status_id', 1)
-                    ->select('new_end_date')
-                    ->OrderBy('id', 'desc')
+                $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave_id)
+                    ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+                    ->where('study_leave_extensions_approvals.status_id', 1)
+                    ->select('study_leave_extensions.new_end_date')
+                    ->OrderBy('study_leave_extensions.id', 'desc')
                     ->first();
                 if ($extensions) {
                     $extended_end_date = $extensions->new_end_date;
@@ -820,8 +821,8 @@ class StudyLeaveController extends Controller
                 DB::raw('COALESCE(extension_durations.total_extension_days, 0) as total_extension_days')
             )
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
-            ->leftJoin(DB::raw('(SELECT study_leave_id, status_id as extension_status_id FROM study_leave_extensions WHERE id IN (SELECT MAX(id) FROM study_leave_extensions GROUP BY study_leave_id)) as latest_extensions'), 'study_leaves.id', '=', 'latest_extensions.study_leave_id')
-            ->leftJoin(DB::raw('(SELECT study_leave_id, SUM(DATEDIFF(new_end_date, old_end_date)) as total_extension_days FROM study_leave_extensions WHERE status_id = 1 GROUP BY study_leave_id) as extension_durations'), 'study_leaves.id', '=', 'extension_durations.study_leave_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, study_leave_extensions_approvals.status_id as extension_status_id FROM study_leave_extensions Join study_leave_extensions_approvals ON study_leave_extensions.id = study_leave_extensions_approvals.study_leave_extension_id WHERE study_leave_extensions.id IN (SELECT MAX(id) FROM study_leave_extensions GROUP BY study_leave_id)) as latest_extensions'), 'study_leaves.id', '=', 'latest_extensions.study_leave_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, SUM(DATEDIFF(new_end_date, old_end_date)) as total_extension_days FROM study_leave_extensions Join study_leave_extensions_approvals ON study_leave_extensions.id = study_leave_extensions_approvals.study_leave_extension_id WHERE study_leave_extensions_approvals.status_id = 1 GROUP BY study_leave_id) as extension_durations'), 'study_leaves.id', '=', 'extension_durations.study_leave_id')
             ->get();
 
         return $previousLeaves;
@@ -1188,7 +1189,8 @@ class StudyLeaveController extends Controller
 
         // Get extensions for this study leave with status information
         $extensions = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->join('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->select('study_leave_extensions.*', 'statuses.status')
             ->orderBy('study_leave_extensions.created_at', 'desc')
             ->get();
@@ -1215,7 +1217,8 @@ class StudyLeaveController extends Controller
 
         // Check for pending extension requests (status not approved or rejected)
         $hasPendingExtension = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
-            ->whereNotIn('status_id', [1, 2]) // Not approved (1) or rejected (2)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2]) // Not approved (1) or rejected (2)
             ->exists();
 
         $extensionController = new StudyLeaveExtensionController();
@@ -1226,8 +1229,9 @@ class StudyLeaveController extends Controller
 
         // Get the last approved extension to determine the new start date
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $id)
-            ->where('status_id', 1) // Only approved extensions
-            ->orderBy('created_at', 'desc')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
+            ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
 
         $extensionStartDate = $lastApprovedExtension
@@ -1388,8 +1392,9 @@ class StudyLeaveController extends Controller
 
         // Get the actual end date (considering extensions)
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $study_leave->id)
-            ->where('status_id', 1)
-            ->orderBy('created_at', 'desc')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions_approvals.status_id', 1)
+            ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
 
         $leaveEnd = $lastApprovedExtension
@@ -1448,8 +1453,9 @@ class StudyLeaveController extends Controller
 
         // Get the actual end date (considering extensions)
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $study_leave->id)
-            ->where('status_id', 1)
-            ->orderBy('created_at', 'desc')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions_approvals.status_id', 1)
+            ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
 
         $leaveEnd = $lastApprovedExtension

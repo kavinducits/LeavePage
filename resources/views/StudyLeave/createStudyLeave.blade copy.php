@@ -395,64 +395,31 @@
                 @endif
             @else
                 <!-- Show new application section when no active draft -->
-                @php
-                    // Check if the latest study leave is approved (status_id = 1)
-                    $latestLeave = isset($previousLeaves) ? $previousLeaves->sortByDesc('id')->first() : null;
-                    $latestLeaveApproved = $latestLeave && $latestLeave->status_id == 1;
-                @endphp
 
-                @if($latestLeaveApproved)
-                    <!-- Two tiles: Progress Report & Extension Request -->
-                    <div class="d-flex justify-content-center gap-5 flex-wrap">
-                        <a href="{{ route('StudyLeave.progressReports.show', $latestLeave->id) }}" 
-                           class="d-inline-block text-decoration-none tile-action-item">
-                            <div class="tile-icon progress-tile-icon d-flex align-items-center justify-content-center mx-auto mb-2">
-                                <i class="bi bi-file-earmark-bar-graph"></i>
-                            </div>
-                            <div class="text-center">
-                                <span class="fw-semibold text-maroon">Upload Progress Report</span><br>
-                                <small class="text-muted">{{ $latestLeave->reference_no ?? '' }}</small>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('StudyLeave.show.extensionForm', $latestLeave->id) }}" 
-                           class="d-inline-block text-decoration-none tile-action-item">
-                            <div class="tile-icon extension-tile-icon d-flex align-items-center justify-content-center mx-auto mb-2">
-                                <i class="bi bi-calendar-plus"></i>
-                            </div>
-                            <div class="text-center">
-                                <span class="fw-semibold text-maroon">Study Leave Extension</span><br>
-                                <small class="text-muted">{{ $latestLeave->reference_no ?? '' }}</small>
-                            </div>
-                        </a>
-                    </div>
-                @else
-                    <!-- Show Start a New Application tile -->
-                    <div class="new-application-section">
-                        @if (false)
-                            { <!-- tempory dissable the academic year selection -->
-                            <div class="mb-3">
-                                <label for="academic-year" class="form-label fw-semibold text-maroon">
-                                    <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
-                                </label>
-                                <select class="form-select" id="academic-year" name="academic_year">
-                                    <option value="">Choose Academic Year..</option>
-                                    @foreach ($academicYears as $year)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            }
-                        @endif
-                        <a href="#" class="d-inline-block text-decoration-none" id="new-application-button"
-                            onclick="startNewApplication(event, {{ $hasActiveDraft ? 'true' : 'false' }}, {{ isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste ? 'true' : 'false' }})">
-                            <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
-                                <i class="bi bi-journal-plus"></i>
-                            </div>
-                            <div><span class="fw-semibold text-maroon">Start a New Application</span></div>
-                        </a>
-                    </div>
-                @endif
+                <div class="new-application-section">
+                    @if (false)
+                        { <!-- tempory dissable the academic year selection -->
+                        <div class="mb-3">
+                            <label for="academic-year" class="form-label fw-semibold text-maroon">
+                                <i class="fas fa-calendar-alt me-2 icon-gold"></i>Select Academic Year
+                            </label>
+                            <select class="form-select" id="academic-year" name="academic_year">
+                                <option value="">Choose Academic Year..</option>
+                                @foreach ($academicYears as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        }
+                    @endif
+                    <a href="#" class="d-inline-block text-decoration-none" id="new-application-button"
+                        onclick="startNewApplication(event, {{ $hasActiveDraft ? 'true' : 'false' }}, {{ isset($isEnableStudyLeaveRequiste) && $isEnableStudyLeaveRequiste ? 'true' : 'false' }})">
+                        <div class="new-app-icon d-flex align-items-center justify-content-center mx-auto mb-2">
+                            <i class="bi bi-journal-plus"></i>
+                        </div>
+                        <div><span class="fw-semibold text-maroon">Start a New Application</span></div>
+                    </a>
+                </div>
 
             @endif
         </div>
@@ -1172,49 +1139,6 @@
         font-size: 2.5rem;
         color: #0d6efd;
         box-shadow: 0 2px 8px rgba(13, 110, 253, 0.08);
-    }
-
-    .tile-action-item {
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .tile-action-item:hover {
-        transform: translateY(-4px);
-        text-decoration: none;
-    }
-
-    .tile-icon {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        font-size: 2.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-    }
-
-    .progress-tile-icon {
-        background: #e8f5e9;
-        border: 2px solid #4caf50;
-        color: #2e7d32;
-    }
-
-    .tile-action-item:hover .progress-tile-icon {
-        background: #4caf50;
-        color: white;
-        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-    }
-
-    .extension-tile-icon {
-        background: #e3f2fd;
-        border: 2px solid #2196f3;
-        color: #1565c0;
-    }
-
-    .tile-action-item:hover .extension-tile-icon {
-        background: #2196f3;
-        color: white;
-        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
     }
 
     .new-application-section {

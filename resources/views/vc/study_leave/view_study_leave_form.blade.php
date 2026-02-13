@@ -124,11 +124,7 @@
                         </a>
 
                         <div class="text-end">
-                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
-                                <i class="fas fa-check-circle me-2"></i>Submit Final Decision
-                            </button>
-
-                            <div class="card mt-2" style="min-width: 280px;">
+                            <div class="card mb-2">
                                 <div class="card-body py-2">
                                     <div class="alert alert-info mb-0 py-2">
                                         <i class="fas fa-info-circle me-2"></i>
@@ -137,6 +133,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn">
+                                <i class="fas fa-check-circle me-2"></i>Submit Final Decision
+                            </button>
                         </div>
                     </div>
                 </div>

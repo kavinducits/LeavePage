@@ -95,19 +95,51 @@
             </div>
         </div>
 
-        <!-- MA Remarks (if any) -->
-        @if (!empty($extension->ma_remarks))
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white fw-semibold">
-                    <i class="fas fa-comment-dots me-2"></i>MA Remarks
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info mb-0">
-                        <div style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div>
+        <!-- MA Review & Recommendation (Read-only) -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
+            </div>
+            <div class="card-body">
+                <!-- MA Recommendation -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">MA Recommendation</label>
+                    <div>
+                        @if(isset($extension->ma_recommend))
+                            @if($extension->ma_recommend == 1)
+                                <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                            @else
+                                <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                            @endif
+                        @else
+                            <span class="badge bg-secondary fs-6">Not specified</span>
+                        @endif
                     </div>
                 </div>
+
+                <!-- MA Not Recommend Reason (if not recommended) -->
+                @if(isset($extension->ma_recommend) && $extension->ma_recommend == 0 && !empty($extension->ma_not_recommend_reason))
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p class="mb-0" style="white-space: pre-wrap;">{{ $extension->ma_not_recommend_reason }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- MA Remarks -->
+                @if(!empty($extension->ma_remarks))
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">MA Remarks</label>
+                        <div class="alert alert-info mb-0">
+                            <div style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div>
+                        </div>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
 
         <!-- Accordion for More Details -->
         <div class="accordion mb-4" id="detailsAccordion">
@@ -140,14 +172,52 @@
 
             <div class="card mt-4">
                 <div class="card-header card-header-dark text-white fw-semibold">
-                    <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
+                    <i class="fas fa-clipboard-check me-2"></i>HOD Academic Establishment Review & Recommendation
                 </div>
                 <div class="card-body">
+
+                    <!-- Recommendation Radio Buttons -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            Extension is recommended
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="acad_est_head_recommend" id="acadEstRecommendYes"
+                                value="1" required>
+                            <label class="form-check-label" for="acadEstRecommendYes">
+                                Yes
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="acad_est_head_recommend" id="acadEstRecommendNo"
+                                value="0" required>
+                            <label class="form-check-label" for="acadEstRecommendNo">
+                                No
+                            </label>
+                        </div>
+                        <div id="recommendError" class="form-text text-danger" style="display: none;">
+                            Please select a recommendation.
+                        </div>
+                    </div>
+
+                    <!-- Not Recommend Reason (shown when No is selected) -->
+                    <div class="mb-4" id="acadEstNotRecommendReasonDiv" style="display: none;">
+                        <label for="acad_est_head_not_recommend_reason" class="form-label fw-semibold">
+                            If not recommended, please give reasons
+                            <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" id="acad_est_head_not_recommend_reason" name="acad_est_head_not_recommend_reason" rows="4"
+                            placeholder="Please provide detailed reasons for not recommending this extension"></textarea>
+                        <div id="notRecommendReasonError" class="form-text text-danger" style="display: none;">
+                            Please provide reasons for not recommending.
+                        </div>
+                    </div>
 
                     <!-- Remarks -->
                     <div class="mb-4">
                         <label for="registrar_remarks" class="form-label fw-semibold">
-                            Remarks
+                            Any other remarks
                         </label>
                         <textarea class="form-control" id="registrar_remarks" name="registrar_remarks" rows="3"
                             placeholder="Add any comments or remarks (optional)"></textarea>
@@ -167,15 +237,10 @@
                         </button>
 
                         <div class="text-end">
-                            <button type="submit" class="btn btn-success btn-lg" id="submitBtn"
-                                {{ empty($departmentHead) ? 'disabled' : '' }}>
-                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Department HOD
-                            </button>
-
                             @if (isset($departmentHead))
-                                <div class="card mt-2" style="min-width: 280px;">
+                                <div class="card mb-2">
                                     <div class="card-body py-2">
-                                        <div class="d-flex align-items-center">
+                                        <div class="d-flex align-items-center justify-content-end">
                                             <strong>Forward to,&nbsp;</strong>
                                             <div>
                                                 <div class="fw-semibold">
@@ -187,9 +252,9 @@
                                     </div>
                                 </div>
                             @else
-                                <div class="card mt-2 border-warning" style="min-width: 280px;">
+                                <div class="card mb-2 border-warning">
                                     <div class="card-body py-2">
-                                        <div class="text-danger">
+                                        <div class="text-danger text-end">
                                             <strong>No active Department Head found</strong>
                                             <div class="text-muted small">Forwarding is disabled until a Department Head is active.
                                             </div>
@@ -197,6 +262,10 @@
                                     </div>
                                 </div>
                             @endif
+                            <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn"
+                                {{ empty($departmentHead) ? 'disabled' : '' }}>
+                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to Department HOD
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -278,9 +347,45 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Form validation
+            // Show/hide not recommend reason field based on radio selection
+            document.querySelectorAll('input[name="acad_est_head_recommend"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    const notRecommendDiv = document.getElementById('acadEstNotRecommendReasonDiv');
+                    if (this.value === '0') {
+                        notRecommendDiv.style.display = 'block';
+                    } else {
+                        notRecommendDiv.style.display = 'none';
+                        document.getElementById('acad_est_head_not_recommend_reason').value = '';
+                        clearNotRecommendReasonError();
+                    }
+                    clearRecommendError();
+                });
+            });
+
+            // Form validation - Forward
             const hodReviewForm = document.getElementById('hodReviewForm');
             hodReviewForm.addEventListener('submit', function(e) {
+                clearAllErrors();
+
+                const recommendRadio = document.querySelector('input[name="acad_est_head_recommend"]:checked');
+
+                // Validate recommendation is selected
+                if (!recommendRadio) {
+                    e.preventDefault();
+                    showRecommendError();
+                    return false;
+                }
+
+                // If not recommended, validate reason is provided
+                if (recommendRadio.value === '0') {
+                    const notRecommendReason = document.getElementById('acad_est_head_not_recommend_reason').value.trim();
+                    if (notRecommendReason === '') {
+                        e.preventDefault();
+                        showNotRecommendReasonError();
+                        return false;
+                    }
+                }
+
                 if (!confirm('Are you sure you want to submit this review and forward to Department HOD?')) {
                     e.preventDefault();
                     return false;
@@ -308,6 +413,33 @@
             document.getElementById('returnRemarks').addEventListener('input', function() {
                 this.classList.remove('is-invalid');
             });
+
+            document.getElementById('acad_est_head_not_recommend_reason').addEventListener('input', function() {
+                clearNotRecommendReasonError();
+            });
         });
+
+        function showRecommendError() {
+            document.getElementById('recommendError').style.display = 'block';
+        }
+
+        function clearRecommendError() {
+            document.getElementById('recommendError').style.display = 'none';
+        }
+
+        function showNotRecommendReasonError() {
+            document.getElementById('notRecommendReasonError').style.display = 'block';
+            document.getElementById('acad_est_head_not_recommend_reason').classList.add('is-invalid');
+        }
+
+        function clearNotRecommendReasonError() {
+            document.getElementById('notRecommendReasonError').style.display = 'none';
+            document.getElementById('acad_est_head_not_recommend_reason').classList.remove('is-invalid');
+        }
+
+        function clearAllErrors() {
+            clearRecommendError();
+            clearNotRecommendReasonError();
+        }
     </script>
 @endsection

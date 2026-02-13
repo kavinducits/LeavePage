@@ -37,21 +37,10 @@
 
         <div class="d-flex justify-content-end align-items-start">
             <div class="text-right">
-                <form id="submitForm"
-                    action="{{ route('hod.progressreport.submit', $progressReport->progress_report_id) }}"
-                    method="POST" class="d-inline">
-                    @csrf
-                    <input type="hidden" id="approvalDecisionInput" name="approval_decision" value="">
-                    <input type="hidden" id="remarkInput" name="remark" value="">
-                    <button type="button" onclick="submitHODForm()" class="btn btn-success btn-lg" {{ empty($deanInfo) ? 'disabled' : '' }}>
-                        <i class="fas fa-forward me-2"></i>Forward to Dean
-                    </button>
-                </form>
-
                 @if (isset($deanInfo))
-                    <div class="card mt-2" style="min-width: 260px;">
+                    <div class="card mb-2">
                         <div class="card-body py-2">
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center justify-content-end">
                                 <strong>Forward to,&nbsp;</strong>
                                 <div>
                                     <div class="fw-semibold">
@@ -63,15 +52,25 @@
                         </div>
                     </div>
                 @else
-                    <div class="card mt-2 border-warning" style="min-width: 260px;">
+                    <div class="card mb-2 border-warning">
                         <div class="card-body py-2">
-                            <div class="text-danger">
+                            <div class="text-danger text-end">
                                 <strong>No active Faculty Dean</strong>
                                 <div class="text-muted small">Forwarding is disabled until a dean is active.</div>
                             </div>
                         </div>
                     </div>
                 @endif
+                <form id="submitForm"
+                    action="{{ route('hod.progressreport.submit', $progressReport->progress_report_id) }}"
+                    method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" id="approvalDecisionInput" name="approval_decision" value="">
+                    <input type="hidden" id="remarkInput" name="remark" value="">
+                    <button type="button" onclick="submitHODForm()" class="btn btn-success btn-lg w-100" {{ empty($deanInfo) ? 'disabled' : '' }}>
+                        <i class="fas fa-forward me-2"></i>Forward to Dean
+                    </button>
+                </form>
             </div>
         </div>
     </div>

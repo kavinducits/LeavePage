@@ -94,8 +94,9 @@ class HODController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions.status_id', 5) // Processing HOD (status_id = 5)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions_approvals.status_id', 5) // Processing HOD (status_id = 5)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -209,8 +210,9 @@ class HODController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions.status_id', 5) // Processing HOD (status_id = 5)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions_approvals.status_id', 5) // Processing HOD (status_id = 5)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -266,8 +268,9 @@ class HODController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions.status_id', 5) // Processing HOD (status_id = 5)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions_approvals.status_id', 5) // Processing HOD (status_id = 5)
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -600,7 +603,6 @@ class HODController extends Controller
         ];
         
         $readonly = true;
-      
 
         return view('hod.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'deanInfo'));
     }
@@ -620,9 +622,10 @@ class HODController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions.status_id', 5) // Processing HOD
+            ->where('study_leave_extensions_approvals.status_id', 5) // Processing HOD
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -630,9 +633,16 @@ class HODController extends Controller
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.reason_for_extension',
-                'study_leave_extensions.status_id as extension_status_id',
-                'study_leave_extensions.ma_remarks',
-                'study_leave_extensions.hod_remarks',
+                'study_leave_extensions_approvals.status_id as extension_status_id',
+                'study_leave_extensions_approvals.ma_empno',
+                'study_leave_extensions_approvals.ma_recommend',
+                'study_leave_extensions_approvals.ma_not_recommend_reason',
+                'study_leave_extensions_approvals.ma_remarks',
+                'study_leave_extensions_approvals.acad_est_head_empno',
+                'study_leave_extensions_approvals.acad_est_head_recommend',
+                'study_leave_extensions_approvals.acad_est_head_not_recommend_reason',
+                'study_leave_extensions_approvals.acad_est_head_remarks',
+                'study_leave_extensions_approvals.hod_remarks',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -695,7 +705,7 @@ class HODController extends Controller
         $durationMonths = round($durationDays / 30, 1);
 
         $readonly = true;
-       
+
         return view('hod.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'deanInfo', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
     }
 
@@ -716,8 +726,9 @@ class HODController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions.status_id', 5)
+            ->where('study_leave_extensions_approvals.status_id', 5)
             ->whereIn('employees.department_id', $departmentIds)
             ->select('study_leave_extensions.*')
             ->first();
@@ -729,8 +740,8 @@ class HODController extends Controller
      //  dd($request->hod_not_recommend_reason);
 
         // Update extension status to Processing Dean (status_id = 6)
-        DB::table('study_leave_extensions')
-            ->where('id', $extension_id)
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 6, // Processing Dean
                 'hod_empno' => self::HOD_EMP_NO,
@@ -759,8 +770,9 @@ class HODController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions.status_id', 5)
+            ->where('study_leave_extensions_approvals.status_id', 5)
             ->whereIn('employees.department_id', $departmentIds)
             ->select('study_leave_extensions.*')
             ->first();
@@ -773,8 +785,8 @@ class HODController extends Controller
         $returnRemark = "\n\n[HOD Returned - " . $timestamp . "]\n" . $request->hod_remarks;
 
         // Update extension status to Returned (status_id = 3)
-        DB::table('study_leave_extensions')
-            ->where('id', $extension_id)
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 3, // Returned
                 'hod_empno' => self::HOD_EMP_NO,

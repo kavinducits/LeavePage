@@ -50,13 +50,9 @@
                     </a>
 
                     <div class="text-end">
-                        <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
-                            <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to VC
-                        </button>
-                        
-                        <div class="card mt-2" style="min-width: 280px;">
+                        <div class="card mb-2">
                             <div class="card-body py-2">
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-end">
                                     <strong>Forward to,&nbsp;</strong>
                                     <div>
                                         <div class="fw-semibold">Vice Chancellor</div>
@@ -65,6 +61,9 @@
                                 </div>
                             </div>
                         </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to VC
+                        </button>
                     </div>
                 </div>
             </div>
