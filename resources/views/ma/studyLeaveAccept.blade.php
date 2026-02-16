@@ -108,94 +108,12 @@
                         </div>
                     </div>
 
-                    <div class="container py-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="mb-0 fw-bold">Study Leave Applications</h2>
-                            <div class="text-muted">
-                               
-                               Requests for Study Leave
-                            </div>
-                        </div>
-                       
-                        <div class="card">
-                            <div class="card-header bg-primary text-white">
-                                <h3 class="card-title mb-0">
-                                    <i class="fas fa-graduation-cap mr-2"></i>
-                                    Study Leave Applications
-                                    <span class="badge badge-light ml-2">{{ $statistics['pending'] ?? 0 }}</span>
-                                </h3>
-                            </div>
+                    @include('ma.study_leave.study_leave_accept_table')
 
-                            <div class="card-body p-0">
-                                @if ($studyLeaveApplications->count() > 0)
-                                    <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="px-3">Reference No</th>
-                                                    <th>Employee No</th>
-                                                    <th>Name with Initials</th>
-                                                    <th>Department</th>
-                                                    <th>Faculty</th>
-                                                    <th>Applied Date</th>
-                                                    <th>Status</th>
-                                                    <th class="text-center">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($studyLeaveApplications as $application)
-                                                    <tr>
-                                                        <td class="px-3">
-                                                            <span
-                                                                class="fw-semibold text-primary">{{ $application->reference_no }}</span>
-                                                        </td>
-                                                        <td>
-                                                            <span
-                                                                class="badge bg-secondary">{{ $application->empno }}</span>
-                                                        </td>
-                                                        <td>
-                                                            <div class="fw-semibold">
-                                                                {{ $application->name_with_initials }}</div>
-                                                        </td>
-                                                        <td>{{ $application->department }}</td>
-                                                        <td>{{ $application->faculty }}</td>
-
-                                                        <td>
-                                                            <div class="text-muted">
-                                                                {{ \Carbon\Carbon::parse($application->applied_date)->format('M d, Y') }}
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            
-                                                            <span class="badge bg-warning">{{ $application->status }}</span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <a href="{{ route('ma.show.studyleave', $application->id) }}"
-                                                                class="btn btn-sm btn-outline-primary">
-                                                                <i class="fas fa-eye me-1"></i>View
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @else
-                                    <div class="text-center py-5">
-                                        <div class="text-muted mb-3">
-                                            <i class="fas fa-inbox fa-3x"></i>
-                                        </div>
-                                        <h5 class="text-muted">No Applications Pending</h5>
-                                        <p class="text-muted">There are no applications currently waiting for review.</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        @if ($studyLeaveApplications->count() > 0)
+                        @if ($acceptedApplications->count() > 0)
                             <div class="mt-3 text-muted text-center">
                                 <small>
-                                    <i class="fas fa-list"></i> Total Applications: {{ $studyLeaveApplications->count() }}
+                                    <i class="fas fa-list"></i> Total Applications: {{ $acceptedApplications->count() }}
                                 </small>
                             </div>
                         @endif

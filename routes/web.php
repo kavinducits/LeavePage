@@ -234,6 +234,7 @@ Route::get('/dashboard/vc-approved', [MAController::class, 'dashboardVcApproved'
 Route::get('/dashboard/status', [MAController::class, 'statusPage'])->name('ma.status');
 Route::get('/dashboard/study-leave', [MAController::class, 'studyLeavePage'])->name('ma.studyleave');
 Route::get('/dashboard/study-leave-status', [MAController::class, 'studyLeaveStatusPage'])->name('ma.studyleavestatus');
+Route::get('/dashboard/study-leave-accepted', [MAController::class, 'studyLeaveAccepted'])->name('ma.studyleave.accepted');
 //Route::get('/dashboard/study-leave/{id}', [MAController::class, 'showStudyLeave'])->name('ma.show.studyleave');
 
 Route::get('/MApage/{id}/hod', [MAController::class, 'showHod'])->name('ma.show.hod');
