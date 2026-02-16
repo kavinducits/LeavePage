@@ -621,7 +621,7 @@ class MAController extends Controller
      
         $maUserId = self::MA_USER_ID;
 
-         $progressReportApplications = DB::table('study_leave_progress_reports')
+        $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
@@ -629,8 +629,7 @@ class MAController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
-            //->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
-            //->where('statuses.status', 'Processing MA') // Filter for MA Processing status
+            ->where('statuses.stat_id', '!=', 1) // Exclude status_id = 1
             ->where(function($query) {
                 $query->where('statuses.status', 'Processing MA')
                       ->orWhere('statuses.status', 'Editing') // Include reports returned to user
@@ -1564,6 +1563,44 @@ class MAController extends Controller
 
         return view('ma.showStudyLeaveExtensionsAccept',  compact('extensionApplications'));
     }
+    public function showProgressReportsAcceptedPage()
+    {
+        
+        $maUserId = self::MA_USER_ID;
+
+         $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            //->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
+            //->where('statuses.status', 'Processing MA') // Filter for MA Processing status
+            ->where(function($query) {
+                $query->where('statuses.stat_id', 1)
+                     
+                      ->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
+            })
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.due_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('ma.showStudyLeaveProgressReportAccept', compact('progressReportApplications'));
+
+       
    
     
+}
 }
