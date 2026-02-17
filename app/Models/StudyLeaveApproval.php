@@ -36,6 +36,12 @@ class StudyLeaveApproval extends Model
         'is_completed',
         'ma_remarks',
         'current_step',
+        'ma_approve_leave_committee',
+        'ma_leave_committee_number',
+        'ma_leave_committee_date',
+        'ma_approve_council',
+        'ma_council_number',
+        'ma_council_date',
     ];
     
 }

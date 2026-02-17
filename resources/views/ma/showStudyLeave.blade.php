@@ -136,52 +136,130 @@
                             </div>
                         </div>
                     @elseif($statusId == 8)
-                        <!-- Status: VC Checked - Awaiting Council Approval -->
+                        <!-- Status: VC Checked - Finalizing -->
                         <div class="card">
                             <div class="card-header bg-primary text-white fw-semibold">
-                                <i class="fas fa-gavel me-2"></i>Council Approval Required
+                                <i class="fas fa-gavel me-2"></i>Finalizing
                             </div>
                             <div class="card-body">
                                 <div class="alert alert-info mb-4">
                                     <i class="fas fa-info-circle me-2"></i>
                                     <strong>VC Recommendation Completed</strong>
-                                    <p class="mb-0 mt-2">This application has been reviewed by the VC and requires council approval decision.</p>
+                                    <p class="mb-0 mt-2">This application has been reviewed by the VC. Please finalize the study leave decision.</p>
                                 </div>
 
                                 <form id="councilApprovalForm" action="{{ route('ma.studyleave.council.approve', $draft_study_leave->id) }}" method="POST">
                                     @csrf
                                     
+                                    <!-- Study Leave Decision Radio -->
                                     <div class="mb-4">
                                         <label class="form-label fw-semibold">
-                                            Council Approval Decision
+                                            Study Leave Decision
                                             <span class="text-danger">*</span>
                                         </label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="ma_council_approval" id="councilApprovalYes" value="1" required>
-                                            <label class="form-check-label" for="councilApprovalYes">
-                                                <i class="fas fa-check-circle text-success me-1"></i> Approved by Council
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="study_leave_decision" id="decisionApproved" value="approved" required>
+                                            <label class="form-check-label" for="decisionApproved">
+                                                <i class="fas fa-check-circle text-success me-1"></i> Approved
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="ma_council_approval" id="councilApprovalNo" value="0" required>
-                                            <label class="form-check-label" for="councilApprovalNo">
-                                                <i class="fas fa-times-circle text-danger me-1"></i> Not Approved by Council
+                                            <input class="form-check-input" type="radio" name="study_leave_decision" id="decisionNotApproved" value="not_approved" required>
+                                            <label class="form-check-label" for="decisionNotApproved">
+                                                <i class="fas fa-times-circle text-danger me-1"></i> Not Approved
                                             </label>
                                         </div>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <label for="councilRemarks" class="form-label fw-semibold">Remarks (Optional)</label>
-                                        <textarea class="form-control" id="councilRemarks" name="ma_council_remarks" rows="3"
-                                                  placeholder="Add any comments regarding the council's decision"></textarea>
+                                    <!-- Approved Fields (shown only when Approved is selected) -->
+                                    <div id="approvedFields" style="display: none;">
+                                        <!-- Committee Section -->
+                                        <div class="card mb-3 border-success">
+                                            <div class="card-header bg-light fw-semibold">
+                                                <i class="fas fa-users me-2 text-success"></i>Committee Approval Details
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-semibold">Approved by Committee <span class="text-danger">*</span></label>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="ma_approve_leave_committee" id="committeeYes" value="1">
+                                                            <label class="form-check-label" for="committeeYes">Yes</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="ma_approve_leave_committee" id="committeeNo" value="0">
+                                                            <label class="form-check-label" for="committeeNo">No</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="ma_leave_committee_number" class="form-label fw-semibold">Committee Number <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="ma_leave_committee_number" name="ma_leave_committee_number" placeholder="Enter committee number">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="ma_leave_committee_date" class="form-label fw-semibold">Committee Date <span class="text-danger">*</span></label>
+                                                        <input type="date" class="form-control" id="ma_leave_committee_date" name="ma_leave_committee_date">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Council Section -->
+                                        <div class="card mb-3 border-primary">
+                                            <div class="card-header bg-light fw-semibold">
+                                                <i class="fas fa-landmark me-2 text-primary"></i>Council Approval Details
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row g-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label fw-semibold">Approved by Council <span class="text-danger">*</span></label>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="ma_approve_council" id="councilYes" value="1">
+                                                            <label class="form-check-label" for="councilYes">Yes</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="ma_approve_council" id="councilNo" value="0">
+                                                            <label class="form-check-label" for="councilNo">No</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="ma_council_number" class="form-label fw-semibold">Council Number <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control" id="ma_council_number" name="ma_council_number" placeholder="Enter council number">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="ma_council_date" class="form-label fw-semibold">Council Date <span class="text-danger">*</span></label>
+                                                        <input type="date" class="form-control" id="ma_council_date" name="ma_council_date">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-paper-plane me-2"></i>Submit Council Decision
+                                        <button type="button" id="finalizeBtn" class="btn btn-primary btn-lg" disabled>
+                                            <i class="fas fa-check-double me-2"></i>Finalize
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+
+                        <!-- Confirmation Modal -->
+                        <div class="modal fade" id="finalizeConfirmModal" tabindex="-1" role="dialog" aria-labelledby="finalizeConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header" id="finalizeModalHeader">
+                                        <h5 class="modal-title" id="finalizeConfirmModalLabel"></h5>
+                                    </div>
+                                    <div class="modal-body" id="finalizeModalBody"></div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" id="finalizeConfirmNo">
+                                            <i class="fas fa-times me-1"></i>No
+                                        </button>
+                                        <button type="button" class="btn" id="finalizeConfirmYes">
+                                            <i class="fas fa-check me-1"></i>Yes
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @else
@@ -294,26 +372,118 @@
 
     @if($statusId == 8)
     <script>
-        // Council approval form submission handling
-        document.getElementById('councilApprovalForm').addEventListener('submit', function(e) {
-            const approvalYes = document.getElementById('councilApprovalYes');
-            const approvalNo = document.getElementById('councilApprovalNo');
-            
-            // Check if at least one radio is selected
-            if (!approvalYes.checked && !approvalNo.checked) {
-                e.preventDefault();
-                alert('Please select a council approval decision (Approved or Not Approved).');
-                return;
-            }
+        $(document).ready(function() {
+            var approvedRadio = document.getElementById('decisionApproved');
+            var notApprovedRadio = document.getElementById('decisionNotApproved');
+            var approvedFields = document.getElementById('approvedFields');
+            var finalizeBtn = document.getElementById('finalizeBtn');
+            var form = document.getElementById('councilApprovalForm');
+            var confirmed = false;
 
-            // Confirm action
-            const confirmMessage = approvalYes.checked 
-                ? 'Are you sure you want to mark this application as APPROVED by Council? This will finalize the approval process.' 
-                : 'Are you sure you want to mark this application as NOT APPROVED by Council?';
-            
-            if (!confirm(confirmMessage)) {
+            // Block all form submissions unless confirmed via modal Yes
+            $(form).on('submit', function(e) {
+                if (!confirmed) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // Toggle approved fields and finalize button based on radio selection
+            $(approvedRadio).on('change', function() {
+                if (this.checked) {
+                    $(approvedFields).show();
+                    $(finalizeBtn).prop('disabled', false).removeClass('btn-danger').addClass('btn-primary');
+                }
+            });
+
+            $(notApprovedRadio).on('change', function() {
+                if (this.checked) {
+                    $(approvedFields).hide();
+                    // Clear approved fields
+                    $('input[name="ma_approve_leave_committee"]').prop('checked', false);
+                    $('#ma_leave_committee_number').val('');
+                    $('#ma_leave_committee_date').val('');
+                    $('input[name="ma_approve_council"]').prop('checked', false);
+                    $('#ma_council_number').val('');
+                    $('#ma_council_date').val('');
+                    $(finalizeBtn).prop('disabled', false).removeClass('btn-primary').addClass('btn-danger');
+                }
+            });
+
+            // Finalize button click - validate then show confirmation modal
+            $(finalizeBtn).on('click', function(e) {
                 e.preventDefault();
-            }
+                var isApproved = approvedRadio.checked;
+
+                // If approved, validate required fields
+                if (isApproved) {
+                    var missing = [];
+
+                    if (!$('input[name="ma_approve_leave_committee"]:checked').length) {
+                        missing.push('Approved by Committee');
+                    }
+                    if (!$('#ma_leave_committee_number').val().trim()) {
+                        $('#ma_leave_committee_number').addClass('is-invalid');
+                        missing.push('Committee Number');
+                    } else {
+                        $('#ma_leave_committee_number').removeClass('is-invalid');
+                    }
+                    if (!$('#ma_leave_committee_date').val()) {
+                        $('#ma_leave_committee_date').addClass('is-invalid');
+                        missing.push('Committee Date');
+                    } else {
+                        $('#ma_leave_committee_date').removeClass('is-invalid');
+                    }
+                    if (!$('input[name="ma_approve_council"]:checked').length) {
+                        missing.push('Approved by Council');
+                    }
+                    if (!$('#ma_council_number').val().trim()) {
+                        $('#ma_council_number').addClass('is-invalid');
+                        missing.push('Council Number');
+                    } else {
+                        $('#ma_council_number').removeClass('is-invalid');
+                    }
+                    if (!$('#ma_council_date').val()) {
+                        $('#ma_council_date').addClass('is-invalid');
+                        missing.push('Council Date');
+                    } else {
+                        $('#ma_council_date').removeClass('is-invalid');
+                    }
+
+                    if (missing.length > 0) {
+                        alert('Please fill in all required fields: ' + missing.join(', '));
+                        return;
+                    }
+                }
+
+                // Set modal content based on decision
+                if (isApproved) {
+                    $('#finalizeModalHeader').attr('class', 'modal-header bg-success text-white');
+                    $('#finalizeConfirmModalLabel').text('Confirm Approval');
+                    $('#finalizeModalBody').html('<p>Are you sure you want to <strong>approve</strong> this study leave application?</p><p class="text-muted mb-0">This action will finalize the application as approved.</p>');
+                    $('#finalizeConfirmYes').attr('class', 'btn btn-success');
+                } else {
+                    $('#finalizeModalHeader').attr('class', 'modal-header bg-danger text-white');
+                    $('#finalizeConfirmModalLabel').text('Confirm Rejection');
+                    $('#finalizeModalBody').html('<p>Are you sure you want to <strong>reject</strong> this study leave application?</p><p class="text-muted mb-0">This action will finalize the application as not approved.</p>');
+                    $('#finalizeConfirmYes').attr('class', 'btn btn-danger');
+                }
+
+                $('#finalizeConfirmModal').modal('show');
+            });
+
+            // Yes button - set flag and submit form
+            $('#finalizeConfirmYes').on('click', function() {
+                confirmed = true;
+                $('#finalizeConfirmModal').modal('hide');
+                form.submit();
+            });
+
+            // No button - just close modal, do nothing
+            $('#finalizeConfirmNo').on('click', function() {
+                confirmed = false;
+                $('#finalizeConfirmModal').modal('hide');
+            });
         });
     </script>
     @endif

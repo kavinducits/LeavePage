@@ -43,6 +43,12 @@ return new class extends Migration
             $table->boolean('is_draft')->default(false);
             $table->boolean('is_completed')->nullable();
             $table->unsignedInteger('current_step')->nullable();
+            $table->integer('ma_approve_leave_committee')->nullable();
+            $table->string('ma_leave_committee_number')->nullable();
+            $table->date('ma_leave_committee_date')->nullable();
+            $table->integer('ma_approve_council')->nullable();
+            $table->string('ma_council_number')->nullable();
+            $table->date('ma_council_date')->nullable();
             
             // Foreign key constraint
             $table->foreign('study_leave_id')->references('id')->on('study_leaves')->onDelete('cascade');

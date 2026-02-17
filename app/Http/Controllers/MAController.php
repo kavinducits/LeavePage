@@ -1427,13 +1427,18 @@ class MAController extends Controller
     }
 
     /**
-     * Approve study leave with council approval
+     * Finalize study leave with committee and council approval
      */
     public function approveWithCouncil(Request $request, $id)
     {
         $request->validate([
-            'ma_council_approval' => 'required|in:1,0',
-            'ma_council_remarks' => 'nullable|string|max:1000',
+            'study_leave_decision' => 'required|in:approved,not_approved',
+            'ma_approve_leave_committee' => 'required_if:study_leave_decision,approved|nullable|in:0,1',
+            'ma_leave_committee_number' => 'required_if:study_leave_decision,approved|nullable|string|max:255',
+            'ma_leave_committee_date' => 'required_if:study_leave_decision,approved|nullable|date',
+            'ma_approve_council' => 'required_if:study_leave_decision,approved|nullable|in:0,1',
+            'ma_council_number' => 'required_if:study_leave_decision,approved|nullable|string|max:255',
+            'ma_council_date' => 'required_if:study_leave_decision,approved|nullable|date',
         ]);
 
         $maUserId = self::MA_USER_ID;
@@ -1452,28 +1457,30 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave')->with('error', 'Application not found or not in the correct status.');
         }
 
-        // Prepare remarks with timestamp
-        $newRemark = '';
-        if ($request->ma_council_remarks) {
-            $timestamp = now()->format('Y-m-d H:i:s');
-            $newRemark = "\n\n[MA Council Approval - " . $timestamp . "]\n" . $request->ma_council_remarks;
-        }
+        $isApproved = $request->study_leave_decision === 'approved';
+        $statusId = $isApproved ? 1 : 2; // 1 = Approved, 2 = Rejected
 
-        // Update with council approval - if approved, set status to 1 (Approved)
-        $statusId = $request->ma_council_approval == 1 ? 1 : 2; // 1 = Approved, 2 = Not Approved
+        $updateData = [
+            'status_id' => $statusId,
+            'updated_at' => now(),
+        ];
+
+        if ($isApproved) {
+            $updateData['ma_approve_leave_committee'] = $request->ma_approve_leave_committee;
+            $updateData['ma_leave_committee_number'] = $request->ma_leave_committee_number;
+            $updateData['ma_leave_committee_date'] = $request->ma_leave_committee_date;
+            $updateData['ma_approve_council'] = $request->ma_approve_council;
+            $updateData['ma_council_number'] = $request->ma_council_number;
+            $updateData['ma_council_date'] = $request->ma_council_date;
+        }
 
         DB::table('study_leave_approvals')
             ->where('id', $application->approval_id)
-            ->update([
-                'status_id' => $statusId,
-                'vc_council_covering_approval_status' => $request->ma_council_approval,
-                'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
-                'updated_at' => now()
-            ]);
+            ->update($updateData);
 
-        $message = $request->ma_council_approval == 1 
-            ? 'Study leave application approved by council successfully.' 
-            : 'Study leave application not approved by council.';
+        $message = $isApproved
+            ? 'Study leave application has been approved and finalized successfully.'
+            : 'Study leave application has been rejected.';
 
         return redirect()->route('ma.studyleave')->with('success', $message);
     }
@@ -1498,8 +1505,8 @@ class MAController extends Controller
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->where('study_leaves.is_draft', false) // Only non-draft applications
             ->where(function($q) {
-                $q->where('study_leave_approvals.status_id', 1) // Processing MA (status_id = 1)
-                  ->orWhereNotNull('study_leave_approvals.ma_empno'); // Or MA has processed it
+                $q->where('study_leave_approvals.status_id', 1); // Processing MA (status_id = 1)
+                 
                  
             });
         
