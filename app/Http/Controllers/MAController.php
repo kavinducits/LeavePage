@@ -226,7 +226,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.index')->with('success', 'Application forwarded to HOD successfully.');
+        return redirect()->route('ma.index');
     }
 
     public function return(Request $request, $id)
@@ -992,10 +992,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')
-            ->with('success', 'Study Leave Application returned to user successfully.')
-            ->with('show_return_modal', true)
-            ->with('returned_reference', $application->reference_no);
+        return redirect()->route('ma.studyleave')->with('success', 'Application returned to the user successfully.');
     }
 
     /**

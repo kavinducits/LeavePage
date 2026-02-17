@@ -268,6 +268,27 @@
                             <i class="fas fa-eye"></i> This application is in a different workflow stage. You have read-only access.
                         </div>
                     @endif
+
+                    <!-- Return Confirmation Modal -->
+                    @if($statusId == 4)
+                    <div class="modal fade" id="returnConfirmModal" tabindex="-1" role="dialog" aria-labelledby="returnConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="returnConfirmModalLabel">Confirm Return</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to <strong>return</strong> this study leave application to the user?</p>
+                                    <p class="text-muted mb-0">The user will be notified and can make changes before resubmitting.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" id="returnConfirmNo">No</button>
+                                    <button type="button" class="btn btn-danger" id="returnConfirmYes">Yes, Return</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </section>
         </div>
@@ -293,12 +314,10 @@
 
             // Clear any previous error highlighting
             clearRemarkError();
-
-            // Confirm action
-            if (!confirm('Are you sure you want to forward this application to HOD?')) {
-                e.preventDefault();
-            }
+            // No confirm dialog
         });
+
+        var returnConfirmed = false;
 
         document.getElementById('returnForm').addEventListener('submit', function(e) {
             const remarkValue = document.getElementById('actionRemark').value.trim();
@@ -316,10 +335,25 @@
             // Clear any previous error highlighting
             clearRemarkError();
 
-            // Confirm action
-            if (!confirm('Are you sure you want to return this application to the user?')) {
+            // If not yet confirmed, show modal instead of submitting
+            if (!returnConfirmed) {
                 e.preventDefault();
+                $('#returnConfirmModal').modal('show');
+                return;
             }
+        });
+
+        // Yes button - set flag and submit form
+        $('#returnConfirmYes').on('click', function() {
+            returnConfirmed = true;
+            $('#returnConfirmModal').modal('hide');
+            document.getElementById('returnForm').submit();
+        });
+
+        // No button - just close modal
+        $('#returnConfirmNo').on('click', function() {
+            returnConfirmed = false;
+            $('#returnConfirmModal').modal('hide');
         });
 
         // Helper functions for error handling
@@ -344,8 +378,7 @@
             // Focus on the textarea
             remarkTextarea.focus();
 
-            // Show alert
-            alert('Please provide remarks when returning an application.');
+
         }
 
         function clearRemarkError() {

@@ -71,7 +71,9 @@ class HODAcademicEstablishmentController extends Controller
     }
     public function showStudyLeaveApplication($id)
     {
+       
    
+
         
         // Get department IDs for this HOD
         //$departmentIds = $this->getHodDepartments();
@@ -111,8 +113,9 @@ class HODAcademicEstablishmentController extends Controller
                 
             )
             ->first();
+        
 
-       
+   
         if (!$draft_study_leave) {
             return redirect()->route('hod.show.studyleaves')->with('error', 'Study leave application not found or not accessible.');
         }
@@ -735,5 +738,100 @@ class HODAcademicEstablishmentController extends Controller
             ]);
 
         return redirect()->route('hodacademicestablishment.studyLeaveProgress')->with('success', 'Progress report returned to MA successfully.');
+    }
+
+    /**
+     * Show accepted study leave applications (reviewed by HOD Academic Establishment)
+     */
+    public function studyLeaveAccepted()
+    {
+        $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_approvals.registrar_empno')
+            ->where('study_leave_approvals.status_id', '!=', 9)
+            ->orderByDesc('study_leaves.created_at')
+            ->select(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leaves.created_at as applied_date',
+                'statuses.status',
+                'employees.department_id'
+            )
+            ->get();
+
+        return view('hod_academic_establishment.study_leave_accept_dashboard', compact('studyLeaveApplications'));
+    }
+
+    /**
+     * Show accepted study leave extensions (reviewed by HOD Academic Establishment)
+     */
+    public function studyLeaveExtensionsAccepted()
+    {
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_extensions_approvals.acad_est_head_empno')
+            ->where('study_leave_extensions_approvals.status_id', '!=', 9)
+            ->orderByDesc('study_leave_extensions.created_at')
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('hod_academic_establishment.study_leave_extensions_accept_dashboard', compact('extensionApplications'));
+    }
+
+    /**
+     * Show accepted study leave progress reports (reviewed by HOD Academic Establishment)
+     */
+    public function studyLeaveProgressReportsAccepted()
+    {
+        $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_progress_reports_approval.registrar_empno')
+            ->where('study_leave_progress_reports_approval.approval_status_id', '!=', 9)
+            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('hod_academic_establishment.study_leave_progress_report_accept_dashboard', compact('progressReportApplications'));
     }
 }

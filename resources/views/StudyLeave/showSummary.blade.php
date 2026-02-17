@@ -33,6 +33,34 @@
         </div>
     </div>
 
+    <!-- Submit Confirmation Modal -->
+    <div class="modal fade" id="submitConfirmModal" tabindex="-1" aria-labelledby="submitConfirmModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="submitConfirmModalLabel">
+                        <i class="fas fa-paper-plane me-2"></i>Confirm Submission
+                    </h5>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-question-circle text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="mb-1">Are you sure you want to submit this study leave application?</p>
+                    <p class="text-muted small mb-0">Once submitted, you will not be able to make any further changes.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" id="submitConfirmNo" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>No
+                    </button>
+                    <button type="button" class="btn btn-primary px-4" id="submitConfirmYes">
+                        <i class="fas fa-check me-1"></i>Yes, Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Show remark if returned -->
     @isset($remark)
     <div class="alert alert-warning fw-semibold">
@@ -156,22 +184,25 @@
             
             // Scroll to declaration
             declaration.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Show alert
-            alert('Please agree to the declaration before submitting.');
             return false;
         }
         
-        const originalAction = form.action;
+        // Show confirmation modal
+        var submitModal = new bootstrap.Modal(document.getElementById('submitConfirmModal'));
+        submitModal.show();
         
-        // Change form action to save and exit route
+        return false;
+    }
+
+    // Handle Yes button in confirmation modal
+    document.getElementById('submitConfirmYes').addEventListener('click', function() {
+        const form = document.getElementById('leave-form');
+        var submitModal = bootstrap.Modal.getInstance(document.getElementById('submitConfirmModal'));
+        submitModal.hide();
         
         form.action = "{{ route('StudyLeave.Submit') }}";
         form.submit();
-        
-        // Restore original action (optional, for safety)
-        form.action = originalAction;
-    }
+    });
     </script>
             <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm" onclick="submiteStudyLeave()">
                 Submit for Recommendation of Department Head <i class="fas fa-paper-plane ms-2"></i>
@@ -296,10 +327,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // Show success modal if there's a success message
 document.addEventListener('DOMContentLoaded', function() {
-    @if(session('success') && str_contains(session('success'), 'submitted successfully'))
+    @if(session('success') && (str_contains(session('success'), 'submitted successfully')))
         const successModal = new bootstrap.Modal(document.getElementById('successModal'));
         successModal.show();
-        
         // Auto redirect after 3 seconds
         setTimeout(function() {
             window.location.href = "{{ route('StudyLeave.create') }}";

@@ -1087,7 +1087,7 @@ class StudyLeaveController extends Controller
         StudyLeaveApproval::where('study_leave_id', $id)
             ->update(['status_id' => 4, 'is_draft' => false]);
 
-        return redirect()->route('StudyLeave.create')->with('success', 'Study leave application updated successfully.');
+        return redirect()->route('StudyLeave.show.editeForm', ['id' => $id])->with('success', 'Study leave application submitted successfully! Your application is now under review.');
     }
 
     /**

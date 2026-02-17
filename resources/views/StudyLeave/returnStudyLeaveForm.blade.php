@@ -29,4 +29,35 @@
         </div>
     </div>
 </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="fw-bold text-success mb-3">Submission Successful!</h4>
+                    <p class="text-muted mb-4">Your study leave application has been submitted successfully and is now under review.</p>
+                    <button type="button" class="btn btn-success px-4 py-2 rounded-pill" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-2"></i>OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success') && (str_contains(session('success'), 'submitted successfully')))
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+            // Auto redirect after 3 seconds
+            setTimeout(function() {
+                window.location.href = "{{ route('StudyLeave.create') }}";
+            }, 3000);
+        @endif
+    });
+    </script>
 @endsection
