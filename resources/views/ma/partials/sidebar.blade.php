@@ -30,76 +30,72 @@
                     <p>Status</p>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item has-treeview{{ isset($pageName) && $pageName == 'Study Leave' ? ' menu-open' : '' }}">
                 <a href="#" class="nav-link{{ isset($pageName) && $pageName == 'Study Leave' ? ' active' : '' }}">
                     <i class="nav-icon fas fa-stream"></i>
                     <p>Study Leave
-                        <i class="nav-arrow bi bi-chevron-right" style="float: right;"></i>
+                        <i class="right fas fa-angle-left"></i>
                     </p>
-                    
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave') }}" class="nav-link">
+                        <a href="{{ route('ma.studyleave') }}" class="nav-link{{ request()->routeIs('ma.studyleave') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Study Leave Request</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.accepted') }}" class="nav-link">
+                        <a href="{{ route('ma.studyleave.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.accepted') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Accepted Study Leave</p>
                         </a>
                     </li>
-
                 </ul>
             </li>
-            <li class="nav-item">
+            <li class="nav-item has-treeview{{ isset($pageName) && $pageName == 'Study Leave Extensions' ? ' menu-open' : '' }}">
                 <a href="#"
                     class="nav-link{{ isset($pageName) && $pageName == 'Study Leave Extensions' ? ' active' : '' }}">
                     <i class="nav-icon fas fa-stream"></i>
                     <p>Extensions
-                        <i class="nav-arrow bi bi-chevron-right" style="float: right;"></i>
+                        <i class="right fas fa-angle-left"></i>
                     </p>
                 </a>
-                  <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link">
+                        <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link{{ request()->routeIs('ma.studyleave.extensions') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Study Leave Extensions Request</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.extensions.accepted') }}" class="nav-link">
+                        <a href="{{ route('ma.studyleave.extensions.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.extensions.accepted') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Accepted Study Leave Extensions</p>
                         </a>
                     </li>
-
                 </ul>
             </li>
-            <li class="nav-item">
+            <li class="nav-item has-treeview{{ isset($pageName) && $pageName == 'Study Leave Progress' ? ' menu-open' : '' }}">
                 <a href="#"
                     class="nav-link{{ isset($pageName) && $pageName == 'Study Leave Progress' ? ' active' : '' }}">
                     <i class="nav-icon fas fa-stream"></i>
                     <p>Study Leave Progress
-                        <i class="nav-arrow bi bi-chevron-right" style="float: right;"></i>
+                        <i class="right fas fa-angle-left"></i>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.progress') }}" class="nav-link">
+                        <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Pending Reports</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.extensions.accepted') }}" class="nav-link">
+                        <a href="{{ route('ma.studyleave.progress.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress.accepted') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Accepted Reports</p>
                         </a>
                     </li>
-
                 </ul>
             </li>
             <li class="nav-item">
@@ -151,5 +147,15 @@
     /* When sidebar is collapsed */
     .sidebar-collapse .content-wrapper {
         margin-left: 4.6rem !important;
+    }
+
+    /* Active submenu item: white background with black text */
+    .nav-treeview > .nav-item > .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: #343a40 !important;
+    }
+
+    .nav-treeview > .nav-item > .nav-link.active .nav-icon {
+        color: #343a40 !important;
     }
 </style>

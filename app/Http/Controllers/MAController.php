@@ -1608,7 +1608,7 @@ class MAController extends Controller
 
         return view('ma.showStudyLeaveExtensionsAccept',  compact('extensionApplications'));
     }
-    public function showProgressReportsAcceptedPage()
+    public function studyLeaveProgressReportsAcceptedPage()
     {
         
         $maUserId = self::MA_USER_ID;
