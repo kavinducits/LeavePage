@@ -798,14 +798,14 @@ class MAController extends Controller
       
 
         $totalStudyLeaveDays = $this->calculateTotalStudyLeaveDays($draft_study_leave->employee_no);
-      
+        $totalStudyLeaveDuration = $this->calculateTotalStudyLeaveMonths($draft_study_leave->employee_no);
 
         $from = new \DateTime($draft_study_leave->study_leave_from);
         $to = new \DateTime($draft_study_leave->study_leave_to);
         $interval = $from->diff($to);
         $requistedStudyLeaveDays = $interval->days + 1; // +1 to include both start and end dates
 
-        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays'));
+        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays', 'totalStudyLeaveDuration'));
     }
      /**
      * Calculate total study leave days taken by an employee.
@@ -845,6 +845,44 @@ class MAController extends Controller
             return $totalDays;
         }
 
+    }
+
+    /**
+     * Calculate total study leave months and days taken by an employee.
+     * Returns ['months' => int, 'days' => int]
+     */
+    public function calculateTotalStudyLeaveMonths($emp_no)
+    {
+        $totalMonths = 0;
+        $totalDays = 0;
+        $previousLeaves = StudyLeave::where('empno', $emp_no)
+            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
+            ->where('study_leave_approvals.is_draft', false)
+            ->where('study_leave_approvals.status_id', 1)
+            ->select('study_leaves.id', 'study_leaves.study_leave_from as study_leave_from', 'study_leaves.study_leave_to as study_leave_to')
+            ->get();
+
+        foreach ($previousLeaves as $leave) {
+            $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave->id)
+                ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+                ->where('study_leave_extensions_approvals.status_id', 1)
+                ->select('study_leave_extensions.new_end_date')
+                ->orderBy('study_leave_extensions.id', 'desc')
+                ->first();
+
+            $endDate = $extensions ? $extensions->new_end_date : $leave->study_leave_to;
+            $from = new \DateTime($leave->study_leave_from);
+            $to = new \DateTime($endDate);
+            $interval = $from->diff($to);
+            $totalMonths += ($interval->y * 12) + $interval->m;
+            $totalDays += $interval->d;
+        }
+
+        // Carry over excess days into months
+        $totalMonths += intdiv($totalDays, 30);
+        $totalDays = $totalDays % 30;
+
+        return ['months' => $totalMonths, 'days' => $totalDays];
     }
 
     public function approveStudyLeave(Request $request, $id)
