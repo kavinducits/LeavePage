@@ -841,7 +841,7 @@ class HODController extends Controller
                 'updated_at' => now()
             ]);
           
-        return redirect()->route('hod.study.leave.index')->with('success', 'Study Leave Application reviewed and forwarded to Dean successfully.');
+        return redirect()->route('hod.study.leave.index');
     }
 
     public function showProgressReport($progress_report_id)
@@ -1031,3 +1031,4 @@ class HODController extends Controller
         }
     }
 }
+

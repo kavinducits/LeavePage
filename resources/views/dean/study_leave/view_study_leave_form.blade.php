@@ -71,6 +71,24 @@
     </form>
 </div>
 
+
+<!-- Forward Confirmation Modal -->
+<div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Forward</h5>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">is that ok to foward it to VC</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="forwardConfirmCancel">Cancel</button>
+                <button type="button" class="btn btn-success" id="forwardConfirmOk">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
 .card-header-dark {
     background: linear-gradient(135deg, #212529 0%, #343a40 100%);
@@ -114,43 +132,54 @@
 </style>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('deanReviewForm');
+    const recommendNo = document.getElementById('recommendNo');
+    const notRecommendReasonTextarea = document.getElementById('dean_not_recommend_reason');
+    let forwardConfirmed = false;
 
+    if (!form) {
+        return;
+    }
 
-    // Form validation
     form.addEventListener('submit', function(e) {
-        let isValid = true;
-
-        // Check if "No" is selected and reason is empty
-        if (recommendNo.checked) {
-            const reasonValue = notRecommendReasonTextarea.value.trim();
+        if (recommendNo && recommendNo.checked) {
+            const reasonValue = notRecommendReasonTextarea ? notRecommendReasonTextarea.value.trim() : '';
             if (!reasonValue) {
                 e.preventDefault();
-                notRecommendReasonTextarea.classList.add('is-invalid');
-                notRecommendReasonTextarea.focus();
-                isValid = false;
-                alert('Please provide reasons for not recommending this leave.');
+                if (notRecommendReasonTextarea) {
+                    notRecommendReasonTextarea.classList.add('is-invalid');
+                    notRecommendReasonTextarea.focus();
+                }
                 return;
             }
         }
 
-        // Confirm submission
-        if (isValid) {
-            const confirmMessage = recommendYes.checked 
-                ? 'Are you sure you want to submit your review and forward this application to the Vice Chancellor?' 
-                : 'Are you sure you want to submit your review with a NOT RECOMMENDED status?';
-            
-            if (!confirm(confirmMessage)) {
-                e.preventDefault();
-            }
+        if (!forwardConfirmed) {
+            e.preventDefault();
+            $('#forwardConfirmModal').modal('show');
         }
     });
 
-    // Clear invalid state when user starts typing
-    notRecommendReasonTextarea.addEventListener('input', function() {
-        if (this.value.trim()) {
-            this.classList.remove('is-invalid');
-        }
+    $('#forwardConfirmOk').on('click', function() {
+        forwardConfirmed = true;
+        $('#forwardConfirmModal').modal('hide');
+        form.submit();
     });
+
+    $('#forwardConfirmCancel').on('click', function() {
+        forwardConfirmed = false;
+        $('#forwardConfirmModal').modal('hide');
+    });
+
+    if (notRecommendReasonTextarea) {
+        notRecommendReasonTextarea.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
 });
 </script>
 @endsection
+

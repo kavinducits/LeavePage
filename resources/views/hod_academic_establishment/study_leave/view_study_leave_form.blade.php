@@ -75,13 +75,30 @@
                                 </div>
                             @endif
                             <button type="submit" class="btn btn-success btn-lg w-100" id="submitBtn">
-                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to HOD Academic Establishment
+                                <i class="fas fa-paper-plane me-2"></i>Submit Review & Forward to HOD
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
+    </div>
+    <!-- Forward Confirmation Modal -->
+    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Forward</h5>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Is it OK to forward this study leave application to HOD?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="forwardConfirmCancel">Cancel</button>
+                    <button type="button" class="btn btn-success" id="forwardConfirmOk">OK</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <style>
@@ -110,42 +127,56 @@
         }
     </style>
 
-    <script>
-        // Form validation
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('hodReviewForm');
+            const recommendYes = document.getElementById('recommendYes');
+            const recommendNo = document.getElementById('recommendNo');
+            const notRecommendReasonTextarea = document.getElementById('registrar_not_recommend_reason');
+            let forwardConfirmed = false;
 
-            // Check if "No" is selected and reason is empty
-            if (recommendNo.checked) {
-                const reasonValue = notRecommendReasonTextarea.value.trim();
-                if (!reasonValue) {
-                    e.preventDefault();
-                    notRecommendReasonTextarea.classList.add('is-invalid');
-                    notRecommendReasonTextarea.focus();
-                    isValid = false;
-                    alert('Please provide reasons for not recommending this leave.');
-                    return;
-                }
+            if (!form) {
+                return;
             }
 
-            // Confirm submission
-            if (isValid) {
-                const confirmMessage = recommendYes.checked ?
-                    'Are you sure you want to submit your review and forward this application to the Dean?' :
-                    'Are you sure you want to submit your review with a NOT RECOMMENDED status?';
-
-                if (!confirm(confirmMessage)) {
-                    e.preventDefault();
+            form.addEventListener('submit', function(e) {
+                if (recommendNo && recommendNo.checked) {
+                    const reasonValue = notRecommendReasonTextarea ? notRecommendReasonTextarea.value.trim() : '';
+                    if (!reasonValue) {
+                        e.preventDefault();
+                        if (notRecommendReasonTextarea) {
+                            notRecommendReasonTextarea.classList.add('is-invalid');
+                            notRecommendReasonTextarea.focus();
+                        }
+                        return;
+                    }
                 }
-            }
-        });
 
-        // Clear invalid state when user starts typing
-        notRecommendReasonTextarea.addEventListener('input', function() {
-        if (this.value.trim()) {
-            this.classList.remove('is-invalid');
-        }
-        });
+                if (!forwardConfirmed) {
+                    e.preventDefault();
+                    $('#forwardConfirmModal').modal('show');
+                }
+            });
+
+            $('#forwardConfirmOk').on('click', function() {
+                forwardConfirmed = true;
+                $('#forwardConfirmModal').modal('hide');
+                form.submit();
+            });
+
+            $('#forwardConfirmCancel').on('click', function() {
+                forwardConfirmed = false;
+                $('#forwardConfirmModal').modal('hide');
+            });
+
+            if (notRecommendReasonTextarea) {
+                notRecommendReasonTextarea.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            }
         });
     </script>
 @endsection
+

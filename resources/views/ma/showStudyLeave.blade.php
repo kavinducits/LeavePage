@@ -288,6 +288,24 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Forward Confirmation Modal -->
+                    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Forward</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to <strong>forward</strong> this study leave application to the <strong>Head of Academic Establishment</strong>?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" id="forwardConfirmNo">Cancel</button>
+                                    <button type="button" class="btn btn-success" id="forwardConfirmYes">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @endif
                 </div>
             </section>
@@ -306,6 +324,8 @@
 
     @if($statusId == 4)
     <script>
+        var forwardConfirmed = false;
+
         // Form validation and submission handling
         document.getElementById('approveForm').addEventListener('submit', function(e) {
             // Get the remark value and set it to the hidden input
@@ -314,7 +334,13 @@
 
             // Clear any previous error highlighting
             clearRemarkError();
-            // No confirm dialog
+
+            // If not yet confirmed, show modal instead of submitting
+            if (!forwardConfirmed) {
+                e.preventDefault();
+                $('#forwardConfirmModal').modal('show');
+                return;
+            }
         });
 
         var returnConfirmed = false;
@@ -354,6 +380,19 @@
         $('#returnConfirmNo').on('click', function() {
             returnConfirmed = false;
             $('#returnConfirmModal').modal('hide');
+        });
+
+        // Forward modal Yes - set flag and submit form
+        $('#forwardConfirmYes').on('click', function() {
+            forwardConfirmed = true;
+            $('#forwardConfirmModal').modal('hide');
+            document.getElementById('approveForm').submit();
+        });
+
+        // Forward modal No - cancel forwarding
+        $('#forwardConfirmNo').on('click', function() {
+            forwardConfirmed = false;
+            $('#forwardConfirmModal').modal('hide');
         });
 
         // Helper functions for error handling
@@ -562,3 +601,5 @@
     </style>
 </body>
 </html>
+
+

@@ -935,7 +935,7 @@ class MAController extends Controller
             ]);
     
 
-        return redirect()->route('ma.studyleave')->with('success', 'Study Leave Application forwarded to HOD successfully.');
+        return redirect()->route('ma.studyleave');
     }
 
     public function returnStudyLeave(Request $request, $id)

@@ -142,6 +142,23 @@
             </div>
         </form>
     </div>
+    <!-- Forward Confirmation Modal -->
+    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Submit</h5>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">is that ok to foward it to MA for finlize</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="forwardConfirmCancel">Cancel</button>
+                    <button type="button" class="btn btn-success" id="forwardConfirmOk">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <style>
         .card-header-dark {
@@ -194,6 +211,7 @@
             const notApproveReasonDiv = document.getElementById('notApproveReasonDiv');
             const notApproveReasonTextarea = document.getElementById('vc_not_approve_reason');
             const form = document.getElementById('vcReviewForm');
+            let forwardConfirmed = false;
 
             // Show/hide reason textarea based on recommendation
             function toggleReasonField() {
@@ -228,14 +246,11 @@
                     }
                 }
 
-                // Confirm submission
+                // Confirm submission using modal
                 if (isValid) {
-                    const confirmMessage = recommendCommitteeYes.checked ?
-                        'Are you sure you want to recommend this study leave application to the committee?' :
-                        'Are you sure you want to not recommend this study leave application?';
-
-                    if (!confirm(confirmMessage)) {
+                    if (!forwardConfirmed) {
                         e.preventDefault();
+                        $('#forwardConfirmModal').modal('show');
                     }
                 }
             });
@@ -246,6 +261,18 @@
                     this.classList.remove('is-invalid');
                 }
             });
+
+            $('#forwardConfirmOk').on('click', function() {
+                forwardConfirmed = true;
+                $('#forwardConfirmModal').modal('hide');
+                form.submit();
+            });
+
+            $('#forwardConfirmCancel').on('click', function() {
+                forwardConfirmed = false;
+                $('#forwardConfirmModal').modal('hide');
+            });
         });
     </script>
 @endsection
+

@@ -213,7 +213,7 @@ class HODAcademicEstablishmentController extends Controller
                 'updated_at' => now()
             ]);
           
-        return redirect()->route('hodacademicestablishment.studyLeave')->with('success', 'Study Leave Application reviewed and forwarded to Department HOD successfully.');
+        return redirect()->route('hodacademicestablishment.studyLeave');
     }
 
      public function study_leave_extenstions(Request $request)
@@ -835,3 +835,4 @@ class HODAcademicEstablishmentController extends Controller
         return view('hod_academic_establishment.study_leave_progress_report_accept_dashboard', compact('progressReportApplications'));
     }
 }
+

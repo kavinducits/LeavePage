@@ -44,7 +44,7 @@
                 <div class="container-fluid">
 
                     <!-- Success Modal -->
-                    @if(session('success'))
+                    @if(session('success') && session('success') !== 'Study Leave Application forwarded to HOD successfully.')
                     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content border-0 shadow-lg">
@@ -242,7 +242,7 @@
                 ]
             });
 
-            @if(session('success'))
+            @if(session('success') && session('success') !== 'Study Leave Application forwarded to HOD successfully.')
                 // Show success modal
                 $('#successModal').modal('show');
             @endif
