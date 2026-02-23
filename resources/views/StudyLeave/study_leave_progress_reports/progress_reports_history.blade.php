@@ -4,21 +4,6 @@
         <h5 class="mb-0">
             <i class="fas fa-chart-line me-2"></i>Progress Reports History
         </h5>
-        <!-- DEBUG: canUpload={{ isset($canUploadProgressReport) ? ($canUploadProgressReport ? 'YES' : 'NO') : 'NOT SET' }}, hasPending={{ isset($hasPendingProgressReport) ? ($hasPendingProgressReport ? 'YES' : 'NO') : 'NOT SET' }} -->
-        
-        @if(isset($canUploadProgressReport) && $canUploadProgressReport)
-            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#uploadProgressReportModal">
-                <i class="fas fa-upload me-1"></i>Upload Progress Report
-            </button>
-        @elseif(isset($hasPendingProgressReport) && $hasPendingProgressReport)
-            <button type="button" class="btn btn-sm btn-warning" disabled title="You have a pending progress report">
-                <i class="fas fa-hourglass-half me-1"></i>Pending Report
-            </button>
-        @else
-            <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#uploadProgressReportModal">
-                <i class="fas fa-upload me-1"></i>Upload Progress Report (Test)
-            </button>
-        @endif
     </div>
     <div class="card-body">
         @if(isset($progressReports) && $progressReports->count() > 0)
@@ -420,11 +405,6 @@
             <div class="text-center py-5">
                 <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
                 <p class="text-muted mb-0">No progress reports found for this study leave.</p>
-                @if(isset($canUploadProgressReport) && $canUploadProgressReport)
-                    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#uploadProgressReportModal">
-                        <i class="fas fa-upload me-2"></i>Upload Your First Progress Report
-                    </button>
-                @endif
             </div>
         @endif
     </div>

@@ -4,15 +4,6 @@
         <h5 class="mb-0">
             <i class="fas fa-history me-2"></i>Extension History
         </h5>
-        @if(isset($hasPendingExtension) && $hasPendingExtension)
-            <button type="button" class="btn btn-sm btn-warning" disabled title="You have a pending extension request">
-                <i class="fas fa-hourglass-half me-1"></i>Pending Request
-            </button>
-        @elseif(isset($canExtend) && $canExtend)
-            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addExtensionModal">
-                <i class="fas fa-plus me-1"></i>Add New Extension Request
-            </button>
-        @endif
     </div>
     <div class="card-body">
         @if(isset($extensions) && $extensions->count() > 0)
@@ -365,10 +356,6 @@
                     <div class="alert alert-warning mt-3 d-inline-block">
                         <i class="fas fa-hourglass-half me-2"></i>You have a pending extension request
                     </div>
-                @elseif(isset($canExtend) && $canExtend)
-                    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#addExtensionModal">
-                        <i class="fas fa-plus me-2"></i>Add Your First Extension Request
-                    </button>
                 @endif
             </div>
         @endif
