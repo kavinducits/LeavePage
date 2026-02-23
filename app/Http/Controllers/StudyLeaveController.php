@@ -671,9 +671,13 @@ class StudyLeaveController extends Controller
                 "warm_cloth_allowance_request",
                 "self_funding_declaration",
                 "placement_letter",
+                "id",
                 "nominee_teaching_empno",
                 "nominee_admin_empno",
-                "nominee_other_empno"
+                "nominee_other_empno",
+                "consent_letter_teaching_path",
+                "consent_letter_admin_path",
+                "consent_letter_other_path"
             )
             ->first();
 
@@ -1571,11 +1575,13 @@ class StudyLeaveController extends Controller
         // Find the study leave record
         $studyLeave = StudyLeave::findOrFail($id);
 
-        // Verify the user owns this study leave - check multiple session possibilities
-        $sessionStudyLeaveEmpNo = session('study_leave.employee_no');
-        $isOwner = ($studyLeave->empno === $userEmpNo) ||
-            ($studyLeave->empno === $sessionStudyLeaveEmpNo) ||
-            ($sessionStudyLeaveEmpNo === $userEmpNo);
+        // Verify ownership using normalized employee numbers to avoid type mismatch issues
+        $ownerEmpNo = trim((string) $studyLeave->empno);
+        $sessionEmpNos = [
+            trim((string) session('empno')),
+            trim((string) session('study_leave.employee_no'))
+        ];
+        $isOwner = in_array($ownerEmpNo, $sessionEmpNos, true);
 
         if (!$isOwner) {
             return response()->json([
@@ -1583,8 +1589,8 @@ class StudyLeaveController extends Controller
                 'message' => 'Unauthorized access to this document.',
                 'debug' => [
                     'studyLeave_empno' => $studyLeave->empno,
-                    'session_empno' => $userEmpNo,
-                    'session_study_leave_empno' => $sessionStudyLeaveEmpNo
+                    'session_empno' => session('empno'),
+                    'session_study_leave_empno' => session('study_leave.employee_no')
                 ]
             ], 403);
         }

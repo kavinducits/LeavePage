@@ -119,12 +119,8 @@
         <p class="text-muted">Review your study leave application before submission</p>
     </div>
 
-    <!-- Form for Summary and Submit -->
-    <form action="{{ route('StudyLeave.Submit') }}" method="POST" id="summary-form">
-        @csrf
-
-        <!-- Include Summary Layout Component -->
-        @include('StudyLeave.partials.summary_layout')
+    <!-- Include Summary Layout Component -->
+    @include('StudyLeave.partials.summary_layout')
 
    
 
@@ -197,14 +193,20 @@
     // Handle Yes button in confirmation modal
     document.getElementById('submitConfirmYes').addEventListener('click', function() {
         const form = document.getElementById('leave-form');
+        const confirmBtn = document.getElementById('submitConfirmYes');
         var submitModal = bootstrap.Modal.getInstance(document.getElementById('submitConfirmModal'));
         submitModal.hide();
-        
+
+        confirmBtn.disabled = true;
         form.action = "{{ route('StudyLeave.Submit') }}";
-        form.submit();
+        form.requestSubmit();
+    });
+
+    document.getElementById('submitConfirmModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('submitConfirmYes').disabled = false;
     });
     </script>
-            <button type="submit" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm" onclick="submiteStudyLeave()">
+            <button type="button" class="btn btn-maroon px-4 py-2 rounded-pill fw-semibold shadow-sm" onclick="submiteStudyLeave()">
                 Submit for Recommendation of Department Head <i class="fas fa-paper-plane ms-2"></i>
             </button>
         </div>

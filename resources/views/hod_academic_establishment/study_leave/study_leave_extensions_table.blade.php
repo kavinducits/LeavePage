@@ -1,4 +1,4 @@
-<!-- Study Leave Extension Applications Table -->
+u<!-- Study Leave Extension Applications Table -->
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0 fw-bold text-dark">Study Leave Extension Applications</h2>
