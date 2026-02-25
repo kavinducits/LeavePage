@@ -1579,8 +1579,8 @@ class MAController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where(function($query) {
-                $query->where('statuses.stat_id', 1)
-                      ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
+                $query->where('statuses.stat_id', 1);
+                     // ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
             })
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
