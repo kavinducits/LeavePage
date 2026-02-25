@@ -893,27 +893,21 @@ class MAController extends Controller
         ]);
 
         $maUserId = self::MA_USER_ID;
-/*
+
+        // Allow MA forward action only while the application is in Processing MA state
         $application = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leaves.status_id', 4) // Processing MA
-            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
-            ->select('study_leaves.*')
+            ->where('study_leave_approvals.status_id', 4) // Processing MA
+            ->where('employees.assign_ma_user_id', $maUserId) // Assigned MA only
+            ->select('study_leaves.id')
             ->first();
 
         if (!$application) {
-            return redirect()->route('ma.studyleave')->with('error', 'Application not found.');
+            return redirect()->route('ma.studyleave')->with('error', 'Application is not available for MA review.');
         }
 
-        // Prepare new remark by appending to existing remarks
-        
-        $newRemark = '';
-        if ($request->remark) {
-            $timestamp = now()->format('Y-m-d');
-            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
-        }
-*/
         // Update status to Processing HOD (status_id = 5)
         /*
         DB::table('study_leaves')
@@ -1220,7 +1214,7 @@ class MAController extends Controller
             ->first();
       
         if (!$progressReport) {
-            return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
+            return redirect()->route('ma.studyleave')->with('error', 'Progress report is not available for MA review.');
         }
         $draft_study_leave=$progressReport;
 
@@ -1291,13 +1285,15 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
             ->where('study_leave_progress_reports.id', $progress_report_id)
             ->where('employees.assign_ma_user_id', $maUserId)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 4) // Processing MA only
             ->select('study_leave_progress_reports.*')
             ->first();
           
         if (!$progressReport) {
-            return redirect()->route('ma.studyleave')->with('error', 'Progress report not found.');
+            return redirect()->route('ma.studyleave')->with('error', 'Progress report is not available for MA review.');
         }
 
         // Prepare remarkh
@@ -1344,8 +1340,10 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
             ->where('study_leave_progress_reports.id', $progress_report_id)
             ->where('employees.assign_ma_user_id', $maUserId)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 4) // Processing MA only
             ->select('study_leave_progress_reports.*')
             ->first();
 
@@ -1621,9 +1619,9 @@ class MAController extends Controller
             //->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
             //->where('statuses.status', 'Processing MA') // Filter for MA Processing status
             ->where(function($query) {
-                $query->where('statuses.stat_id', 1)
+                $query->where('statuses.stat_id', 1);
                      
-                      ->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
+                      //->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
             })
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',

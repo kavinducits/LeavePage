@@ -1195,7 +1195,11 @@ class StudyLeaveController extends Controller
         $extensions = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
             ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->join('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
-            ->select('study_leave_extensions.*', 'statuses.status')
+            ->select(
+                'study_leave_extensions.*',
+                'study_leave_extensions_approvals.status_id',
+                'statuses.status'
+            )
             ->orderBy('study_leave_extensions.created_at', 'desc')
             ->get();
 

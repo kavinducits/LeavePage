@@ -244,7 +244,7 @@
                     </div>
 
                 <!-- Action Section -->
-                    @if($progressReport->approval_status_id != 3 && $progressReport->approval_status_id != 1)
+                    @if((int) ($progressReport->approval_status_id ?? 0) === 4)
                     <div class="card mb-4">
                         <div class="card-header bg-dark text-white fw-semibold">
                             <i class="fas fa-tasks me-2"></i>Review Actions
@@ -311,6 +311,17 @@
                                 </div>
                             </div>
                     </div>
+                    @else
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary text-white fw-semibold">
+                            <i class="fas fa-lock me-2"></i>Review Actions
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info mb-0">
+                                This progress report is already processed by MA. Further review actions are disabled.
+                            </div>
+                        </div>
+                    </div>
                     @endif
 
                 </div>
@@ -319,6 +330,50 @@
 
         <!-- Footer -->
         @include('ma.partials.footer')
+    </div>
+
+    <!-- Return Confirmation Modal -->
+    <div class="modal fade" id="returnConfirmModal" tabindex="-1" aria-labelledby="returnConfirmModalLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="returnConfirmModalLabel">Confirm Return</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to return this progress report to the user?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="returnConfirmNo"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="returnConfirmYes">Yes, Return</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forward Confirmation Modal -->
+    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" aria-labelledby="forwardConfirmModalLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Forward</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to forward this progress report to HOD Academic Establishment?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="forwardConfirmNo"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="forwardConfirmYes">Yes, Forward</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- jQuery -->
@@ -330,19 +385,64 @@
 
     <script>
         // Form validation and submission handling
-        document.getElementById('approveForm').addEventListener('submit', function(e) {
+        const approveForm = document.getElementById('approveForm');
+        const returnForm = document.getElementById('returnForm');
+        const actionRemark = document.getElementById('actionRemark');
+        const approveRemarkInput = document.getElementById('approveRemarkInput');
+        const returnRemarkInput = document.getElementById('returnRemarkInput');
+        const returnConfirmModalEl = document.getElementById('returnConfirmModal');
+        const returnConfirmYesBtn = document.getElementById('returnConfirmYes');
+        const returnConfirmNoBtn = document.getElementById('returnConfirmNo');
+        const forwardConfirmModalEl = document.getElementById('forwardConfirmModal');
+        const forwardConfirmYesBtn = document.getElementById('forwardConfirmYes');
+        const forwardConfirmNoBtn = document.getElementById('forwardConfirmNo');
+        let forwardConfirmed = false;
+
+        if (approveForm) {
+            approveForm.addEventListener('submit', function(e) {
             const remarkValue = document.getElementById('actionRemark').value.trim();
             document.getElementById('approveRemarkInput').value = remarkValue;
 
             clearRemarkError();
 
-            if (!confirm('Are you sure you want to forward this progress report to the Department Head?')) {
+            if (!forwardConfirmed) {
                 e.preventDefault();
+                const forwardModal = new bootstrap.Modal(document.getElementById('forwardConfirmModal'));
+                forwardModal.show();
                 return false;
             }
         });
+        }
 
-        document.getElementById('returnForm').addEventListener('submit', function(e) {
+        if (forwardConfirmYesBtn) {
+            forwardConfirmYesBtn.addEventListener('click', function() {
+            forwardConfirmed = true;
+            const modal = bootstrap.Modal.getInstance(document.getElementById('forwardConfirmModal'));
+            if (modal) {
+                modal.hide();
+            }
+            if (approveForm) {
+                approveForm.submit();
+            }
+        });
+        }
+
+        if (forwardConfirmNoBtn) {
+            forwardConfirmNoBtn.addEventListener('click', function() {
+            forwardConfirmed = false;
+        });
+        }
+
+        if (forwardConfirmModalEl) {
+            forwardConfirmModalEl.addEventListener('hidden.bs.modal', function() {
+            forwardConfirmed = false;
+        });
+        }
+
+        let returnConfirmed = false;
+
+        if (returnForm) {
+            returnForm.addEventListener('submit', function(e) {
             const remarkValue = document.getElementById('actionRemark').value.trim();
 
             clearRemarkError();
@@ -355,11 +455,37 @@
 
             document.getElementById('returnRemarkInput').value = remarkValue;
 
-            if (!confirm('Are you sure you want to return this progress report to the user?')) {
+            if (!returnConfirmed) {
                 e.preventDefault();
+                const returnModal = new bootstrap.Modal(document.getElementById('returnConfirmModal'));
+                returnModal.show();
                 return false;
             }
         });
+        }
+
+        if (returnConfirmYesBtn) {
+            returnConfirmYesBtn.addEventListener('click', function() {
+            returnConfirmed = true;
+            const modal = bootstrap.Modal.getInstance(document.getElementById('returnConfirmModal'));
+            if (modal) {
+                modal.hide();
+            }
+            document.getElementById('returnForm').submit();
+        });
+        }
+
+        if (returnConfirmNoBtn) {
+            returnConfirmNoBtn.addEventListener('click', function() {
+            returnConfirmed = false;
+        });
+        }
+
+        if (returnConfirmModalEl) {
+            returnConfirmModalEl.addEventListener('hidden.bs.modal', function() {
+            returnConfirmed = false;
+        });
+        }
 
         function showRemarkError() {
             document.getElementById('remarkError').style.display = 'block';
@@ -371,7 +497,9 @@
             document.getElementById('actionRemark').classList.remove('is-invalid');
         }
 
-        document.getElementById('actionRemark').addEventListener('input', clearRemarkError);
+        if (actionRemark) {
+            actionRemark.addEventListener('input', clearRemarkError);
+        }
     </script>
 </body>
 

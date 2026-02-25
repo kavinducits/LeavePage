@@ -108,8 +108,9 @@
                                                     <div class="d-flex align-items-center justify-content-end">
                                                         <strong>Forward to,&nbsp;</strong>
                                                         <div>
-                                                            <div class="fw-semibold">{{ $departmentHead->head_title ?? 'Head' }}&nbsp;{{ $departmentHead->head_name ?? ''}}</div>
-                                                            <div class="text-muted small">{{ $departmentHead->head_position ?? '' }}</div>
+                                                            <div class="fw-semibold">{{ $departmentHead->head_name ?? ''}}</div>
+                                                            <!-- <div class="text-muted small">{{ $departmentHead->head_position ?? '' }}</div>-->
+                                                            <div class="text-muted small">Head of Academic Establishment</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -601,5 +602,4 @@
     </style>
 </body>
 </html>
-
 
