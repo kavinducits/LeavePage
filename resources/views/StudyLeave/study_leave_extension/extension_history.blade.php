@@ -12,11 +12,10 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width: 5%">#</th>
-                            <th style="width: 16%">Original End Date</th>
-                            <th style="width: 16%">Extended End Date</th>
-                            <th style="width: 10%">Extension Period</th>
-                            <th style="width: 28%">Reason for Extension</th>
-                            <th style="width: 13%">Status</th>
+                            <th style="width: 18%">Original End Date</th>
+                            <th style="width: 18%">Extended End Date</th>
+                            <th style="width: 32%">Remark</th>
+                            <th style="width: 15%">Status</th>
                             <th style="width: 12%" class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -63,12 +62,6 @@
                                 <td>
                                     <i class="fas fa-calendar-check text-success me-1"></i>
                                     {{ $newEndDate->format('d M Y') }}
-                                </td>
-                                <td>
-                                    <span class="badge bg-primary">
-                                        <i class="fas fa-clock me-1"></i>
-                                        {{ $extensionPeriod }} days
-                                    </span>
                                 </td>
                                 <td>
                                     <small>{{ \Illuminate\Support\Str::limit($extension->reason_for_extension, 100) }}</small>

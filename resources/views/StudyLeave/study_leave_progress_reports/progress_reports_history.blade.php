@@ -12,12 +12,10 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width: 5%">#</th>
-                            <th style="width: 13%">Due Date</th>
-                            <th style="width: 13%">Submitted Date</th>
-                            <th style="width: 10%">Submission Status</th>
-                            <th style="width: 30%">Remarks</th>
-                            <th style="width: 13%">Status</th>
-                            <th style="width: 16%" class="text-center">Actions</th>
+                            <th style="width: 20%">Submitted Date</th>
+                            <th style="width: 38%">Remarks</th>
+                            <th style="width: 17%">Status</th>
+                            <th style="width: 20%" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,14 +74,6 @@
                             <tr>
                                 <td class="text-center fw-semibold">{{ $index + 1 }}</td>
                                 <td>
-                                    <i class="fas fa-calendar-alt text-muted me-1"></i>
-                                    {{ $dueDate->format('d M Y') }}
-                                    <br>
-                                    <small class="text-muted">
-                                        {{ $periodStart->format('M Y') }} - {{ $dueDate->format('M Y') }}
-                                    </small>
-                                </td>
-                                <td>
                                     @if($submittedDate)
                                         <i class="fas fa-calendar-check text-success me-1"></i>
                                         {{ $submittedDate->format('d M Y') }}
@@ -92,20 +82,6 @@
                                             <i class="fas fa-minus me-1"></i>Not Submitted
                                         </span>
                                     @endif
-                                </td>
-                                <td>
-                                    <span class="badge {{ $submissionBadge }}">
-                                        @if($submittedDate)
-                                            @if($submittedDate->gt($dueDate))
-                                                <i class="fas fa-exclamation-triangle me-1"></i>
-                                            @else
-                                                <i class="fas fa-check-circle me-1"></i>
-                                            @endif
-                                        @else
-                                            <i class="fas fa-clock me-1"></i>
-                                        @endif
-                                        {{ $submissionStatus }}
-                                    </span>
                                 </td>
                                 <td>
                                     @if($report->remark)

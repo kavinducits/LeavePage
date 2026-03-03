@@ -71,11 +71,10 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width: 6%">#</th>
-                            <th style="width: 20%">Extension From</th>
-                            <th style="width: 20%">Extension To</th>
-                            <th style="width: 12%">Period</th>
-                            <th style="width: 14%">Status</th>
-                            <th style="width: 28%">Actions</th>
+                            <th style="width: 24%">Extension From</th>
+                            <th style="width: 24%">Extension To</th>
+                            <th style="width: 16%">Status</th>
+                            <th style="width: 30%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,10 +82,7 @@
                             @php
                                 $oldEnd = \Carbon\Carbon::parse($extension->old_end_date);
                                 $newEnd = \Carbon\Carbon::parse($extension->new_end_date);
-                                $days   = $oldEnd->diffInDays($newEnd);
                                 $sid    = $extension->approval_status_id ?? $extension->status_id;
-
-                                $badgeClass = 'bg-secondary';
                                 $icon       = 'fa-clock';
                                 if ($sid == 1)                        { $badgeClass = 'bg-success';           $icon = 'fa-check-circle'; }
                                 elseif ($sid == 2)                    { $badgeClass = 'bg-danger';            $icon = 'fa-times-circle'; }
@@ -103,11 +99,6 @@
                                 <td>
                                     <i class="fas fa-calendar-check text-success me-1"></i>
                                     {{ $newEnd->format('d M Y') }}
-                                </td>
-                                <td>
-                                    <span class="badge bg-primary">
-                                        <i class="fas fa-clock me-1"></i>{{ $days }} days
-                                    </span>
                                 </td>
                                 <td>
                                     <span class="badge {{ $badgeClass }}">
@@ -135,7 +126,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-5">
+                                <td colspan="5" class="text-center py-5">
                                     <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
                                     <br>
                                     <p class="text-muted mb-0">No extension requests submitted yet.</p>
