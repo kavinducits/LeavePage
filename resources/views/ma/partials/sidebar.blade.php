@@ -45,7 +45,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.accepted') ? ' active' : '' }}">
+                        <a href="{{ route('ma.studyleave.accepted') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.accepted') || (request()->routeIs('ma.show.studyleave') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Accepted Study Leave</p>
                         </a>
@@ -62,13 +62,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link{{ request()->routeIs('ma.studyleave.extensions') ? ' active' : '' }}">
+                        <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.extensions') || (request()->routeIs('ma.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Study Leave Extensions Request</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.extensions.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.extensions.accepted') ? ' active' : '' }}">
+                        <a href="{{ route('ma.studyleave.extensions.accepted') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.extensions.accepted') || (request()->routeIs('ma.show.extension') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Accepted Study Leave Extensions</p>
                         </a>
@@ -85,13 +85,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress') ? ' active' : '' }}">
+                        <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress') || (request()->routeIs('ma.show.studyleave.progressreport') && request()->get('from') != 'accepted') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Pending Reports</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.progress.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress.accepted') ? ' active' : '' }}">
+                        <a href="{{ route('ma.studyleave.progress.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress.accepted') || (request()->routeIs('ma.show.studyleave.progressreport') && request()->get('from') == 'accepted') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>Accepted Reports</p>
                         </a>

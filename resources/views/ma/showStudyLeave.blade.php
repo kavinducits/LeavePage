@@ -48,8 +48,8 @@
                             <h2 class="mb-0 fw-bold">Application Review</h2>
                             <p class="text-muted mb-0">Reference No: {{ $draft_study_leave->reference_no }}</p>
                         </div>
-                        <a href="{{ route('ma.dashboard') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        <a href="{{ request()->get('from') == 'accepted' ? route('ma.studyleave.accepted') : route('ma.dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>
 

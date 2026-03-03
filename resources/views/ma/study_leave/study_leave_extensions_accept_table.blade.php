@@ -74,7 +74,7 @@
                                         <span class="badge {{ $statusBadge }}">{{ $statusText }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('ma.show.extension', $extension->extension_id) }}" 
+                                        <a href="{{ route('ma.show.extension', $extension->extension_id) }}?from=accepted" 
                                            class="btn btn-sm btn-outline-primary"
                                            title="View Extension Request">
                                             <i class="fas fa-eye me-1"></i>View

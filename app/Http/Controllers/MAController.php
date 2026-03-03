@@ -1125,7 +1125,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Extension request forwarded to HOD Academic Establishment successfully.');
+        return redirect()->route('ma.studyleave.extensions')->with('success', 'Extension request forwarded to HOD Academic Establishment successfully.');
     }
 
     /**
@@ -1168,7 +1168,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Extension request returned to user successfully.');
+        return redirect()->route('ma.studyleave.extensions')->with('success', 'Extension request returned to user successfully.');
     }
 
     /**
@@ -1320,7 +1320,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Progress report forwarded to HOD Academic Establishment successfully.');
+        return redirect()->route('ma.studyleave.progress')->with('success', 'Progress report forwarded to HOD Academic Establishment successfully.');
     }
 
     /**
@@ -1371,7 +1371,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        return redirect()->route('ma.studyleave')->with('success', 'Progress report returned to user successfully. User can now remove and re-upload the progress report.');
+        return redirect()->route('ma.studyleave.progress')->with('success', 'Progress report returned to user successfully. User can now remove and re-upload the progress report.');
     }
 
      public function serveProgressReportFile($filename)

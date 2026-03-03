@@ -73,6 +73,25 @@
         <!-- Footer -->
         @include('ma.partials.footer')
     </div>
+    @if(session('success'))
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="successModalLabel"><i class="fas fa-check-circle me-2"></i> Success</h5>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">{{ session('success') }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -86,6 +105,10 @@
     <!-- Initialize DataTables -->
     <script>
         $(document).ready(function() {
+            @if(session('success'))
+            $('#successModal').modal('show');
+            @endif
+
             // Wait a bit for DOM to fully render
             setTimeout(function() {
                 console.log('Checking for tables...');

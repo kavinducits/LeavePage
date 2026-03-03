@@ -28,7 +28,7 @@
                 <span class="brand-text font-weight-light">MA Dashboard</span>
             </a>
             <!-- Sidebar -->
-            @php $pageName = 'Study Leave' @endphp
+            @php $pageName = 'Study Leave Extensions' @endphp
             @include('ma.partials.sidebar')
         </aside>
 
@@ -45,8 +45,8 @@
                             <h2 class="mb-0 fw-bold">Extension Request Review</h2>
                             <p class="text-muted mb-0">Reference No: {{ $extension->reference_no }}</p>
                         </div>
-                        <a href="{{ route('ma.studyleave') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        <a href="{{ request()->get('from') == 'accepted' ? route('ma.studyleave.extensions.accepted') : route('ma.studyleave.extensions') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>
 
