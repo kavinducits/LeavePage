@@ -48,43 +48,11 @@ class StudyLeaveProgressReportsController extends Controller
 
     /**
      * Check if user can upload next progress report
+     * No time limitations - always allowed.
      */
     private function canUploadNextReport($study_leave, $progress_reports)
     {
-        $today = Carbon::now();
-        $leaveStart = Carbon::parse($study_leave->study_leave_from);
-        if($this->isExtended($study_leave->id)) {
-            $leaveEnd = $this->getLastExtendedEndDate($study_leave->id);
-            
-        } else {
-            $leaveEnd = Carbon::parse($study_leave->study_leave_to);
-        }
-
-        // Can't upload if study leave hasn't started
-        if ($today->lessThan($leaveStart)) {
-            return false;
-        }
-
-        // Can't upload if study leave has ended
-        if ($today->greaterThan($leaveEnd)) {
-            return false;
-        }
-
-        // If no reports yet, can upload first one
-        if ($progress_reports->count() == 0) {
-            return true;
-        }
-        if ($progress_reports->count() < $today->diffInMonths($leaveStart) / 6) {
-            return false;
-        }
-
-        // Get the last submitted report
-        $lastReport = $progress_reports->sortByDesc('due_date')->first();
-
-        // Check if last report's due date has passed
-        $lastDueDate = Carbon::parse($lastReport->due_date);
-        
-        return $today->greaterThan($lastDueDate);
+        return true;
     }
 
     /**
@@ -123,39 +91,11 @@ class StudyLeaveProgressReportsController extends Controller
 
     /**
      * Calculate next due date for progress report
+     * Returns today's date as default; user can override in the form.
      */
     private function calculateNextDueDate($study_leave, $progress_reports)
     {
-        $leaveStart = Carbon::parse($study_leave->study_leave_from);
-        
-        if($this->isExtended($study_leave->id)) {
-            $leaveEnd = $this->getLastExtendedEndDate($study_leave->id);
-            
-        } else {
-            $leaveEnd = Carbon::parse($study_leave->study_leave_to);
-        }
-
-        // If no reports yet, first due date is 6 months from start
-        if ($progress_reports->count() == 0) {
-            if($leaveStart->copy()->addMonths(6)->greaterThan($leaveEnd)) {
-                return Carbon::parse($leaveEnd);
-            }
-            else{
-                return $leaveStart->copy()->addMonths(6);
-            }
-           
-        }
-
-        // Get the last report's due date and add 6 months
-        $lastReport = $progress_reports->sortByDesc('due_date')->first();
-        $nextDueDate = Carbon::parse($lastReport->due_date)->addMonths(6);
-
-        // Don't set due date beyond leave end date
-        if ($nextDueDate->greaterThan($leaveEnd)) {
-            return Carbon::parse($leaveEnd);
-        }
-
-        return $nextDueDate;
+        return Carbon::now();
     }
 
     /**
@@ -210,8 +150,8 @@ class StudyLeaveProgressReportsController extends Controller
                 'approval_status_id' => 4, // Processing MA
             ]);
 
-            return redirect()->route('StudyLeave.show.studyLeave', $studyLeave->id)
-                ->with('success', 'Progress report uploaded successfully and forwarded to MA!');
+            return redirect()->route('StudyLeave.progressReports.show', $studyLeave->id)
+                ->with('upload_success', true);
         }
 
         return redirect()->back()->with('error', 'Failed to upload progress report. Please ensure you selected a valid PDF file.');

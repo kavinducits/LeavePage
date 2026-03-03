@@ -50,42 +50,15 @@
         </a>
     </div>
 
-    <!-- Study Leave Information -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header card-header-maroon fw-semibold">
-            <i class="fas fa-info-circle me-2"></i>Study Leave Information
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <strong>Reference No:</strong><br>
-                    {{ $study_leave->reference_no }}
-                </div>
-                <div class="col-md-4">
-                    <strong>Degree Title:</strong><br>
-                    {{ $study_leave->degree_title }}
-                </div>
-                <div class="col-md-4">
-                    <strong>University/Institute:</strong><br>
-                    {{ $study_leave->university_institute }}
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-4">
-                    <strong>Study Period:</strong><br>
-                    {{ \Carbon\Carbon::parse($study_leave->study_leave_from)->format('d M Y') }} - 
-                    {{ \Carbon\Carbon::parse($study_leave->study_leave_to)->format('d M Y') }}
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Progress Reports List -->
     <div class="card shadow-sm">
         <div class="card-header card-header-maroon fw-semibold d-flex justify-content-between align-items-center">
             <span>
-                <i class="fas fa-list me-2"></i>Progress Reports (Every 6 Months)
+                <i class="fas fa-list me-2"></i>Progress Reports
             </span>
+            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#uploadNewModal">
+                <i class="fas fa-upload me-1"></i>Upload New Report
+            </button>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -93,11 +66,10 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width: 8%">#</th>
-                            <th style="width: 22%">Report Period</th>
-                            <th style="width: 15%">Due Date</th>
-                            <th style="width: 12%">Status</th>
-                            <th style="width: 15%">Submitted Date</th>
-                            <th style="width: 28%">Actions</th>
+                            <th style="width: 30%">Report Period</th>
+                            <th style="width: 14%">Status</th>
+                            <th style="width: 18%">Submitted Date</th>
+                            <th style="width: 30%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,7 +91,6 @@
                                             {{ $periodStart->format('M Y') }} - {{ $dueDate->format('M Y') }}
                                         </small>
                                     </td>
-                                    <td>{{ $dueDate->format('d M Y') }}</td>
                                     <td>
                                         @php
                                             // Determine badge color based on status_id
@@ -182,76 +153,15 @@
                                 </tr>
                             @endforeach
                         @endif
-                        @php
-                            // Log the next due date and related information to browser console
-                            if ($nextDueDate) {
-                                $nextDueDateFormatted = $nextDueDate instanceof \Carbon\Carbon 
-                                    ? $nextDueDate->format('Y-m-d H:i:s') 
-                                    : \Carbon\Carbon::parse($nextDueDate)->format('Y-m-d H:i:s');
-                                echo "<script>console.log('Next Due Date:', '" . $nextDueDateFormatted . "');</script>";
-                            } else {
-                                echo "<script>console.log('Next Due Date:', null);</script>";
-                            }
-                            echo "<script>console.log('Can Upload Next:', " . json_encode($canUploadNext) . ");</script>";
-                            echo "<script>console.log('Next Report Index:', " . ($progress_reports->count() + 1) . ");</script>";
-                        @endphp
 
-                        <!-- Show next upload option if available -->
-                        @if($canUploadNext && $nextDueDate)
-                        
-                            @php
-                                $nextIndex = $progress_reports->count() + 1;
-                                $periodStart = $nextDueDate->copy()->subMonths(6);
-                                $today = \Carbon\Carbon::now();
-                                $isOverdue = $today->greaterThan($nextDueDate);
-                            @endphp
-                            <tr class="table-warning">
-                                <td class="text-center fw-semibold">{{ $nextIndex }}</td>
-                                <td>
-                                    <strong>Progress Report {{ $nextIndex }}</strong>
-                                    <br>
-                                    <small class="text-muted">
-                                        {{ $periodStart->format('M Y') }} - {{ $nextDueDate->format('M Y') }}
-                                    </small>
-                                </td>
-                                <td>
-                                    {{ $nextDueDate->format('d M Y') }}
-                                    @if($isOverdue)
-                                        <br><span class="badge bg-danger">Overdue</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="badge bg-info text-dark">
-                                        <i class="fas fa-clock me-1"></i>Pending
-                                    </span>
-                                </td>
-                                <td>-</td>
-                                <td>
-                                    <button type="button" 
-                                            class="btn btn-sm {{ $isOverdue ? 'btn-danger' : 'btn-primary' }}" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#uploadNewModal">
-                                        <i class="fas fa-upload me-1"></i> Upload Report
-                                    </button>
-                                </td>
-                            </tr>
-                        @endif
 
-                        @if($progress_reports->count() == 0 && !$canUploadNext)
+                        @if($progress_reports->count() == 0)
                             <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                <td colspan="5" class="text-center py-5">
+                                    <i class="fas fa-file-upload fa-3x text-muted mb-3"></i>
                                     <br>
-                                    <p class="text-muted mb-0">Study leave has not started yet.</p>
-                                    <small class="text-muted">Upload will be available from {{ \Carbon\Carbon::parse($study_leave->study_leave_from)->format('d M Y') }}.</small>
-                                </td>
-                            </tr>
-                        @elseif($progress_reports->count() > 0 && !$canUploadNext && !$nextDueDate)
-                            <tr>
-                                <td colspan="6" class="text-center py-4">
-                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
-                                    <br>
-                                    <p class="text-muted mb-0">All progress reports have been submitted.</p>
+                                    <p class="text-muted mb-0">No progress reports uploaded yet.</p>
+                                    <small class="text-muted">Click <strong>Upload New Report</strong> above to submit your first report.</small>
                                 </td>
                             </tr>
                         @endif
@@ -304,67 +214,153 @@
 @endif
 
 <!-- Upload New Report Modal -->
-@if($canUploadNext && $nextDueDate)
-    @php
-        $periodStart = $nextDueDate->copy()->subMonths(6);
-        $nextIndex = $progress_reports->count() + 1;
-    @endphp
-    <div class="modal fade" id="uploadNewModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('StudyLeave.progressReport.upload', $study_leave->id) }}" 
-                      method="POST" 
-                      enctype="multipart/form-data">
-                    @csrf
-                    <input type="hidden" name="due_date" value="{{ $nextDueDate->format('Y-m-d') }}">
-                    
-                    <div class="modal-header bg-maroon text-white">
-                        <h5 class="modal-title">
-                            <i class="fas fa-upload me-2"></i>Upload Progress Report {{ $nextIndex }}
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Report Period:</strong> 
-                            {{ $periodStart->format('d M Y') }} - {{ $nextDueDate->format('d M Y') }}
-                            <br>
-                            <strong>Due Date:</strong> {{ $nextDueDate->format('d M Y') }}
-                        </div>
+@php
+    $nextIndex = $progress_reports->count() + 1;
+@endphp
+<div class="modal fade" id="uploadNewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="uploadReportForm" action="{{ route('StudyLeave.progressReport.upload', $study_leave->id) }}" 
+                  method="POST" 
+                  enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header bg-maroon text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-upload me-2"></i>Upload Progress Report {{ $nextIndex }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="due_date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
 
-                        <!-- File Upload -->
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                Progress Report Document <span class="text-danger">*</span>
-                            </label>
-                            <input type="file" 
-                                   name="progress_report" 
-                                   class="form-control" 
-                                   accept=".pdf,application/pdf"
-                                   required>
-                            <small class="text-muted">Only PDF files are allowed (Max: 10MB)</small>
-                            @error('progress_report')
-                                <div class="text-danger mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <!-- File Upload -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Progress Report Document <span class="text-danger">*</span>
+                        </label>
+                        <input type="file" 
+                               name="progress_report" 
+                               class="form-control" 
+                               accept=".pdf,application/pdf"
+                               required>
+                        <small class="text-muted">Only PDF files are allowed (Max: 10MB)</small>
+                        @error('progress_report')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary" style="background-color: #800020; border-color: #800020;">
-                            <i class="fas fa-check me-2"></i>Submit Report
-                        </button>
+
+                    <!-- Optional Remark -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Remark <span class="text-muted">(optional)</span></label>
+                        <textarea name="remark" class="form-control" rows="3" maxlength="1000" placeholder="Add any notes about this report..."></textarea>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" id="submitReportBtn" class="btn btn-primary" style="background-color: #800020; border-color: #800020;">
+                        <i class="fas fa-check me-2"></i>Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmSubmitModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-maroon text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-question-circle me-2"></i>Confirm Submission
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-file-upload fa-3x mb-3" style="color:#800020"></i>
+                <p class="mb-0 fs-6">Are you sure you want to submit this progress report?</p>
+                <small class="text-muted">This will be forwarded to MA for review.</small>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" id="cancelConfirmBtn">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmYesBtn" style="background-color:#800020;border-color:#800020;">
+                    <i class="fas fa-check me-2"></i>Yes, Submit
+                </button>
             </div>
         </div>
     </div>
-@endif
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#28a745;color:white;">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>Submitted Successfully
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                <p class="mb-0 fs-6">Your progress report has been submitted successfully!</p>
+                <small class="text-muted">It has been forwarded to MA for review.</small>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const submitBtn = document.getElementById('submitReportBtn');
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
+        const uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadNewModal'));
+        const cancelBtn = document.getElementById('cancelConfirmBtn');
+        const yesBtn = document.getElementById('confirmYesBtn');
+
+        // Open confirmation when Submit is clicked
+        submitBtn.addEventListener('click', function () {
+            const form = document.getElementById('uploadReportForm');
+            const fileInput = form.querySelector('input[name="progress_report"]');
+            if (!fileInput.value) {
+                fileInput.reportValidity();
+                return;
+            }
+            confirmModal.show();
+        });
+
+        // Cancel: close confirm modal, reopen upload modal
+        cancelBtn.addEventListener('click', function () {
+            confirmModal.hide();
+            document.getElementById('uploadNewModal').addEventListener('hidden.bs.modal', function reopenUpload() {
+                const upload = new bootstrap.Modal(document.getElementById('uploadNewModal'));
+                upload.show();
+                document.getElementById('uploadNewModal').removeEventListener('hidden.bs.modal', reopenUpload);
+            }, { once: true });
+        });
+
+        // Yes: submit the form
+        yesBtn.addEventListener('click', function () {
+            confirmModal.hide();
+            document.getElementById('uploadReportForm').submit();
+        });
+
+        // Show success modal if redirected back with success flag
+        @if(session('upload_success'))
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        @endif
+    });
+</script>
 
 <style>
-    .bg-maroon {
         background-color: #800020 !important;
     }
     
