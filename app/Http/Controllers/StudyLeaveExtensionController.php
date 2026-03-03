@@ -26,9 +26,7 @@ class StudyLeaveExtensionController extends Controller
     
      public function showStudyLeaveExtensionForm($id){
 
-        $readonly = false;
         $study_leave = StudyLeave::where('id', $id)
-  
             ->select(
                 "id",
                 "empno",
@@ -47,51 +45,40 @@ class StudyLeaveExtensionController extends Controller
             )
             ->first();
 
-        // Calculate total duration including all extensions
-        $originalDuration = \Carbon\Carbon::parse($study_leave->study_leave_from)
-            ->diffInDays(\Carbon\Carbon::parse($study_leave->study_leave_to));
-        
-        // Get all approved extensions for this study leave
-        $extensions = StudyLeaveExtension::where('study_leave_id', $id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->whereIn('study_leave_extensions_approvals.status_id', [1]) // Only approved extensions
-            ->get();
-        
-        $totalExtensionDays = 0;
-        foreach ($extensions as $extension) {
-            $extensionDays = \Carbon\Carbon::parse($extension->old_end_date)
-                ->diffInDays(\Carbon\Carbon::parse($extension->new_end_date));
-            $totalExtensionDays += $extensionDays;
-        }
-        
         $totalDurationDays = $this->calculateTotalStudyLeaveDays($study_leave->empno);
-        $threeYearsInDays = 3 * 365; // 1095 days
-        
-        // Check for pending extension requests (status not approved or rejected)
-        $hasPendingExtension = StudyLeaveExtension::where('study_leave_id', $id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2]) // Not approved (1) or rejected (2)
-            ->exists();
-        
-        $canExtend = $totalDurationDays < $threeYearsInDays && !$hasPendingExtension;
-        $remainingDays = $threeYearsInDays - $totalDurationDays;
+        $threeYearsInDays = 3 * 365;
+        $remainingDays = max(0, $threeYearsInDays - $totalDurationDays);
 
-        // Get the last approved extension to determine the new start date
+        // Check if there is any extension request currently in process (not approved=1, not rejected=2)
+        $hasPendingExtension = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $id)
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2])
+            ->exists();
+
+        $canExtend = $totalDurationDays < $threeYearsInDays && !$hasPendingExtension;
+
+        // Get last approved extension to determine extension start date
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $id)
             ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
+            ->where('study_leave_extensions_approvals.status_id', 1)
             ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
-        
-        // If there's an approved extension, use its new_end_date as the start date
-        // Otherwise, use the original study leave end date
-        $extensionStartDate = $lastApprovedExtension 
-            ? $lastApprovedExtension->new_end_date 
+
+        $extensionStartDate = $lastApprovedExtension
+            ? $lastApprovedExtension->new_end_date
             : $study_leave->study_leave_to;
-        
-        return view('StudyLeave.study_leave_extension.study_leave_extension_form', compact('study_leave', 'readonly', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'hasPendingExtension'));
 
+        // Get all existing extensions with their status
+        $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $id)
+            ->leftJoin('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->orderBy('study_leave_extensions.created_at', 'asc')
+            ->select('study_leave_extensions.*', 'statuses.status as status_name', 'study_leave_extensions_approvals.status_id as approval_status_id')
+            ->get();
 
+        return view('StudyLeave.study_leave_extension.study_leave_extension_form', compact(
+            'study_leave', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'extensions', 'hasPendingExtension'
+        ));
     }
 
      /**
@@ -176,11 +163,9 @@ class StudyLeaveExtensionController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            dd([
-                'errors' => $validator->errors()->all(),
-                'failed_rules' => $validator->failed(),
-                'request_data' => $request->all()
-            ]);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $validatedData = $validator->validated();
@@ -190,7 +175,7 @@ class StudyLeaveExtensionController extends Controller
         if (!$creationSuccess) {
             return redirect()->back()->withErrors(['error' => 'Failed to submit study leave extension. Please try again.'])->withInput();
         }
-        return redirect()->route('StudyLeave.show.studyLeave', $id)->with('success', 'Study leave extension submitted successfully!');
+        return redirect()->route('StudyLeave.show.extensionForm', $id)->with('upload_success', true);
     }
 
 
@@ -263,8 +248,8 @@ class StudyLeaveExtensionController extends Controller
             $extensionApprover->status_id = 4;
             $extensionApprover->save();
             
-            return redirect()->route('StudyLeave.show.studyLeave', ['id' => $extension->study_leave_id])
-                ->with('success', 'Extension resubmitted successfully!');
+            return redirect()->route('StudyLeave.show.extensionForm', ['id' => $extension->study_leave_id])
+                ->with('upload_success', true);
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withErrors(['error' => 'Failed to resubmit extension. Please try again.'])

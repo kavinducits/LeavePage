@@ -2,256 +2,383 @@
 
 @section('content')
 
-<div class="container py-4">
+<div class="container-fluid px-4 py-3">
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Error:</strong>
+            <ul class="mb-0 mt-2">
+                @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    @if(isset($hasPendingExtension) && $hasPendingExtension)
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="dashboard-header text-maroon mb-1">
+                <i class="fas fa-calendar-plus icon-gold me-2"></i>Request for Study Leave Extension
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ route('StudyLeave.create') }}">Study Leaves</a></li>
+                    <li class="breadcrumb-item active">Extension Requests</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ route('StudyLeave.create') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Study Leaves
+        </a>
+    </div>
+
+    @if(!$canExtend && $hasPendingExtension)
         <div class="alert alert-warning fw-semibold">
             <i class="fas fa-hourglass-half me-2"></i>
-            <strong>Pending Extension Request:</strong> You already have an extension request pending approval. You cannot submit a new extension request until the current one is processed.
+            <strong>Extension Request In Process:</strong> You already have an extension request pending approval. You cannot submit a new request until the current one is approved or rejected.
         </div>
-    @endif
-
-    @if (!$canExtend && (!isset($hasPendingExtension) || !$hasPendingExtension))
+    @elseif(!$canExtend)
         <div class="alert alert-danger fw-semibold">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>Extension Not Allowed:</strong> The total study leave duration (including approved extensions) has reached or exceeded the 3-year limit.
+            <strong>Extension Not Allowed:</strong> The total study leave duration has reached or exceeded the 3-year limit.
             <br><small>Total duration: {{ round($totalDurationDays / 365, 2) }} years ({{ $totalDurationDays }} days)</small>
         </div>
-    @endif
-
-    @if ($canExtend && $remainingDays < 365 && (!isset($hasPendingExtension) || !$hasPendingExtension))
+    @elseif($remainingDays < 365)
         <div class="alert alert-warning fw-semibold">
             <i class="fas fa-info-circle me-2"></i>
             <strong>Notice:</strong> You have {{ round($remainingDays / 30, 1) }} months ({{ $remainingDays }} days) remaining before reaching the 3-year limit.
-            <br><small>Current total: {{ round($totalDurationDays / 365, 2) }} years | Maximum: 3 years</small>
         </div>
     @endif
 
-    @isset($remark)
-    <div class="alert alert-warning fw-semibold">
-        Returned with remark:
-        <pre class="mb-0">{{ $remark }}</pre>
-    </div>
-    @endisset
+    <!-- Extensions Table Card -->
+    <div class="card shadow-sm">
+        <div class="card-header card-header-maroon fw-semibold d-flex justify-content-between align-items-center">
+            <span>
+                <i class="fas fa-list me-2"></i>Extension Requests — Ref: {{ $study_leave->reference_no ?? 'N/A' }}
+            </span>
+            @if($canExtend)
+                <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#newExtensionModal">
+                    <i class="fas fa-plus me-1"></i>New Extension Request
+                </button>
+            @endif
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 6%">#</th>
+                            <th style="width: 20%">Extension From</th>
+                            <th style="width: 20%">Extension To</th>
+                            <th style="width: 12%">Period</th>
+                            <th style="width: 14%">Status</th>
+                            <th style="width: 28%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($extensions as $index => $extension)
+                            @php
+                                $oldEnd = \Carbon\Carbon::parse($extension->old_end_date);
+                                $newEnd = \Carbon\Carbon::parse($extension->new_end_date);
+                                $days   = $oldEnd->diffInDays($newEnd);
+                                $sid    = $extension->approval_status_id ?? $extension->status_id;
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-0 fw-bold text-maroon dashboard-header">
-                <i class="fas fa-file-alt me-2 icon-gold"></i>
-                Request for Study Leave Extension
-            </h2>
+                                $badgeClass = 'bg-secondary';
+                                $icon       = 'fa-clock';
+                                if ($sid == 1)                        { $badgeClass = 'bg-success';           $icon = 'fa-check-circle'; }
+                                elseif ($sid == 2)                    { $badgeClass = 'bg-danger';            $icon = 'fa-times-circle'; }
+                                elseif ($sid == 3)                    { $badgeClass = 'bg-warning text-dark'; $icon = 'fa-undo'; }
+                                elseif ($sid == 4)                    { $badgeClass = 'bg-info';              $icon = 'fa-spinner'; }
+                                elseif (in_array($sid, [5,6,7,9]))   { $badgeClass = 'bg-primary';           $icon = 'fa-hourglass-half'; }
+                            @endphp
+                            <tr>
+                                <td class="text-center fw-semibold">{{ $index + 1 }}</td>
+                                <td>
+                                    <i class="fas fa-calendar-alt text-muted me-1"></i>
+                                    {{ $oldEnd->format('d M Y') }}
+                                </td>
+                                <td>
+                                    <i class="fas fa-calendar-check text-success me-1"></i>
+                                    {{ $newEnd->format('d M Y') }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-clock me-1"></i>{{ $days }} days
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {{ $badgeClass }}">
+                                        <i class="fas {{ $icon }} me-1"></i>{{ $extension->status_name ?? 'Submitted' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($extension->reason_for_extension)
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#reasonModal{{ $extension->id }}">
+                                            <i class="fas fa-eye me-1"></i>View Reason
+                                        </button>
+                                    @endif
+                                    @if($sid == 3)
+                                        <button type="button"
+                                                class="btn btn-sm btn-warning"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#resubmitModal{{ $extension->id }}">
+                                            <i class="fas fa-redo me-1"></i>Resubmit
+                                        </button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                                    <br>
+                                    <p class="text-muted mb-0">No extension requests submitted yet.</p>
+                                    @if($canExtend)
+                                        <small class="text-muted">Click <strong>New Extension Request</strong> above to submit your first request.</small>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <form action="{{Route('StudyLeave.store.extension', ['id' => $study_leave->id])}}" method="POST" enctype="multipart/form-data" id="leave-form" class="needs-validation" novalidate>
-        @csrf
+</div>
 
-        <div class="card mb-4">
-            <div class="card-header card-header-maroon fw-semibold d-flex justify-content-between align-items-center">
-                <span>
-                    <i class="fas fa-user me-2"></i>Details of the Study Leave Extention - Refference No: {{ $study_leave->reference_no ?? 'N/A' }}
-                </span>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-
-                    <!-- Period of Study Leave Requested -->
-                    <div class="col-12">
-                        <label class="form-label fw-semibold">Period of Study Leave Requested <span class="text-danger">*</span></label>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">From </label>
-                                <input type="date" name="old_end_date" id="old_end_date" class="form-control" 
-                                       value="{{ $extensionStartDate ?? optional($study_leave)->study_leave_to ?? '' }}" 
-                                       min="{{ date('Y-m-d') }}" 
-                                       readonly required>
-                                <div class="invalid-feedback">
-                                    Please select a valid start date.
-                                </div>
-                                @if(isset($extensionStartDate) && $extensionStartDate != $study_leave->study_leave_to)
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle"></i> Start date based on previous approved extension end date
-                                    </small>
-                                @endif
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">To <span class="text-danger">*</span></label>
-                                <input type="date" name="new_end_date" id="new_end_date" class="form-control" 
-                                       value=''
-                                       min="{{ $extensionStartDate ?? optional($study_leave)->study_leave_to ?? date('Y-m-d') }}" 
-                                       required 
-                                       {{ ($readonly ?? true) || !$canExtend ? 'readonly' : '' }}>
-                                <div class="invalid-feedback">
-                                    Please select a valid end date (must be after start date).
-                                </div>
-                            </div>
-                        </div>
+<!-- ───── Reason View Modals ───── -->
+@foreach($extensions as $extension)
+    @if($extension->reason_for_extension)
+        <div class="modal fade" id="reasonModal{{ $extension->id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-maroon text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-file-alt me-2"></i>Reason for Extension #{{ $loop->iteration }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            const oldEndDate = document.getElementById('old_end_date');
-                            const newEndDate = document.getElementById('new_end_date');
-                            const remainingDays = {{ $remainingDays ?? 0 }};
-                            const studyLeaveFrom = '{{ $study_leave->study_leave_from }}';
-                            
-                            function updateNewEndDateRestrictions() {
-                                if (oldEndDate.value && studyLeaveFrom) {
-                                    // Set minimum to the day after old_end_date (must be greater than "From" date)
-                                    const minDate = new Date(oldEndDate.value);
-                                    minDate.setDate(minDate.getDate() + 1);
-                                    const minDateString = minDate.toISOString().split('T')[0];
-                                    newEndDate.min = minDateString;
-                                    
-                                    // Calculate maximum date: original study_leave_from + remainingDays
-                                    // This ensures total duration doesn't exceed 3 years from original start
-                                    const originalStartDate = new Date(studyLeaveFrom);
-                                    const maxDate = new Date(originalStartDate);
-                                    maxDate.setDate(maxDate.getDate() + remainingDays + {{ $totalDurationDays ?? 0 }});
-                                    const maxDateString = maxDate.toISOString().split('T')[0];
-                                    newEndDate.max = maxDateString;
-                                    
-                                    // If current value exceeds max date, clear it
-                                    if (newEndDate.value && new Date(newEndDate.value) > maxDate) {
-                                        newEndDate.value = '';
-                                    }
-                                    
-                                    // If current value is less than min date, clear it
-                                    if (newEndDate.value && new Date(newEndDate.value) < minDate) {
-                                        newEndDate.value = '';
-                                    }
-                                }
-                            }
-                            
-                            // Initialize on page load
-                            updateNewEndDateRestrictions();
-                            
-                            // Update when old_end_date changes (though it's readonly, good to have for consistency)
-                            oldEndDate.addEventListener('change', updateNewEndDateRestrictions);
-                        });
-                    </script>
-
-                    <!-- Reason for Extension -->
-                    <div class="col-12">
-                        <label for="reason_for_extension" class="form-label fw-semibold">
-                            Reason for Extension <span class="text-danger">*</span>
-                        </label>
-                        <textarea name="reason_for_extension" id="reason_for_extension" class="form-control" 
-                                  rows="4" placeholder="Enter reason for requesting extension" 
-                                  required {{ ($readonly ?? true) || !$canExtend ? 'readonly' : '' }}>{{ old('reason_for_extension', $study_leave->reason_for_extension ?? '') }}</textarea>
-                        <div class="invalid-feedback">
-                            Please provide a reason for the extension.
-                        </div>
+                    <div class="modal-body">
+                        <div class="p-3 bg-light border rounded" style="white-space: pre-wrap;">{{ $extension->reason_for_extension }}</div>
                     </div>
-
-                  
-
-                    
-                  
-            <!-- Action Buttons -->
-            <div class="card mt-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ route('StudyLeave.create') }}" class="btn btn-outline-secondary btn-lg">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </a>
-
-                        @if ($canExtend)
-                            <button type="submit" class="btn btn-primary btn-lg" style="background-color: #800020; border-color: #800020;">
-                                <i class="fas fa-paper-plane me-2"></i>Submit Extension Request
-                            </button>
-                        @else
-                            <button type="button" class="btn btn-secondary btn-lg" disabled>
-                                <i class="fas fa-ban me-2"></i>Extension Not Allowed (3-Year Limit Reached)
-                            </button>
-                        @endif
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Close
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+    @endif
 
-    </form>
+    {{-- Resubmit modal for returned extensions --}}
+    @php $sid = $extension->approval_status_id ?? $extension->status_id; @endphp
+    @if($sid == 3)
+        <div class="modal fade" id="resubmitModal{{ $extension->id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form action="{{ route('StudyLeave.update.extension', $extension->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="old_end_date" value="{{ $extension->old_end_date }}">
+                        <div class="modal-header bg-maroon text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-redo me-2"></i>Resubmit Extension Request #{{ $loop->iteration }}
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">New End Date <span class="text-danger">*</span></label>
+                                <input type="date" name="new_end_date" class="form-control"
+                                       value="{{ $extension->new_end_date }}"
+                                       min="{{ \Carbon\Carbon::parse($extension->old_end_date)->addDay()->format('Y-m-d') }}"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Reason for Extension <span class="text-danger">*</span></label>
+                                <textarea name="reason_for_extension" class="form-control" rows="4" required>{{ $extension->reason_for_extension }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-redo me-2"></i>Resubmit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
+@endforeach
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const fundingType = document.querySelector('select[name="funding_type"]');
-            const scholarshipDetails = document.getElementById('scholarship-details');
-            const scholarshipExtraDetails = document.getElementById('scholarship-extra-details');
-            const scholarshipSource = document.getElementById('scholarship_source');
-            const scholarshipAmountGroup = document.getElementById('scholarship-amount-group');
-            const projectNameGroup = document.getElementById('project-name-group');
-            const leavePaymentType = document.getElementById('leave_payment_type');
-            const loanHandlingSection = document.getElementById('loan_handling_section');
-            const loanHandlingDetails = document.getElementById('loan_handling_details');
+<!-- ───── New Extension Request Modal ───── -->
+@if($canExtend)
+<div class="modal fade" id="newExtensionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="extensionForm" action="{{ route('StudyLeave.store.extension', ['id' => $study_leave->id]) }}" method="POST">
+                @csrf
+                <input type="hidden" name="old_end_date" value="{{ $extensionStartDate }}">
+                <div class="modal-header bg-maroon text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-plus me-2"></i>New Extension Request
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Extension from:</strong> {{ \Carbon\Carbon::parse($extensionStartDate)->format('d M Y') }}
+                    </div>
 
-            function updateLoanHandlingVisibility() {
-                if (leavePaymentType.value === '2') {
-                    loanHandlingSection.style.display = 'block';
-                    loanHandlingDetails.setAttribute('required', 'required');
-                } else {
-                    loanHandlingSection.style.display = 'none';
-                    loanHandlingDetails.removeAttribute('required');
-                    loanHandlingDetails.value = '';
-                }
-            }
+                    <!-- New End Date -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            New End Date <span class="text-danger">*</span>
+                        </label>
+                        <input type="date"
+                               name="new_end_date"
+                               id="ext_new_end_date"
+                               class="form-control"
+                               min="{{ \Carbon\Carbon::parse($extensionStartDate)->addDay()->format('Y-m-d') }}"
+                               required>
+                        <small class="text-muted">Must be after {{ \Carbon\Carbon::parse($extensionStartDate)->format('d M Y') }}</small>
+                    </div>
 
-            function updateScholarshipVisibility() {
-                if (fundingType.value === '2') {
-                    scholarshipDetails.style.display = 'block';
-                    scholarshipSource.setAttribute('required', 'required');
-                } else {
-                    scholarshipDetails.style.display = 'none';
-                    scholarshipExtraDetails.style.display = 'none';
-                    scholarshipAmountGroup.style.display = 'none';
-                    projectNameGroup.style.display = 'none';
-                    scholarshipSource.removeAttribute('required');
-                }
-            }
-
-            scholarshipSource.addEventListener('change', function() {
-                if (this.value === '1') {
-                    scholarshipExtraDetails.style.display = 'block';
-                    scholarshipAmountGroup.style.display = 'block';
-                    projectNameGroup.style.display = 'none';
-                } else if (this.value === '2') {
-                    scholarshipExtraDetails.style.display = 'block';
-                    scholarshipAmountGroup.style.display = 'none';
-                    projectNameGroup.style.display = 'block';
-                } else {
-                    scholarshipExtraDetails.style.display = 'none';
-                }
-            });
-
-            leavePaymentType.addEventListener('change', updateLoanHandlingVisibility);
-            fundingType.addEventListener('change', updateScholarshipVisibility);
-
-            updateLoanHandlingVisibility();
-            updateScholarshipVisibility();
-            if (scholarshipSource.value) {
-                scholarshipSource.dispatchEvent(new Event('change'));
-            }
-        });
-    </script>
-
+                    <!-- Reason -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Reason for Extension <span class="text-danger">*</span>
+                        </label>
+                        <textarea name="reason_for_extension"
+                                  id="ext_reason"
+                                  class="form-control"
+                                  rows="4"
+                                  maxlength="2000"
+                                  placeholder="Enter reason for requesting extension"
+                                  required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" id="submitExtensionBtn" class="btn btn-primary" style="background-color:#800020;border-color:#800020;">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmExtensionModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-maroon text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-question-circle me-2"></i>Confirm Submission
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-calendar-plus fa-3x mb-3" style="color:#800020"></i>
+                <p class="mb-0 fs-6">Are you sure you want to submit this extension request?</p>
+                <small class="text-muted">It will be forwarded to MA for review.</small>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" id="cancelExtensionConfirm">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmExtensionYes" style="background-color:#800020;border-color:#800020;">
+                    <i class="fas fa-check me-2"></i>Yes, Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#28a745;color:white;">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>Submitted Successfully
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
+                <p class="mb-0 fs-6">Your extension request has been submitted successfully!</p>
+                <small class="text-muted">It has been forwarded to MA for review.</small>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    @if($canExtend)
+    const submitBtn     = document.getElementById('submitExtensionBtn');
+    const newExtModal   = new bootstrap.Modal(document.getElementById('newExtensionModal'));
+    const confirmModal  = new bootstrap.Modal(document.getElementById('confirmExtensionModal'));
+    const cancelConfirm = document.getElementById('cancelExtensionConfirm');
+    const yesConfirm    = document.getElementById('confirmExtensionYes');
+
+    submitBtn.addEventListener('click', function () {
+        const form = document.getElementById('extensionForm');
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+        newExtModal.hide();
+        document.getElementById('newExtensionModal').addEventListener('hidden.bs.modal', function showConfirm() {
+            confirmModal.show();
+        }, { once: true });
+    });
+
+    cancelConfirm.addEventListener('click', function () {
+        confirmModal.hide();
+        document.getElementById('confirmExtensionModal').addEventListener('hidden.bs.modal', function reopenNew() {
+            newExtModal.show();
+        }, { once: true });
+    });
+
+    yesConfirm.addEventListener('click', function () {
+        confirmModal.hide();
+        document.getElementById('extensionForm').submit();
+    });
+    @endif
+
+    @if(session('upload_success'))
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
+    @endif
+});
+</script>
+
+<style>
+    .bg-maroon          { background-color: #800020 !important; }
+    .card-header-maroon { background-color: #800020; color: #ffffff; }
+    .text-maroon        { color: #800020 !important; }
+    .icon-gold          { color: #FFD700; }
+    .dashboard-header   { font-size: 1.75rem; }
+    .btn-close-white    { filter: brightness(0) invert(1); }
+    .table-hover tbody tr:hover { background-color: rgba(128,0,32,0.05); }
+</style>
 
 @endsection
