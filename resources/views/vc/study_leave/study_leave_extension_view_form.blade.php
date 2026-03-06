@@ -319,13 +319,7 @@
             <!-- Action Buttons -->
             <div class="card mt-4">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Return to User Button -->
-                        <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal"
-                            data-bs-target="#returnModal">
-                            <i class="fas fa-undo me-2"></i>Return to User
-                        </button>
-
+                    <div class="d-flex justify-content-end align-items-center">
                         <div class="text-end">
                             <div class="card mb-2">
                                 <div class="card-body py-2">
@@ -344,43 +338,20 @@
         </form>
     </div>
 
-    <!-- Return Modal -->
-    <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <!-- Confirm Approve Modal -->
+    <div class="modal fade" id="confirmApproveModal" tabindex="-1" aria-labelledby="confirmApproveModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form action="{{ route('vc.extension.return', $extension->extension_id) }}" method="POST"
-                    id="returnForm">
-                    @csrf
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title" id="returnModalLabel">
-                            <i class="fas fa-undo me-2"></i>Return Extension Request to User
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            This extension request will be returned to the employee for revision.
-                        </div>
-                        <div class="mb-3">
-                            <label for="returnRemarks" class="form-label fw-semibold">
-                                Remarks <span class="text-danger">*</span>
-                            </label>
-                            <textarea class="form-control" id="returnRemarks" name="vc_remarks" rows="4"
-                                placeholder="Please provide reasons for returning this extension request" required></textarea>
-                            <div class="invalid-feedback">
-                                Remarks are required when returning an extension request.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-undo me-2"></i>Return to User
-                        </button>
-                    </div>
-                </form>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="confirmApproveModalLabel"><i class="fas fa-check-circle me-2"></i>Confirm Approval</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to approve this extension request? This is the final approval.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmApproveBtn">Yes, Approve</button>
+                </div>
             </div>
         </div>
     </div>
@@ -440,7 +411,12 @@
 
             // Form validation
             const vcReviewForm = document.getElementById('vcReviewForm');
+            const confirmApproveModal = new bootstrap.Modal(document.getElementById('confirmApproveModal'));
+            let approveConfirmed = false;
+
             vcReviewForm.addEventListener('submit', function(e) {
+                if (approveConfirmed) { return; }
+
                 const recommendValue = document.querySelector('input[name="vc_recommend"]:checked')?.value;
 
                 if (recommendValue === '0') {
@@ -453,37 +429,18 @@
                     }
                 }
 
-                if (!confirm(
-                        'Are you sure you want to approve this extension request? This is the final approval.'
-                        )) {
-                    e.preventDefault();
-                    return false;
-                }
+                e.preventDefault();
+                confirmApproveModal.show();
             });
 
-            // Return form validation
-            const returnForm = document.getElementById('returnForm');
-            returnForm.addEventListener('submit', function(e) {
-                const returnRemarks = document.getElementById('returnRemarks').value.trim();
-
-                if (returnRemarks === '') {
-                    e.preventDefault();
-                    document.getElementById('returnRemarks').classList.add('is-invalid');
-                    return false;
-                }
-
-                if (!confirm('Are you sure you want to return this extension request to the user?')) {
-                    e.preventDefault();
-                    return false;
-                }
+            document.getElementById('confirmApproveBtn').addEventListener('click', function() {
+                approveConfirmed = true;
+                confirmApproveModal.hide();
+                vcReviewForm.submit();
             });
 
             // Clear invalid state on input
             notRecommendTextarea.addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-            });
-
-            document.getElementById('returnRemarks').addEventListener('input', function() {
                 this.classList.remove('is-invalid');
             });
         });
