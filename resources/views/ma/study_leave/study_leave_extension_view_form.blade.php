@@ -282,6 +282,52 @@
         @include('ma.partials.footer')
     </div>
 
+<!-- Confirm Forward Modal -->
+<div class="modal fade" id="confirmForwardModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#800020;color:white;">
+                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Forward</h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-forward fa-3x mb-3" style="color:#800020"></i>
+                <p class="mb-0 fs-6">Are you sure you want to forward this extension request to Head of Academic Establishment?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="confirmForwardYes">
+                    <i class="fas fa-check me-2"></i>Yes, Forward
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Return Modal -->
+<div class="modal fade" id="confirmReturnModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#800020;color:white;">
+                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Return</h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-undo fa-3x mb-3" style="color:#800020"></i>
+                <p class="mb-0 fs-6">Are you sure you want to return this extension request to the user?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-warning" id="confirmReturnYes">
+                    <i class="fas fa-check me-2"></i>Yes, Return
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 5 -->
@@ -305,8 +351,14 @@
             });
         });
 
+        // Forward form
+        const confirmForwardModal = new bootstrap.Modal(document.getElementById('confirmForwardModal'));
+        let forwardConfirmed = false;
+
         // Form validation and submission handling - Forward
         document.getElementById('approveForm').addEventListener('submit', function(e) {
+            if (forwardConfirmed) { return; }
+
             const remarkValue = document.getElementById('actionRemark').value.trim();
             const recommendRadio = document.querySelector('input[name="ma_recommend"]:checked');
 
@@ -333,16 +385,24 @@
             document.getElementById('approveRemarkInput').value = remarkValue;
             document.getElementById('approveRecommendInput').value = recommendRadio.value;
 
-            if (!confirm('Are you sure you want to forward this extension request to HOD?')) {
-                e.preventDefault();
-                return false;
-            }
+            e.preventDefault();
+            confirmForwardModal.show();
+        });
+
+        document.getElementById('confirmForwardYes').addEventListener('click', function () {
+            forwardConfirmed = true;
+            confirmForwardModal.hide();
+            document.getElementById('approveForm').submit();
         });
 
         // Return form
-        document.getElementById('returnForm').addEventListener('submit', function(e) {
-            const remarkValue = document.getElementById('actionRemark').value.trim();
+        const returnConfirmModal = new bootstrap.Modal(document.getElementById('confirmReturnModal'));
+        let returnConfirmed = false;
 
+        document.getElementById('returnForm').addEventListener('submit', function(e) {
+            if (returnConfirmed) { return; }
+
+            const remarkValue = document.getElementById('actionRemark').value.trim();
             clearAllErrors();
 
             if (remarkValue === '') {
@@ -352,11 +412,14 @@
             }
 
             document.getElementById('returnRemarkInput').value = remarkValue;
+            e.preventDefault();
+            returnConfirmModal.show();
+        });
 
-            if (!confirm('Are you sure you want to return this extension request to the user?')) {
-                e.preventDefault();
-                return false;
-            }
+        document.getElementById('confirmReturnYes').addEventListener('click', function () {
+            returnConfirmed = true;
+            returnConfirmModal.hide();
+            document.getElementById('returnForm').submit();
         });
 
         function showRemarkError() {
@@ -396,6 +459,7 @@
         document.getElementById('actionRemark').addEventListener('input', clearRemarkError);
         document.getElementById('ma_not_recommend_reason').addEventListener('input', clearNotRecommendReasonError);
     </script>
+
 </body>
 
 </html>
