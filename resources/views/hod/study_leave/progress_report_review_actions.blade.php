@@ -76,6 +76,29 @@
     </div>
 </div>
 
+<!-- Confirm Submit Modal -->
+<div class="modal fade" id="confirmSubmitModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#800020;color:white;">
+                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Submission</h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-forward fa-3x mb-3" style="color:#800020"></i>
+                <p class="mb-0 fs-6" id="confirmSubmitMessage">Are you sure you want to submit this review?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="confirmSubmitYes">
+                    <i class="fas fa-check me-2"></i>Yes, Forward
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Form validation and submission handling for HOD
     function submitHODForm() {
@@ -100,11 +123,11 @@
         document.getElementById('approvalDecisionInput').value = approvalDecision.value;
         document.getElementById('remarkInput').value = remarkValue;
 
-        // Confirm submission
+        // Show confirm modal
         const action = approvalDecision.value === 'approved' ? 'recommend and forward to Dean' : 'not recommend';
-        if (confirm(`Are you sure you want to ${action} this progress report?`)) {
-            document.getElementById('submitForm').submit();
-        }
+        document.getElementById('confirmSubmitMessage').textContent = `Are you sure you want to ${action} this progress report?`;
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
+        confirmModal.show();
     }
 
     function showApprovalError() {
@@ -132,5 +155,9 @@
     document.getElementById('actionRemark').addEventListener('input', clearErrors);
     document.querySelectorAll('input[name="approval_decision"]').forEach(radio => {
         radio.addEventListener('change', clearErrors);
+    });
+
+    document.getElementById('confirmSubmitYes').addEventListener('click', function () {
+        document.getElementById('submitForm').submit();
     });
 </script>
