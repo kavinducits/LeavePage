@@ -229,13 +229,7 @@
             <!-- Action Buttons -->
             <div class="card mt-4">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Return to User Button -->
-                        <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal"
-                            data-bs-target="#returnModal">
-                            <i class="fas fa-undo me-2"></i>Return to User
-                        </button>
-
+                    <div class="d-flex justify-content-end align-items-center">
                         <div class="text-end">
                             @if (isset($departmentHead))
                                 <div class="card mb-2">
@@ -273,46 +267,28 @@
         </form>
     </div>
 
-    <!-- Return Modal -->
-    <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('hodacademicestablishment.extension.return', $extension->extension_id) }}" method="POST"
-                    id="returnForm">
-                    @csrf
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title" id="returnModalLabel">
-                            <i class="fas fa-undo me-2"></i>Return Extension Request to MA
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            This extension request will be returned to MA for revision.
-                        </div>
-                        <div class="mb-3">
-                            <label for="returnRemarks" class="form-label fw-semibold">
-                                Remarks <span class="text-danger">*</span>
-                            </label>
-                            <textarea class="form-control" id="returnRemarks" name="registrar_remarks" rows="4"
-                                placeholder="Please provide reasons for returning this extension request" required></textarea>
-                            <div class="invalid-feedback">
-                                Remarks are required when returning an extension request.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-undo me-2"></i>Return to MA
-                        </button>
-                    </div>
-                </form>
+<!-- Confirm Forward Modal -->
+<div class="modal fade" id="confirmForwardModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#800020;color:white;">
+                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Forward</h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-forward fa-3x mb-3" style="color:#800020"></i>
+                <p class="mb-0 fs-6">Are you sure you want to submit this review and forward to Department HOD?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="confirmForwardYes">
+                    <i class="fas fa-check me-2"></i>Yes, Forward
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <style>
         .card-header-dark {
@@ -363,8 +339,13 @@
             });
 
             // Form validation - Forward
+            const confirmForwardModal = new bootstrap.Modal(document.getElementById('confirmForwardModal'));
+            let forwardConfirmed = false;
+
             const hodReviewForm = document.getElementById('hodReviewForm');
             hodReviewForm.addEventListener('submit', function(e) {
+                if (forwardConfirmed) { return; }
+
                 clearAllErrors();
 
                 const recommendRadio = document.querySelector('input[name="acad_est_head_recommend"]:checked');
@@ -386,34 +367,17 @@
                     }
                 }
 
-                if (!confirm('Are you sure you want to submit this review and forward to Department HOD?')) {
-                    e.preventDefault();
-                    return false;
-                }
+                e.preventDefault();
+                confirmForwardModal.show();
             });
 
-            // Return form validation
-            const returnForm = document.getElementById('returnForm');
-            returnForm.addEventListener('submit', function(e) {
-                const returnRemarks = document.getElementById('returnRemarks').value.trim();
-
-                if (returnRemarks === '') {
-                    e.preventDefault();
-                    document.getElementById('returnRemarks').classList.add('is-invalid');
-                    return false;
-                }
-
-                if (!confirm('Are you sure you want to return this extension request to MA?')) {
-                    e.preventDefault();
-                    return false;
-                }
+            document.getElementById('confirmForwardYes').addEventListener('click', function () {
+                forwardConfirmed = true;
+                confirmForwardModal.hide();
+                hodReviewForm.submit();
             });
 
             // Clear invalid state on input
-            document.getElementById('returnRemarks').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-            });
-
             document.getElementById('acad_est_head_not_recommend_reason').addEventListener('input', function() {
                 clearNotRecommendReasonError();
             });
