@@ -5,23 +5,69 @@
                         
                         
                         
-                         <li class="nav-item">
-                            <a href="{{ route('hodacademicestablishment.studyLeave') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave') ? ' active' : '' }}">
+                        <li class="nav-item has-treeview{{ isset($pageName) && $pageName == 'Study Leave' ? ' menu-open' : '' }}">
+                            <a href="#" class="nav-link{{ isset($pageName) && $pageName == 'Study Leave' ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
-                                <p>Study Leaves</p>
+                                <p>Study Leave
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('hodacademicestablishment.studyLeave') }}" class="nav-link{{ request()->routeIs('hodacademicestablishment.studyLeave') ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Study Leave Request</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('hodacademicestablishment.studyLeave.accepted') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeave.accepted') || (request()->routeIs('hodacademicestablishment.studyLeave.view') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Accepted Study Leave</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
-                         <li class="nav-item">
-                            <a href="{{ route('hodacademicestablishment.studyLeaveExtensions') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Extensions') ? ' active' : '' }}">
-                                <i class="nav-icon fas fa-stream"></i>
-                                <p>Study Leave Extensions</p>
+                         <li class="nav-item has-treeview{{ isset($pageName) && $pageName == 'Study Leave Extensions' ? ' menu-open' : '' }}">
+                            <a href="#" class="nav-link{{ isset($pageName) && $pageName == 'Study Leave Extensions' ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-calendar-plus"></i>
+                                <p>Study Leave Extensions
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('hodacademicestablishment.studyLeaveExtensions') }}" class="nav-link{{ request()->routeIs('hodacademicestablishment.studyLeaveExtensions') ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Extension Request</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('hodacademicestablishment.studyLeaveExtensions.accepted') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveExtensions.accepted') || (request()->routeIs('hodacademicestablishment.show.extension') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Accepted Extensions</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
-                         <li class="nav-item">
-                            <a href="{{ route('hodacademicestablishment.studyLeaveProgress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
+                         <li class="nav-item has-treeview{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' menu-open' : '' }}">
+                            <a href="#" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
-                                <p>Study Leave Progress</p>
+                                <p>Study Leave Progress<i class="fas fa-angle-left right"></i></p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('hodacademicestablishment.studyLeaveProgress') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveProgress') || (request()->routeIs('hodacademicestablishment.studyLeaveProgress.view') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Pending Reports</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('hodacademicestablishment.studyLeaveProgress.accepted') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveProgress.accepted') || (request()->routeIs('hodacademicestablishment.studyLeaveProgress.view') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Accepted Reports</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                        
                     </ul>

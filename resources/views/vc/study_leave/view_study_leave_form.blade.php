@@ -9,7 +9,7 @@
                 </h2>
                 <p class="text-muted mb-0">Reference No: {{ $draft_study_leave->reference_no }}</p>
             </div>
-            <a href="{{ route('vc.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ isset($from) && $from == 'accepted' ? route('vc.study.leave.index.accepted') : route('vc.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
             </a>
         </div>
@@ -36,6 +36,11 @@
         @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => true])
         @include('dean.study_leave.study_leave_dean_review_section', ['readonly' => true])
 
+        @if(isset($from) && $from == 'accepted')
+            <div class="alert alert-success mt-3">
+                <i class="fas fa-check-circle me-2"></i>This application has already been processed by the VC.
+            </div>
+        @else
         <!-- VC Review Section -->
         <form action="{{ route('vc.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="vcReviewForm">
             @csrf
@@ -119,7 +124,7 @@
             <div class="card mt-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="{{ route('vc.index') }}" class="btn btn-outline-secondary btn-lg">
+                        <a href="{{ isset($from) && $from == 'accepted' ? route('vc.study.leave.index.accepted') : route('vc.index') }}" class="btn btn-outline-secondary btn-lg">
                             <i class="fas fa-times me-2"></i>Cancel
                         </a>
 
@@ -141,6 +146,7 @@
                 </div>
             </div>
         </form>
+        @endif
     </div>
     <!-- Forward Confirmation Modal -->
     <div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">

@@ -10,23 +10,69 @@
                             </a>
                         </li>
                         
-                         <li class="nav-item">
-                            <a href="{{ route('hod.study.leave.index') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave') ? ' active' : '' }}">
+                        <li class="nav-item has-treeview{{ isset($pageName) && $pageName == 'Study Leave' ? ' menu-open' : '' }}">
+                            <a href="#" class="nav-link{{ isset($pageName) && $pageName == 'Study Leave' ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
-                                <p>Study Leaves</p>
+                                <p>Study Leave
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('hod.study.leave.index') }}" class="nav-link{{ request()->routeIs('hod.study.leave.index') ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Study Leave Request</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('hod.study.leave.index.accepted') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.index.accepted') || (request()->routeIs('hod.view.studyLeave') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Accepted Study Leave</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
-                         <li class="nav-item">
-                            <a href="{{ route('hod.study.leave.extensions') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Extensions') ? ' active' : '' }}">
-                                <i class="nav-icon fas fa-stream"></i>
-                                <p>Study Leave Extensions</p>
+                         <li class="nav-item has-treeview{{ isset($pageName) && $pageName == 'Study Leave Extensions' ? ' menu-open' : '' }}">
+                            <a href="#" class="nav-link{{ isset($pageName) && $pageName == 'Study Leave Extensions' ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-calendar-plus"></i>
+                                <p>Study Leave Extensions
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('hod.study.leave.extensions') }}" class="nav-link{{ request()->routeIs('hod.study.leave.extensions') ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Extension Request</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('hod.study.leave.extensions.accepted') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.extensions.accepted') || (request()->routeIs('hod.show.extension') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Accepted Extensions</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
-                         <li class="nav-item">
-                            <a href="{{ route('hod.study.leave.progress') }}" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
+                         <li class="nav-item has-treeview{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' menu-open' : '' }}">
+                            <a href="#" class="nav-link{{ (isset($pageName) && $pageName == 'Study Leave Progress') ? ' active' : '' }}">
                                 <i class="nav-icon fas fa-stream"></i>
-                                <p>Study Leave Progress</p>
+                                <p>Study Leave Progress<i class="fas fa-angle-left right"></i></p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('hod.study.leave.progress') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.progress') || (request()->routeIs('hod.show.studyleave.progressreport') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Pending Reports</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('hod.study.leave.progress.accepted') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.progress.accepted') || (request()->routeIs('hod.show.studyleave.progressreport') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
+                                        <i class="nav-icon bi bi-circle"></i>
+                                        <p>Accepted Reports</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                        
                     </ul>

@@ -9,7 +9,7 @@
             </h2>
             <p class="text-muted mb-0">Reference No: {{ $extension->reference_no }}</p>
         </div>
-        <a href="{{ route('dean.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ isset($from) && $from == 'accepted' ? route('dean.study.leave.extensions.accepted') : route('dean.study.leave.extensions') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
         </a>
     </div>
@@ -211,6 +211,7 @@
     </div>
 
     <!-- Dean Review Section -->
+    @if(!isset($from) || $from != 'accepted')
     <form action="{{ route('dean.extension.approve', $extension->extension_id) }}" method="POST" id="deanReviewForm">
         @csrf
         
@@ -285,6 +286,16 @@
             </div>
         </div>
     </form>
+    @else
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="alert alert-success mb-0">
+                <i class="fas fa-check-circle me-2"></i>
+                This extension has already been forwarded by Dean.
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <!-- Confirm Forward Modal -->

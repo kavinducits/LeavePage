@@ -207,6 +207,71 @@ class DeanController extends Controller
 
         return view('dean.study_leave_dashboard', compact('studyLeaveApplications', 'extensionApplications'));
     }
+    public function study_leave_index_accepted()
+    {
+        // Get faculty IDs for this Dean
+        $facultyIds = $this->getDeanFaculties();
+
+        // Get all study leave applications already forwarded by Dean (dean_empno set, past status 6)
+        $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_approvals.dean_empno') // Dean has already acted
+            ->where('study_leave_approvals.status_id', '!=', 6) // No longer at Dean stage
+            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->orderByDesc('study_leaves.created_at')
+            ->select(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leaves.created_at as applied_date',
+                'statuses.status'
+            )
+            ->get();
+
+        return view('dean.study_leave_dashboard_accepted', compact('studyLeaveApplications'));
+    }
+
+    public function study_leave_extensions_accepted()
+    {
+        $facultyIds = $this->getDeanFaculties();
+
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_extensions_approvals.dean_empno')
+            ->where('study_leave_extensions_approvals.status_id', '!=', 6)
+            ->whereIn('employees.faculty_id', $facultyIds)
+            ->orderByDesc('study_leave_extensions.created_at')
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('dean.study_leave_extenstions_dashboard_accepted', compact('extensionApplications'));
+    }
+
      public function study_leave_extensions()
     {
         // Get faculty IDs for this Dean
@@ -277,6 +342,38 @@ class DeanController extends Controller
             ->get();
 
         return view('dean.study_leave_progress_report_dashboard', compact('progressReportApplications'));
+    }
+
+    public function study_leave_progress_reports_accepted()
+    {
+        // Get faculty IDs for this Dean
+        $facultyIds = $this->getDeanFaculties();
+
+        $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_progress_reports_approval.dean_empno')
+            ->where('study_leave_progress_reports_approval.approval_status_id', '!=', 6)
+            ->whereIn('employees.faculty_id', $facultyIds)
+            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('dean.study_leave_progress_report_dashboard_accepted', compact('progressReportApplications'));
     }
 
     public function show($id)
@@ -406,8 +503,9 @@ class DeanController extends Controller
         return redirect()->route('dean.index')->with('success', $msg);
     }
 
-    public function showStudyLeaveApplication($id)
+    public function showStudyLeaveApplication(Request $request, $id)
     {
+        $from = $request->get('from');
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
        
@@ -423,8 +521,15 @@ class DeanController extends Controller
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
             ->where('study_leaves.id', $id)
-            ->where('study_leave_approvals.status_id', 6) // Processing Dean
-            ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
+            ->where(function($q) use ($from, $facultyIds) {
+                if ($from === 'accepted') {
+                    $q->whereNotNull('study_leave_approvals.dean_empno')
+                      ->whereIn('employees.faculty_id', $facultyIds);
+                } else {
+                    $q->where('study_leave_approvals.status_id', 6) // Processing Dean
+                      ->whereIn('employees.faculty_id', $facultyIds);
+                }
+            })
             ->select(
                 'study_leaves.*',
                 'employees.employee_no as employee_no',
@@ -471,7 +576,7 @@ class DeanController extends Controller
         
         $readonly = true;
 
-        return view('dean.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly'));
+        return view('dean.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'from'));
     }
 
     public function approveStudyLeave(Request $request, $id)
@@ -518,10 +623,11 @@ class DeanController extends Controller
     /**
      * Show study leave extension for Dean review
      */
-    public function showExtension($extension_id)
+    public function showExtension(Request $request, $extension_id)
     {
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
+        $from = $request->get('from');
 
         // Get the complete study leave extension data
         $extension = DB::table('study_leave_extensions')
@@ -533,7 +639,13 @@ class DeanController extends Controller
             ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions_approvals.status_id', 6) // Processing Dean
+            ->where(function ($q) use ($from) {
+                if ($from === 'accepted') {
+                    $q->whereNotNull('study_leave_extensions_approvals.dean_empno');
+                } else {
+                    $q->where('study_leave_extensions_approvals.status_id', 6); // Processing Dean
+                }
+            })
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -573,7 +685,10 @@ class DeanController extends Controller
             
 
         if (!$extension) {
-            return redirect()->route('dean.index')->with('error', 'Extension application not found or not accessible.');
+            $redirectRoute = $from === 'accepted'
+                ? 'dean.study.leave.extensions.accepted'
+                : 'dean.index';
+            return redirect()->route($redirectRoute)->with('error', 'Extension application not found or not accessible.');
         }
 
         // Create user object for forms
@@ -601,7 +716,7 @@ class DeanController extends Controller
         $readonly = true;
        // dd( $extension);
 
-        return view('dean.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
+        return view('dean.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from'));
     }
 
     /**
@@ -707,8 +822,9 @@ class DeanController extends Controller
     /**
      * Show progress report for Dean review
      */
-    public function showProgressReport($progress_report_id)
+    public function showProgressReport(Request $request, $progress_report_id)
     {
+        $from = $request->get('from');
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -722,8 +838,13 @@ class DeanController extends Controller
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_progress_reports.id', $progress_report_id)
-            ->where('study_leave_progress_reports_approval.approval_status_id', 6) // Processing Dean
-            ->whereIn('employees.faculty_id', $facultyIds) // Ensure Dean has access
+            ->when($from === 'accepted', function ($query) use ($facultyIds) {
+                $query->whereNotNull('study_leave_progress_reports_approval.dean_empno')
+                      ->whereIn('employees.faculty_id', $facultyIds);
+            }, function ($query) use ($facultyIds) {
+                $query->where('study_leave_progress_reports_approval.approval_status_id', 6)
+                      ->whereIn('employees.faculty_id', $facultyIds);
+            })
             ->select(
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
@@ -803,7 +924,7 @@ class DeanController extends Controller
 
         $readonly = false;
 
-        return view('dean.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'vcInfo', 'draft_study_leave'));
+        return view('dean.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'vcInfo', 'draft_study_leave', 'from'));
     }
 
     /**

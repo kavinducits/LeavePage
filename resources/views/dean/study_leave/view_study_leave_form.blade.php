@@ -9,7 +9,7 @@
             </h2>
             <p class="text-muted mb-0">Reference No: {{ $draft_study_leave->reference_no }}</p>
         </div>
-        <a href="{{ route('dean.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ isset($from) && $from == 'accepted' ? route('dean.study.leave.index.accepted') : route('dean.index') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
         </a>
     </div>
@@ -35,6 +35,12 @@
     @include('hod_academic_establishment.study_leave.study_leave_hod_academic_establishment_review_section', ['readonly' => true])
     @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => true])
 
+    @if(isset($from) && $from == 'accepted')
+        @include('dean.study_leave.study_leave_dean_review_section', ['readonly' => true])
+        <div class="alert alert-success mt-3">
+            <i class="fas fa-check-circle me-2"></i>This application has already been forwarded.
+        </div>
+    @else
     <!-- Dean Review Section -->
     <form action="{{ route('dean.view.studyLeave.approve', $draft_study_leave->id) }}" method="POST" id="deanReviewForm">
         @csrf
@@ -45,7 +51,7 @@
         <div class="card mt-4">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <a href="{{ route('dean.index') }}" class="btn btn-outline-secondary btn-lg">
+        <a href="{{ isset($from) && $from == 'accepted' ? route('dean.study.leave.index.accepted') : route('dean.index') }}" class="btn btn-outline-secondary btn-lg">
                         <i class="fas fa-times me-2"></i>Cancel
                     </a>
 
@@ -69,6 +75,7 @@
             </div>
         </div>
     </form>
+    @endif
 </div>
 
 

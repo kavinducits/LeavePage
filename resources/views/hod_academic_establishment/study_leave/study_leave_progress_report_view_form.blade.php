@@ -7,7 +7,7 @@
                 <h2 class="mb-0 fw-bold">Progress Report Review</h2>
                 <p class="text-muted mb-0">Reference No: {{ $progressReport->reference_no }}</p>
             </div>
-            <a href="{{ route('hod.study.leave.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ isset($from) && $from === 'accepted' ? route('hodacademicestablishment.studyLeaveProgress.accepted') : route('hodacademicestablishment.studyLeaveProgress') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
             </a>
         </div>
@@ -188,8 +188,10 @@
         </div>
     </div>
 
+    @if(!isset($from) || $from !== 'accepted')
     <!-- Include Review Actions Section -->
     @include('hod_academic_establishment.study_leave.progress_report_review_actions')
+    @endif
 
     </div>
 </section>

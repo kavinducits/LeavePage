@@ -170,6 +170,66 @@ class VCController extends Controller
 
         return view('vc.study_leave_dashboard', compact( 'studyLeaveApplications', 'extensionApplications'));
     }
+    public function study_leave_index_accepted()
+    {
+        // Get all study leave applications already processed by VC (vc_empno set, past status 7)
+        $studyLeaveApplications = DB::table('study_leaves')
+            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_approvals.vc_empno') // VC has already acted
+            ->where('study_leave_approvals.status_id', '!=', 7) // No longer at VC stage
+            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->orderByDesc('study_leaves.created_at')
+            ->select(
+                'study_leaves.id',
+                'study_leaves.reference_no',
+                'study_leaves.empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leaves.created_at as applied_date',
+                'statuses.status'
+            )
+            ->get();
+
+        return view('vc.study_leave_dashboard_accepted', compact('studyLeaveApplications'));
+    }
+
+    public function study_leave_extenstions_accepted()
+    {
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_extensions_approvals.vc_empno')
+            ->where('study_leave_extensions_approvals.status_id', '!=', 7)
+            ->where('employees.main_branch_id', 52)
+            ->orderByDesc('study_leave_extensions.created_at')
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('vc.study_leave_extentions_dashboard_accepted', compact('extensionApplications'));
+    }
+
       public function study_leave_extenstions()
     {
         
@@ -234,6 +294,35 @@ class VCController extends Controller
             ->get();
 
         return view('vc.study_leave_progress_report_dashboard', compact('progressReportApplications'));
+    }
+
+    public function study_leave_progress_reports_accepted()
+    {
+        $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_progress_reports_approval.vc_empno')
+            ->where('study_leave_progress_reports_approval.approval_status_id', '!=', 7)
+            ->where('employees.main_branch_id', 52)
+            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('vc.study_leave_progress_report_dashboard_accepted', compact('progressReportApplications'));
     }
 
 
@@ -360,8 +449,9 @@ class VCController extends Controller
         return redirect()->route('vc.index')->with('success', 'Application forwarded.');
     }
 
-    public function showStudyLeaveApplication($id)
+    public function showStudyLeaveApplication(Request $request, $id)
     {
+        $from = $request->get('from');
         // Fetch study leave application with main_branch_id filtering
         $draft_study_leave = DB::table('study_leaves')
             ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
@@ -374,8 +464,15 @@ class VCController extends Controller
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
             ->where('study_leaves.id', $id)
-            ->where('study_leave_approvals.status_id', 7) // Processing VC
-            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->where(function($q) use ($from) {
+                if ($from === 'accepted') {
+                    $q->whereNotNull('study_leave_approvals.vc_empno')
+                      ->where('employees.main_branch_id', 52);
+                } else {
+                    $q->where('study_leave_approvals.status_id', 7) // Processing VC
+                      ->where('employees.main_branch_id', 52);
+                }
+            })
             ->select(
                 'study_leaves.*',
                 'study_leave_approvals.registrar_empno',
@@ -425,7 +522,7 @@ class VCController extends Controller
         
         $readonly = true;
 
-        return view('vc.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly'));
+        return view('vc.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'from'));
     }
 
     public function approveStudyLeave(Request $request, $id)
@@ -477,8 +574,10 @@ class VCController extends Controller
     /**
      * Show study leave extension for VC review
      */
-    public function showExtension($extension_id)
+    public function showExtension(Request $request, $extension_id)
     {
+        $from = $request->get('from');
+
         // Get the complete study leave extension data
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
@@ -489,7 +588,13 @@ class VCController extends Controller
             ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions_approvals.status_id', 7) // Processing VC
+            ->where(function ($q) use ($from) {
+                if ($from === 'accepted') {
+                    $q->whereNotNull('study_leave_extensions_approvals.vc_empno');
+                } else {
+                    $q->where('study_leave_extensions_approvals.status_id', 7); // Processing VC
+                }
+            })
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -529,7 +634,10 @@ class VCController extends Controller
             ->first();
 
         if (!$extension) {
-            return redirect()->route('vc.index')->with('error', 'Extension application not found or not accessible.');
+            $redirectRoute = $from === 'accepted'
+                ? 'vc.study.leave.extensions.accepted'
+                : 'vc.index';
+            return redirect()->route($redirectRoute)->with('error', 'Extension application not found or not accessible.');
         }
 
         // Create user object for forms
@@ -553,9 +661,10 @@ class VCController extends Controller
         $newDate = Carbon::parse($extension->new_end_date);
         $durationDays = $oldDate->diffInDays($newDate);
         $durationMonths = round($durationDays / 30, 1);
+        $readonly = true;
 //dd($extension);
 
-        return view('vc.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'draft_study_leave', 'durationDays', 'durationMonths'));
+        return view('vc.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from'));
     }
 
     /**
@@ -660,8 +769,9 @@ class VCController extends Controller
     /**
      * Show progress report for VC review
      */
-    public function showProgressReport($progress_report_id)
+    public function showProgressReport(Request $request, $progress_report_id)
     {
+        $from = $request->get('from');
         // Fetch the progress report with related study leave and employee details
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
@@ -672,8 +782,13 @@ class VCController extends Controller
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_progress_reports.id', $progress_report_id)
-            ->where('study_leave_progress_reports_approval.approval_status_id', 7) // Processing VC
-            ->where('employees.main_branch_id', 52) // Filter by main_branch_id
+            ->when($from === 'accepted', function ($query) {
+                $query->whereNotNull('study_leave_progress_reports_approval.vc_empno')
+                      ->where('employees.main_branch_id', 52);
+            }, function ($query) {
+                $query->where('study_leave_progress_reports_approval.approval_status_id', 7)
+                      ->where('employees.main_branch_id', 52);
+            })
             ->select(
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
@@ -757,7 +872,7 @@ class VCController extends Controller
 
         $readonly = false;
 
-        return view('vc.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave', 'vcName'));
+        return view('vc.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave', 'vcName', 'from'));
     }
 
     /**

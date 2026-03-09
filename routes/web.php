@@ -41,8 +41,11 @@ Route::get('/MApage/progressReport/file/{filename}', [MAController::class, 'serv
 Route::get('/HODpage', [HODController::class, 'leave_index'])->name('hod.index');//remove
 Route::get('/HODpage/leave', [HODController::class, 'leave_index'])->name('hod.leave.index');
 Route::get('/HODpage/studyLeave', [HODController::class, 'study_leave_index'])->name('hod.study.leave.index');
+Route::get('/HODpage/studyLeaveAccepted', [HODController::class, 'study_leave_index_accepted'])->name('hod.study.leave.index.accepted');
 Route::get('/HODpage/studyLeaveExtensions', [HODController::class, 'study_leave_extenstions'])->name('hod.study.leave.extensions');
+Route::get('/HODpage/studyLeaveExtensionsAccepted', [HODController::class, 'study_leave_extenstions_accepted'])->name('hod.study.leave.extensions.accepted');
 Route::get('/HODpage/studyLeaveProgress', [HODController::class, 'study_leave_progress_reports'])->name('hod.study.leave.progress');
+Route::get('/HODpage/studyLeaveProgressAccepted', [HODController::class, 'study_leave_progress_reports_accepted'])->name('hod.study.leave.progress.accepted');
 Route::get('/HODpage/{id}', [HODController::class, 'show'])->name('hod.show');
 Route::post('/HODpage/{id}/approve', [HODController::class, 'approve'])->name('hod.approve');
 Route::post('/HODpage/{id}/return', [HODController::class, 'return'])->name('hod.return');
@@ -52,8 +55,11 @@ Route::post('/HODpage/{id}/return', [HODController::class, 'return'])->name('hod
 Route::get('/Deanpage', [DeanController::class, 'leave_index'])->name('dean.index');
 Route::get('/Deanpage/leave', [DeanController::class, 'leave_index'])->name('dean.leave.index');
 Route::get('/Deanpage/studyLeave', [DeanController::class, 'study_leave_index'])->name('dean.study.leave.index');
+Route::get('/Deanpage/studyLeaveAccepted', [DeanController::class, 'study_leave_index_accepted'])->name('dean.study.leave.index.accepted');
 Route::get('/Deanpage/studyLeaveExtensions', [DeanController::class, 'study_leave_extensions'])->name('dean.study.leave.extensions');
+Route::get('/Deanpage/studyLeaveExtensionsAccepted', [DeanController::class, 'study_leave_extensions_accepted'])->name('dean.study.leave.extensions.accepted');
 Route::get('/Deanpage/studyLeaveProgress', [DeanController::class, 'study_leave_progress_reports'])->name('dean.study.leave.progress');
+Route::get('/Deanpage/studyLeaveProgressAccepted', [DeanController::class, 'study_leave_progress_reports_accepted'])->name('dean.study.leave.progress.accepted');
 Route::get('/Deanpage/{id}', [DeanController::class, 'show'])->name('dean.show');
 Route::post('/Deanpage/{id}/recommend', [DeanController::class, 'recommend'])->name('dean.recommend');
 
@@ -72,8 +78,11 @@ Route::post('/Deanpage/progressreport/{progress_report_id}/submit', [DeanControl
 Route::get('/VCpage', [VCController::class, 'leave_index'])->name('vc.index');
 Route::get('/VCpage/leave', [VCController::class, 'leave_index'])->name('vc.leave.index');
 Route::get('/VCpage/studyLeave', [VCController::class, 'study_leave_index'])->name('vc.study.leave.index');
+Route::get('/VCpage/studyLeaveAccepted', [VCController::class, 'study_leave_index_accepted'])->name('vc.study.leave.index.accepted');
 Route::get('/VCpage/studyLeaveExtensions', [VCController::class, 'study_leave_extenstions'])->name('vc.study.leave.extensions');
+Route::get('/VCpage/studyLeaveExtensionsAccepted', [VCController::class, 'study_leave_extenstions_accepted'])->name('vc.study.leave.extensions.accepted');
 Route::get('/VCpage/studyLeaveProgress', [VCController::class, 'study_leave_progress_reports'])->name('vc.study.leave.progress');
+Route::get('/VCpage/studyLeaveProgressAccepted', [VCController::class, 'study_leave_progress_reports_accepted'])->name('vc.study.leave.progress.accepted');
 Route::get('/VCpage/{id}', [VCController::class, 'show'])->name('vc.show');
 Route::post('/VCpage/{id}/recommend', [VCController::class, 'recommend'])->name('vc.recommend');
 
@@ -246,8 +255,11 @@ Route::get('/MApage/{id}/vc', [MAController::class, 'showVc'])->name('ma.show.vc
 // HOD Academic Establishment routes
 Route::get('/HODAcademicEstablishment', [HODAcademicEstablishmentController::class, 'study_leave'])->name('hodacademicestablishment.studyLeave');
 Route::get('/HODAcademicEstablishment/study-leave', [HODAcademicEstablishmentController::class, 'study_leave'])->name('hodacademicestablishment.studyLeave');
+Route::get('/HODAcademicEstablishment/study-leave-accepted', [HODAcademicEstablishmentController::class, 'studyLeaveAccepted'])->name('hodacademicestablishment.studyLeave.accepted');
 Route::get('/HODAcademicEstablishment/study-leave-extensions', [HODAcademicEstablishmentController::class, 'study_leave_extenstions'])->name('hodacademicestablishment.studyLeaveExtensions');
+Route::get('/HODAcademicEstablishment/study-leave-extensions-accepted', [HODAcademicEstablishmentController::class, 'studyLeaveExtensionsAccepted'])->name('hodacademicestablishment.studyLeaveExtensions.accepted');
 Route::get('/HODAcademicEstablishment/study-leave-progress', [HODAcademicEstablishmentController::class, 'study_leave_progress_reports'])->name('hodacademicestablishment.studyLeaveProgress');
+Route::get('/HODAcademicEstablishment/study-leave-progress-accepted', [HODAcademicEstablishmentController::class, 'studyLeaveProgressReportsAccepted'])->name('hodacademicestablishment.studyLeaveProgress.accepted');
 Route::get('/HODAcademicEstablishment/study-leave-progress/view/{id}', [HODAcademicEstablishmentController::class, 'showProgressReport'])->name('hodacademicestablishment.studyLeaveProgress.view');
 Route::post('/HODAcademicEstablishment/study-leave-progress/view/{id}/submit', [HODAcademicEstablishmentController::class, 'submitProgressReportReview'])->name('hodacademicestablishment.progressreport.submit');
 Route::post('/HODAcademicEstablishment/study-leave-progress/view/{id}/approve', [HODAcademicEstablishmentController::class, 'approveProgressReport'])->name('hodacademicestablishment.progressreport.approve');
