@@ -13,7 +13,7 @@
         <div class="card-body p-0">
             @if (isset($progressReportApplications) && $progressReportApplications->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="table table-hover mb-0 dt-enable">
                         <thead class="table-light">
                             <tr>
                                 <th class="px-3">Reference No</th>
