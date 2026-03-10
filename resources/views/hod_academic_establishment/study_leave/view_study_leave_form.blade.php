@@ -1,6 +1,19 @@
-@extends('layouts.screen1')
+@extends('layouts.dashborad')
+@section('title', 'HOD Academic Establishment Dashboard - Leave Management')
+@section('brand-logo')
+    <a href="{{ route('hod.leave.index') }}" class="brand-link">
+        <span class="brand-text font-weight-light">HOD Academic Establishment Dashboard</span>
+    </a>
+@endsection
+@section('sidebar')
+    @php($pageName = 'Study Leave')
+    @include('hod_academic_establishment.partials.sidebar')
+@endsection
 
-@section('content')
+@section('main-content')
+<div class="content-wrapper">
+    <section class="content">
+        <div class="container-fluid">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -17,14 +30,14 @@
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
         @endif
 
@@ -185,5 +198,8 @@
             }
         });
     </script>
+        </div>
+    </section>
+</div>
 @endsection
 

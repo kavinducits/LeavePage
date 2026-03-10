@@ -1,6 +1,45 @@
-@extends('layouts.screen1')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('content')
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dean Dashboard - Extension Review</title>
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <!-- Navbar -->
+        @include('dean.partials.navbar')
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="{{ route('dean.leave.index') }}" class="brand-link">
+                <span class="brand-text font-weight-light">Dean Dashboard</span>
+            </a>
+            <!-- Sidebar -->
+            @php $pageName = 'Study Leave Extensions' @endphp
+            @include('dean.partials.sidebar')
+        </aside>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Content Header -->
+            @include('dean.partials.header')
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -375,10 +414,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form validation
-    const confirmForwardModal = new bootstrap.Modal(document.getElementById('confirmForwardModal'));
     let forwardConfirmed = false;
 
     const deanReviewForm = document.getElementById('deanReviewForm');
+    const confirmForwardModal = new bootstrap.Modal(document.getElementById('confirmForwardModal'));
     deanReviewForm.addEventListener('submit', function(e) {
         if (forwardConfirmed) { return; }
 
@@ -410,5 +449,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+            </section>
+        </div>
+        <!-- Footer -->
+        @include('dean.partials.footer')
+    </div>
 
-@endsection
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+</body>
+
+</html>

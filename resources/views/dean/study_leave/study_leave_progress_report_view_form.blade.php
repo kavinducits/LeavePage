@@ -1,28 +1,68 @@
-@extends('layouts.screen1')
-<!-- Main content -->
-<section class="content">
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="mb-0 fw-bold">Progress Report Review</h2>
-                <p class="text-muted mb-0">Reference No: {{ $progressReport->reference_no }}</p>
-            </div>
-            <a href="{{ isset($from) && $from === 'accepted' ? route('dean.study.leave.progress.accepted') : route('dean.study.leave.progress') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dean Dashboard - Progress Report Review</title>
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .accordion-button.collapsed:hover {
+            background-color: #e8f4f8;
+            color: #0056b3;
+            transition: all 0.3s ease;
+        }
+        .accordion-button.collapsed:hover i {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+        .accordion-details-text {
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        @include('dean.partials.navbar')
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a href="{{ route('dean.leave.index') }}" class="brand-link">
+                <span class="brand-text font-weight-light">Dean Dashboard</span>
             </a>
-        </div>
+            @php $pageName = 'Study Leave Progress' @endphp
+            @include('dean.partials.sidebar')
+        </aside>
+        <div class="content-wrapper">
+            @include('dean.partials.header')
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="mb-0 fw-bold">Progress Report Review</h2>
+                            <p class="text-muted mb-0">Reference No: {{ $progressReport->reference_no }}</p>
+                        </div>
+                        <a href="{{ isset($from) && $from === 'accepted' ? route('dean.study.leave.progress.accepted') : route('dean.study.leave.progress') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
 
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
@@ -269,7 +309,7 @@
                     </button>
                 </h2>
                 <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails"
-                    data-bs-parent="#detailsAccordion">
+                    data-parent="#detailsAccordion">
                     <div class="accordion-body">
                         <form method="POST" class="my-4">
                             @csrf
@@ -294,19 +334,18 @@
     @include('dean.study_leave.progress_report_review_actions')
     @endif
 
-</section>
-</div>
+                </div>
+            </section>
+        </div>
+        @include('dean.partials.footer')
+    </div>
 
-<!-- Footer -->
-
-</div>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Bootstrap 5 -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
 </body>
 

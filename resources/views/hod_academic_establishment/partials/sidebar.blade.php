@@ -36,7 +36,7 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{ route('hodacademicestablishment.studyLeaveExtensions') }}" class="nav-link{{ request()->routeIs('hodacademicestablishment.studyLeaveExtensions') ? ' active' : '' }}">
+                                    <a href="{{ route('hodacademicestablishment.studyLeaveExtensions') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveExtensions') || (request()->routeIs('hodacademicestablishment.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Extension Request</p>
                                     </a>

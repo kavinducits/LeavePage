@@ -41,7 +41,7 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{ route('dean.study.leave.extensions') }}" class="nav-link{{ request()->routeIs('dean.study.leave.extensions') ? ' active' : '' }}">
+                                    <a href="{{ route('dean.study.leave.extensions') }}" class="nav-link{{ (request()->routeIs('dean.study.leave.extensions') || (request()->routeIs('dean.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
                                         <p>Extension Request</p>
                                     </a>

@@ -119,11 +119,10 @@
                                 @else
                                 @if(isset($draft_study_leave->consent_letter_teaching_path) && $draft_study_leave->consent_letter_teaching_path)
                                     <div class="mt-2">
-                                        <button type="button" class="btn btn-sm btn-secondary" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#previewTeachingModal">
+                                        <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'teaching', 'id' => $draft_study_leave->id]) }}"
+                                           target="_blank" class="btn btn-sm btn-secondary">
                                             <i class="fas fa-eye me-1"></i>Preview Consent Letter
-                                        </button>
+                                        </a>
                                     </div>
                                 @endif
                                 @endif
@@ -231,11 +230,10 @@
                                 @else
                                 @if(isset($draft_study_leave->consent_letter_admin_path) && $draft_study_leave->consent_letter_admin_path)
                                     <div class="mt-2">
-                                        <button type="button" class="btn btn-sm btn-secondary" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#previewAdminModal">
+                                        <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'administrative', 'id' => $draft_study_leave->id]) }}"
+                                           target="_blank" class="btn btn-sm btn-secondary">
                                             <i class="fas fa-eye me-1"></i>Preview Consent Letter
-                                        </button>
+                                        </a>
                                     </div>
                                 @endif
                                 @endif
@@ -343,11 +341,10 @@
                                 @else
                                 @if(isset($draft_study_leave->consent_letter_other_path) && $draft_study_leave->consent_letter_other_path)
                                     <div class="mt-2">
-                                        <button type="button" class="btn btn-sm btn-secondary" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#previewOtherModal">
+                                        <a href="{{ route('StudyLeave.consentLetter.view', ['type' => 'other', 'id' => $draft_study_leave->id]) }}"
+                                           target="_blank" class="btn btn-sm btn-secondary">
                                             <i class="fas fa-eye me-1"></i>Preview Consent Letter
-                                        </button>
+                                        </a>
                                     </div>
                                 @endif
                                 @endif

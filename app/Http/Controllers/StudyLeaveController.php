@@ -858,18 +858,16 @@ class StudyLeaveController extends Controller
         $fileEmpNo = $parts[0] ?? null;
 
         // Authorization check: Allow if:
-        // 1. User is the employee who owns the file
-        // 2. User is an approver (MA, HOD, Dean, VC) - you can add more checks here
+        // 1. User is the employee who owns the file (session empno matches)
+        // 2. User is an approver role (HOD, HODAcadEstab, Dean, VC, MA) — these roles
+        //    access the system without an empno session, so no session means approver.
         $currentEmpNo = (string) session('empno');
 
         $isOwner = ($currentEmpNo === $fileEmpNo);
 
-        // Check if user is an approver by checking if they have ma_user_id, hod role, etc.
-        // For now, we'll allow access if they're the owner or if they have a session
-        // You can add more sophisticated role checks here
-        $isApprover = !empty(session('ma_user_id')) || !empty(session('hod_id')) || !empty(session('dean_id'));
-
-        if (!$isOwner) {
+        // If the user has an empno session but it doesn't match the file owner, deny access.
+        // If there is no empno session, the request comes from an approver role — allow it.
+        if (!empty($currentEmpNo) && !$isOwner) {
             abort(403, 'Unauthorized access to this file');
         }
 
@@ -1016,6 +1014,9 @@ class StudyLeaveController extends Controller
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',
+            'consent_letter_teaching' => 'nullable|file|mimes:pdf|max:5120',
+            'consent_letter_admin' => 'nullable|file|mimes:pdf|max:5120',
+            'consent_letter_other' => 'nullable|file|mimes:pdf|max:5120',
         );
 
 
@@ -1082,10 +1083,44 @@ class StudyLeaveController extends Controller
             unset($validatedData['self_funding_declaration']);
         }
 
-        // Update study leave with validated data
+        // Handle consent letter uploads
+        $consentLetters = [
+            'teaching' => ['file' => 'consent_letter_teaching', 'path_field' => 'consent_letter_teaching_path'],
+            'administrative' => ['file' => 'consent_letter_admin', 'path_field' => 'consent_letter_admin_path'],
+            'other' => ['file' => 'consent_letter_other', 'path_field' => 'consent_letter_other_path'],
+        ];
 
-        // $studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
-        //$studyLeave->update($validatedData + ['status_id' => 4, 'is_draft' => false]);
+        foreach ($consentLetters as $type => $config) {
+            if ($request->hasFile($config['file'])) {
+                $file = $request->file($config['file']);
+
+                // Delete old file if exists
+                if ($studyLeave->{$config['path_field']}) {
+                    Storage::disk('private')->delete($studyLeave->{$config['path_field']});
+                }
+
+                // Generate filename: empno_id_referenceNo_type.pdf
+                $filename = $studyLeave->empno . '_' . $studyLeave->id . '_' . $studyLeave->reference_no . '_' . $type . '.pdf';
+
+                // Store in private directory
+                $path = $file->storeAs(
+                    'study_leave_documents/consent_letters_nominators/' . $type,
+                    $filename,
+                    'private'
+                );
+
+                $validatedData[$config['path_field']] = $path;
+            }
+        }
+
+        // Update study leave with validated data (exclude non-DB fields and raw file objects)
+        $updateData = array_diff_key($validatedData, array_flip([
+            'study_location',
+            'consent_letter_teaching',
+            'consent_letter_admin',
+            'consent_letter_other',
+        ]));
+        $studyLeave->update($updateData);
 
         // Update the study_leave_approvals table
         StudyLeaveApproval::where('study_leave_id', $id)
@@ -1507,24 +1542,13 @@ class StudyLeaveController extends Controller
         // Get authenticated user's employee number from session
         $userEmpNo = session('empno');
 
-
-        if (!$userEmpNo) {
-            abort(403, 'Unauthorized access. Please login.');
-        }
-
         // Find the study leave record
         $studyLeave = StudyLeave::findOrFail($id);
 
-
-        // Verify the user owns this study leave (check both empno fields)
-        $sessionStudyLeaveEmpNo = session('study_leave.employee_no');
-        /*
-        if ($studyLeave->empno !== $userEmpNo && $studyLeave->empno !== $sessionStudyLeaveEmpNo) {
-            abort(403, 'Unauthorized access to this document.');
-        }
-        */
-        //dd($studyLeave->empno, strval($userEmpNo), $sessionStudyLeaveEmpNo);
-        if ($studyLeave->empno !== strval($userEmpNo)) {
+        // If an empno session exists this is an employee request — verify ownership.
+        // If there is no empno session the request comes from an approver role (HOD,
+        // HODAcadEstab, Dean, VC, MA) which do not use an empno session — allow it.
+        if (!empty($userEmpNo) && $studyLeave->empno !== strval($userEmpNo)) {
             abort(403, 'Unauthorized access to this document.');
         }
         // Determine which path to use based on type
