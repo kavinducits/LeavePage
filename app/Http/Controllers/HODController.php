@@ -669,7 +669,6 @@ class HODController extends Controller
                 'study_leave_approvals.registrar_recommendation',
                 'study_leave_approvals.registrar_not_recommend_reason',
                 'study_leave_approvals.registrar_remarks'
-                
             )
             ->first();
 

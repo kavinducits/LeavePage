@@ -109,7 +109,6 @@ class HODAcademicEstablishmentController extends Controller
                 'study_leaves.nominee_other_empno as other_nominee_emp_no',
                 DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
                 'departments.id as department_id'
-                
             )
             ->first();
         

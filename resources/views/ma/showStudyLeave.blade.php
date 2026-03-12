@@ -61,6 +61,20 @@
                   
                     
                   
+                    <!-- Completed Review Sections (shown whenever data exists) -->
+                    @if(optional($draft_study_leave)->registrar_recommendation !== null)
+                        @include('hod_academic_establishment.study_leave.study_leave_hod_academic_establishment_review_section', ['readonly' => true])
+                    @endif
+                    @if(optional($draft_study_leave)->hod_recommend !== null)
+                        @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => true])
+                    @endif
+                    @if(optional($draft_study_leave)->dean_leave_recommendation_status !== null)
+                        @include('dean.study_leave.study_leave_dean_review_section', ['readonly' => true])
+                    @endif
+                    @if(optional($draft_study_leave)->vc_recommend_submit_to_committee !== null)
+                        @include('vc.study_leave.study_leave_vc_review_section', ['readonly' => true])
+                    @endif
+
                     <!-- Review Section based on Status -->
                     @if($statusId == 3)
                         <!-- Status: Editing (Returned to User) -->
@@ -262,6 +276,11 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    @elseif($statusId == 1)
+                        <!-- Accepted - all review sections shown above -->
+                        <div class="alert alert-success mt-3">
+                            <i class="fas fa-check-circle me-2"></i>This study leave application has been fully processed and approved.
                         </div>
                     @else
                         <!-- Other statuses - Read-only view -->
@@ -561,6 +580,12 @@
     </script>
     @endif
       <style>
+                        .card-header-dark {
+                            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+                            color: white;
+                            border-bottom: 3px solid #0d6efd;
+                        }
+
                         /* Override AdminLTE dark theme styles for summary layout */
                    
                         .card-header.card-header-maroon {

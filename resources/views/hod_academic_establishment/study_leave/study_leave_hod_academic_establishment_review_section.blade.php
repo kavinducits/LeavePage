@@ -2,7 +2,7 @@
 
  <div class="card mt-4">
      <div class="card-header card-header-dark text-white fw-semibold">
-         <i class="fas fa-clipboard-check me-2"></i>Deputy Registrar Review & Recommendation
+         <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
      </div>
      <div class="card-body">
 

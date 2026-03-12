@@ -718,7 +718,27 @@ class MAController extends Controller
                 'study_leaves.nominee_admin_empno as nominee_admin_empno',
                 'study_leaves.nominee_other_empno as nominee_other_empno',
                 'study_leaves.self_funding_declaration as self_funding_declaration',
-                'study_leaves.placement_letter as placement_letter'
+                'study_leaves.placement_letter as placement_letter',
+                // Deputy Registrar (HOD Academic Establishment) Review data
+                'study_leave_approvals.registrar_recommendation',
+                'study_leave_approvals.registrar_not_recommend_reason',
+                'study_leave_approvals.registrar_remarks',
+                // HOD Review data
+                'study_leave_approvals.hod_adequate_staff_available',
+                'study_leave_approvals.hod_teaching_covered',
+                'study_leave_approvals.hod_service_period',
+                'study_leave_approvals.hod_recommend',
+                'study_leave_approvals.hod_not_recommend_reason',
+                'study_leave_approvals.hod_remarks',
+                // Dean Review data
+                'study_leave_approvals.dean_leave_recommendation_status',
+                'study_leave_approvals.dean_not_recommended_reason',
+                'study_leave_approvals.dean_remarks',
+                // VC Review data
+                'study_leave_approvals.vc_recommend_submit_to_committee',
+                'study_leave_approvals.vc_council_covering_approval_status',
+                'study_leave_approvals.vc_not_approve_reason',
+                'study_leave_approvals.vc_remarks'
             )
             ->first();
            
