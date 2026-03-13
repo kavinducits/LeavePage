@@ -1012,7 +1012,11 @@ class HODController extends Controller
                 'study_leave_progress_reports_approval.registrar_empno',
                 'study_leave_progress_reports_approval.registrar_approval_status',
                 'study_leave_progress_reports_approval.registrar_not_approve_reason',
-                'study_leave_progress_reports_approval.registrar_remarks'
+                'study_leave_progress_reports_approval.registrar_remarks',
+                // HOD review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.hod_approval_status',
+                'study_leave_progress_reports_approval.hod_not_approve_reason',
+                'study_leave_progress_reports_approval.hod_remarks'
             )
             ->first();
 

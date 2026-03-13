@@ -543,7 +543,11 @@ class HODAcademicEstablishmentController extends Controller
                 'departments.id as department_id',
                 'faculties.faculty_name as faculty',
                 'designations.designation_name as designation',
-                'statuses.status'
+                'statuses.status',
+                'study_leave_progress_reports_approval.registrar_empno',
+                'study_leave_progress_reports_approval.registrar_approval_status',
+                'study_leave_progress_reports_approval.registrar_not_approve_reason',
+                'study_leave_progress_reports_approval.registrar_remarks'
             )
             ->first();
 

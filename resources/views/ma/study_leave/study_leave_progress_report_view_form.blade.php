@@ -64,13 +64,6 @@
                         </a>
                     </div>
 
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
                     @if (session('error'))
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             {{ session('error') }}
@@ -243,6 +236,134 @@
                         </div>
                     </div>
 
+                @if(optional($progressReport)->registrar_approval_status !== null)
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white fw-semibold">
+                        <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Registrar Decision</label>
+                            <div>
+                                @if($progressReport->registrar_approval_status == 1)
+                                    <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                                @else
+                                    <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Approved</span>
+                                @endif
+                            </div>
+                        </div>
+                        @if(!empty($progressReport->registrar_not_approve_reason))
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Reason for Not Approving</label>
+                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->registrar_not_approve_reason }}</p></div></div>
+                        </div>
+                        @endif
+                        @if(!empty($progressReport->registrar_remarks))
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Registrar Remarks</label>
+                            <div class="alert alert-secondary mb-0"><div style="white-space: pre-wrap;">{{ $progressReport->registrar_remarks }}</div></div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                @if(optional($progressReport)->hod_approval_status !== null)
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white fw-semibold">
+                        <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">HOD Decision</label>
+                            <div>
+                                @if($progressReport->hod_approval_status == 1)
+                                    <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                                @else
+                                    <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Approved</span>
+                                @endif
+                            </div>
+                        </div>
+                        @if(!empty($progressReport->hod_not_approve_reason))
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Reason for Not Approving</label>
+                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->hod_not_approve_reason }}</p></div></div>
+                        </div>
+                        @endif
+                        @if(!empty($progressReport->hod_remarks))
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">HOD Remarks</label>
+                            <div class="alert alert-dark mb-0"><div style="white-space: pre-wrap;">{{ $progressReport->hod_remarks }}</div></div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                @if(optional($progressReport)->dean_approval_status !== null)
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white fw-semibold">
+                        <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Dean Decision</label>
+                            <div>
+                                @if($progressReport->dean_approval_status == 1)
+                                    <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                                @else
+                                    <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Approved</span>
+                                @endif
+                            </div>
+                        </div>
+                        @if(!empty($progressReport->dean_not_approve_reason))
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Reason for Not Approving</label>
+                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->dean_not_approve_reason }}</p></div></div>
+                        </div>
+                        @endif
+                        @if(!empty($progressReport->dean_remarks))
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Dean Remarks</label>
+                            <div class="alert alert-info mb-0"><div style="white-space: pre-wrap;">{{ $progressReport->dean_remarks }}</div></div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
+                @if(optional($progressReport)->vc_approval_status !== null)
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white fw-semibold">
+                        <i class="fas fa-clipboard-check me-2"></i>VC Review & Recommendation
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">VC Decision</label>
+                            <div>
+                                @if($progressReport->vc_approval_status == 1)
+                                    <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                                @else
+                                    <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Approved</span>
+                                @endif
+                            </div>
+                        </div>
+                        @if(!empty($progressReport->vc_not_approve_reason))
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Reason for Not Approving</label>
+                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->vc_not_approve_reason }}</p></div></div>
+                        </div>
+                        @endif
+                        @if(!empty($progressReport->vc_remarks))
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">VC Remarks</label>
+                            <div class="alert alert-dark mb-0"><div style="white-space: pre-wrap;">{{ $progressReport->vc_remarks }}</div></div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 <!-- Action Section -->
                     @if((int) ($progressReport->approval_status_id ?? 0) === 4)
                     <div class="card mb-4">
@@ -311,6 +432,26 @@
                                 </div>
                             </div>
                     </div>
+                    @elseif((int) ($progressReport->approval_status_id ?? 0) === 8)
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white fw-semibold">
+                            <i class="fas fa-gavel me-2"></i>Finalize Progress Report Decision
+                        </div>
+                        <div class="card-body d-flex justify-content-end gap-2">
+                            <form id="finalizeForm" action="{{ route('ma.progressreport.finalize', $progressReport->progress_report_id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-check-circle me-2"></i>Finalize as Approved
+                                </button>
+                            </form>
+                            <form id="rejectForm" action="{{ route('ma.progressreport.reject', $progressReport->progress_report_id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-times-circle me-2"></i>Finalize as Rejected
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                     @else
                     <div class="card mb-4">
                         <div class="card-header bg-secondary text-white fw-semibold">
@@ -376,6 +517,64 @@
         </div>
     </div>
 
+    <!-- Finalize Confirmation Modal -->
+    <div class="modal fade" id="finalizeConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Confirm Finalize</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to finalize this progress report as Approved?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-success" id="finalizeConfirmYes">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Confirmation Modal -->
+    <div class="modal fade" id="rejectConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirm Rejection</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to finalize this progress report as Rejected?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger" id="rejectConfirmYes">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operation Success Modal -->
+    <div class="modal fade" id="operationSuccessModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#198754;color:white;">
+                    <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Success</h5>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-check-circle fa-3x mb-3" style="color:#198754"></i>
+                    <p class="mb-0 fs-6">{{ session('success') }}</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-2"></i>OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 5 -->
@@ -396,6 +595,10 @@
         const forwardConfirmModalEl = document.getElementById('forwardConfirmModal');
         const forwardConfirmYesBtn = document.getElementById('forwardConfirmYes');
         const forwardConfirmNoBtn = document.getElementById('forwardConfirmNo');
+        const finalizeForm = document.getElementById('finalizeForm');
+        const rejectForm = document.getElementById('rejectForm');
+        const finalizeConfirmYesBtn = document.getElementById('finalizeConfirmYes');
+        const rejectConfirmYesBtn = document.getElementById('rejectConfirmYes');
         let forwardConfirmed = false;
 
         if (approveForm) {
@@ -500,6 +703,56 @@
         if (actionRemark) {
             actionRemark.addEventListener('input', clearRemarkError);
         }
+
+        let finalizeConfirmed = false;
+        if (finalizeForm) {
+            finalizeForm.addEventListener('submit', function (e) {
+                if (finalizeConfirmed) { return; }
+                e.preventDefault();
+                const modal = new bootstrap.Modal(document.getElementById('finalizeConfirmModal'));
+                modal.show();
+            });
+        }
+
+        if (finalizeConfirmYesBtn) {
+            finalizeConfirmYesBtn.addEventListener('click', function () {
+                finalizeConfirmed = true;
+                const modal = bootstrap.Modal.getInstance(document.getElementById('finalizeConfirmModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                finalizeForm.submit();
+            });
+        }
+
+        let rejectConfirmed = false;
+        if (rejectForm) {
+            rejectForm.addEventListener('submit', function (e) {
+                if (rejectConfirmed) { return; }
+                e.preventDefault();
+                const modal = new bootstrap.Modal(document.getElementById('rejectConfirmModal'));
+                modal.show();
+            });
+        }
+
+        if (rejectConfirmYesBtn) {
+            rejectConfirmYesBtn.addEventListener('click', function () {
+                rejectConfirmed = true;
+                const modal = bootstrap.Modal.getInstance(document.getElementById('rejectConfirmModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                rejectForm.submit();
+            });
+        }
+
+        @if (session('success'))
+        const successModalElement = document.getElementById('operationSuccessModal');
+        if (successModalElement) {
+            const successModal = new bootstrap.Modal(successModalElement);
+            successModal.show();
+        }
+        @endif
     </script>
 </body>
 

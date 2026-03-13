@@ -629,7 +629,7 @@ class MAController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
-            ->where('statuses.stat_id', '!=', 1) // Exclude status_id = 1
+            ->whereNotIn('statuses.stat_id', [1, 2]) // Exclude final states: approved and rejected
             ->where(function($query) {
                 $query->where('statuses.status', 'Processing MA')
                       ->orWhere('statuses.status', 'Editing') // Include reports returned to user
@@ -1293,6 +1293,19 @@ class MAController extends Controller
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leave_progress_reports_approval.approval_status_id',
+                'study_leave_progress_reports_approval.ma_empno',
+                'study_leave_progress_reports_approval.registrar_approval_status',
+                'study_leave_progress_reports_approval.registrar_not_approve_reason',
+                'study_leave_progress_reports_approval.registrar_remarks',
+                'study_leave_progress_reports_approval.hod_approval_status',
+                'study_leave_progress_reports_approval.hod_not_approve_reason',
+                'study_leave_progress_reports_approval.hod_remarks',
+                'study_leave_progress_reports_approval.dean_approval_status',
+                'study_leave_progress_reports_approval.dean_not_approve_reason',
+                'study_leave_progress_reports_approval.dean_remarks',
+                'study_leave_progress_reports_approval.vc_approval_status',
+                'study_leave_progress_reports_approval.vc_not_approve_reason',
+                'study_leave_progress_reports_approval.vc_remarks',
                 'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
@@ -1472,6 +1485,84 @@ class MAController extends Controller
             ]);
 
         return redirect()->route('ma.studyleave.progress')->with('success', 'Progress report returned to user successfully. User can now remove and re-upload the progress report.');
+    }
+
+    /**
+     * Finalize progress report after VC check (approval_status_id = 8 -> 1 Approved)
+     */
+    public function finalizeProgressReport($progress_report_id)
+    {
+        $maUserId = self::MA_USER_ID;
+
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 8) // VC Checked
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_progress_reports.id')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('ma.studyleave.progress')->with('error', 'Progress report is not available for finalization.');
+        }
+
+        DB::table('study_leave_progress_reports_approval')
+            ->where('study_leave_progress_report_id', $progress_report_id)
+            ->update([
+                'approval_status_id' => 1, // Approved
+                'ma_empno' => self::MA_USER_ID,
+                'updated_at' => now()
+            ]);
+
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
+            ->update([
+                'status_id' => 1, // Approved
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave.progress')->with('success', 'Progress report finalized successfully as Approved.');
+    }
+
+    /**
+     * Reject progress report after VC check (approval_status_id = 8 -> 2 Rejected)
+     */
+    public function rejectProgressReport($progress_report_id)
+    {
+        $maUserId = self::MA_USER_ID;
+
+        $progressReport = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
+            ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports_approval.approval_status_id', 8) // VC Checked
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_progress_reports.id')
+            ->first();
+
+        if (!$progressReport) {
+            return redirect()->route('ma.studyleave.progress')->with('error', 'Progress report is not available for rejection.');
+        }
+
+        DB::table('study_leave_progress_reports_approval')
+            ->where('study_leave_progress_report_id', $progress_report_id)
+            ->update([
+                'approval_status_id' => 2, // Rejected
+                'ma_empno' => self::MA_USER_ID,
+                'updated_at' => now()
+            ]);
+
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
+            ->update([
+                'status_id' => 2, // Rejected
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave.progress')->with('success', 'Progress report finalized successfully as Rejected.');
     }
 
      public function serveProgressReportFile($filename)

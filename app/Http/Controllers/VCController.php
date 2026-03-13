@@ -821,11 +821,17 @@ class VCController extends Controller
                 // HOD review data from study_leave_progress_reports_approval
                 'study_leave_progress_reports_approval.hod_empno',
                 'study_leave_progress_reports_approval.hod_approval_status',
+                'study_leave_progress_reports_approval.hod_not_approve_reason',
                 'study_leave_progress_reports_approval.hod_remarks',
                 // Dean review data from study_leave_progress_reports_approval
                 'study_leave_progress_reports_approval.dean_empno',
                 'study_leave_progress_reports_approval.dean_approval_status',
-                'study_leave_progress_reports_approval.dean_remarks'
+                'study_leave_progress_reports_approval.dean_not_approve_reason',
+                'study_leave_progress_reports_approval.dean_remarks',
+                // VC review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.vc_approval_status',
+                'study_leave_progress_reports_approval.vc_not_approve_reason',
+                'study_leave_progress_reports_approval.vc_remarks'
             )
             ->first();
 
@@ -911,26 +917,26 @@ class VCController extends Controller
         }
 
         if ($request->approval_decision === 'approved') {
-            // Approve (final approval)
+            // VC checked; MA will finalize later
             DB::table('study_leave_progress_reports_approval')
                 ->where('study_leave_progress_report_id', $progress_report_id)
                 ->update([
                     'vc_empno' => $vcEmpNo,
                     'vc_approval_status' => 1, // Approved
                     'vc_remarks' => $request->remark,
-                    'approval_status_id' => 1, // Final Approved
+                    'approval_status_id' => 8, // VC Checked
                     'updated_at' => Carbon::now()
                 ]);
 
-            // Update progress report status to Approved
+            // Update progress report status to VC Checked
             DB::table('study_leave_progress_reports')
                 ->where('id', $progress_report_id)
                 ->update([
-                    'status_id' => 1, // Approved
+                    'status_id' => 8, // VC Checked
                     'updated_at' => Carbon::now()
                 ]);
 
-            return redirect()->route('vc.study.leave.progress')->with('success', 'Progress report approved successfully.');
+            return redirect()->route('vc.study.leave.progress')->with('success', 'Progress report reviewed by VC and sent to MA for finalization.');
         } else {
             // Return to Dean (not approved)
             DB::table('study_leave_progress_reports_approval')

@@ -877,7 +877,12 @@ class DeanController extends Controller
                 // HOD review data from study_leave_progress_reports_approval
                 'study_leave_progress_reports_approval.hod_empno',
                 'study_leave_progress_reports_approval.hod_approval_status',
-                'study_leave_progress_reports_approval.hod_remarks'
+                'study_leave_progress_reports_approval.hod_not_approve_reason',
+                'study_leave_progress_reports_approval.hod_remarks',
+                // Dean review data from study_leave_progress_reports_approval
+                'study_leave_progress_reports_approval.dean_approval_status',
+                'study_leave_progress_reports_approval.dean_not_approve_reason',
+                'study_leave_progress_reports_approval.dean_remarks'
             )
             ->first();
 

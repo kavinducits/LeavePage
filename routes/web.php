@@ -158,6 +158,8 @@ Route::POST('/dashboard/StudyLeaveExtension/{extension_id}/reject', [MAControlle
 Route::get('/dashboard/StudyLeaveProgressReport/{progress_report_id}', [MAController::class, 'showProgressReport'])->name('ma.show.studyleave.progressreport');
 Route::POST('/dashboard/StudyLeaveProgressReport/{progress_report_id}/approve', [MAController::class, 'approveProgressReport'])->name('ma.progressreport.approve');
 Route::POST('/dashboard/StudyLeaveProgressReport/{progress_report_id}/return', [MAController::class, 'returnProgressReport'])->name('ma.progressreport.return');
+Route::POST('/dashboard/StudyLeaveProgressReport/{progress_report_id}/finalize', [MAController::class, 'finalizeProgressReport'])->name('ma.progressreport.finalize');
+Route::POST('/dashboard/StudyLeaveProgressReport/{progress_report_id}/reject', [MAController::class, 'rejectProgressReport'])->name('ma.progressreport.reject');
 
 Route::POST('/StudyLeave/view/{id}/approve', [MAController::class, 'approveStudyLeave'])->name('StudyLeave.approve');
 

@@ -297,6 +297,38 @@
         </div>
     </div>
 
+    @if(optional($progressReport)->hod_approval_status !== null)
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white fw-semibold">
+            <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">HOD Decision</label>
+                <div>
+                    @if($progressReport->hod_approval_status == 1)
+                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Approved</span>
+                    @else
+                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Approved</span>
+                    @endif
+                </div>
+            </div>
+            @if(!empty($progressReport->hod_not_approve_reason))
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Reason for Not Approving</label>
+                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->hod_not_approve_reason }}</p></div></div>
+            </div>
+            @endif
+            @if(!empty($progressReport->hod_remarks))
+            <div class="mb-0">
+                <label class="form-label fw-semibold">HOD Remarks</label>
+                <div class="alert alert-dark mb-0"><div style="white-space: pre-wrap;">{{ $progressReport->hod_remarks }}</div></div>
+            </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
     @if(!isset($from) || $from !== 'accepted')
     <!-- Include HOD Review Actions Section -->
     @include('hod.study_leave.progress_report_review_actions')
