@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('old_end_date');
             $table->date('new_end_date');
             $table->text('reason_for_extension');
+             
             //$table->string('leave_type')->nullable();
             //$table->string('leave_payment_type')->nullable();
             //$table->string('funding_type')->nullable();
