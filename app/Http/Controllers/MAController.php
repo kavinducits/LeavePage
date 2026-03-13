@@ -516,7 +516,7 @@ class MAController extends Controller
               ->orWhereNotNull('study_leave_approvals.ma_empno') // Or MA has processed it
               ->orWhereNull('study_leave_approvals.id'); // Or no approval record yet (newly submitted)
             })
-            ->whereNotIn('study_leave_approvals.status_id', [1]); // Exclude approved applications
+            ->whereNotIn('study_leave_approvals.status_id', [1, 2]); // Exclude final applications: approved and rejected
         
         // Apply search filter if provided
         if ($search) {
@@ -1032,6 +1032,7 @@ class MAController extends Controller
                 'study_leave_extensions.study_leave_id',
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
+                'study_leave_extensions.extension_payment_type',
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions_approvals.status_id as extension_status_id',
                 'study_leave_extensions_approvals.ma_remarks',
@@ -1691,7 +1692,7 @@ class MAController extends Controller
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->where('study_leaves.is_draft', false) // Only non-draft applications
             ->where(function($q) {
-                $q->where('study_leave_approvals.status_id', 1); // Processing MA (status_id = 1)
+                $q->whereIn('study_leave_approvals.status_id', [1, 2]); // Final applications: approved and rejected
                  
                  
             });
@@ -1770,7 +1771,7 @@ class MAController extends Controller
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->where(function($query) {
-                $query->where('statuses.stat_id', 1);
+                $query->whereIn('statuses.stat_id', [1, 2]);
                      // ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
             })
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
@@ -1810,7 +1811,7 @@ class MAController extends Controller
             //->whereNotNull('study_leave_progress_reports.submitted_date') // Only submitted reports
             //->where('statuses.status', 'Processing MA') // Filter for MA Processing status
             ->where(function($query) {
-                $query->where('statuses.stat_id', 1);
+                $query->whereIn('statuses.stat_id', [1, 2]);
                      
                       //->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
             })

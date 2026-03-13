@@ -601,6 +601,7 @@ class VCController extends Controller
                 'study_leave_extensions.study_leave_id',
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
+                'study_leave_extensions.extension_payment_type',
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions_approvals.status_id as extension_status_id',
                 'study_leave_extensions_approvals.ma_empno',

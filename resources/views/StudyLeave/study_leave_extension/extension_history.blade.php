@@ -14,9 +14,10 @@
                             <th style="width: 5%">#</th>
                             <th style="width: 18%">Original End Date</th>
                             <th style="width: 18%">Extended End Date</th>
-                            <th style="width: 32%">Remark</th>
-                            <th style="width: 15%">Status</th>
-                            <th style="width: 12%" class="text-center">Actions</th>
+                            <th style="width: 12%">Payment Type</th>
+                            <th style="width: 25%">Remark</th>
+                            <th style="width: 12%">Status</th>
+                            <th style="width: 10%" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,6 +63,15 @@
                                 <td>
                                     <i class="fas fa-calendar-check text-success me-1"></i>
                                     {{ $newEndDate->format('d M Y') }}
+                                </td>
+                                <td>
+                                    @if((string) $extension->extension_payment_type === '1')
+                                        <span class="badge bg-success">With Pay</span>
+                                    @elseif((string) $extension->extension_payment_type === '0')
+                                        <span class="badge bg-danger">Without Pay</span>
+                                    @else
+                                        <span class="badge bg-secondary">Not specified</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <small>{{ \Illuminate\Support\Str::limit($extension->reason_for_extension, 100) }}</small>
@@ -146,6 +156,20 @@
                                                                 <span class="badge bg-primary">
                                                                     <i class="fas fa-clock me-1"></i>{{ $extensionPeriod }} days
                                                                 </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-3">
+                                                        <div class="col-md-4">
+                                                            <label class="text-muted small">Payment Type:</label>
+                                                            <div>
+                                                                @if((string) $extension->extension_payment_type === '1')
+                                                                    <span class="badge bg-success">With Pay</span>
+                                                                @elseif((string) $extension->extension_payment_type === '0')
+                                                                    <span class="badge bg-danger">Without Pay</span>
+                                                                @else
+                                                                    <span class="badge bg-secondary">Not specified</span>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>
@@ -302,6 +326,20 @@
                                                                                 Please select a valid end date (must be after start date).
                                                                             </div>
                                                                         </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label fw-semibold">
+                                                                        Extension Payment Type <span class="text-danger">*</span>
+                                                                    </label>
+                                                                    <select name="extension_payment_type" class="form-select" required>
+                                                                        <option value="" disabled>Select payment type</option>
+                                                                        <option value="1" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '1' ? 'selected' : '' }}>With Pay</option>
+                                                                        <option value="0" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '0' ? 'selected' : '' }}>Without Pay</option>
+                                                                    </select>
+                                                                    <div class="invalid-feedback">
+                                                                        Please select extension payment type.
                                                                     </div>
                                                                 </div>
 

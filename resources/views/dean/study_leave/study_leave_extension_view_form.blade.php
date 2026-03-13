@@ -106,6 +106,20 @@
             </div>
 
             <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Extension Payment Type</label>
+                        <div>
+                            @if((string) $extension->extension_payment_type === '1')
+                                <span class="badge bg-success fs-6">With Pay</span>
+                            @elseif((string) $extension->extension_payment_type === '0')
+                                <span class="badge bg-danger fs-6">Without Pay</span>
+                            @else
+                                <span class="badge bg-secondary fs-6">Not specified</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
                 <div class="col-12">
                     <div class="mb-0">
                         <label class="text-muted small mb-1">Reason for Extension</label>

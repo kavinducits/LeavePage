@@ -73,8 +73,9 @@
                             <th style="width: 6%">#</th>
                             <th style="width: 24%">Extension From</th>
                             <th style="width: 24%">Extension To</th>
-                            <th style="width: 16%">Status</th>
-                            <th style="width: 30%">Actions</th>
+                            <th style="width: 12%">Payment Type</th>
+                            <th style="width: 14%">Status</th>
+                            <th style="width: 20%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,6 +100,15 @@
                                 <td>
                                     <i class="fas fa-calendar-check text-success me-1"></i>
                                     {{ $newEnd->format('d M Y') }}
+                                </td>
+                                <td>
+                                    @if((string) $extension->extension_payment_type === '1')
+                                        <span class="badge bg-success">With Pay</span>
+                                    @elseif((string) $extension->extension_payment_type === '0')
+                                        <span class="badge bg-danger">Without Pay</span>
+                                    @else
+                                        <span class="badge bg-secondary">Not specified</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <span class="badge {{ $badgeClass }}">
