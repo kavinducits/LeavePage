@@ -7,7 +7,7 @@
     </div>
 
     <div class="card">
-        <div class="card-header card-header-dark text-white fw-semibold">
+        <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-file-alt me-2"></i>Submitted Progress Reports
         </div>
         <div class="card-body p-0">

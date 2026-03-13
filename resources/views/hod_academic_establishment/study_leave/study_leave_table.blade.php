@@ -9,8 +9,8 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header card-header-dark fw-semibold">
-            <i class="fas fa-list me-2"></i>Study Leave Applications - Status: Processing HOD
+        <div class="card-header bg-primary text-white fw-semibold">
+            <i class="fas fa-list me-2"></i>Study Leave Applications - Status: Processing HODs
         </div>
         <div class="card-body p-0">
             @if ($studyLeaveApplications->count() > 0)

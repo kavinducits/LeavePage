@@ -6,7 +6,7 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header card-header-dark fw-semibold">
+        <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-calendar-check me-2"></i> Accepted Extension Requests
         </div>
         <div class="card-body p-0">

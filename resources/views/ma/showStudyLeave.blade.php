@@ -45,7 +45,7 @@
                 <div class="container-fluid">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
-                            <h2 class="mb-0 fw-bold">Application Review</h2>
+                            <h2 class="mb-0 fw-bold">Application Reviews</h2>
                             <p class="text-muted mb-0">Reference No: {{ $draft_study_leave->reference_no }}</p>
                         </div>
                         <a href="{{ request()->get('from') == 'accepted' ? route('ma.studyleave.accepted') : route('ma.dashboard') }}" class="btn btn-outline-secondary">
@@ -93,7 +93,7 @@
                     @elseif($statusId == 4)
                         <!-- Status: Processing MA - Show Action Section -->
                         <div class="card">
-                            <div class="card-header bg-dark text-white fw-semibold">
+                            <div class="card-header bg-primary text-white fw-semibold">
                                 <i class="fas fa-tasks me-2"></i>Review Actions
                             </div>
                             <div class="card-body">

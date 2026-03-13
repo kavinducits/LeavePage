@@ -1,4 +1,4 @@
-u<!-- Study Leave Extension Applications Table -->
+<!-- Study Leave Extension Applications Table -->
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0 fw-bold text-dark">Study Leave Extension Applications</h2>
@@ -6,7 +6,7 @@ u<!-- Study Leave Extension Applications Table -->
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header card-header-dark fw-semibold">
+        <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-calendar-plus me-2"></i> Extension Requests - Processing HOD
         </div>
         <div class="card-body p-0">

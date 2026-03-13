@@ -3,7 +3,7 @@
     <!-- Section 1: Personal Details -->
     <div class="card mb-4">
         <div class="card-header card-header-maroon fw-semibold">
-            <i class="fas fa-user me-2"></i>Personal Detailss
+            <i class="fas fa-user me-2"></i>Personal Detailsss
         </div>
         <div class="card-body">
             <div class="row g-3">

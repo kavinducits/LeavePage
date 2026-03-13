@@ -145,6 +145,7 @@
             padding: 0.5rem 1.5rem;
             font-size: 1rem;
         }
+        
     </style>
 
         <script>
@@ -198,6 +199,27 @@
             }
         });
     </script>
+     <style>
+                        .card-header-dark {
+                            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+                            color: white;
+                            border-bottom: 3px solid #0d6efd;
+                        }
+
+                        /* Override AdminLTE dark theme styles for summary layout */
+                   
+                        .card-header.card-header-maroon {
+                            background-color: #007bff !important;
+                            color: #ffffff !important;
+                        }
+
+                        .card-header.bg-primary {
+                            background-color: #007bff !important;
+                            color: #ffffff !important;
+                        }
+
+                       
+                    </style>
         </div>
     </section>
 </div>

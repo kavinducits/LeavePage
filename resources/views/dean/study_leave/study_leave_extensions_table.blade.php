@@ -6,7 +6,7 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header card-header-maroon fw-semibold">
+        <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-calendar-plus me-2"></i> Extension Requests - Processing Dean
         </div>
         <div class="card-body p-0">

@@ -9,7 +9,7 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header card-header-maroon fw-semibold">
+        <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-list me-2"></i>Study Leave Applications - Status: Processing Dean
         </div>
         <div class="card-body p-0">

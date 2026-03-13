@@ -9,7 +9,7 @@
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header card-header-dark fw-semibold">
+        <div class="card-header card-header-dark bg-primary fw-semibold">
             <i class="fas fa-list me-2"></i>Study Leave Applications - Status: Processing HOD
         </div>
         <div class="card-body p-0">
