@@ -16,13 +16,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('hodacademicestablishment.studyLeave') }}" class="nav-link{{ request()->routeIs('hodacademicestablishment.studyLeave') ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Study Leave Request</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('hodacademicestablishment.studyLeave.accepted') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeave.accepted') || (request()->routeIs('hodacademicestablishment.studyLeave.view') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Study Leave</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>
@@ -38,13 +38,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('hodacademicestablishment.studyLeaveExtensions') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveExtensions') || (request()->routeIs('hodacademicestablishment.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Extension Request</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('hodacademicestablishment.studyLeaveExtensions.accepted') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveExtensions.accepted') || (request()->routeIs('hodacademicestablishment.show.extension') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Extensions</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>
@@ -58,13 +58,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('hodacademicestablishment.studyLeaveProgress') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveProgress') || (request()->routeIs('hodacademicestablishment.studyLeaveProgress.view') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Pending Reports</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('hodacademicestablishment.studyLeaveProgress.accepted') }}" class="nav-link{{ (request()->routeIs('hodacademicestablishment.studyLeaveProgress.accepted') || (request()->routeIs('hodacademicestablishment.studyLeaveProgress.view') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Reports</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>

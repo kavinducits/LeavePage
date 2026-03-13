@@ -21,13 +21,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('dean.study.leave.index') }}" class="nav-link{{ request()->routeIs('dean.study.leave.index') ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Study Leave Request</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('dean.study.leave.index.accepted') }}" class="nav-link{{ (request()->routeIs('dean.study.leave.index.accepted') || (request()->routeIs('dean.view.studyLeave') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Study Leave</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>
@@ -43,13 +43,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('dean.study.leave.extensions') }}" class="nav-link{{ (request()->routeIs('dean.study.leave.extensions') || (request()->routeIs('dean.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Extension Request</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('dean.study.leave.extensions.accepted') }}" class="nav-link{{ (request()->routeIs('dean.study.leave.extensions.accepted') || (request()->routeIs('dean.show.extension') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Extensions</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>
@@ -64,13 +64,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('dean.study.leave.progress') }}" class="nav-link{{ (request()->routeIs('dean.study.leave.progress') || (request()->routeIs('dean.show.studyleave.progressreport') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Pending Reports</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('dean.study.leave.progress.accepted') }}" class="nav-link{{ (request()->routeIs('dean.study.leave.progress.accepted') || (request()->routeIs('dean.show.studyleave.progressreport') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Reports</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>

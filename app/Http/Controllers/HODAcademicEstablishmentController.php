@@ -211,7 +211,7 @@ class HODAcademicEstablishmentController extends Controller
                 'updated_at' => now()
             ]);
           
-        return redirect()->route('hodacademicestablishment.studyLeave');
+        return redirect()->route('hodacademicestablishment.studyLeave')->with('success', 'Study leave application forwarded to Department HOD successfully.');
     }
 
      public function study_leave_extenstions(Request $request)

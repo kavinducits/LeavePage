@@ -21,13 +21,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('hod.study.leave.index') }}" class="nav-link{{ request()->routeIs('hod.study.leave.index') ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Study Leave Request</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('hod.study.leave.index.accepted') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.index.accepted') || (request()->routeIs('hod.view.studyLeave') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Study Leave</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>
@@ -43,13 +43,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('hod.study.leave.extensions') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.extensions') || (request()->routeIs('hod.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Extension Request</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('hod.study.leave.extensions.accepted') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.extensions.accepted') || (request()->routeIs('hod.show.extension') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Extensions</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>
@@ -63,13 +63,13 @@
                                 <li class="nav-item">
                                     <a href="{{ route('hod.study.leave.progress') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.progress') || (request()->routeIs('hod.show.studyleave.progressreport') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Pending Reports</p>
+                                        <p>In Review</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('hod.study.leave.progress.accepted') }}" class="nav-link{{ (request()->routeIs('hod.study.leave.progress.accepted') || (request()->routeIs('hod.show.studyleave.progressreport') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                                         <i class="nav-icon bi bi-circle"></i>
-                                        <p>Accepted Reports</p>
+                                        <p>Forwarded</p>
                                     </a>
                                 </li>
                             </ul>

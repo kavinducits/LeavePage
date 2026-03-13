@@ -959,7 +959,7 @@ class HODController extends Controller
                 'updated_at' => now()
             ]);
           
-        return redirect()->route('hod.study.leave.index');
+        return redirect()->route('hod.study.leave.index')->with('success', 'Study leave application forwarded to Dean successfully.');
     }
 
     public function showProgressReport(Request $request, $progress_report_id)

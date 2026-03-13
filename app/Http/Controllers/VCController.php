@@ -568,7 +568,7 @@ class VCController extends Controller
                 'updated_at' => Carbon::now()
             ]);
           
-        return redirect()->route('vc.study.leave.index');
+        return redirect()->route('vc.study.leave.index')->with('success', 'Study leave application submitted successfully and sent to MA for finalization.');
     }
 
     /**

@@ -41,13 +41,13 @@
                     <li class="nav-item">
                         <a href="{{ route('ma.studyleave') }}" class="nav-link{{ request()->routeIs('ma.studyleave') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                            <p>Study Leave Request</p>
+                            <p>In Review</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('ma.studyleave.accepted') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.accepted') || (request()->routeIs('ma.show.studyleave') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                            <p>Accepted Study Leave</p>
+                            <p>Finalized</p>
                         </a>
                     </li>
                 </ul>
@@ -64,13 +64,13 @@
                     <li class="nav-item">
                         <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.extensions') || (request()->routeIs('ma.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                            <p>Study Leave Extensions Request</p>
+                            <p>In Review</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('ma.studyleave.extensions.accepted') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.extensions.accepted') || (request()->routeIs('ma.show.extension') && request()->get('from') == 'accepted')) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                            <p>Accepted Study Leave Extensions</p>
+                            <p>Finalized</p>
                         </a>
                     </li>
                 </ul>
@@ -87,13 +87,13 @@
                     <li class="nav-item">
                         <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress') || (request()->routeIs('ma.show.studyleave.progressreport') && request()->get('from') != 'accepted') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                            <p>Pending Reports</p>
+                            <p>In Review</p>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('ma.studyleave.progress.accepted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress.accepted') || (request()->routeIs('ma.show.studyleave.progressreport') && request()->get('from') == 'accepted') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
-                            <p>Accepted Reports</p>
+                            <p>Finalized</p>
                         </a>
                     </li>
                 </ul>
