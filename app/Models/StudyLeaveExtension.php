@@ -11,6 +11,7 @@ class StudyLeaveExtension extends Model
         'study_leave_id',
         'old_end_date',
         'new_end_date',
+        'extension_payment_type',
         'reason_for_extension',
         'leave_type',
         'leave_payment_type',

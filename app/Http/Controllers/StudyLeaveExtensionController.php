@@ -157,6 +157,7 @@ class StudyLeaveExtensionController extends Controller
            
             'old_end_date' => 'required|date',
             'new_end_date' => 'required|date|after_or_equal:old_end_date',
+            'extension_payment_type' => 'required|integer|in:0,1',
             'reason_for_extension' => 'required|string|max:2000',
         );
         
@@ -193,6 +194,7 @@ class StudyLeaveExtensionController extends Controller
         
             $studyLeaveExtension->old_end_date = $validatedData['old_end_date'];
             $studyLeaveExtension->new_end_date = $validatedData['new_end_date'];
+            $studyLeaveExtension->extension_payment_type = $validatedData['extension_payment_type'];
             $studyLeaveExtension->reason_for_extension = $validatedData['reason_for_extension'];
            // $studyLeaveExtension->status_id = 4; // Pending status
            
@@ -223,6 +225,7 @@ class StudyLeaveExtensionController extends Controller
         $rules = [
             'old_end_date' => 'required|date',
             'new_end_date' => 'required|date|after_or_equal:old_end_date',
+            'extension_payment_type' => 'required|integer|in:0,1',
             'reason_for_extension' => 'required|string|max:2000',
         ];
         
@@ -240,6 +243,7 @@ class StudyLeaveExtensionController extends Controller
             // Update the extension
             $extension->old_end_date = $validatedData['old_end_date'];
             $extension->new_end_date = $validatedData['new_end_date'];
+            $extension->extension_payment_type = $validatedData['extension_payment_type'];
             $extension->reason_for_extension = $validatedData['reason_for_extension'];
            // $extension->status_id = 4; // Reset to pending status
             $extension->save();

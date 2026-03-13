@@ -194,6 +194,14 @@
                                        required>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label fw-semibold">Extension Payment Type <span class="text-danger">*</span></label>
+                                <select name="extension_payment_type" class="form-select" required>
+                                    <option value="" disabled>Select payment type</option>
+                                    <option value="1" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '1' ? 'selected' : '' }}>With Pay</option>
+                                    <option value="0" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '0' ? 'selected' : '' }}>Without Pay</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label fw-semibold">Reason for Extension <span class="text-danger">*</span></label>
                                 <textarea name="reason_for_extension" class="form-control" rows="4" required>{{ $extension->reason_for_extension }}</textarea>
                             </div>
@@ -245,6 +253,18 @@
                                min="{{ \Carbon\Carbon::parse($extensionStartDate)->addDay()->format('Y-m-d') }}"
                                required>
                         <small class="text-muted">Must be after {{ \Carbon\Carbon::parse($extensionStartDate)->format('d M Y') }}</small>
+                    </div>
+
+                    <!-- Extension Payment Type -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            Extension Payment Type <span class="text-danger">*</span>
+                        </label>
+                        <select name="extension_payment_type" id="ext_payment_type" class="form-select" required>
+                            <option value="" selected disabled>Select payment type</option>
+                            <option value="1" {{ old('extension_payment_type') === '1' ? 'selected' : '' }}>With Pay</option>
+                            <option value="0" {{ old('extension_payment_type') === '0' ? 'selected' : '' }}>Without Pay</option>
+                        </select>
                     </div>
 
                     <!-- Reason -->
