@@ -14,6 +14,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .card-header-dark {
+            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+            color: white;
+            border-bottom: 3px solid #0d6efd;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -49,13 +56,6 @@
                             <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>
-
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
 
                     @if (session('error'))
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -163,8 +163,195 @@
                         </div>
                     </div>
 
+                    <!-- Review Sections (shown whenever data exists) -->
+                    @if(optional($extension)->acad_est_head_recommend !== null)
+                    <div class="card mt-4 mb-4">
+                        <div class="card-header card-header-dark text-white fw-semibold">
+                            <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Recommendation</label>
+                                <div>
+                                    @if($extension->acad_est_head_recommend == 1)
+                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                                    @else
+                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($extension->acad_est_head_recommend == 0 && !empty($extension->acad_est_head_not_recommend_reason))
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space:pre-wrap">{{ $extension->acad_est_head_not_recommend_reason }}</p></div></div>
+                            </div>
+                            @endif
+                            @if(!empty($extension->acad_est_head_remarks))
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">Any other remarks</label>
+                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->acad_est_head_remarks }}</div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(optional($extension)->hod_recommend !== null)
+                    <div class="card mt-4 mb-4">
+                        <div class="card-header card-header-dark text-white fw-semibold">
+                            <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Recommendation</label>
+                                <div>
+                                    @if($extension->hod_recommend == 1)
+                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                                    @else
+                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($extension->hod_recommend == 0 && !empty($extension->hod_not_recommend_reason))
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space:pre-wrap">{{ $extension->hod_not_recommend_reason }}</p></div></div>
+                            </div>
+                            @endif
+                            @if(!empty($extension->hod_remarks))
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">Any other remarks</label>
+                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->hod_remarks }}</div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(optional($extension)->dean_recommend !== null)
+                    <div class="card mt-4 mb-4">
+                        <div class="card-header card-header-dark text-white fw-semibold">
+                            <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Recommendation</label>
+                                <div>
+                                    @if($extension->dean_recommend == 1)
+                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                                    @else
+                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($extension->dean_recommend == 0 && !empty($extension->dean_not_recommended_reason))
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space:pre-wrap">{{ $extension->dean_not_recommended_reason }}</p></div></div>
+                            </div>
+                            @endif
+                            @if(!empty($extension->dean_remark))
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">Any other remarks</label>
+                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->dean_remark }}</div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(optional($extension)->vc_recommend !== null)
+                    <div class="card mt-4 mb-4">
+                        <div class="card-header card-header-dark text-white fw-semibold">
+                            <i class="fas fa-clipboard-check me-2"></i>VC Review & Recommendation
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Recommendation</label>
+                                <div>
+                                    @if($extension->vc_recommend == 1)
+                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                                    @else
+                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($extension->vc_recommend == 0 && !empty($extension->vc_not_recommend_reason))
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space:pre-wrap">{{ $extension->vc_not_recommend_reason }}</p></div></div>
+                            </div>
+                            @endif
+                            @if(!empty($extension->vc_remarks))
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">Any other remarks</label>
+                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->vc_remarks }}</div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Action Section -->
-                    @if($extension->extension_status_id != 3 && $extension->extension_status_id != 1)
+                    @if($extension->ma_recommend !== null)
+                    {{-- MA has already submitted their review — show readonly card --}}
+                    <div class="card mb-4">
+                        <div class="card-header card-header-dark text-white fw-semibold">
+                            <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">MA Recommendation</label>
+                                <div>
+                                    @if($extension->ma_recommend == 1)
+                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                                    @else
+                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($extension->ma_recommend == 0 && !empty($extension->ma_not_recommend_reason))
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <p class="mb-0" style="white-space: pre-wrap;">{{ $extension->ma_not_recommend_reason }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            @if(!empty($extension->ma_remarks))
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">MA Remarks</label>
+                                <div class="alert alert-info mb-0">
+                                    <div style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @if($extension->extension_status_id == 8)
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white fw-semibold">
+                            <i class="fas fa-gavel me-2"></i>Finalize Extension Decision
+                        </div>
+                        <div class="card-body d-flex justify-content-end gap-2">
+                            <form id="finalizeForm" action="{{ route('ma.extension.finalize', $extension->extension_id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-check-circle me-2"></i>Finalize as Approved
+                                </button>
+                            </form>
+                            <form id="rejectForm" action="{{ route('ma.extension.reject', $extension->extension_id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-times-circle me-2"></i>Reject Extension
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    @endif
+                    @elseif($extension->extension_status_id != 3 && $extension->extension_status_id != 1)
                     <div class="card">
                         <div class="card-header bg-dark text-white fw-semibold">
                             <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
@@ -328,6 +515,72 @@
     </div>
 </div>
 
+<!-- Confirm Finalize Modal -->
+<div class="modal fade" id="confirmFinalizeModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#800020;color:white;">
+                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Finalize</h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-check-circle fa-3x mb-3" style="color:#198754"></i>
+                <p class="mb-0 fs-6">Are you sure you want to finalize this extension as Approved?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>No
+                </button>
+                <button type="button" class="btn btn-success" id="confirmFinalizeYes">
+                    <i class="fas fa-check me-2"></i>Yes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Reject Modal -->
+<div class="modal fade" id="confirmRejectModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#800020;color:white;">
+                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Reject</h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-times-circle fa-3x mb-3" style="color:#dc3545"></i>
+                <p class="mb-0 fs-6">Are you sure you want to reject this extension request?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>No
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmRejectYes">
+                    <i class="fas fa-check me-2"></i>Yes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Operation Success Modal -->
+<div class="modal fade" id="operationSuccessModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#198754;color:white;">
+                <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Success</h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-check-circle fa-3x mb-3" style="color:#198754"></i>
+                <p class="mb-0 fs-6">{{ session('success') }}</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 5 -->
@@ -336,15 +589,26 @@
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
     <script>
+        const approveForm = document.getElementById('approveForm');
+        const returnForm = document.getElementById('returnForm');
+        const finalizeForm = document.getElementById('finalizeForm');
+        const rejectForm = document.getElementById('rejectForm');
+        const actionRemarkInput = document.getElementById('actionRemark');
+        const notRecommendReasonInput = document.getElementById('ma_not_recommend_reason');
+
         // Show/hide not recommend reason field based on radio selection
         document.querySelectorAll('input[name="ma_recommend"]').forEach(function(radio) {
             radio.addEventListener('change', function() {
                 const notRecommendDiv = document.getElementById('maNotRecommendReasonDiv');
+                if (!notRecommendDiv || !notRecommendReasonInput) {
+                    return;
+                }
+
                 if (this.value === '0') {
                     notRecommendDiv.style.display = 'block';
                 } else {
                     notRecommendDiv.style.display = 'none';
-                    document.getElementById('ma_not_recommend_reason').value = '';
+                    notRecommendReasonInput.value = '';
                     clearNotRecommendReasonError();
                 }
                 clearRecommendError();
@@ -352,102 +616,181 @@
         });
 
         // Forward form
-        const confirmForwardModal = new bootstrap.Modal(document.getElementById('confirmForwardModal'));
+        const forwardModalElement = document.getElementById('confirmForwardModal');
+        const confirmForwardModal = forwardModalElement ? new bootstrap.Modal(forwardModalElement) : null;
         let forwardConfirmed = false;
 
-        // Form validation and submission handling - Forward
-        document.getElementById('approveForm').addEventListener('submit', function(e) {
-            if (forwardConfirmed) { return; }
+        if (approveForm && confirmForwardModal) {
+            approveForm.addEventListener('submit', function(e) {
+                if (forwardConfirmed) { return; }
 
-            const remarkValue = document.getElementById('actionRemark').value.trim();
-            const recommendRadio = document.querySelector('input[name="ma_recommend"]:checked');
+                const remarkValue = actionRemarkInput ? actionRemarkInput.value.trim() : '';
+                const recommendRadio = document.querySelector('input[name="ma_recommend"]:checked');
 
-            clearAllErrors();
+                clearAllErrors();
 
-            // Validate recommendation is selected
-            if (!recommendRadio) {
-                e.preventDefault();
-                showRecommendError();
-                return false;
-            }
-
-            // If not recommended, validate reason is provided
-            if (recommendRadio.value === '0') {
-                const notRecommendReason = document.getElementById('ma_not_recommend_reason').value.trim();
-                if (notRecommendReason === '') {
+                if (!recommendRadio) {
                     e.preventDefault();
-                    showNotRecommendReasonError();
+                    showRecommendError();
                     return false;
                 }
-                document.getElementById('approveNotRecommendReasonInput').value = notRecommendReason;
+
+                if (recommendRadio.value === '0') {
+                    const notRecommendReason = notRecommendReasonInput ? notRecommendReasonInput.value.trim() : '';
+                    if (notRecommendReason === '') {
+                        e.preventDefault();
+                        showNotRecommendReasonError();
+                        return false;
+                    }
+                    document.getElementById('approveNotRecommendReasonInput').value = notRecommendReason;
+                }
+
+                document.getElementById('approveRemarkInput').value = remarkValue;
+                document.getElementById('approveRecommendInput').value = recommendRadio.value;
+
+                e.preventDefault();
+                confirmForwardModal.show();
+            });
+
+            const confirmForwardYes = document.getElementById('confirmForwardYes');
+            if (confirmForwardYes) {
+                confirmForwardYes.addEventListener('click', function () {
+                    forwardConfirmed = true;
+                    confirmForwardModal.hide();
+                    approveForm.submit();
+                });
             }
-
-            document.getElementById('approveRemarkInput').value = remarkValue;
-            document.getElementById('approveRecommendInput').value = recommendRadio.value;
-
-            e.preventDefault();
-            confirmForwardModal.show();
-        });
-
-        document.getElementById('confirmForwardYes').addEventListener('click', function () {
-            forwardConfirmed = true;
-            confirmForwardModal.hide();
-            document.getElementById('approveForm').submit();
-        });
+        }
 
         // Return form
-        const returnConfirmModal = new bootstrap.Modal(document.getElementById('confirmReturnModal'));
+        const returnModalElement = document.getElementById('confirmReturnModal');
+        const returnConfirmModal = returnModalElement ? new bootstrap.Modal(returnModalElement) : null;
         let returnConfirmed = false;
 
-        document.getElementById('returnForm').addEventListener('submit', function(e) {
-            if (returnConfirmed) { return; }
+        if (returnForm && returnConfirmModal) {
+            returnForm.addEventListener('submit', function(e) {
+                if (returnConfirmed) { return; }
 
-            const remarkValue = document.getElementById('actionRemark').value.trim();
-            clearAllErrors();
+                const remarkValue = actionRemarkInput ? actionRemarkInput.value.trim() : '';
+                clearAllErrors();
 
-            if (remarkValue === '') {
+                if (remarkValue === '') {
+                    e.preventDefault();
+                    showRemarkError();
+                    return false;
+                }
+
+                document.getElementById('returnRemarkInput').value = remarkValue;
                 e.preventDefault();
-                showRemarkError();
-                return false;
+                returnConfirmModal.show();
+            });
+
+            const confirmReturnYes = document.getElementById('confirmReturnYes');
+            if (confirmReturnYes) {
+                confirmReturnYes.addEventListener('click', function () {
+                    returnConfirmed = true;
+                    returnConfirmModal.hide();
+                    returnForm.submit();
+                });
             }
+        }
 
-            document.getElementById('returnRemarkInput').value = remarkValue;
-            e.preventDefault();
-            returnConfirmModal.show();
-        });
+        // Finalize extension form
+        const finalizeModalElement = document.getElementById('confirmFinalizeModal');
+        const confirmFinalizeModal = finalizeModalElement ? new bootstrap.Modal(finalizeModalElement) : null;
+        let finalizeConfirmed = false;
 
-        document.getElementById('confirmReturnYes').addEventListener('click', function () {
-            returnConfirmed = true;
-            returnConfirmModal.hide();
-            document.getElementById('returnForm').submit();
-        });
+        if (finalizeForm && confirmFinalizeModal) {
+            finalizeForm.addEventListener('submit', function (e) {
+                if (finalizeConfirmed) { return; }
+                e.preventDefault();
+                confirmFinalizeModal.show();
+            });
+
+            const confirmFinalizeYes = document.getElementById('confirmFinalizeYes');
+            if (confirmFinalizeYes) {
+                confirmFinalizeYes.addEventListener('click', function () {
+                    finalizeConfirmed = true;
+                    confirmFinalizeModal.hide();
+                    finalizeForm.submit();
+                });
+            }
+        }
+
+        // Reject extension form
+        const rejectModalElement = document.getElementById('confirmRejectModal');
+        const confirmRejectModal = rejectModalElement ? new bootstrap.Modal(rejectModalElement) : null;
+        let rejectConfirmed = false;
+
+        if (rejectForm && confirmRejectModal) {
+            rejectForm.addEventListener('submit', function (e) {
+                if (rejectConfirmed) { return; }
+                e.preventDefault();
+                confirmRejectModal.show();
+            });
+
+            const confirmRejectYes = document.getElementById('confirmRejectYes');
+            if (confirmRejectYes) {
+                confirmRejectYes.addEventListener('click', function () {
+                    rejectConfirmed = true;
+                    confirmRejectModal.hide();
+                    rejectForm.submit();
+                });
+            }
+        }
 
         function showRemarkError() {
-            document.getElementById('remarkError').style.display = 'block';
-            document.getElementById('actionRemark').classList.add('is-invalid');
+            const remarkError = document.getElementById('remarkError');
+            if (remarkError) {
+                remarkError.style.display = 'block';
+            }
+            if (actionRemarkInput) {
+                actionRemarkInput.classList.add('is-invalid');
+            }
         }
 
         function clearRemarkError() {
-            document.getElementById('remarkError').style.display = 'none';
-            document.getElementById('actionRemark').classList.remove('is-invalid');
+            const remarkError = document.getElementById('remarkError');
+            if (remarkError) {
+                remarkError.style.display = 'none';
+            }
+            if (actionRemarkInput) {
+                actionRemarkInput.classList.remove('is-invalid');
+            }
         }
 
         function showRecommendError() {
-            document.getElementById('recommendError').style.display = 'block';
+            const recommendError = document.getElementById('recommendError');
+            if (recommendError) {
+                recommendError.style.display = 'block';
+            }
         }
 
         function clearRecommendError() {
-            document.getElementById('recommendError').style.display = 'none';
+            const recommendError = document.getElementById('recommendError');
+            if (recommendError) {
+                recommendError.style.display = 'none';
+            }
         }
 
         function showNotRecommendReasonError() {
-            document.getElementById('notRecommendReasonError').style.display = 'block';
-            document.getElementById('ma_not_recommend_reason').classList.add('is-invalid');
+            const reasonError = document.getElementById('notRecommendReasonError');
+            if (reasonError) {
+                reasonError.style.display = 'block';
+            }
+            if (notRecommendReasonInput) {
+                notRecommendReasonInput.classList.add('is-invalid');
+            }
         }
 
         function clearNotRecommendReasonError() {
-            document.getElementById('notRecommendReasonError').style.display = 'none';
-            document.getElementById('ma_not_recommend_reason').classList.remove('is-invalid');
+            const reasonError = document.getElementById('notRecommendReasonError');
+            if (reasonError) {
+                reasonError.style.display = 'none';
+            }
+            if (notRecommendReasonInput) {
+                notRecommendReasonInput.classList.remove('is-invalid');
+            }
         }
 
         function clearAllErrors() {
@@ -456,8 +799,21 @@
             clearNotRecommendReasonError();
         }
 
-        document.getElementById('actionRemark').addEventListener('input', clearRemarkError);
-        document.getElementById('ma_not_recommend_reason').addEventListener('input', clearNotRecommendReasonError);
+        if (actionRemarkInput) {
+            actionRemarkInput.addEventListener('input', clearRemarkError);
+        }
+
+        if (notRecommendReasonInput) {
+            notRecommendReasonInput.addEventListener('input', clearNotRecommendReasonError);
+        }
+
+        @if (session('success'))
+        const successModalElement = document.getElementById('operationSuccessModal');
+        if (successModalElement) {
+            const successModal = new bootstrap.Modal(successModalElement);
+            successModal.show();
+        }
+        @endif
     </script>
 
 </body>

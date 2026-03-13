@@ -665,6 +665,9 @@ class DeanController extends Controller
                 'study_leave_extensions_approvals.hod_remarks as extension_hod_remarks',
                 'study_leave_extensions_approvals.hod_recommend as extension_hod_recommend',
                 'study_leave_extensions_approvals.hod_not_recommend_reason as extension_hod_not_recommend_reason',
+                'study_leave_extensions_approvals.dean_recommend as extension_dean_recommend',
+                'study_leave_extensions_approvals.dean_not_recommended_reason as extension_dean_not_recommend_reason',
+                'study_leave_extensions_approvals.dean_remark as extension_dean_remarks',
                 'study_leave_extensions_approvals.dean_remark',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',

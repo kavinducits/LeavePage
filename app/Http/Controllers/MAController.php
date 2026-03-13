@@ -595,7 +595,7 @@ class MAController extends Controller
                 $query->where('statuses.status', 'Processing MA')
                       ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
             })
-            ->where('statuses.stat_id', '!=', 1) // Exclude status_id = 1
+            ->whereNotIn('statuses.stat_id', [1, 2]) // Exclude final states: approved and rejected
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -1035,6 +1035,24 @@ class MAController extends Controller
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions_approvals.status_id as extension_status_id',
                 'study_leave_extensions_approvals.ma_remarks',
+                'study_leave_extensions_approvals.ma_recommend',
+                'study_leave_extensions_approvals.ma_not_recommend_reason',
+                // Registrar (HOD Academic Establishment) review
+                'study_leave_extensions_approvals.acad_est_head_recommend',
+                'study_leave_extensions_approvals.acad_est_head_not_recommend_reason',
+                'study_leave_extensions_approvals.acad_est_head_remarks',
+                // HOD review
+                'study_leave_extensions_approvals.hod_recommend',
+                'study_leave_extensions_approvals.hod_not_recommend_reason',
+                'study_leave_extensions_approvals.hod_remarks',
+                // Dean review
+                'study_leave_extensions_approvals.dean_recommend',
+                'study_leave_extensions_approvals.dean_not_recommended_reason',
+                'study_leave_extensions_approvals.dean_remark',
+                // VC review
+                'study_leave_extensions_approvals.vc_recommend',
+                'study_leave_extensions_approvals.vc_not_recommend_reason',
+                'study_leave_extensions_approvals.vc_remarks',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -1189,6 +1207,68 @@ class MAController extends Controller
             ]);
 
         return redirect()->route('ma.studyleave.extensions')->with('success', 'Extension request returned to user successfully.');
+    }
+
+    /**
+     * Finalize extension after VC check (status_id = 8 -> 1 Approved)
+     */
+    public function finalizeExtension($extension_id)
+    {
+        $maUserId = self::MA_USER_ID;
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions_approvals.status_id', 8) // VC Checked
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_extensions.id')
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('ma.studyleave.extensions')->with('error', 'Extension is not available for finalization.');
+        }
+
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
+            ->update([
+                'status_id' => 1, // Approved
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave.extensions')->with('success', 'Extension finalized successfully as Approved.');
+    }
+
+    /**
+     * Reject extension after VC check (status_id = 8 -> 2 Rejected)
+     */
+    public function rejectExtension($extension_id)
+    {
+        $maUserId = self::MA_USER_ID;
+
+        $extension = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions_approvals.status_id', 8) // VC Checked
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->select('study_leave_extensions.id')
+            ->first();
+
+        if (!$extension) {
+            return redirect()->route('ma.studyleave.extensions')->with('error', 'Extension is not available for rejection.');
+        }
+
+        DB::table('study_leave_extensions_approvals')
+            ->where('study_leave_extension_id', $extension_id)
+            ->update([
+                'status_id' => 2, // Rejected
+                'updated_at' => now()
+            ]);
+
+        return redirect()->route('ma.studyleave.extensions')->with('success', 'Extension finalized successfully as Rejected.');
     }
 
     /**

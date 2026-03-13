@@ -351,7 +351,10 @@ class HODAcademicEstablishmentController extends Controller
                 'statuses.status',
                 'study_leave_extensions_approvals.ma_recommend',
                 'study_leave_extensions_approvals.ma_not_recommend_reason',
-                'study_leave_extensions_approvals.ma_remarks'
+                'study_leave_extensions_approvals.ma_remarks',
+                'study_leave_extensions_approvals.acad_est_head_recommend',
+                'study_leave_extensions_approvals.acad_est_head_not_recommend_reason',
+                'study_leave_extensions_approvals.acad_est_head_remarks'
             )
             ->first();
 

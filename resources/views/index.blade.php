@@ -1,3 +1,4 @@
+
 @extends('layouts.dashborad')
 @section('brand-logo')
    <a href="{{ route('hod.index') }}" class="brand-link">

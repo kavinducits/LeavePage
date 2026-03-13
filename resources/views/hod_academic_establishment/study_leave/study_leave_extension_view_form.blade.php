@@ -204,6 +204,44 @@
             </div>
         </div>
 
+        @if(optional($extension)->acad_est_head_recommend !== null)
+        <div class="card mb-4">
+            <div class="card-header card-header-dark text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>HOD Academic Establishment Review & Recommendation
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Recommendation</label>
+                    <div>
+                        @if($extension->acad_est_head_recommend == 1)
+                            <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
+                        @else
+                            <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
+                        @endif
+                    </div>
+                </div>
+                @if($extension->acad_est_head_recommend == 0 && !empty($extension->acad_est_head_not_recommend_reason))
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Reason for Not Recommending</label>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <p class="mb-0" style="white-space: pre-wrap;">{{ $extension->acad_est_head_not_recommend_reason }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                @if(!empty($extension->acad_est_head_remarks))
+                <div class="mb-0">
+                    <label class="form-label fw-semibold">Remarks</label>
+                    <div class="alert alert-secondary mb-0">
+                        <div style="white-space: pre-wrap;">{{ $extension->acad_est_head_remarks }}</div>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <!-- HOD Academic Establishment Review Section -->
         @if(!isset($from) || $from != 'accepted')
         <form action="{{ route('hodacademicestablishment.extension.forward', $extension->extension_id) }}" method="POST" id="hodReviewForm">

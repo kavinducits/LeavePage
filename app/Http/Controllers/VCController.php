@@ -617,6 +617,9 @@ class VCController extends Controller
                 'study_leave_extensions_approvals.dean_remark as extension_dean_remarks',
                 'study_leave_extensions_approvals.dean_recommend as extension_dean_recommend',
                 'study_leave_extensions_approvals.dean_not_recommended_reason as extension_dean_not_recommend_reason',
+                'study_leave_extensions_approvals.vc_recommend',
+                'study_leave_extensions_approvals.vc_not_recommend_reason',
+                'study_leave_extensions_approvals.vc_remarks',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -707,12 +710,12 @@ class VCController extends Controller
         $timestamp = Carbon::now()->format('Y-m-d H:i:s');
         $vcRemarks .= "\n[VC Reviewed - " . $timestamp . "]";
 
-        // Update extension status to Approved (status_id = 1)
+        // Update extension status to VC Checked (status_id = 8)
         //dd($request->all());
         DB::table('study_leave_extensions_approvals')
             ->where('study_leave_extension_id', $extension_id)
             ->update([
-                'status_id' => 1, // Approved
+                'status_id' => 8, // VC Checked
                 'vc_empno' => self::VC_EMP_NO,
                 'vc_recommend' => $request->vc_recommend,
                 'vc_not_recommend_reason' => $request->vc_not_recommend_reason,
