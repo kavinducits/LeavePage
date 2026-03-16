@@ -651,6 +651,7 @@ class HODAcademicEstablishmentController extends Controller
                     'registrar_approval_status' => 1, // Approved
                     'registrar_remarks' => $request->remark,
                     'approval_status_id' => 5, // Approved
+                    'registrar_reviewed_date' => now()->toDateString(),
                     'updated_at' => now()
                 ]);
 

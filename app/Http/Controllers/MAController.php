@@ -753,7 +753,6 @@ class MAController extends Controller
                 'employees.employee_no as empno',
                 'employees.nic',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
-                'employees.name_denoted_by_initials as names_denoted_by_initials',
                 'employees.email as email',
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
@@ -1438,6 +1437,7 @@ class MAController extends Controller
             ->update([
                 'ma_empno' => self::MA_USER_ID,
                 'approval_status_id' => 9, // Processing HOD Academic Establishment
+                'ma_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 
@@ -1489,6 +1489,7 @@ class MAController extends Controller
         StudyLeaveProgressReportsApproval::where('study_leave_progress_report_id', $progress_report_id)
             ->update([
                 'ma_empno' => self::MA_USER_ID,
+                'ma_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 
@@ -1521,6 +1522,7 @@ class MAController extends Controller
             ->update([
                 'approval_status_id' => 1, // Approved
                 'ma_empno' => self::MA_USER_ID,
+                'ma_finalized_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 
@@ -1560,6 +1562,7 @@ class MAController extends Controller
             ->update([
                 'approval_status_id' => 2, // Rejected
                 'ma_empno' => self::MA_USER_ID,
+                'ma_finalized_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 

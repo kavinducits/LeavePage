@@ -928,6 +928,7 @@ class VCController extends Controller
                     'vc_approval_status' => 1, // Approved
                     'vc_remarks' => $request->remark,
                     'approval_status_id' => 8, // VC Checked
+                    'vc_reviewed_date' => now()->toDateString(),
                     'updated_at' => Carbon::now()
                 ]);
 

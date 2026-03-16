@@ -1123,6 +1123,7 @@ class HODController extends Controller
                     'hod_approval_status' => 1, // Approved
                     'hod_remarks' => $request->remark,
                     'approval_status_id' => 6, // Processing Dean
+                    'hod_reviewed_date' => now()->toDateString(),
                     'updated_at' => now()
                 ]);
 

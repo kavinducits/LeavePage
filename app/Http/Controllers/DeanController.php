@@ -980,6 +980,7 @@ class DeanController extends Controller
                     'dean_approval_status' => 1, // Approved
                     'dean_remarks' => $request->remark,
                     'approval_status_id' => 7, // Processing VC
+                    'dean_reviewed_date' => now()->toDateString(),
                     'updated_at' => now()
                 ]);
 
