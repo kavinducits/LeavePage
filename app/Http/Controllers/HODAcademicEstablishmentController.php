@@ -264,9 +264,9 @@ class HODAcademicEstablishmentController extends Controller
         $validSortColumns = ['extension_applied_date', 'reference_no', 'empno', 'name_with_initials', 'department', 'faculty', 'status'];
         if (in_array($sortBy, $validSortColumns)) {
             if ($sortBy === 'extension_applied_date') {
-                $extensionApplications = $extensionApplications->orderBy('study_leave_extensions.created_at', $sortOrder);
+                $extensionApplications = $extensionApplications->orderBy('study_leave_extensions.created_at', 'desc');
             } else {
-                $extensionApplications = $extensionApplications->orderBy($sortBy, $sortOrder);
+                $extensionApplications = $extensionApplications->orderBy($sortBy, 'desc');
             }
         } else {
             $extensionApplications = $extensionApplications->orderByDesc('study_leave_extensions.created_at');
@@ -572,7 +572,7 @@ class HODAcademicEstablishmentController extends Controller
                 'study_leave_progress_reports.document_path',
                 'statuses.status'
             )
-            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->orderBy('study_leave_progress_reports.due_date', 'desc')
             ->get();
 
         // Prepare user object for the view

@@ -857,7 +857,7 @@ class VCController extends Controller
                 'study_leave_progress_reports.document_path',
                 'statuses.status'
             )
-            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->orderBy('study_leave_progress_reports.due_date', 'desc')
             ->get();
 
         // Prepare user object for the view

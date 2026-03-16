@@ -326,7 +326,7 @@ class MAController extends Controller
         ];
 
         if (array_key_exists($sortBy, $validSortColumns)) {
-            $query->orderBy($validSortColumns[$sortBy], $sortOrder === 'asc' ? 'asc' : 'desc');
+            $query->orderBy($validSortColumns[$sortBy], 'desc');
         } else {
             $query->orderByDesc('leave_details.applied_date'); // default fallback
         }
@@ -544,7 +544,7 @@ class MAController extends Controller
         ];
 
         if (array_key_exists($sortBy, $validSortColumns)) {
-            $query->orderBy($validSortColumns[$sortBy], $sortOrder === 'asc' ? 'asc' : 'desc');
+            $query->orderBy($validSortColumns[$sortBy], 'desc');
         } else {
             $query->orderByDesc('study_leave_approvals.ma_finalized_date');
         }
@@ -1351,7 +1351,7 @@ class MAController extends Controller
                 'study_leave_progress_reports.document_path',
                 'statuses.status'
             )
-            ->orderBy('study_leave_progress_reports.due_date', 'asc')
+            ->orderBy('study_leave_progress_reports.due_date', 'desc')
             ->get();
 
         // Prepare user object for the view
@@ -1733,7 +1733,7 @@ class MAController extends Controller
         ];
 
         if (array_key_exists($sortBy, $validSortColumns)) {
-            $query->orderBy($validSortColumns[$sortBy], $sortOrder === 'asc' ? 'asc' : 'desc');
+            $query->orderBy($validSortColumns[$sortBy], 'desc');
         } else {
             $query->orderByDesc('study_leaves.created_at');
         }
