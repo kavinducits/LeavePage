@@ -804,7 +804,7 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
             ->whereNotNull('study_leave_extensions_approvals.acad_est_head_empno')
             ->where('study_leave_extensions_approvals.status_id', '!=', 9)
-            ->orderByDesc('study_leave_extensions.created_at')
+            ->orderByDesc('study_leave_extensions_approvals.registrar_reviewed_date')
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leaves.id as study_leave_id',

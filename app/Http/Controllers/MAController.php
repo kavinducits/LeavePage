@@ -1783,6 +1783,7 @@ class MAController extends Controller
                      // ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
             })
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->orderByDesc('study_leave_extensions_approvals.ma_reviewed_date')
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leaves.id as study_leave_id',

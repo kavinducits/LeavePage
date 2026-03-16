@@ -303,7 +303,7 @@ class HODController extends Controller
             ->whereNotNull('study_leave_extensions_approvals.hod_empno')
             ->where('study_leave_extensions_approvals.status_id', '!=', 5)
             ->whereIn('employees.department_id', $departmentIds)
-            ->orderByDesc('study_leave_extensions.created_at')
+            ->orderByDesc('study_leave_extensions_approvals.hod_reviewed_date')
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leaves.id as study_leave_id',
