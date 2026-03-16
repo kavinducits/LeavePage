@@ -1827,6 +1827,7 @@ class MAController extends Controller
                      
                       //->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
             })
+            ->orderByDesc('study_leave_progress_reports_approval.ma_reviewed_date')
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leaves.id as study_leave_id',

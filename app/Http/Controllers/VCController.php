@@ -308,7 +308,7 @@ class VCController extends Controller
             ->whereNotNull('study_leave_progress_reports_approval.vc_empno')
             ->where('study_leave_progress_reports_approval.approval_status_id', '!=', 7)
             ->where('employees.main_branch_id', 52)
-            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->orderByDesc('study_leave_progress_reports_approval.vc_reviewed_date')
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leaves.id as study_leave_id',

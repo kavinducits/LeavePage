@@ -359,7 +359,7 @@ class DeanController extends Controller
             ->whereNotNull('study_leave_progress_reports_approval.dean_empno')
             ->where('study_leave_progress_reports_approval.approval_status_id', '!=', 6)
             ->whereIn('employees.faculty_id', $facultyIds)
-            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->orderByDesc('study_leave_progress_reports_approval.dean_reviewed_date')
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leaves.id as study_leave_id',

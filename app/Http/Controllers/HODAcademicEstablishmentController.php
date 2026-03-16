@@ -839,7 +839,7 @@ class HODAcademicEstablishmentController extends Controller
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->whereNotNull('study_leave_progress_reports_approval.registrar_empno')
             ->where('study_leave_progress_reports_approval.approval_status_id', '!=', 9)
-            ->orderByDesc('study_leave_progress_reports.submitted_date')
+            ->orderByDesc('study_leave_progress_reports_approval.registrar_reviewed_date')
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leaves.id as study_leave_id',
