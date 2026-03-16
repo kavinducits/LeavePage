@@ -208,6 +208,7 @@ class HODAcademicEstablishmentController extends Controller
                 'registrar_recommendation' => $request->registrar_recommendation,
                 'registrar_not_recommend_reason' => $request->registrar_not_recommend_reason,
                 'registrar_remarks' => $request->registrar_remarks,
+                'registrar_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
           
@@ -771,7 +772,7 @@ class HODAcademicEstablishmentController extends Controller
             ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
             ->whereNotNull('study_leave_approvals.registrar_empno')
             ->where('study_leave_approvals.status_id', '!=', 9)
-            ->orderByDesc('study_leaves.created_at')
+            ->orderByDesc('study_leave_approvals.registrar_reviewed_date')
             ->select(
                 'study_leaves.id',
                 'study_leaves.reference_no',

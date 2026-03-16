@@ -272,7 +272,7 @@ class HODController extends Controller
             ->whereNotNull('study_leave_approvals.hod_empno') // HOD has already acted
             ->where('study_leave_approvals.status_id', '!=', 5) // No longer at HOD stage
             ->whereIn('employees.department_id', $departmentIds) // Filter by HOD's departments
-            ->orderByDesc('study_leaves.created_at')
+            ->orderByDesc('study_leave_approvals.hod_reviewed_date')
             ->select(
                 'study_leaves.id',
                 'study_leaves.reference_no',
@@ -956,6 +956,7 @@ class HODController extends Controller
                 'hod_recommend' => $request->hod_recommend,
                 'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
                 'hod_remarks' => $request->hod_remarks,
+                'hod_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
           

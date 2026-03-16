@@ -182,7 +182,7 @@ class VCController extends Controller
             ->whereNotNull('study_leave_approvals.vc_empno') // VC has already acted
             ->where('study_leave_approvals.status_id', '!=', 7) // No longer at VC stage
             ->where('employees.main_branch_id', 52) // Filter by main_branch_id
-            ->orderByDesc('study_leaves.created_at')
+            ->orderByDesc('study_leave_approvals.vc_reviewed_date')
             ->select(
                 'study_leaves.id',
                 'study_leaves.reference_no',
@@ -565,6 +565,7 @@ class VCController extends Controller
                 'vc_council_covering_approval_status' => $request->vc_approved_council,
                 'vc_not_approve_reason' => $request->vc_not_approve_reason,
                 'vc_remarks' => $request->vc_remarks,
+                'vc_reviewed_date' => now()->toDateString(),
                 'updated_at' => Carbon::now()
             ]);
           

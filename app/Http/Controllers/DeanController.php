@@ -222,7 +222,7 @@ class DeanController extends Controller
             ->whereNotNull('study_leave_approvals.dean_empno') // Dean has already acted
             ->where('study_leave_approvals.status_id', '!=', 6) // No longer at Dean stage
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
-            ->orderByDesc('study_leaves.created_at')
+            ->orderByDesc('study_leave_approvals.dean_reviewed_date')
             ->select(
                 'study_leaves.id',
                 'study_leaves.reference_no',
@@ -614,6 +614,7 @@ class DeanController extends Controller
                 'dean_leave_recommendation_status' => $request->dean_recommend,
                 'dean_not_recommended_reason' => $request->dean_not_recommend_reason,
                 'dean_remarks' => $request->dean_remarks,
+                'dean_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
           

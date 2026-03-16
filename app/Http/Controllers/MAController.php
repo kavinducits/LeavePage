@@ -497,7 +497,7 @@ class MAController extends Controller
         
         // Get search and sort parameters
         $search = $request->get('search');
-        $sortBy = $request->get('sort_by', 'applied_date');
+        $sortBy = $request->get('sort_by', 'finalized_date');
         $sortOrder = $request->get('sort_order', 'desc');
         
         // Build base query
@@ -534,6 +534,7 @@ class MAController extends Controller
         // Apply sorting
         $validSortColumns = [
             'applied_date' => 'study_leaves.created_at',
+            'finalized_date' => 'study_leave_approvals.ma_finalized_date',
             'reference_no' => 'study_leaves.reference_no',
             'empno' => 'employees.employee_no',
             'name' => 'employees.last_name',
@@ -545,7 +546,7 @@ class MAController extends Controller
         if (array_key_exists($sortBy, $validSortColumns)) {
             $query->orderBy($validSortColumns[$sortBy], $sortOrder === 'asc' ? 'asc' : 'desc');
         } else {
-            $query->orderByDesc('study_leaves.created_at');
+            $query->orderByDesc('study_leave_approvals.ma_finalized_date');
         }
         
         $studyLeaveApplications = $query->select(
@@ -944,6 +945,7 @@ class MAController extends Controller
             ->update([
                 'status_id' => 9, // Processing HOD
                 'ma_empno' => self::MA_USER_ID, // Record which MA processed this
+                'ma_reviewed_date' => now()->toDateString(),
                 //'remark' => DB::raw("CONCAT(COALESCE(remark, '', '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()
             ]);
@@ -1001,6 +1003,7 @@ class MAController extends Controller
                 'status_id' => 3, // Edited to Returned
                'ma_empno' => self::MA_USER_ID, // Record which MA processed this
                 'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
+                'ma_reviewed_date' => now()->toDateString(),
                 //'remark' => DB::raw("CONCAT(COALESCE(remark, ' '), '" . addslashes($newRemark) . "')"),
                 // Mark as draft for resubmission
                 'updated_at' => now()
@@ -1649,6 +1652,7 @@ class MAController extends Controller
 
         $updateData = [
             'status_id' => $statusId,
+            'ma_finalized_date' => now()->toDateString(),
             'updated_at' => now(),
         ];
 
