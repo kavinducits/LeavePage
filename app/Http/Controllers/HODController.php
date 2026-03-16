@@ -866,6 +866,7 @@ class HODController extends Controller
                 'hod_recommend' => $request->hod_recommend,
                 'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
                 'hod_remarks' => $request->hod_remarks,
+                'hod_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
            

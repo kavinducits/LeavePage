@@ -459,6 +459,7 @@ class HODAcademicEstablishmentController extends Controller
                 'acad_est_head_recommend' => $request->acad_est_head_recommend,
                 'acad_est_head_not_recommend_reason' => $request->acad_est_head_recommend == 0 ? $request->acad_est_head_not_recommend_reason : null,
                 'acad_est_head_remarks' => $request->registrar_remarks,
+                'registrar_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 

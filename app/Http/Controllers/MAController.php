@@ -1164,6 +1164,7 @@ class MAController extends Controller
                 'ma_recommend' => $request->ma_recommend,
                 'ma_not_recommend_reason' => $request->ma_recommend == 0 ? $request->ma_not_recommend_reason : null,
                 'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
+                'ma_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 
@@ -1207,6 +1208,7 @@ class MAController extends Controller
                 'status_id' => 3, // Returned
                 'ma_empno' => self::MA_USER_ID,
                 'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
+                'ma_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 
@@ -1238,6 +1240,7 @@ class MAController extends Controller
             ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 1, // Approved
+                'ma_finalized_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 
@@ -1269,6 +1272,7 @@ class MAController extends Controller
             ->where('study_leave_extension_id', $extension_id)
             ->update([
                 'status_id' => 2, // Rejected
+                'ma_finalized_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 

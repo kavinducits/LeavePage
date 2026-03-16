@@ -722,6 +722,7 @@ class VCController extends Controller
                 'vc_recommend' => $request->vc_recommend,
                 'vc_not_recommend_reason' => $request->vc_not_recommend_reason,
                 'vc_remarks' => DB::raw("CONCAT(COALESCE(vc_remarks, ''), '" . addslashes($vcRemarks) . "')"),
+                'vc_reviewed_date' => now()->toDateString(),
                 'updated_at' => Carbon::now()
             ]);
 

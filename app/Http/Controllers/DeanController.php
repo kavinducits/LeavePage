@@ -776,6 +776,7 @@ class DeanController extends Controller
                 'dean_recommend' => $request->dean_recommend,
                 'dean_not_recommended_reason' => $request->dean_not_recommend_reason,
                 'dean_remark' => DB::raw("CONCAT(COALESCE(dean_remark, ''), '" . addslashes($deanRemarks) . "')"),
+                'dean_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
 
