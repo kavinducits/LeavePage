@@ -508,6 +508,9 @@
                                                 } elseif ($paymentType == 1) {
                                                     $displayText = 'With Pay';
                                                     $badgeClass = 'bg-success';
+                                                } elseif ($paymentType == 2) {
+                                                    $displayText = 'Pending';
+                                                    $badgeClass = 'bg-warning text-dark';
                                                 } else {
                                                     $displayText = 'Study Leave';
                                                     $badgeClass = 'bg-info';

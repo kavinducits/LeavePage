@@ -910,6 +910,7 @@ class MAController extends Controller
        
         $request->validate([
             'remark' => 'nullable|string|max:1000',
+            'leave_payment_type' => 'required|integer|in:0,1',
         ]);
 
         $maUserId = self::MA_USER_ID;
@@ -927,6 +928,14 @@ class MAController extends Controller
         if (!$application) {
             return redirect()->route('ma.studyleave')->with('error', 'Application is not available for MA review.');
         }
+
+        // MA selects final study leave payment type before forwarding.
+        DB::table('study_leaves')
+            ->where('id', $id)
+            ->update([
+                'leave_payment_type' => $request->leave_payment_type,
+                'updated_at' => now()
+            ]);
 
         // Update status to Processing HOD (status_id = 5)
         /*

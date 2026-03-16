@@ -329,7 +329,7 @@ class StudyLeaveController extends Controller
             'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
             'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
-            'leave_payment_type' => 'required|integer|in:1,2',
+            'leave_payment_type' => 'nullable|integer',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
@@ -344,7 +344,7 @@ class StudyLeaveController extends Controller
             'any_other_details' => 'nullable|string|max:1000',
             'air_passage_request' => 'required_if:funding_type,1|integer|in:0,1',
             'warm_cloth_allowance_request' => 'required_if:funding_type,1|integer|in:0,1',
-            'loan_handling' => 'required_if:leave_payment_type,2|string|max:100',
+            'loan_handling' => 'nullable|string|max:100',
         );
         $empno = session('study_leave.employee_no') ?? session('empno');
 
@@ -421,6 +421,9 @@ class StudyLeaveController extends Controller
         if ($validatedData['study_location'] == 'Sri Lanka') {
             $validatedData['country'] = 'Sri Lanka';
         }
+
+        // User-side field is fixed as Pending (2); MA sets the final value during review.
+        $validatedData['leave_payment_type'] = 2;
 
         if ($draft) {
             // Prepare update data
@@ -995,7 +998,7 @@ class StudyLeaveController extends Controller
             'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
             'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
-            'leave_payment_type' => 'required|integer|in:1,2',
+            'leave_payment_type' => 'nullable|integer',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
@@ -1010,7 +1013,7 @@ class StudyLeaveController extends Controller
             'any_other_details' => 'nullable|string|max:1000',
             'air_passage_request' => 'required_if:funding_type,1|integer|in:0,1',
             'warm_cloth_allowance_request' => 'required_if:funding_type,1|integer|in:0,1',
-            'loan_handling' => 'required_if:leave_payment_type,2|string|max:100',
+            'loan_handling' => 'nullable|string|max:100',
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',
@@ -1044,6 +1047,9 @@ class StudyLeaveController extends Controller
         if ($validatedData['study_location'] == 'Sri Lanka') {
             $validatedData['country'] = 'Sri Lanka';
         }
+
+        // User-side field is fixed as Pending (2); MA sets the final value during review.
+        $validatedData['leave_payment_type'] = 2;
 
         // Handle placement_letter file upload
         if ($request->hasFile('placement_letter')) {

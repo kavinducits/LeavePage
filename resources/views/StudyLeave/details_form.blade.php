@@ -553,12 +553,19 @@
 
 
                  <!-- Type of Study Leave Requested -->
+                    @php
+                        $isUserDetailsPage = !($readonly ?? true) && request()->routeIs('StudyLeave.Details.create', 'StudyLeave.show.editeForm');
+                        $currentLeavePaymentType = old('leave_payment_type', $draft_study_leave->leave_payment_type ?? '');
+                    @endphp
                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
-                        <select name="leave_payment_type" id="leave_payment_type" class="form-select @if(!($readonly ?? true)) @error('leave_payment_type') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
-                            <option value="" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) == '' ? 'selected' : '' }} >Select an option</option>
-                            <option value="1" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) == '1' ? 'selected' : '' }}>With Pay</option>
-                            <option value="2" {{ ($draft_study_leave->leave_payment_type ?? old('leave_payment_type')) == '2' ? 'selected' : '' }}>Without Pay</option>
+                        @if($isUserDetailsPage)
+                            <input type="hidden" name="leave_payment_type" value="2">
+                        @endif
+                        <select name="{{ $isUserDetailsPage ? 'leave_payment_type_display' : 'leave_payment_type' }}" id="leave_payment_type" class="form-select @if(!($readonly ?? true) && !$isUserDetailsPage) @error('leave_payment_type') is-invalid @enderror @endif" @if(!($readonly ?? true) && !$isUserDetailsPage) required @endif {{ ($readonly ?? true) || $isUserDetailsPage ? 'disabled' : '' }}>
+                            <option value="2" {{ (string)$currentLeavePaymentType === '2' || $currentLeavePaymentType === '' ? 'selected' : '' }}>Pending</option>
+                            <option value="1" {{ (string)$currentLeavePaymentType === '1' ? 'selected' : '' }}>With Pay</option>
+                            <option value="0" {{ (string)$currentLeavePaymentType === '0' ? 'selected' : '' }}>Without Pay</option>
                         </select>
                         @if(!($readonly ?? true))
                         @error('leave_payment_type')
@@ -567,6 +574,9 @@
                         <div class="invalid-feedback" id="leave_payment_type_error" style="display: none;">
                             Please select the type of study leave.
                         </div>
+                        @if($isUserDetailsPage)
+                        <small class="text-muted">Defaulted to Pending. This field can be selected by MA during review.</small>
+                        @endif
                         @endif
                     </div>
                     <script>

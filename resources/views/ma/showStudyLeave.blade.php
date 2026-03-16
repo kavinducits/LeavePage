@@ -106,6 +106,15 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3">
+                                    <label for="maLeavePaymentType" class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="maLeavePaymentType" name="leave_payment_type" form="approveForm" required>
+                                        <option value="" {{ in_array((string)($draft_study_leave->leave_payment_type ?? ''), ['0', '1'], true) ? '' : 'selected' }} disabled>Select an option</option>
+                                        <option value="1" {{ (string)($draft_study_leave->leave_payment_type ?? '') === '1' ? 'selected' : '' }}>With Pay</option>
+                                        <option value="0" {{ (string)($draft_study_leave->leave_payment_type ?? '') === '0' ? 'selected' : '' }}>Without Pay</option>
+                                    </select>
+                                </div>
+
                                 <div class="d-flex justify-content-between align-items-start">
                                     <form id="returnForm" action="{{ route('ma.studyleave.return', $draft_study_leave->id) }}" method="POST" class="d-inline">
                                         @csrf
