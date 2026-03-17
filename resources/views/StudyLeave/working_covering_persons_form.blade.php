@@ -99,6 +99,11 @@
                                            id="consent_letter_teaching" 
                                            name="consent_letter_teaching" 
                                            accept="application/pdf">
+                                    @error('consent_letter_teaching')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                     <small class="text-muted">
                                         <i class="fas fa-info-circle"></i> Upload signed consent letter (PDF only)
                                     </small>
@@ -110,7 +115,7 @@
                                                 <i class="fas fa-eye me-1"></i>Preview Uploaded Letter
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="removeConsentLetter('teaching', {{ $draft_study_leave->id }})">
+                                                    onclick="removeConsentLetter('teaching', {{ $draft_study_leave->id }}, this)">
                                                 <i class="fas fa-trash me-1"></i>Remove
                                             </button>
                                         </div>
@@ -210,6 +215,11 @@
                                            id="consent_letter_admin" 
                                            name="consent_letter_admin" 
                                            accept="application/pdf">
+                                    @error('consent_letter_admin')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                     <small class="text-muted">
                                         <i class="fas fa-info-circle"></i> Upload signed consent letter (PDF only)
                                     </small>
@@ -221,7 +231,7 @@
                                                 <i class="fas fa-eye me-1"></i>Preview Uploaded Letter
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="removeConsentLetter('administrative', {{ $draft_study_leave->id }})">
+                                                    onclick="removeConsentLetter('administrative', {{ $draft_study_leave->id }}, this)">
                                                 <i class="fas fa-trash me-1"></i>Remove
                                             </button>
                                         </div>
@@ -321,6 +331,11 @@
                                            id="consent_letter_other" 
                                            name="consent_letter_other" 
                                            accept="application/pdf">
+                                    @error('consent_letter_other')
+                                        <div class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                     <small class="text-muted">
                                         <i class="fas fa-info-circle"></i> Upload signed consent letter (PDF only)
                                     </small>
@@ -332,7 +347,7 @@
                                                 <i class="fas fa-eye me-1"></i>Preview Uploaded Letter
                                             </button>
                                             <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="removeConsentLetter('other', {{ $draft_study_leave->id }})">
+                                                    onclick="removeConsentLetter('other', {{ $draft_study_leave->id }}, this)">
                                                 <i class="fas fa-trash me-1"></i>Remove
                                             </button>
                                         </div>
@@ -814,43 +829,151 @@ $(document).ready(function () {
 </script>
 
 <script>
-function removeConsentLetter(type, studyLeaveId) {
-    if (confirm('Are you sure you want to remove this consent letter? This action cannot be undone.')) {
-        // Show loading state
-        const button = event.target.closest('button');
-        const originalHtml = button.innerHTML;
-        button.disabled = true;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
-        
-        // Send delete request
-        fetch(`/StudyLeave/consent-letter/remove/${type}/${studyLeaveId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Reload the page to show updated state
-                window.location.reload();
-            } else {
-                alert(data.message || 'Failed to remove consent letter.');
-                button.disabled = false;
-                button.innerHTML = originalHtml;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while removing the consent letter.');
-            button.disabled = false;
-            button.innerHTML = originalHtml;
-        });
+let pendingConsentRemoval = null;
+
+function removeConsentLetter(type, studyLeaveId, buttonEl) {
+    pendingConsentRemoval = {
+        type: type,
+        studyLeaveId: studyLeaveId,
+        button: buttonEl,
+        originalHtml: buttonEl ? buttonEl.innerHTML : ''
+    };
+
+    const confirmModalElement = document.getElementById('removeConsentConfirmModal');
+    if (confirmModalElement && window.bootstrap) {
+        const confirmModal = new bootstrap.Modal(confirmModalElement);
+        confirmModal.show();
     }
 }
+
+function showConsentRemovalMessage(message, isSuccess) {
+    const messageModalElement = document.getElementById('removeConsentMessageModal');
+    const messageText = document.getElementById('removeConsentMessageText');
+    const messageTitle = document.getElementById('removeConsentMessageTitle');
+    const messageHeader = document.getElementById('removeConsentMessageHeader');
+
+    if (messageText) {
+        messageText.textContent = message;
+    }
+
+    if (messageTitle) {
+        messageTitle.textContent = isSuccess ? 'Success' : 'Error';
+    }
+
+    if (messageHeader) {
+        messageHeader.classList.remove('bg-success', 'bg-danger', 'text-white');
+        messageHeader.classList.add(isSuccess ? 'bg-success' : 'bg-danger', 'text-white');
+    }
+
+    if (messageModalElement && window.bootstrap) {
+        const messageModal = new bootstrap.Modal(messageModalElement);
+        messageModal.show();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const confirmYesBtn = document.getElementById('confirmRemoveConsentYes');
+    const confirmModalElement = document.getElementById('removeConsentConfirmModal');
+    const messageModalElement = document.getElementById('removeConsentMessageModal');
+
+    if (confirmYesBtn) {
+        confirmYesBtn.addEventListener('click', function () {
+            if (!pendingConsentRemoval) {
+                return;
+            }
+
+            const currentRemoval = pendingConsentRemoval;
+            const button = currentRemoval.button;
+
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Removing...';
+            }
+
+            if (confirmModalElement && window.bootstrap) {
+                bootstrap.Modal.getInstance(confirmModalElement)?.hide();
+            }
+
+            fetch(`/StudyLeave/consent-letter/remove/${currentRemoval.type}/${currentRemoval.studyLeaveId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showConsentRemovalMessage(data.message || 'Consent letter removed successfully.', true);
+                } else {
+                    if (button) {
+                        button.disabled = false;
+                        button.innerHTML = currentRemoval.originalHtml;
+                    }
+                    showConsentRemovalMessage(data.message || 'Failed to remove consent letter.', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = currentRemoval.originalHtml;
+                }
+                showConsentRemovalMessage('An error occurred while removing the consent letter.', false);
+            });
+        });
+    }
+
+    if (messageModalElement) {
+        messageModalElement.addEventListener('hidden.bs.modal', function () {
+            const messageTitle = document.getElementById('removeConsentMessageTitle');
+            if (messageTitle && messageTitle.textContent === 'Success') {
+                window.location.reload();
+            }
+        });
+    }
+});
 </script>
+
+<!-- Remove Consent Letter: Confirm Modal -->
+<div class="modal fade" id="removeConsentConfirmModal" tabindex="-1" aria-labelledby="removeConsentConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="removeConsentConfirmModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Remove
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to remove this consent letter? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveConsentYes">
+                    <i class="fas fa-trash me-1"></i>Yes, Remove
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Consent Letter: Message Modal -->
+<div class="modal fade" id="removeConsentMessageModal" tabindex="-1" aria-labelledby="removeConsentMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" id="removeConsentMessageHeader">
+                <h5 class="modal-title" id="removeConsentMessageTitle">Message</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="removeConsentMessageText"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Preview Modals for Consent Letters -->
 @if(isset($draft_study_leave))

@@ -98,21 +98,21 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <label for="actionRemark" class="form-label fw-semibold">Remarks</label>
-                                    <textarea class="form-control" id="actionRemark" name="remark" rows="3"
-                                              placeholder="Add any comments or remarks"></textarea>
-                                    <div id="remarkError" class="form-text text-danger" style="display: none;">
-                                        Remarks are required when returning an application.
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
                                     <label for="maLeavePaymentType" class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
                                     <select class="form-select" id="maLeavePaymentType" name="leave_payment_type" form="approveForm" required>
                                         <option value="" {{ in_array((string)($draft_study_leave->leave_payment_type ?? ''), ['0', '1'], true) ? '' : 'selected' }} disabled>Select an option</option>
                                         <option value="1" {{ (string)($draft_study_leave->leave_payment_type ?? '') === '1' ? 'selected' : '' }}>With Pay</option>
                                         <option value="0" {{ (string)($draft_study_leave->leave_payment_type ?? '') === '0' ? 'selected' : '' }}>Without Pay</option>
                                     </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="actionRemark" class="form-label fw-semibold">Remarks</label>
+                                    <textarea class="form-control" id="actionRemark" name="remark" rows="3"
+                                              placeholder="Add any comments or remarks"></textarea>
+                                    <div id="remarkError" class="form-text text-danger" style="display: none;">
+                                        Remarks are required when returning an application.
+                                    </div>
                                 </div>
 
                                 <div class="d-flex justify-content-between align-items-start">

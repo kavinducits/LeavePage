@@ -538,14 +538,23 @@ class StudyLeaveController extends Controller
     public function updateWorkCoveringPersons($request)
     {
 
+        $empno = session('study_leave.employee_no') ?? session('empno');
+        $draft = StudyLeave::where('empno', $empno)
+            ->where('is_draft', true)
+            ->first();
+
+        $teachingConsentRule = (($draft && $draft->consent_letter_teaching_path) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
+        $adminConsentRule = (($draft && $draft->consent_letter_admin_path) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
+        $otherConsentRule = (($draft && $draft->consent_letter_other_path) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
+
         // Validate the incoming request data
         $validatedData = $request->validate([
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',
-            'consent_letter_teaching' => 'nullable|file|mimes:pdf|max:5120',
-            'consent_letter_admin' => 'nullable|file|mimes:pdf|max:5120',
-            'consent_letter_other' => 'nullable|file|mimes:pdf|max:5120',
+            'consent_letter_teaching' => $teachingConsentRule,
+            'consent_letter_admin' => $adminConsentRule,
+            'consent_letter_other' => $otherConsentRule,
         ]);
 
         // Validate that each employee number exists
@@ -574,11 +583,6 @@ class StudyLeaveController extends Controller
 
         // Here you can handle the validated data, e.g., save it to the database or session
         // For demonstration, we'll just redirect back with a success message
-        $empno = session('study_leave.employee_no') ?? session('empno');
-        $draft = StudyLeave::where('empno', $empno)
-            ->where('is_draft', true)
-            ->first();
-
         if ($draft) {
             // Prepare update data
             $updateData = [
@@ -1029,6 +1033,10 @@ class StudyLeaveController extends Controller
         if (!$studyLeave) {
             return redirect()->route('StudyLeave.create')->with('error', 'Study leave application not found.');
         }
+
+        $rules['consent_letter_teaching'] = (($studyLeave->consent_letter_teaching_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
+        $rules['consent_letter_admin'] = (($studyLeave->consent_letter_admin_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
+        $rules['consent_letter_other'] = (($studyLeave->consent_letter_other_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
 
         // Check if files already exist
         if ($studyLeave->placement_letter == null) {

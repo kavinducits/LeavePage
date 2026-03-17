@@ -937,6 +937,12 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
+        $newRemark = '';
+        if ($request->remark) {
+            $timestamp = now()->format('Y-m-d');
+            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
+        }
+
         // Update status to Processing HOD (status_id = 5)
         /*
         DB::table('study_leaves')
@@ -953,6 +959,7 @@ class MAController extends Controller
             ->update([
                 'status_id' => 9, // Processing HOD
                 'ma_empno' => self::MA_USER_ID, // Record which MA processed this
+                'ma_remarks' => DB::raw("CONCAT(COALESCE(ma_remarks, ''), '" . addslashes($newRemark) . "')"),
                 'ma_reviewed_date' => now()->toDateString(),
                 //'remark' => DB::raw("CONCAT(COALESCE(remark, '', '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()
