@@ -105,7 +105,22 @@ class StudyLeaveController extends Controller
             }
         }
 
-        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate', 'academicYears', 'leaveProgressData'));
+        // Check for returned extensions from MA
+        $hasReturnedExtensions = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            ->where('study_leaves.empno', session('empno'))
+            ->where('study_leave_extensions_approvals.status_id', 3) // Returned status
+            ->exists();
+
+        // Check for returned progress reports from MA
+        $hasReturnedProgressReports = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->where('study_leaves.empno', session('empno'))
+            ->where('study_leave_progress_reports.status_id', 3) // Returned status
+            ->exists();
+
+        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate', 'academicYears', 'leaveProgressData', 'hasReturnedExtensions', 'hasReturnedProgressReports'));
     }
 
     /**

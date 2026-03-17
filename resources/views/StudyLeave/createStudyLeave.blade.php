@@ -341,6 +341,27 @@
             <i class="fas fa-file-alt me-2 icon-gold"></i>New Study Leave Applications
         </h3>
 
+        <!-- Notification: Returned Extensions and Progress Reports -->
+        @if($hasReturnedExtensions || $hasReturnedProgressReports)
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-exclamation-circle me-3 mt-1" style="font-size: 1.2rem;"></i>
+                    <div>
+                        <strong>Action Required!</strong>
+                        @if($hasReturnedExtensions && $hasReturnedProgressReports)
+                            <p class="mb-2">You have returned extension requests and progress reports from MA. Please review and re-submit them.</p>
+                        @elseif($hasReturnedExtensions)
+                            <p class="mb-2">You have returned extension request(s) from MA. Please review the remarks and re-submit your extension request.</p>
+                        @else
+                            <p class="mb-2">You have returned progress report(s) from MA. Please review the remarks and re-upload your progress report.</p>
+                        @endif
+                        <p class="text-muted small mb-0">Your MA has provided feedback. Check the remarks and make necessary corrections before resubmitting.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <!-- Flash Messages -->
         @if (session('info'))
             <div class="alert alert-info alert-dismissible fade show" role="alert">
