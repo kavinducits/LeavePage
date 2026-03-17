@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    @include('StudyLeave.study_leave_progress_reports.partials.progress_summary_styles')
     <style>
         .accordion-button.collapsed:hover {
             background-color: #e8f4f8;
@@ -66,92 +67,11 @@
             </div>
         @endif
 
-        <!-- Progress Report Summary Card -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white fw-semibold">
-                <i class="fas fa-file-alt me-2"></i> Progress Report Details
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1">Study Leave Reference Number</label>
-                            <div class="fw-bold fs-5 text-primary">{{ $progressReport->reference_no }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1">Employee</label>
-                            <div class="fw-bold">{{ $progressReport->name_with_initials }}</div>
-                            <div class="text-muted small">{{ $progressReport->empno }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1">Due Date</label>
-                            <div class="fw-semibold text-warning">
-                                <i class="far fa-calendar-alt me-1"></i>
-                                {{ \Carbon\Carbon::parse($progressReport->due_date)->format('d M Y') }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="text-muted small mb-1">Submitted Date</label>
-                            <div class="fw-semibold text-success">
-                                <i class="far fa-calendar-check me-1"></i>
-                                {{ $progressReport->submitted_date ? \Carbon\Carbon::parse($progressReport->submitted_date)->format('d M Y') : 'Not Submitted' }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                @if ($progressReport->remark)
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label class="text-muted small mb-1">Employee Remarks</label>
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->remark }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                @if ($progressReport->document_path)
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-0">
-                                <label class="text-muted small mb-1">Progress Report Document</label>
-                                <div class="card border-primary">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-file-pdf fa-3x text-danger me-3"></i>
-                                                <div>
-                                                    <div class="fw-bold">Progress Report PDF</div>
-                                                    <div class="text-muted small">Click to view the submitted document</div>
-                                                </div>
-                                            </div>
-                                            <a href="{{ route('ma.serveProgressReport', ['filename' => basename($progressReport->document_path)]) }}"
-                                                target="_blank" class="btn btn-outline-primary">
-                                                <i class="fas fa-eye me-1"></i>View PDF
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
+        @include('StudyLeave.study_leave_progress_reports.partials.progress_summary_card', [
+            'progressItem' => $progressReport,
+            'headerClass' => 'bg-primary text-white fw-semibold',
+            'documentRouteName' => 'ma.serveProgressReport',
+        ])
 
         <!-- Registrar Review Section (Disabled/Read-only for Dean) -->
         <div class="card mb-4">

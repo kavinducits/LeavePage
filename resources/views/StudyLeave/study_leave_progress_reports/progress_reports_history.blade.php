@@ -1,4 +1,5 @@
 <!-- Study Leave Progress Reports History -->
+@include('StudyLeave.study_leave_progress_reports.partials.progress_summary_styles')
 <div class="card mb-4 shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #000000; color: white;">
         <h5 class="mb-0">
@@ -137,46 +138,14 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Report Dates -->
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-light">
-                                                    <strong><i class="fas fa-calendar me-2"></i>Report Dates</strong>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <label class="text-muted small">Due Date:</label>
-                                                            <div class="fw-semibold">{{ $dueDate->format('d M Y') }}</div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <label class="text-muted small">Submitted Date:</label>
-                                                            <div class="fw-semibold {{ $submittedDate ? 'text-success' : 'text-muted' }}">
-                                                                {{ $submittedDate ? $submittedDate->format('d M Y') : 'Not Submitted' }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    @if($submittedDate)
-                                                        <div class="row mt-2">
-                                                            <div class="col-md-12">
-                                                                <label class="text-muted small">Submission Status:</label>
-                                                                <div>
-                                                                    @if($submittedDate->gt($dueDate))
-                                                                        <span class="badge bg-warning text-dark">
-                                                                            <i class="fas fa-exclamation-triangle me-1"></i>
-                                                                            Submitted Late ({{ $dueDate->diffInDays($submittedDate) }} days)
-                                                                        </span>
-                                                                    @else
-                                                                        <span class="badge bg-success">
-                                                                            <i class="fas fa-check-circle me-1"></i>
-                                                                            Submitted On Time
-                                                                        </span>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
+                                            @include('StudyLeave.study_leave_progress_reports.partials.progress_summary_card', [
+                                                'progressItem' => $report,
+                                                'headerClass' => 'bg-primary text-white fw-semibold',
+                                                'cardMarginClass' => 'mb-3',
+                                                'title' => 'Progress Report Details',
+                                                'showRemarks' => false,
+                                                'showDocument' => false,
+                                            ])
 
                                             <!-- Remarks -->
                                             @if($report->status_id == 3)
