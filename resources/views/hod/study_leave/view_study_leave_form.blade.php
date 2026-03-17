@@ -146,6 +146,11 @@
             padding: 0.5rem 1.5rem;
             font-size: 1rem;
         }
+
+        .card-header-maroon {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
+        }
     </style>
 
         <script>

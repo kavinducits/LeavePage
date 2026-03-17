@@ -149,6 +149,10 @@
     background-color: #218838;
     border-color: #1e7e34;
 }
+ .card-header-maroon {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
+        }
 </style>
 
 <script>

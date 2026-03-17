@@ -59,7 +59,7 @@
             @csrf
 
             <div class="card mt-4">
-                <div class="card-header card-header-dark text-white fw-semibold">
+                <div class="card-header bg-primary text-white fw-semibold">
                     <i class="fas fa-clipboard-check me-2"></i>Vice Chancellor Review & Recommendation
                 </div>
                 <div class="card-body">
@@ -220,6 +220,10 @@
         .btn-success:hover {
             background-color: #218838;
             border-color: #1e7e34;
+        }
+         .card-header-maroon {
+            background-color: #0d6efd !important;
+            color: #ffffff !important;
         }
     </style>
 
