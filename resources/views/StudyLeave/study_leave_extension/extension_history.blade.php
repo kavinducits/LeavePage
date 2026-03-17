@@ -1,4 +1,5 @@
 <!-- Study Leave Extension History -->
+@include('StudyLeave.study_leave_extension.partials.extension_summary_styles')
 <div class="card mb-4 shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #000000; color: white;">
         <h5 class="mb-0">
@@ -135,56 +136,12 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Extension Period Details -->
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-light">
-                                                    <strong><i class="fas fa-calendar me-2"></i>Extension Period</strong>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-4">
-                                                            <label class="text-muted small">Original End Date:</label>
-                                                            <div class="fw-semibold">{{ $oldEndDate->format('d M Y') }}</div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <label class="text-muted small">Extended End Date:</label>
-                                                            <div class="fw-semibold text-success">{{ $newEndDate->format('d M Y') }}</div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <label class="text-muted small">Extension Period:</label>
-                                                            <div>
-                                                                <span class="badge bg-primary">
-                                                                    <i class="fas fa-clock me-1"></i>{{ $extensionPeriod }} days
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mt-3">
-                                                        <div class="col-md-4">
-                                                            <label class="text-muted small">Payment Type:</label>
-                                                            <div>
-                                                                @if((string) $extension->extension_payment_type === '1')
-                                                                    <span class="badge bg-success">With Pay</span>
-                                                                @elseif((string) $extension->extension_payment_type === '0')
-                                                                    <span class="badge bg-danger">Without Pay</span>
-                                                                @else
-                                                                    <span class="badge bg-secondary">Not specified</span>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Reason for Extension -->
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-light">
-                                                    <strong><i class="fas fa-file-alt me-2"></i>Reason for Extension</strong>
-                                                </div>
-                                                <div class="card-body">
-                                                    <p class="mb-0" style="white-space: pre-wrap;">{{ $extension->reason_for_extension }}</p>
-                                                </div>
-                                            </div>
+                                            @include('StudyLeave.study_leave_extension.partials.extension_summary_card', [
+                                                'headerClass' => 'bg-primary text-white fw-semibold',
+                                                'cardMarginClass' => 'mb-3',
+                                                'title' => 'Extension Request Details',
+                                                'durationDays' => $extensionPeriod,
+                                            ])
 
                                             <!-- Leave Details if available -->
                                             @if(isset($extension->leave_type) || isset($extension->leave_payment_type))

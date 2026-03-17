@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    @include('StudyLeave.study_leave_extension.partials.extension_summary_styles')
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -53,86 +54,11 @@
         </a>
     </div>
 
-
-    <!-- Extension Summary Card -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header card-header-dark text-white fw-semibold">
-            <i class="fas fa-calendar-plus me-2"></i> Extension Request Details
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="text-muted small mb-1">Study Leave Reference Number</label>
-                        <div class="fw-bold fs-5 text-primary">{{ $extension->reference_no }}</div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="text-muted small mb-1">Employee</label>
-                        <div class="fw-bold">{{ $extension->name_with_initials }}</div>
-                        <div class="text-muted small">{{ $extension->empno }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="text-muted small mb-1">Original End Date</label>
-                        <div class="fw-semibold text-danger">
-                            <i class="far fa-calendar-alt me-1"></i>
-                            {{ \Carbon\Carbon::parse($extension->old_end_date)->format('d M Y') }}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="text-muted small mb-1">New End Date</label>
-                        <div class="fw-semibold text-success">
-                            <i class="far fa-calendar-check me-1"></i>
-                            {{ \Carbon\Carbon::parse($extension->new_end_date)->format('d M Y') }}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="text-muted small mb-1">Extension Duration</label>
-                        <div class="fw-bold text-primary fs-5">
-                            <i class="fas fa-clock me-1"></i>{{ $durationDays }} days ({{ $durationMonths }} months)
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="text-muted small mb-1">Extension Payment Type</label>
-                        <div>
-                            @if((string) $extension->extension_payment_type === '1')
-                                <span class="badge bg-success fs-6">With Pay</span>
-                            @elseif((string) $extension->extension_payment_type === '0')
-                                <span class="badge bg-danger fs-6">Without Pay</span>
-                            @else
-                                <span class="badge bg-secondary fs-6">Not specified</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="mb-0">
-                        <label class="text-muted small mb-1">Reason for Extension</label>
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <p class="mb-0" style="white-space: pre-wrap;">{{ $extension->reason_for_extension }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('StudyLeave.study_leave_extension.partials.extension_summary_card', [
+        'headerClass' => 'card-header-dark text-white fw-semibold',
+        'durationDays' => $durationDays,
+        'durationMonths' => $durationMonths,
+    ])
 
     <!-- MA Review & Recommendation (Read-only) -->
     <div class="card mb-4">
