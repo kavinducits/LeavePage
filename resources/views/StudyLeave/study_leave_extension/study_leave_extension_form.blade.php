@@ -106,6 +106,8 @@
                                         <span class="badge bg-success">With Pay</span>
                                     @elseif((string) $extension->extension_payment_type === '0')
                                         <span class="badge bg-danger">Without Pay</span>
+                                    @elseif((string) $extension->extension_payment_type === '2')
+                                        <span class="badge bg-warning text-dark">Pending</span>
                                     @else
                                         <span class="badge bg-secondary">Not specified</span>
                                     @endif
@@ -205,11 +207,11 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Extension Payment Type <span class="text-danger">*</span></label>
-                                <select name="extension_payment_type" class="form-select" required>
-                                    <option value="" disabled>Select payment type</option>
-                                    <option value="1" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '1' ? 'selected' : '' }}>With Pay</option>
-                                    <option value="0" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '0' ? 'selected' : '' }}>Without Pay</option>
+                                <input type="hidden" name="extension_payment_type" value="2">
+                                <select name="extension_payment_type_display" class="form-select" disabled>
+                                    <option value="2" selected>Pending</option>
                                 </select>
+                                <small class="text-muted">Defaulted to Pending. This field can be selected by MA during review.</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Reason for Extension <span class="text-danger">*</span></label>
@@ -270,11 +272,11 @@
                         <label class="form-label fw-semibold">
                             Extension Payment Type <span class="text-danger">*</span>
                         </label>
-                        <select name="extension_payment_type" id="ext_payment_type" class="form-select" required>
-                            <option value="" selected disabled>Select payment type</option>
-                            <option value="1" {{ old('extension_payment_type') === '1' ? 'selected' : '' }}>With Pay</option>
-                            <option value="0" {{ old('extension_payment_type') === '0' ? 'selected' : '' }}>Without Pay</option>
+                        <input type="hidden" name="extension_payment_type" value="2">
+                        <select name="extension_payment_type_display" id="ext_payment_type" class="form-select" disabled>
+                            <option value="2" selected>Pending</option>
                         </select>
+                        <small class="text-muted">Defaulted to Pending. This field can be selected by MA during review.</small>
                     </div>
 
                     <!-- Reason -->

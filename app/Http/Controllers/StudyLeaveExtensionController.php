@@ -157,7 +157,6 @@ class StudyLeaveExtensionController extends Controller
            
             'old_end_date' => 'required|date',
             'new_end_date' => 'required|date|after_or_equal:old_end_date',
-            'extension_payment_type' => 'required|integer|in:0,1',
             'reason_for_extension' => 'required|string|max:2000',
         );
         
@@ -170,6 +169,7 @@ class StudyLeaveExtensionController extends Controller
         }
 
         $validatedData = $validator->validated();
+        $validatedData['extension_payment_type'] = 2;
     
         // Create a new StudyLeaveExtension record
         $creationSuccess = $this->createStudyLeaveExtension($id, $validatedData);
@@ -225,7 +225,6 @@ class StudyLeaveExtensionController extends Controller
         $rules = [
             'old_end_date' => 'required|date',
             'new_end_date' => 'required|date|after_or_equal:old_end_date',
-            'extension_payment_type' => 'required|integer|in:0,1',
             'reason_for_extension' => 'required|string|max:2000',
         ];
         
@@ -238,6 +237,7 @@ class StudyLeaveExtensionController extends Controller
         }
 
         $validatedData = $validator->validated();
+        $validatedData['extension_payment_type'] = 2;
         
         try {
             // Update the extension

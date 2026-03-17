@@ -125,6 +125,8 @@
                                                 <span class="badge bg-success fs-6">With Pay</span>
                                             @elseif((string) $extension->extension_payment_type === '0')
                                                 <span class="badge bg-danger fs-6">Without Pay</span>
+                                            @elseif((string) $extension->extension_payment_type === '2')
+                                                <span class="badge bg-warning text-dark fs-6">Pending</span>
                                             @else
                                                 <span class="badge bg-secondary fs-6">Not specified</span>
                                             @endif
@@ -396,6 +398,21 @@
                                 </div>
                             </div>
 
+                            <div class="mb-4">
+                                <label for="ma_extension_payment_type" class="form-label fw-semibold">
+                                    Extension Payment Type
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select id="ma_extension_payment_type" class="form-select" required>
+                                    <option value="" {{ !in_array((string) $extension->extension_payment_type, ['0', '1'], true) ? 'selected' : '' }} disabled>Select payment type</option>
+                                    <option value="1" {{ (string) $extension->extension_payment_type === '1' ? 'selected' : '' }}>With Pay</option>
+                                    <option value="0" {{ (string) $extension->extension_payment_type === '0' ? 'selected' : '' }}>Without Pay</option>
+                                </select>
+                                <div id="extensionPaymentTypeError" class="form-text text-danger" style="display: none;">
+                                    Please select an extension payment type.
+                                </div>
+                            </div>
+
                             <!-- Not Recommend Reason (shown when No is selected) -->
                             <div class="mb-4" id="maNotRecommendReasonDiv" style="display: none;">
                                 <label for="ma_not_recommend_reason" class="form-label fw-semibold">
@@ -464,6 +481,7 @@
                                         <input type="hidden" id="approveRemarkInput" name="remark" value="">
                                         <input type="hidden" id="approveRecommendInput" name="ma_recommend" value="">
                                         <input type="hidden" id="approveNotRecommendReasonInput" name="ma_not_recommend_reason" value="">
+                                        <input type="hidden" id="approveExtensionPaymentTypeInput" name="extension_payment_type" value="">
                                         <button type="submit" class="btn btn-success btn-lg w-100"
                                             {{ empty($departmentHead) ? 'disabled' : '' }}>
                                             <i class="fas fa-forward me-2"></i>Forward to HOD
@@ -609,6 +627,7 @@
         const rejectForm = document.getElementById('rejectForm');
         const actionRemarkInput = document.getElementById('actionRemark');
         const notRecommendReasonInput = document.getElementById('ma_not_recommend_reason');
+        const extensionPaymentTypeInput = document.getElementById('ma_extension_payment_type');
 
         // Show/hide not recommend reason field based on radio selection
         document.querySelectorAll('input[name="ma_recommend"]').forEach(function(radio) {
@@ -640,12 +659,19 @@
 
                 const remarkValue = actionRemarkInput ? actionRemarkInput.value.trim() : '';
                 const recommendRadio = document.querySelector('input[name="ma_recommend"]:checked');
+                const extensionPaymentTypeValue = extensionPaymentTypeInput ? extensionPaymentTypeInput.value : '';
 
                 clearAllErrors();
 
                 if (!recommendRadio) {
                     e.preventDefault();
                     showRecommendError();
+                    return false;
+                }
+
+                if (!extensionPaymentTypeValue) {
+                    e.preventDefault();
+                    showExtensionPaymentTypeError();
                     return false;
                 }
 
@@ -661,6 +687,7 @@
 
                 document.getElementById('approveRemarkInput').value = remarkValue;
                 document.getElementById('approveRecommendInput').value = recommendRadio.value;
+                document.getElementById('approveExtensionPaymentTypeInput').value = extensionPaymentTypeValue;
 
                 e.preventDefault();
                 confirmForwardModal.show();
@@ -807,10 +834,31 @@
             }
         }
 
+        function showExtensionPaymentTypeError() {
+            const extensionPaymentTypeError = document.getElementById('extensionPaymentTypeError');
+            if (extensionPaymentTypeError) {
+                extensionPaymentTypeError.style.display = 'block';
+            }
+            if (extensionPaymentTypeInput) {
+                extensionPaymentTypeInput.classList.add('is-invalid');
+            }
+        }
+
+        function clearExtensionPaymentTypeError() {
+            const extensionPaymentTypeError = document.getElementById('extensionPaymentTypeError');
+            if (extensionPaymentTypeError) {
+                extensionPaymentTypeError.style.display = 'none';
+            }
+            if (extensionPaymentTypeInput) {
+                extensionPaymentTypeInput.classList.remove('is-invalid');
+            }
+        }
+
         function clearAllErrors() {
             clearRemarkError();
             clearRecommendError();
             clearNotRecommendReasonError();
+            clearExtensionPaymentTypeError();
         }
 
         if (actionRemarkInput) {
@@ -819,6 +867,10 @@
 
         if (notRecommendReasonInput) {
             notRecommendReasonInput.addEventListener('input', clearNotRecommendReasonError);
+        }
+
+        if (extensionPaymentTypeInput) {
+            extensionPaymentTypeInput.addEventListener('change', clearExtensionPaymentTypeError);
         }
 
         @if (session('success'))

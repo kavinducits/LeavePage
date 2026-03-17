@@ -1140,6 +1140,7 @@ class MAController extends Controller
             'remark' => 'nullable|string|max:1000',
             'ma_recommend' => 'required|in:0,1',
             'ma_not_recommend_reason' => 'nullable|required_if:ma_recommend,0|string|max:1000',
+            'extension_payment_type' => 'required|integer|in:0,1',
         ]);
 
         $maUserId = self::MA_USER_ID;
@@ -1164,6 +1165,13 @@ class MAController extends Controller
         }
 
         // Update status to Processing HOD Academic Establishment/Registrar (status_id = 9)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
+            ->update([
+                'extension_payment_type' => $request->extension_payment_type,
+                'updated_at' => now(),
+            ]);
+
         DB::table('study_leave_extensions_approvals')
             ->where('study_leave_extension_id', $extension_id)
             ->update([
