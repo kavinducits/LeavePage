@@ -24,7 +24,33 @@
             transition: transform 0.3s ease;
         }
         .accordion-details-text {
-            font-size: 0.8rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        #detailsAccordion .accordion-button::after {
+            display: none;
+        }
+
+        #detailsAccordion .accordion-button,
+        #detailsAccordion .accordion-button:not(.collapsed) {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        #detailsAccordion .accordion-button i {
+            color: #ffffff;
+        }
+
+        .accordion-state-icon {
+            margin-left: auto;
+            transition: transform 0.2s ease;
+        }
+
+        .remarks-display {
+            background-color: #ffffff;
+            color: #212529;
+            border: 1px solid #dee2e6;
         }
     </style>
 </head>
@@ -123,6 +149,7 @@
                         data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
                         <i class="fas fa-info-circle me-2"></i>
                         <span class="accordion-details-text">More Details - Original Study Leave Application</span>
+                        <i id="detailsChevron" class="fas fa-chevron-down accordion-state-icon"></i>
                     </button>
                 </h2>
                 <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails"
@@ -154,13 +181,19 @@
         <div class="card-body">
             <div class="mb-3">
                 <label class="form-label fw-semibold">Decision</label>
-                <div>
-                    @if($progressReport->registrar_approval_status == 1)
-                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Approved</span>
-                    @else
-                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Approved</span>
-                    @endif
+                <div class="d-flex gap-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="registrar_decision_view" id="registrarYes" {{ $progressReport->registrar_approval_status == 1 ? 'checked' : '' }} disabled>
+                        <label class="form-check-label" for="registrarYes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="registrar_decision_view" id="registrarNo" {{ $progressReport->registrar_approval_status == 0 ? 'checked' : '' }} disabled>
+                        <label class="form-check-label" for="registrarNo">No</label>
+                    </div>
                 </div>
+                @if(!isset($progressReport->registrar_approval_status))
+                <div class="text-muted small mt-2">Not specified</div>
+                @endif
             </div>
             @if(!empty($progressReport->registrar_not_approve_reason))
             <div class="mb-3">
@@ -171,7 +204,7 @@
             @if(!empty($progressReport->registrar_remarks))
             <div class="mb-0">
                 <label class="form-label fw-semibold">Registrar Remarks</label>
-                <div class="alert alert-secondary mb-0"><div style="white-space: pre-wrap;">{{ $progressReport->registrar_remarks }}</div></div>
+                <div class="remarks-display rounded p-3 mb-0" style="white-space: pre-wrap;">{{ $progressReport->registrar_remarks }}</div>
             </div>
             @endif
         </div>
@@ -195,6 +228,27 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+    <script>
+        const collapseDetails = document.getElementById('collapseDetails');
+        const detailsChevron = document.getElementById('detailsChevron');
+
+        function updateDetailsChevron() {
+            if (!collapseDetails || !detailsChevron) {
+                return;
+            }
+
+            const isOpen = collapseDetails.classList.contains('show');
+            detailsChevron.classList.toggle('fa-chevron-up', isOpen);
+            detailsChevron.classList.toggle('fa-chevron-down', !isOpen);
+        }
+
+        if (collapseDetails && detailsChevron) {
+            updateDetailsChevron();
+            collapseDetails.addEventListener('shown.bs.collapse', updateDetailsChevron);
+            collapseDetails.addEventListener('hidden.bs.collapse', updateDetailsChevron);
+        }
+    </script>
 
 </body>
 

@@ -15,6 +15,37 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     @include('StudyLeave.study_leave_extension.partials.extension_summary_styles')
+    <style>
+        .accordion-details-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        #detailsAccordion .accordion-button::after {
+            display: none;
+        }
+
+        #detailsAccordion .accordion-button,
+        #detailsAccordion .accordion-button:not(.collapsed) {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        #detailsAccordion .accordion-button i {
+            color: #ffffff;
+        }
+
+        .accordion-state-icon {
+            margin-left: auto;
+            transition: transform 0.2s ease;
+        }
+
+        .remarks-display {
+            background-color: #ffffff;
+            color: #212529;
+            border: 1px solid #dee2e6;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -73,7 +104,8 @@
                                     data-bs-target="#collapseDetails" aria-expanded="false"
                                     aria-controls="collapseDetails">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    <span class="small">More Details - Original Study Leave Application</span>
+                                    <span class="accordion-details-text">More Details - Original Study Leave Application</span>
+                                    <i id="detailsChevron" class="fas fa-chevron-down accordion-state-icon"></i>
                                 </button>
                             </h2>
                             <div id="collapseDetails" class="accordion-collapse collapse"
@@ -105,13 +137,19 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Recommendation</label>
-                                <div>
-                                    @if($extension->acad_est_head_recommend == 1)
-                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
-                                    @else
-                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
-                                    @endif
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="acad_est_head_recommend_view" id="acadEstYes" {{ $extension->acad_est_head_recommend == 1 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="acadEstYes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="acad_est_head_recommend_view" id="acadEstNo" {{ $extension->acad_est_head_recommend == 0 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="acadEstNo">No</label>
+                                    </div>
                                 </div>
+                                @if(!isset($extension->acad_est_head_recommend))
+                                <div class="text-muted small mt-2">Not specified</div>
+                                @endif
                             </div>
                             @if($extension->acad_est_head_recommend == 0 && !empty($extension->acad_est_head_not_recommend_reason))
                             <div class="mb-3">
@@ -126,7 +164,7 @@
                             @if(!empty($extension->acad_est_head_remarks))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
-                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->acad_est_head_remarks }}</div>
+                                <div class="remarks-display rounded p-3 mb-0" style="white-space:pre-wrap">{{ $extension->acad_est_head_remarks }}</div>
                             </div>
                             @endif
                         </div>
@@ -141,13 +179,19 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Recommendation</label>
-                                <div>
-                                    @if($extension->hod_recommend == 1)
-                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
-                                    @else
-                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
-                                    @endif
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_recommend_view" id="hodYes" {{ $extension->hod_recommend == 1 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="hodYes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hod_recommend_view" id="hodNo" {{ $extension->hod_recommend == 0 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="hodNo">No</label>
+                                    </div>
                                 </div>
+                                @if(!isset($extension->hod_recommend))
+                                <div class="text-muted small mt-2">Not specified</div>
+                                @endif
                             </div>
                             @if($extension->hod_recommend == 0 && !empty($extension->hod_not_recommend_reason))
                             <div class="mb-3">
@@ -158,7 +202,7 @@
                             @if(!empty($extension->hod_remarks))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
-                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->hod_remarks }}</div>
+                                <div class="remarks-display rounded p-3 mb-0" style="white-space:pre-wrap">{{ $extension->hod_remarks }}</div>
                             </div>
                             @endif
                         </div>
@@ -173,13 +217,19 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Recommendation</label>
-                                <div>
-                                    @if($extension->dean_recommend == 1)
-                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
-                                    @else
-                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
-                                    @endif
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="dean_recommend_view" id="deanYes" {{ $extension->dean_recommend == 1 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="deanYes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="dean_recommend_view" id="deanNo" {{ $extension->dean_recommend == 0 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="deanNo">No</label>
+                                    </div>
                                 </div>
+                                @if(!isset($extension->dean_recommend))
+                                <div class="text-muted small mt-2">Not specified</div>
+                                @endif
                             </div>
                             @if($extension->dean_recommend == 0 && !empty($extension->dean_not_recommended_reason))
                             <div class="mb-3">
@@ -190,7 +240,7 @@
                             @if(!empty($extension->dean_remark))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
-                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->dean_remark }}</div>
+                                <div class="remarks-display rounded p-3 mb-0" style="white-space:pre-wrap">{{ $extension->dean_remark }}</div>
                             </div>
                             @endif
                         </div>
@@ -205,13 +255,19 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Recommendation</label>
-                                <div>
-                                    @if($extension->vc_recommend == 1)
-                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
-                                    @else
-                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
-                                    @endif
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="vc_recommend_view" id="vcYes" {{ $extension->vc_recommend == 1 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="vcYes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="vc_recommend_view" id="vcNo" {{ $extension->vc_recommend == 0 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="vcNo">No</label>
+                                    </div>
                                 </div>
+                                @if(!isset($extension->vc_recommend))
+                                <div class="text-muted small mt-2">Not specified</div>
+                                @endif
                             </div>
                             @if($extension->vc_recommend == 0 && !empty($extension->vc_not_recommend_reason))
                             <div class="mb-3">
@@ -222,7 +278,7 @@
                             @if(!empty($extension->vc_remarks))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
-                                <div class="alert alert-secondary mb-0" style="white-space:pre-wrap">{{ $extension->vc_remarks }}</div>
+                                <div class="remarks-display rounded p-3 mb-0" style="white-space:pre-wrap">{{ $extension->vc_remarks }}</div>
                             </div>
                             @endif
                         </div>
@@ -239,12 +295,17 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">MA Recommendation</label>
-                                <div>
-                                    @if($extension->ma_recommend == 1)
-                                        <span class="badge bg-success fs-6"><i class="fas fa-check-circle me-1"></i>Recommended</span>
-                                    @else
-                                        <span class="badge bg-danger fs-6"><i class="fas fa-times-circle me-1"></i>Not Recommended</span>
-                                    @endif
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ma_recommend_view" id="maRecommendViewYes"
+                                            {{ $extension->ma_recommend == 1 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="maRecommendViewYes">Yes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ma_recommend_view" id="maRecommendViewNo"
+                                            {{ $extension->ma_recommend == 0 ? 'checked' : '' }} disabled>
+                                        <label class="form-check-label" for="maRecommendViewNo">No</label>
+                                    </div>
                                 </div>
                             </div>
                             @if($extension->ma_recommend == 0 && !empty($extension->ma_not_recommend_reason))
@@ -260,9 +321,7 @@
                             @if(!empty($extension->ma_remarks))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">MA Remarks</label>
-                                <div class="alert alert-info mb-0">
-                                    <div style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div>
-                                </div>
+                                <div class="remarks-display rounded p-3 mb-0" style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div>
                             </div>
                             @endif
                         </div>
@@ -792,6 +851,25 @@
 
         if (extensionPaymentTypeInput) {
             extensionPaymentTypeInput.addEventListener('change', clearExtensionPaymentTypeError);
+        }
+
+        const collapseDetails = document.getElementById('collapseDetails');
+        const detailsChevron = document.getElementById('detailsChevron');
+
+        function updateDetailsChevron() {
+            if (!collapseDetails || !detailsChevron) {
+                return;
+            }
+
+            const isOpen = collapseDetails.classList.contains('show');
+            detailsChevron.classList.toggle('fa-chevron-up', isOpen);
+            detailsChevron.classList.toggle('fa-chevron-down', !isOpen);
+        }
+
+        if (collapseDetails && detailsChevron) {
+            updateDetailsChevron();
+            collapseDetails.addEventListener('shown.bs.collapse', updateDetailsChevron);
+            collapseDetails.addEventListener('hidden.bs.collapse', updateDetailsChevron);
         }
 
         @if (session('success'))
