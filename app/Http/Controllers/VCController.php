@@ -697,20 +697,8 @@ class VCController extends Controller
             return redirect()->route('vc.index')->with('error', 'Extension application not found.');
         }
 
-        // Prepare VC remarks
-        $vcRemarks = "VC Review:\n";
-        $vcRemarks .= "- Recommendation: " . ($request->vc_recommend == 1 ? 'Yes' : 'No') . "\n";
-        
-        if ($request->vc_recommend == 0 && $request->vc_not_recommend_reason) {
-            $vcRemarks .= "- Reason for Not Recommending: " . $request->vc_not_recommend_reason . "\n";
-        }
-        
-        if ($request->vc_remarks) {
-            $vcRemarks .= "- Additional Remarks: " . $request->vc_remarks . "\n";
-        }
-
-        $timestamp = Carbon::now()->format('Y-m-d H:i:s');
-        $vcRemarks .= "\n[VC Reviewed - " . $timestamp . "]";
+        // Prepare VC remarks - only record user-typed remark
+        $vcRemarks = $request->vc_remarks ?? '';
 
         // Update extension status to VC Checked (status_id = 8)
         //dd($request->all());
@@ -753,8 +741,7 @@ class VCController extends Controller
             return redirect()->route('vc.index')->with('error', 'Extension application not found.');
         }
 
-        $timestamp = Carbon::now()->format('Y-m-d H:i:s');
-        $returnRemark = "\n\n[VC Returned - " . $timestamp . "]\n" . $request->vc_remarks;
+        $returnRemark = $request->vc_remarks ?? '';
 
         
        

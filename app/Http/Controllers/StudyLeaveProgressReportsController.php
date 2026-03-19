@@ -315,13 +315,7 @@ class StudyLeaveProgressReportsController extends Controller
                 }
 
                 // Prepare the new remark
-                $timestamp_remark = now()->format('Y-m-d');
-                $newRemark = "\n\n[Resubmitted - " . $timestamp_remark . "]\n";
-                if ($request->notes) {
-                    $newRemark .= $request->notes;
-                } else {
-                    $newRemark .= "Document re-uploaded after corrections.";
-                }
+                $newRemark = $request->notes ?? 'Document re-uploaded after corrections.';
 
                 // Update progress report
                 $progressReport->document_path = $path;

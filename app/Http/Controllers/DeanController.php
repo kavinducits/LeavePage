@@ -752,20 +752,8 @@ class DeanController extends Controller
             return redirect()->route('dean.index')->with('error', 'Extension application not found.');
         }
 
-        // Prepare Dean remarks
-        $deanRemarks = "Dean Review:\n";
-        $deanRemarks .= "- Recommendation: " . ($request->dean_recommend == 1 ? 'Yes' : 'No') . "\n";
-        
-        if ($request->dean_recommend == 0 && $request->dean_not_recommend_reason) {
-            $deanRemarks .= "- Reason for Not Recommending: " . $request->dean_not_recommend_reason . "\n";
-        }
-        
-        if ($request->dean_remarks) {
-            $deanRemarks .= "- Additional Remarks: " . $request->dean_remarks . "\n";
-        }
-
-        $timestamp = now()->format('Y-m-d H:i:s');
-        $deanRemarks .= "\n[Dean Reviewed - " . $timestamp . "]";
+        // Prepare Dean remarks - only record user-typed remark
+        $deanRemarks = $request->dean_remarks ?? '';
 
         // Update extension status to Processing VC (status_id = 7)
         DB::table('study_leave_extensions_approvals')
@@ -809,8 +797,7 @@ class DeanController extends Controller
             return redirect()->route('dean.index')->with('error', 'Extension application not found.');
         }
 
-        $timestamp = now()->format('Y-m-d H:i:s');
-        $returnRemark = "\n\n[Dean Returned - " . $timestamp . "]\n" . $request->dean_remarks;
+        $returnRemark = $request->dean_remarks ?? '';
 
         // Update extension status to Returned (status_id = 3)
         DB::table('study_leave_extensions_approvals')

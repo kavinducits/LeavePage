@@ -210,11 +210,7 @@ class MAController extends Controller
             ->first();
 
         // Prepare new remark by appending to existing remarks
-        $newRemark = '';
-        if ($request->remark) {
-            $timestamp = now()->format('Y-m-d');
-            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
-        }
+        $newRemark = $request->remark ?? '';
 
         // Update status to Processing HOD (status_id = 5)
         DB::table('leave_details')
@@ -260,8 +256,7 @@ class MAController extends Controller
             ->first();
 
         // Prepare new remark by appending to existing remarks
-        $timestamp = now()->format('Y-m-d');
-        $newRemark = "\n\n[MA Return - " . $timestamp . "]\n" . $request->remark;
+        $newRemark = $request->remark ?? '';
 
         // Update status to Returned (form_status = 3, status_id = 2 for Rejected)
         DB::table('leave_details')
@@ -937,11 +932,7 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
 
-        $newRemark = '';
-        if ($request->remark) {
-            $timestamp = now()->format('Y-m-d');
-            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
-        }
+        $newRemark = $request->remark ?? '';
 
         // Update status to Processing HOD (status_id = 5)
         /*
@@ -995,8 +986,7 @@ class MAController extends Controller
         }
 
         // Prepare new remark by appending to existing remarks
-        $timestamp = now()->format('Y-m-d');
-        $newRemark = "\n\n[MA Return - " . $timestamp . "]\n" . $request->remark;
+        $newRemark = $request->remark ?? '';
 
         // Update status to Returned (status_id = 2 for Rejected)
         /*
@@ -1165,11 +1155,7 @@ class MAController extends Controller
         }
 
         // Prepare remark
-        $newRemark = '';
-        if ($request->remark) {
-            $timestamp = now()->format('Y-m-d');
-            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
-        }
+        $newRemark = $request->remark ?? '';
 
         // Update status to Processing HOD Academic Establishment/Registrar (status_id = 9)
         DB::table('study_leave_extensions')
@@ -1221,8 +1207,7 @@ class MAController extends Controller
         }
 
         // Prepare remark
-        $timestamp = now()->format('Y-m-d');
-        $newRemark = "\n\n[MA Return - " . $timestamp . "]\n" . $request->remark;
+        $newRemark = $request->remark ?? '';
 
         // Update status to Returned (status_id = 3)
         DB::table('study_leave_extensions_approvals')
@@ -1440,12 +1425,8 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave')->with('error', 'Progress report is not available for MA review.');
         }
 
-        // Prepare remarkh
-        $newRemark = '';
-        if ($request->remark) {
-            $timestamp = now()->format('Y-m-d');
-            $newRemark = "\n\n[MA Review - " . $timestamp . "]\n" . $request->remark;
-        }
+        // Prepare remark
+        $newRemark = $request->remark ?? '';
 
         // Update status to Processing HOD (status_id = 5)
         DB::table('study_leave_progress_reports')
@@ -1497,8 +1478,7 @@ class MAController extends Controller
         }
 
         // Prepare remark
-        $timestamp = now()->format('Y-m-d');
-        $newRemark = "\n\n[MA Returned - " . $timestamp . "]\n" . $request->remark;
+        $newRemark = $request->remark ?? '';
 
         // Update status to Returned (status_id = 3)
         DB::table('study_leave_progress_reports')

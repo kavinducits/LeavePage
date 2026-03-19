@@ -2,7 +2,7 @@
 
  <div class="card mt-4">
      <div class="card-header bg-primary text-white fw-semibold">
-         <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
+         <i class="fas fa-clipboard-check me-2"></i>Head Of Academic Establishment Review
      </div>
      <div class="card-body">
 

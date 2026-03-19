@@ -900,8 +900,7 @@ class HODController extends Controller
             return redirect()->route('hod.index')->with('error', 'Extension application not found.');
         }
 
-        $timestamp = now()->format('Y-m-d H:i:s');
-        $returnRemark = "\n\n[HOD Returned - " . $timestamp . "]\n" . $request->hod_remarks;
+        $returnRemark = $request->hod_remarks ?? '';
 
         // Update extension status to Returned (status_id = 3)
         DB::table('study_leave_extensions_approvals')

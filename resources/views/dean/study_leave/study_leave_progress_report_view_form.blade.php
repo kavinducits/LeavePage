@@ -99,16 +99,44 @@
             'documentRouteName' => 'ma.serveProgressReport',
         ])
 
+        <!-- Accordion for More Details -->
+        <div class="accordion mb-4" id="detailsAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingDetails">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span class="accordion-details-text">More Details - Original Study Leave Application</span>
+                        <i id="detailsChevron" class="fas fa-chevron-down accordion-state-icon"></i>
+                    </button>
+                </h2>
+                <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails"
+                    data-parent="#detailsAccordion">
+                    <div class="accordion-body">
+                        <form method="POST" class="my-4">
+                            @csrf
+                            <!-- Include study leave forms with readonly -->
+                            @php
+                                $draft_study_leave = $progressReport;
+                                $readonly = true;
+                            @endphp
+
+                            @include('StudyLeave.basic_info_form')
+                            @include('StudyLeave.details_form')
+                            @include('StudyLeave.working_covering_persons_form')
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Registrar Review Section (Disabled/Read-only for Dean) -->
         <div class="card mb-4">
-            <div class="card-header bg-secondary text-white fw-semibold">
-                <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation (For Information)
+            <div class="card-header bg-primary text-white fw-semibold">
+                <i class="fas fa-clipboard-check me-2"></i>Head Of Academic Establishment Review (For Information)
             </div>
             <div class="card-body bg-light">
-                <div class="alert alert-info mb-3">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Note:</strong> This section shows the Registrar's review. You cannot modify these fields.
-                </div>
+               
 
                 @if ($progressReport->registrar_approval_status)
                     <!-- Recommendation -->
@@ -169,7 +197,7 @@
         <!-- HOD Review Section -->
         @if(isset($progressReport->hod_remarks) || isset($progressReport->hod_approval_status))
         <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-secondary text-white fw-semibold">
+            <div class="card-header bg-primary text-white fw-semibold">
                 <i class="fas fa-user-tie me-2"></i> HOD Review
             </div>
             <div class="card-body">
@@ -246,41 +274,11 @@
             </div>
         @endif
 
-        <!-- Accordion for More Details -->
-        <div class="accordion mb-4" id="detailsAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingDetails">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <span class="accordion-details-text">More Details - Original Study Leave Application</span>
-                        <i id="detailsChevron" class="fas fa-chevron-down accordion-state-icon"></i>
-                    </button>
-                </h2>
-                <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails"
-                    data-parent="#detailsAccordion">
-                    <div class="accordion-body">
-                        <form method="POST" class="my-4">
-                            @csrf
-                            <!-- Include study leave forms with readonly -->
-                            @php
-                                $draft_study_leave = $progressReport;
-                                $readonly = true;
-                            @endphp
-
-                            @include('StudyLeave.basic_info_form')
-                            @include('StudyLeave.details_form')
-                            @include('StudyLeave.working_covering_persons_form')
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     @if(optional($progressReport)->dean_approval_status !== null)
     <div class="card mb-4">
-        <div class="card-header bg-dark text-white fw-semibold">
+        <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
         </div>
         <div class="card-body">

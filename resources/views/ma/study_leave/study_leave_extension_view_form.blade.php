@@ -131,8 +131,8 @@
                     <!-- Review Sections (shown whenever data exists) -->
                     @if(optional($extension)->acad_est_head_recommend !== null)
                     <div class="card mt-4 mb-4">
-                        <div class="card-header card-header-dark text-white fw-semibold">
-                            <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
+                        <div class="card-header bg-primary text-white fw-semibold">
+                            <i class="fas fa-clipboard-check me-2"></i>Head Of Academic Establishment Review
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
@@ -173,7 +173,7 @@
 
                     @if(optional($extension)->hod_recommend !== null)
                     <div class="card mt-4 mb-4">
-                        <div class="card-header card-header-dark text-white fw-semibold">
+                        <div class="card-header bg-primary text-white fw-semibold">
                             <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
                         </div>
                         <div class="card-body">
@@ -211,7 +211,7 @@
 
                     @if(optional($extension)->dean_recommend !== null)
                     <div class="card mt-4 mb-4">
-                        <div class="card-header card-header-dark text-white fw-semibold">
+                        <div class="card-header bg-primary text-white fw-semibold">
                             <i class="fas fa-clipboard-check me-2"></i>Dean Review & Recommendation
                         </div>
                         <div class="card-body">
@@ -249,7 +249,7 @@
 
                     @if(optional($extension)->vc_recommend !== null)
                     <div class="card mt-4 mb-4">
-                        <div class="card-header card-header-dark text-white fw-semibold">
+                        <div class="card-header bg-primary text-white fw-semibold">
                             <i class="fas fa-clipboard-check me-2"></i>VC Review & Recommendation
                         </div>
                         <div class="card-body">
@@ -289,7 +289,7 @@
                     @if($extension->ma_recommend !== null)
                     {{-- MA has already submitted their review — show readonly card --}}
                     <div class="card mb-4">
-                        <div class="card-header card-header-dark text-white fw-semibold">
+                        <div class="card-header bg-primary text-white fw-semibold">
                             <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
                         </div>
                         <div class="card-body">

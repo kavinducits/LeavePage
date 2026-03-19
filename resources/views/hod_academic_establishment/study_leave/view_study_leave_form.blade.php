@@ -1,8 +1,8 @@
 @extends('layouts.dashborad')
-@section('title', 'HOD Academic Establishment Dashboard - Leave Management')
+@section('title', 'Head Of Academic Establishment Review - Leave Management')
 @section('brand-logo')
     <a href="{{ route('hod.leave.index') }}" class="brand-link">
-        <span class="brand-text font-weight-light">HOD Academic Establishment Dashboard</span>
+        <span class="brand-text font-weight-light">Head Of Academic Establishment Review</span>
     </a>
 @endsection
 @section('sidebar')

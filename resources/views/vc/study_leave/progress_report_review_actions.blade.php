@@ -38,7 +38,7 @@
         <div class="alert alert-info">
             <strong><i class="fas fa-info-circle me-2"></i>Note:</strong>
             <div class="mt-2">
-                Approving this progress report will mark it as <strong>Final Approved</strong>.
+                Approving this progress report will mark it as <strong>VC Checked</strong> and send it to MA for finalization.
             </div>
         </div>
 
@@ -106,7 +106,7 @@
         document.getElementById('remarkInput').value = remarkValue;
 
         // Show confirm modal
-        const action = approvalDecision.value === 'approved' ? 'give final approval to' : 'return to Dean';
+        const action = approvalDecision.value === 'approved' ? 'mark as VC Checked' : 'return to Dean';
         document.getElementById('confirmSubmitMessage').textContent = `Are you sure you want to ${action} this progress report?`;
         const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
         confirmModal.show();

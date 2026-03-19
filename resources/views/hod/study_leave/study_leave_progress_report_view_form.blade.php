@@ -175,14 +175,11 @@
 
     <!-- Registrar Review Section (Disabled/Read-only for HOD) -->
     <div class="card mb-4">
-        <div class="card-header bg-secondary text-white fw-semibold">
-            <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation (For Information)
+        <div class="card-header bg-primary text-white fw-semibold">
+            <i class="fas fa-clipboard-check me-2"></i>Head Of Academic Establishment Review (For Information)
         </div>
         <div class="card-body bg-light">
-            <div class="alert alert-info mb-3">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Note:</strong> This section shows the Registrar's review. You cannot modify these fields.
-            </div>
+           
 
             @if ($progressReport->registrar_approval_status)
                 <!-- Recommendation -->
@@ -242,7 +239,7 @@
 
     @if(optional($progressReport)->hod_approval_status !== null)
     <div class="card mb-4">
-        <div class="card-header bg-dark text-white fw-semibold">
+        <div class="card-header bg-primary text-white fw-semibold">
             <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
         </div>
         <div class="card-body">

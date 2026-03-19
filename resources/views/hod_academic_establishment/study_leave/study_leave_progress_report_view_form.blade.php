@@ -175,8 +175,8 @@
 
     @if(optional($progressReport)->registrar_approval_status !== null)
     <div class="card mb-4">
-        <div class="card-header bg-secondary text-white fw-semibold">
-            <i class="fas fa-clipboard-check me-2"></i>Registrar Review & Recommendation
+        <div class="card-header bg-primary text-white fw-semibold">
+            <i class="fas fa-clipboard-check me-2"></i>Head Of Academic Establishment Review
         </div>
         <div class="card-body">
             <div class="mb-3">

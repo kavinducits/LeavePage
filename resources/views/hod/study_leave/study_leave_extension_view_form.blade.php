@@ -68,10 +68,36 @@
         @endif
 
         @include('StudyLeave.study_leave_extension.partials.extension_summary_card', [
-            'headerClass' => 'card-header-dark text-white fw-semibold',
+            'headerClass' => 'bg-primary text-white fw-semibold',
             'durationDays' => $durationDays,
             'durationMonths' => $durationMonths,
         ])
+
+        <!-- Accordion for More Details -->
+        <div class="accordion mb-4" id="detailsAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingDetails">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span class="accordion-details-text">More Details - Original Study Leave Application</span>
+                        <i id="detailsChevron" class="fas fa-chevron-down accordion-state-icon"></i>
+                    </button>
+                </h2>
+                <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails">
+                    <div class="accordion-body">
+                        <!-- Include study leave forms with readonly -->
+                        @php
+                            $readonly = true;
+                        @endphp
+
+                        @include('StudyLeave.basic_info_form')
+                        @include('StudyLeave.details_form')
+                        @include('StudyLeave.working_covering_persons_form')
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- MA Review & Recommendation (Read-only) -->
         <div class="card mb-4">
@@ -114,7 +140,7 @@
 
         <!-- HOD Academic Establishment Review & Recommendation (Read-only) -->
         <div class="card mb-4">
-            <div class="card-header bg-secondary text-white fw-semibold">
+            <div class="card-header bg-primary text-white fw-semibold">
                 <i class="fas fa-clipboard-check me-2"></i>HOD Academic Establishment Review & Recommendation
             </div>
             <div class="card-body">
@@ -151,35 +177,9 @@
             </div>
         </div>
 
-        <!-- Accordion for More Details -->
-        <div class="accordion mb-4" id="detailsAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingDetails">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseDetails" aria-expanded="false" aria-controls="collapseDetails">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <span class="accordion-details-text">More Details - Original Study Leave Application</span>
-                        <i id="detailsChevron" class="fas fa-chevron-down accordion-state-icon"></i>
-                    </button>
-                </h2>
-                <div id="collapseDetails" class="accordion-collapse collapse" aria-labelledby="headingDetails">
-                    <div class="accordion-body">
-                        <!-- Include study leave forms with readonly -->
-                        @php
-                            $readonly = true;
-                        @endphp
-
-                        @include('StudyLeave.basic_info_form')
-                        @include('StudyLeave.details_form')
-                        @include('StudyLeave.working_covering_persons_form')
-                    </div>
-                </div>
-            </div>
-        </div>
-
         @if(optional($extension)->extension_hod_recommend !== null)
         <div class="card mb-4">
-            <div class="card-header card-header-dark text-white fw-semibold">
+            <div class="card-header bg-primary text-white fw-semibold">
                 <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
             </div>
             <div class="card-body">
@@ -220,7 +220,7 @@
             @csrf
 
             <div class="card mt-4">
-                <div class="card-header card-header-dark text-white fw-semibold">
+                <div class="card-header bg-primary text-white fw-semibold">
                     <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation
                 </div>
                 <div class="card-body">
