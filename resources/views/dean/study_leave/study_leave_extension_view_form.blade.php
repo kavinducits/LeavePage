@@ -91,24 +91,6 @@
             <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
         </div>
         <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label fw-semibold">MA Recommendation</label>
-                <div class="d-flex gap-4">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ma_recommend_view" id="maRecommendViewYes"
-                            {{ isset($extension->ma_recommend) && $extension->ma_recommend == 1 ? 'checked' : '' }} disabled>
-                        <label class="form-check-label" for="maRecommendViewYes">Yes</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="ma_recommend_view" id="maRecommendViewNo"
-                            {{ isset($extension->ma_recommend) && $extension->ma_recommend == 0 ? 'checked' : '' }} disabled>
-                        <label class="form-check-label" for="maRecommendViewNo">No</label>
-                    </div>
-                </div>
-                @if(!isset($extension->ma_recommend))
-                    <div class="text-muted small mt-2">Not specified</div>
-                @endif
-            </div>
             @if(isset($extension->ma_recommend) && $extension->ma_recommend == 0 && !empty($extension->ma_not_recommend_reason))
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Reason for Not Recommending</label>
