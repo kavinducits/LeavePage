@@ -247,6 +247,7 @@ Route::middleware('checklogin')->group(function () {
 Route::get('/dashboard', [MAController::class, 'dashboard'])->name('ma.dashboard');
 Route::get('/dashboard/vc-approved', [MAController::class, 'dashboardVcApproved'])->name('ma.dashboard.vcapproved');
 Route::get('/dashboard/status', [MAController::class, 'statusPage'])->name('ma.status');
+Route::get('/dashboard/study-leave-submitted', [MAController::class, 'studyLeaveSubmittedPage'])->name('ma.studyleave.submitted');
 Route::get('/dashboard/study-leave', [MAController::class, 'studyLeavePage'])->name('ma.studyleave');
 Route::get('/dashboard/study-leave-status', [MAController::class, 'studyLeaveStatusPage'])->name('ma.studyleavestatus');
 Route::get('/dashboard/study-leave-accepted', [MAController::class, 'studyLeaveAccepted'])->name('ma.studyleave.accepted');

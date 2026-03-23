@@ -486,6 +486,96 @@ class MAController extends Controller
         return $this->show($id);
     }
 
+    public function studyLeaveSubmittedPage(Request $request)
+    {
+        $maUserId = self::MA_USER_ID;
+        
+        // Get search and sort parameters
+        $search = $request->get('search');
+        $sortBy = $request->get('sort_by', 'finalized_date');
+        $sortOrder = $request->get('sort_order', 'desc');
+        
+        // Build base query - only newly submitted applications (status_id = 4 or null)
+        $query = DB::table('study_leaves')
+            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
+            ->leftJoin('statuses', 'statuses.stat_id', '=', 'study_leave_approvals.status_id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->where('study_leaves.is_draft', false) // Only non-draft applications
+            ->where(function($q) {
+                // Only newly submitted: status_id = 4 (Processing MA) or no approval record yet (null)
+                $q->where('study_leave_approvals.status_id', 4)
+                  ->orWhereNull('study_leave_approvals.id');
+            });
+        
+        // Apply search filter if provided
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('study_leaves.reference_no', 'LIKE', "%{$search}%")
+                  ->orWhere('employees.employee_no', 'LIKE', "%{$search}%")
+                  ->orWhere('employees.initials', 'LIKE', "%{$search}%")
+                  ->orWhere('employees.last_name', 'LIKE', "%{$search}%")
+                  ->orWhere('departments.department_name', 'LIKE', "%{$search}%")
+                  ->orWhere('faculties.faculty_name', 'LIKE', "%{$search}%")
+                  ->orWhere(DB::raw("COALESCE(statuses.status, 'Pending')"), 'LIKE', "%{$search}%");
+            });
+        }
+        
+        // Apply sorting
+        $validSortColumns = [
+            'applied_date' => 'study_leaves.created_at',
+            'finalized_date' => 'study_leave_approvals.ma_finalized_date',
+            'reference_no' => 'study_leaves.reference_no',
+            'empno' => 'employees.employee_no',
+            'name' => 'employees.last_name',
+            'department' => 'departments.department_name',
+            'faculty' => 'faculties.faculty_name',
+            'status' => DB::raw("COALESCE(statuses.status, 'Pending')")
+        ];
+
+        if (array_key_exists($sortBy, $validSortColumns)) {
+            $query->orderBy($validSortColumns[$sortBy], 'desc');
+        } else {
+            $query->orderByDesc('study_leave_approvals.ma_finalized_date');
+        }
+        
+        $submittedApplications = $query->select(
+                'study_leaves.id as id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leaves.created_at as applied_date',
+                'study_leave_approvals.status_id as approval_status_id',
+                DB::raw("COALESCE(statuses.status, 'Pending') as status")
+            )
+            ->get();
+
+        // Calculate statistics
+        $allApplications = DB::table('study_leaves')
+            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
+            ->where('employees.assign_ma_user_id', $maUserId)
+            ->where('study_leaves.is_draft', false)
+            ->select('study_leave_approvals.status_id', 'study_leaves.created_at')
+            ->get();
+
+        $statistics = [
+            'total' => $allApplications->count(),
+            'submitted' => $allApplications->where('status_id', 4)->count() + $allApplications->whereNull('status_id')->count(),
+            'in_review' => $allApplications->count(),
+            'this_month' => $allApplications->where('created_at', '>=', now()->startOfMonth())->count()
+        ];
+
+        $applications = $submittedApplications;
+
+        return view('ma.studyLeave', compact('applications', 'search', 'sortBy', 'sortOrder', 'statistics'));
+    }
+    
     public function studyLeavePage(Request $request)
     {
         $maUserId = self::MA_USER_ID;
@@ -506,10 +596,11 @@ class MAController extends Controller
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->where('study_leaves.is_draft', false) // Only non-draft applications
             ->where(function($q) {
-            $q->where('study_leave_approvals.status_id', 4) // Processing MA (status_id = 4)
-              ->orWhere('study_leave_approvals.status_id', 8) // VC Checked - awaiting council approval
-              ->orWhereNotNull('study_leave_approvals.ma_empno') // Or MA has processed it
-              ->orWhereNull('study_leave_approvals.id'); // Or no approval record yet (newly submitted)
+                $q->where('study_leave_approvals.status_id', '>=', 5) // Status 5-9 (HOD, Dean, VC, Registrar, etc)
+                  ->orWhere(function($q2) {
+                      $q2->whereNotNull('study_leave_approvals.ma_empno')
+                        ->where('study_leave_approvals.status_id', '!=', 4);
+                  });
             })
             ->whereNotIn('study_leave_approvals.status_id', [1, 2]); // Exclude final applications: approved and rejected
         
@@ -566,14 +657,20 @@ class MAController extends Controller
             ->select('study_leave_approvals.status_id', 'study_leaves.created_at')
             ->get();
 
+        // Separate submitted applications from all applications
+        $submittedApplications = $studyLeaveApplications->filter(function($app) {
+            return $app->approval_status_id == 4 || is_null($app->approval_status_id);
+        });
+
         $statistics = [
             'total' => $allApplications->count(),
-            'pending' => $allApplications->where('status_id', 4)->count() + $allApplications->whereNull('status_id')->count(),
-            'reviewed' => $allApplications->whereNotNull('status_id')->where('status_id', '>', 4)->count(),
+            'in_review' => $studyLeaveApplications->count(),
             'this_month' => $allApplications->where('created_at', '>=', now()->startOfMonth())->count()
         ];
 
-        return view('ma.studyLeave', compact('studyLeaveApplications', 'search', 'sortBy', 'sortOrder', 'statistics'));
+        $applications = $studyLeaveApplications;
+
+        return view('ma.studyLeave', compact('applications', 'search', 'sortBy', 'sortOrder', 'statistics'));
     }
     
     public function showStudyLeaveExtensionsPage()

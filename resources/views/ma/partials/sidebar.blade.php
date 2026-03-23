@@ -39,6 +39,12 @@
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
+                        <a href="{{ route('ma.studyleave.submitted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.submitted') ? ' active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                            <p>Submitted</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('ma.studyleave') }}" class="nav-link{{ request()->routeIs('ma.studyleave') ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>In Review</p>

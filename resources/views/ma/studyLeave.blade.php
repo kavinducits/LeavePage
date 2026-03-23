@@ -97,13 +97,21 @@
                             <div class="card-header bg-primary text-white">
                                 <h3 class="card-title mb-0">
                                     <i class="fas fa-graduation-cap mr-2"></i>
-                                    Study Leave Applications
-                                    <span class="badge badge-light ml-2">{{ $statistics['pending'] ?? 0 }}</span>
+                                    @if(request()->routeIs('ma.studyleave.submitted'))
+                                        Submitted Study Leave Applications
+                                    @else
+                                        Study Leave Applications
+                                    @endif
+                                    @if(isset($statistics['submitted']))
+                                        <span class="badge badge-light ml-2">{{ $statistics['submitted'] ?? 0 }}</span>
+                                    @else
+                                        <span class="badge badge-light ml-2">{{ $statistics['in_review'] ?? 0 }}</span>
+                                    @endif
                                 </h3>
                             </div>
 
                             <div class="card-body p-0">
-                                @if ($studyLeaveApplications->count() > 0)
+                                @if ($applications && $applications->count() > 0)
                                     <div class="table-responsive">
                                         <table class="table table-hover mb-0">
                                             <thead class="table-light">
@@ -119,7 +127,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($studyLeaveApplications as $application)
+                                                @foreach ($applications as $application)
                                                     <tr>
                                                         <td class="px-3">
                                                             <span
@@ -161,17 +169,22 @@
                                         <div class="text-muted mb-3">
                                             <i class="fas fa-inbox fa-3x"></i>
                                         </div>
-                                        <h5 class="text-muted">No Applications Pending</h5>
-                                        <p class="text-muted">There are no applications currently waiting for review.</p>
+                                        @if(request()->routeIs('ma.studyleave.submitted'))
+                                            <h5 class="text-muted">No Submitted Applications</h5>
+                                            <p class="text-muted">There are no applications currently submitted for review.</p>
+                                        @else
+                                            <h5 class="text-muted">No Applications In Review</h5>
+                                            <p class="text-muted">There are no applications currently in review.</p>
+                                        @endif
                                     </div>
                                 @endif
                             </div>
                         </div>
 
-                        @if ($studyLeaveApplications->count() > 0)
+                        @if ($applications->count() > 0)
                             <div class="mt-3 text-muted text-center">
                                 <small>
-                                    <i class="fas fa-list"></i> Total Applications: {{ $studyLeaveApplications->count() }}
+                                    <i class="fas fa-list"></i> Total Applications: {{ $applications->count() }}
                                 </small>
                             </div>
                         @endif
