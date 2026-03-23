@@ -353,31 +353,6 @@
                             <i class="fas fa-clipboard-check me-2"></i>MA Review & Recommendation
                         </div>
                         <div class="card-body">
-                            <!-- Recommendation Radio Buttons -->
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold">
-                                    Extension is recommended
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ma_recommend" id="maRecommendYes"
-                                        value="1" required>
-                                    <label class="form-check-label" for="maRecommendYes">
-                                        Yes
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="ma_recommend" id="maRecommendNo"
-                                        value="0" required>
-                                    <label class="form-check-label" for="maRecommendNo">
-                                        No
-                                    </label>
-                                </div>
-                                <div id="recommendError" class="form-text text-danger" style="display: none;">
-                                    Please select a recommendation.
-                                </div>
-                            </div>
-
                             <div class="mb-4">
                                 <label for="ma_extension_payment_type" class="form-label fw-semibold">
                                     Extension Payment Type
@@ -390,19 +365,6 @@
                                 </select>
                                 <div id="extensionPaymentTypeError" class="form-text text-danger" style="display: none;">
                                     Please select an extension payment type.
-                                </div>
-                            </div>
-
-                            <!-- Not Recommend Reason (shown when No is selected) -->
-                            <div class="mb-4" id="maNotRecommendReasonDiv" style="display: none;">
-                                <label for="ma_not_recommend_reason" class="form-label fw-semibold">
-                                    If not recommended, please give reasons
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <textarea class="form-control" id="ma_not_recommend_reason" name="ma_not_recommend_reason" rows="4"
-                                    placeholder="Please provide detailed reasons for not recommending this extension"></textarea>
-                                <div id="notRecommendReasonError" class="form-text text-danger" style="display: none;">
-                                    Please provide reasons for not recommending.
                                 </div>
                             </div>
 
@@ -609,25 +571,6 @@
         const notRecommendReasonInput = document.getElementById('ma_not_recommend_reason');
         const extensionPaymentTypeInput = document.getElementById('ma_extension_payment_type');
 
-        // Show/hide not recommend reason field based on radio selection
-        document.querySelectorAll('input[name="ma_recommend"]').forEach(function(radio) {
-            radio.addEventListener('change', function() {
-                const notRecommendDiv = document.getElementById('maNotRecommendReasonDiv');
-                if (!notRecommendDiv || !notRecommendReasonInput) {
-                    return;
-                }
-
-                if (this.value === '0') {
-                    notRecommendDiv.style.display = 'block';
-                } else {
-                    notRecommendDiv.style.display = 'none';
-                    notRecommendReasonInput.value = '';
-                    clearNotRecommendReasonError();
-                }
-                clearRecommendError();
-            });
-        });
-
         // Forward form
         const forwardModalElement = document.getElementById('confirmForwardModal');
         const confirmForwardModal = forwardModalElement ? new bootstrap.Modal(forwardModalElement) : null;
@@ -638,16 +581,9 @@
                 if (forwardConfirmed) { return; }
 
                 const remarkValue = actionRemarkInput ? actionRemarkInput.value.trim() : '';
-                const recommendRadio = document.querySelector('input[name="ma_recommend"]:checked');
                 const extensionPaymentTypeValue = extensionPaymentTypeInput ? extensionPaymentTypeInput.value : '';
 
                 clearAllErrors();
-
-                if (!recommendRadio) {
-                    e.preventDefault();
-                    showRecommendError();
-                    return false;
-                }
 
                 if (!extensionPaymentTypeValue) {
                     e.preventDefault();
@@ -655,18 +591,9 @@
                     return false;
                 }
 
-                if (recommendRadio.value === '0') {
-                    const notRecommendReason = notRecommendReasonInput ? notRecommendReasonInput.value.trim() : '';
-                    if (notRecommendReason === '') {
-                        e.preventDefault();
-                        showNotRecommendReasonError();
-                        return false;
-                    }
-                    document.getElementById('approveNotRecommendReasonInput').value = notRecommendReason;
-                }
-
                 document.getElementById('approveRemarkInput').value = remarkValue;
-                document.getElementById('approveRecommendInput').value = recommendRadio.value;
+                document.getElementById('approveRecommendInput').value = '1';
+                document.getElementById('approveNotRecommendReasonInput').value = '';
                 document.getElementById('approveExtensionPaymentTypeInput').value = extensionPaymentTypeValue;
 
                 e.preventDefault();
