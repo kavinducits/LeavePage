@@ -680,15 +680,11 @@ class MAController extends Controller
         $extensionApplications = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions_approvals.study_leave_extension_id', '=', 'study_leave_extensions.id')
+            ->leftJoin('study_leave_extensions_approvals', 'study_leave_extensions_approvals.study_leave_extension_id', '=', 'study_leave_extensions.id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
-            ->where(function($query) {
-                $query->where('statuses.status', 'Processing MA')
-                      ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
-            })
-            ->whereNotIn('statuses.stat_id', [1, 2]) // Exclude final states: approved and rejected
+            ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2, 4]) // Exclude finalized and submitted states
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -702,7 +698,44 @@ class MAController extends Controller
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions.created_at as extension_applied_date',
+                'study_leave_extensions_approvals.status_id as approval_status_id',
                 'statuses.status as status'
+            )
+            ->get();
+
+        return view('ma.showStudyLeaveExtensions', compact('extensionApplications'));
+    }
+
+    public function showStudyLeaveExtensionsSubmittedPage()
+    {
+        $maUserId = self::MA_USER_ID;
+
+        $extensionApplications = DB::table('study_leave_extensions')
+            ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('study_leave_extensions_approvals', 'study_leave_extensions_approvals.study_leave_extension_id', '=', 'study_leave_extensions.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->where(function ($query) {
+                $query->where('study_leave_extensions_approvals.status_id', 4)
+                      ->orWhereNull('study_leave_extensions_approvals.status_id');
+            })
+            ->select(
+                'study_leave_extensions.id as extension_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_extensions.old_end_date',
+                'study_leave_extensions.new_end_date',
+                'study_leave_extensions.reason_for_extension',
+                'study_leave_extensions.created_at as extension_applied_date',
+                'study_leave_extensions_approvals.status_id as approval_status_id',
+                DB::raw("COALESCE(statuses.status, 'Pending') as status")
             )
             ->get();
 
@@ -716,17 +749,46 @@ class MAController extends Controller
 
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
+            ->leftJoin('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
-            ->whereNotIn('statuses.stat_id', [1, 2]) // Exclude final states: approved and rejected
-            ->where(function($query) {
-                $query->where('statuses.status', 'Processing MA')
-                      ->orWhere('statuses.status', 'Editing') // Include reports returned to user
-                      ->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
+            ->whereNotIn('study_leave_progress_reports.status_id', [1, 2, 4]) // Exclude finalized and submitted states
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leaves.id as study_leave_id',
+                'study_leaves.reference_no as reference_no',
+                'employees.employee_no as empno',
+                DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
+                'departments.department_name as department',
+                'faculties.faculty_name as faculty',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.due_date',
+                'study_leave_progress_reports.status_id as approval_status_id',
+                'statuses.status as status'
+            )
+            ->get();
+
+        return view('ma.showStudyLeaveProgressReport', compact('progressReportApplications'));
+    }
+
+    public function studyLeaveProgressReportsSubmittedPage()
+    {
+        $maUserId = self::MA_USER_ID;
+
+        $progressReportApplications = DB::table('study_leave_progress_reports')
+            ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
+            ->leftJoin('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
+            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
+            ->where(function ($query) {
+                $query->where('study_leave_progress_reports.status_id', 4)
+                      ->orWhereNull('study_leave_progress_reports.status_id');
             })
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
@@ -738,7 +800,8 @@ class MAController extends Controller
                 'faculties.faculty_name as faculty',
                 'study_leave_progress_reports.submitted_date',
                 'study_leave_progress_reports.due_date',
-                'statuses.status as status'
+                'study_leave_progress_reports.status_id as approval_status_id',
+                DB::raw("COALESCE(statuses.status, 'Pending') as status")
             )
             ->get();
 

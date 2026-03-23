@@ -77,7 +77,7 @@
                             <h2 class="mb-0 fw-bold">Extension Request Review</h2>
                             <p class="text-muted mb-0">Reference No: {{ $extension->reference_no }}</p>
                         </div>
-                        <a href="{{ request()->get('from') == 'accepted' ? route('ma.studyleave.extensions.accepted') : route('ma.studyleave.extensions') }}" class="btn btn-outline-secondary">
+                        <a href="{{ request()->get('from') == 'accepted' ? route('ma.studyleave.extensions.accepted') : (request()->get('from') == 'submitted' ? route('ma.studyleave.extensions.submitted') : route('ma.studyleave.extensions')) }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>

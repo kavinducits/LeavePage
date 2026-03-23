@@ -183,7 +183,7 @@
                             <h2 class="mb-0 fw-bold">Progress Report Review</h2>
                             <p class="text-muted mb-0">Reference No: {{ $progressReport->reference_no }}</p>
                         </div>
-                        <a href="{{ request()->get('from') == 'accepted' ? route('ma.studyleave.progress.accepted') : route('ma.studyleave.progress') }}" class="btn btn-outline-secondary">
+                        <a href="{{ request()->get('from') == 'accepted' ? route('ma.studyleave.progress.accepted') : (request()->get('from') == 'submitted' ? route('ma.studyleave.progress.submitted') : route('ma.studyleave.progress')) }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>Back
                         </a>
                     </div>

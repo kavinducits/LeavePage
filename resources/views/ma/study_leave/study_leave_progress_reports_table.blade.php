@@ -1,13 +1,16 @@
 <div class="container py-4">
+    @php
+        $isSubmittedView = request()->routeIs('ma.studyleave.progress.submitted');
+    @endphp
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold">Pending Study Leave Progress Reports</h2>
-        <div class="text-muted">Progress Reports Pending Review</div>
+        <h2 class="mb-0 fw-bold">{{ $isSubmittedView ? 'Submitted Study Leave Progress Reports' : 'Study Leave Progress Reports' }}</h2>
+        <div class="text-muted">{{ $isSubmittedView ? 'New Progress Reports' : 'Progress Reports In Review' }}</div>
     </div>
 
     <div class="card">
         <div class="card-header bg-primary text-white fw-semibold">
-            <i class="fas fa-file-alt me-2"></i>Submitted Progress Reports
-            <span class="badge badge-light ml-2">{{ isset($progressReportApplications) ? $progressReportApplications->where('status', 'Processing MA')->count() : 0 }}</span>
+            <i class="fas fa-file-alt me-2"></i>{{ $isSubmittedView ? ' Submitted Progress Reports' : ' Progress Reports In Review' }}
+            <span class="badge badge-light ml-2">{{ isset($progressReportApplications) ? $progressReportApplications->count() : 0 }}</span>
             <div class="card-tools float-right">
                
             </div>
@@ -67,7 +70,7 @@
                                         <span class="badge {{ $statusBadge }}">{{ $statusText }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ route('ma.show.studyleave.progressreport', $application->progress_report_id) }}" 
+                                        <a href="{{ route('ma.show.studyleave.progressreport', ['progress_report_id' => $application->progress_report_id, 'from' => request()->routeIs('ma.studyleave.progress.submitted') ? 'submitted' : 'in_review']) }}" 
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
@@ -82,8 +85,13 @@
                     <div class="text-muted mb-3">
                         <i class="fas fa-clipboard-check fa-3x"></i>
                     </div>
-                    <h5 class="text-muted">No Progress Reports Pending</h5>
-                    <p class="text-muted">There are no progress reports currently waiting for review.</p>
+                    @if($isSubmittedView)
+                        <h5 class="text-muted">No Submitted Progress Reports</h5>
+                        <p class="text-muted">There are no newly submitted progress reports.</p>
+                    @else
+                        <h5 class="text-muted">No Progress Reports In Review</h5>
+                        <p class="text-muted">There are no progress reports currently in review.</p>
+                    @endif
                 </div>
             @endif
         </div>

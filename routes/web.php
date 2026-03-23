@@ -26,8 +26,10 @@ Route::get('/leaves/{id}', [LoginController::class, 'loginById'])->name('login.b
 Route::get('/MApage', [MAController::class, 'index'])->name('ma.index');
 Route::get('/MAPage', [MAController::class, 'index'])->name('ma.index.alt'); // Alternative route
 Route::get('/MApage/studyLeaveExtensions', [MAController::class, 'showStudyLeaveExtensionsPage'])->name('ma.studyleave.extensions');
+Route::get('/MApage/studyLeaveExtensions/submitted', [MAController::class, 'showStudyLeaveExtensionsSubmittedPage'])->name('ma.studyleave.extensions.submitted');
 Route::get('/MApage/studyLeaveExtensions/accepted', [MAController::class, 'showStudyLeaveExtensionsAcceptedPage'])->name('ma.studyleave.extensions.accepted');
 Route::get('/MApage/studyLeaveProgress', [MAController::class, 'studyLeaveProgressReportsPage'])->name('ma.studyleave.progress');
+Route::get('/MApage/studyLeaveProgress/submitted', [MAController::class, 'studyLeaveProgressReportsSubmittedPage'])->name('ma.studyleave.progress.submitted');
 Route::get('/MApage/studyLeaveProgress/accepted', [MAController::class, 'studyLeaveProgressReportsAcceptedPage'])->name('ma.studyleave.progress.accepted');
 Route::POST('/MApage/studyLeave/view/{id}/return', [MAController::class, 'returnStudyLeave'])->name('ma.studyleave.return');
 Route::POST('/MApage/studyLeave/view/{id}/council-approve', [MAController::class, 'approveWithCouncil'])->name('ma.studyleave.council.approve');

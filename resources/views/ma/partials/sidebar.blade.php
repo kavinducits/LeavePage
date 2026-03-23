@@ -68,7 +68,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.extensions') || (request()->routeIs('ma.show.extension') && request()->get('from') != 'accepted')) ? ' active' : '' }}">
+                        <a href="{{ route('ma.studyleave.extensions.submitted') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.extensions.submitted') || (request()->routeIs('ma.show.extension') && request()->get('from') == 'submitted')) ? ' active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                            <p>Submitted</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('ma.studyleave.extensions') }}" class="nav-link{{ (request()->routeIs('ma.studyleave.extensions') || (request()->routeIs('ma.show.extension') && (request()->get('from') == 'in_review' || request()->get('from') == null))) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>In Review</p>
                         </a>
@@ -91,7 +97,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress') || (request()->routeIs('ma.show.studyleave.progressreport') && request()->get('from') != 'accepted') ? ' active' : '' }}">
+                        <a href="{{ route('ma.studyleave.progress.submitted') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress.submitted') || (request()->routeIs('ma.show.studyleave.progressreport') && request()->get('from') == 'submitted') ? ' active' : '' }}">
+                            <i class="nav-icon bi bi-circle"></i>
+                            <p>Submitted</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('ma.studyleave.progress') }}" class="nav-link{{ request()->routeIs('ma.studyleave.progress') || (request()->routeIs('ma.show.studyleave.progressreport') && (request()->get('from') == 'in_review' || request()->get('from') == null)) ? ' active' : '' }}">
                             <i class="nav-icon bi bi-circle"></i>
                             <p>In Review</p>
                         </a>
