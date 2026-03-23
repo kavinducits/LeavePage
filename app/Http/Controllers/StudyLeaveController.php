@@ -344,7 +344,6 @@ class StudyLeaveController extends Controller
             'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
             'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
-            'leave_payment_type' => 'nullable|integer',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
@@ -359,7 +358,8 @@ class StudyLeaveController extends Controller
             'any_other_details' => 'nullable|string|max:1000',
             'air_passage_request' => 'required_if:funding_type,1|integer|in:0,1',
             'warm_cloth_allowance_request' => 'required_if:funding_type,1|integer|in:0,1',
-            'loan_handling' => 'nullable|string|max:100',
+            'library_and_property_handling' => 'required|integer|in:0,1',
+            'loan_handling' => 'nullable|integer|in:0,1',
         );
         $empno = session('study_leave.employee_no') ?? session('empno');
 
@@ -459,6 +459,7 @@ class StudyLeaveController extends Controller
                 'any_other_details' => $validatedData['any_other_details'] ?? null,
                 'air_passage_request' => $validatedData['air_passage_request'] ?? null,
                 'warm_cloth_allowance_request' => $validatedData['warm_cloth_allowance_request'] ?? null,
+                'library_and_property_handling' => $validatedData['library_and_property_handling'],
                 'loan_handling' => $validatedData['loan_handling'] ?? null,
                 'passport_no' => $validatedData['passport_no'] ?? null,
                 'passport_validity' => $validatedData['passport_validity'] ?? null,
@@ -559,14 +560,14 @@ class StudyLeaveController extends Controller
             ->first();
 
         $teachingConsentRule = (($draft && $draft->consent_letter_teaching_path) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
-        $adminConsentRule = (($draft && $draft->consent_letter_admin_path) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
-        $otherConsentRule = (($draft && $draft->consent_letter_other_path) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
+        $adminConsentRule = (($draft && $draft->consent_letter_admin_path) ? 'nullable' : 'required_with:nominee_admin_empno') . '|file|mimes:pdf|max:5120';
+        $otherConsentRule = (($draft && $draft->consent_letter_other_path) ? 'nullable' : 'required_with:nominee_other_empno') . '|file|mimes:pdf|max:5120';
 
         // Validate the incoming request data
         $validatedData = $request->validate([
             'nominee_teaching_empno' => 'required|string|max:255',
-            'nominee_admin_empno' => 'required|string|max:255',
-            'nominee_other_empno' => 'required|string|max:255',
+            'nominee_admin_empno' => 'nullable|string|max:255',
+            'nominee_other_empno' => 'nullable|string|max:255',
             'consent_letter_teaching' => $teachingConsentRule,
             'consent_letter_admin' => $adminConsentRule,
             'consent_letter_other' => $otherConsentRule,
@@ -580,6 +581,10 @@ class StudyLeaveController extends Controller
         ];
 
         foreach ($employeeNumbers as $field => $empNo) {
+            if (empty($empNo)) {
+                continue;
+            }
+
             $employee = $this->getEmployee($empNo);
             if (!$employee) {
                 return back()->withErrors([
@@ -1017,7 +1022,6 @@ class StudyLeaveController extends Controller
             'study_location' => 'required|string|max:100',
             'passport_no' => 'required_if:study_location,Abroad|nullable|string|max:50',
             'passport_validity' => 'required_if:study_location,Abroad|nullable|date',
-            'leave_payment_type' => 'nullable|integer',
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
@@ -1032,7 +1036,8 @@ class StudyLeaveController extends Controller
             'any_other_details' => 'nullable|string|max:1000',
             'air_passage_request' => 'required_if:funding_type,1|integer|in:0,1',
             'warm_cloth_allowance_request' => 'required_if:funding_type,1|integer|in:0,1',
-            'loan_handling' => 'nullable|string|max:100',
+            'library_and_property_handling' => 'required|integer|in:0,1',
+            'loan_handling' => 'nullable|integer|in:0,1',
             'nominee_teaching_empno' => 'required|string|max:255',
             'nominee_admin_empno' => 'required|string|max:255',
             'nominee_other_empno' => 'required|string|max:255',

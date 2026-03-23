@@ -550,61 +550,63 @@
                     </div>
                 </div>
               
-
-
-                 <!-- Type of Study Leave Requested -->
+                <!-- Library and Property Handling -->
+                <div class="col-md-6">
+                    <label for="library_and_property_handling" class="form-label fw-semibold">
+                        Handling of Library book, Computer or any other properties <span class="text-danger">*</span>
+                    </label>
                     @php
-                        $isUserDetailsPage = !($readonly ?? true) && request()->routeIs('StudyLeave.Details.create', 'StudyLeave.show.editeForm');
-                        $currentLeavePaymentType = old('leave_payment_type', $draft_study_leave->leave_payment_type ?? '');
+                        $currentLibraryAndPropertyHandling = old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '');
                     @endphp
-                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Type of Study Leave Requested <span class="text-danger">*</span></label>
-                        @if($isUserDetailsPage)
-                            <input type="hidden" name="leave_payment_type" value="2">
-                        @endif
-                        <select name="{{ $isUserDetailsPage ? 'leave_payment_type_display' : 'leave_payment_type' }}" id="leave_payment_type" class="form-select @if(!($readonly ?? true) && !$isUserDetailsPage) @error('leave_payment_type') is-invalid @enderror @endif" @if(!($readonly ?? true) && !$isUserDetailsPage) required @endif {{ ($readonly ?? true) || $isUserDetailsPage ? 'disabled' : '' }}>
-                            <option value="2" {{ (string)$currentLeavePaymentType === '2' || $currentLeavePaymentType === '' ? 'selected' : '' }}>Pending</option>
-                            <option value="1" {{ (string)$currentLeavePaymentType === '1' ? 'selected' : '' }}>With Pay</option>
-                            <option value="0" {{ (string)$currentLeavePaymentType === '0' ? 'selected' : '' }}>Without Pay</option>
-                        </select>
-                        @if(!($readonly ?? true))
-                        @error('leave_payment_type')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                        <div class="invalid-feedback" id="leave_payment_type_error" style="display: none;">
-                            Please select the type of study leave.
-                        </div>
-                        @if($isUserDetailsPage)
-                        <small class="text-muted">Defaulted to Pending. This field can be selected by MA during review.</small>
-                        @endif
-                        @endif
+                    <select class="form-select @if(!($readonly ?? true)) @error('library_and_property_handling') is-invalid @enderror @endif" id="library_and_property_handling" name="library_and_property_handling" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
+                        <option value="" {{ $currentLibraryAndPropertyHandling === '' || $currentLibraryAndPropertyHandling === null ? 'selected' : '' }} disabled>Select an option</option>
+                        <option value="1" {{ (string)$currentLibraryAndPropertyHandling === '1' || $currentLibraryAndPropertyHandling === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
+                        <option value="0" {{ (string)$currentLibraryAndPropertyHandling === '0' || $currentLibraryAndPropertyHandling === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
+                    </select>
+                    @if(!($readonly ?? true))
+                    @error('library_and_property_handling')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                    <div class="invalid-feedback" id="library_and_property_handling_error" style="display: none;">
+                        Please select an option for library and property handling.
                     </div>
-                    <script>
-                    // Client-side validation for Leave Payment Type field
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const leaveTypeSelect = document.getElementById('leave_payment_type');
-                        const leaveTypeError = document.getElementById('leave_payment_type_error');
-                        leaveTypeSelect.addEventListener('change', function () {
-                            if (this.value === '') {
-                                leaveTypeSelect.classList.add('is-invalid');
-                                leaveTypeError.style.display = 'block';
-                            } else {
-                                leaveTypeSelect.classList.remove('is-invalid');
-                                leaveTypeError.style.display = 'none';
-                            }
-                        });
+                    @endif
+                </div>
+                <script>
+                // Client-side validation for Library and Property Handling field
+                document.addEventListener('DOMContentLoaded', function () {
+                    const libraryHandlingSelect = document.getElementById('library_and_property_handling');
+                    const libraryHandlingError = document.getElementById('library_and_property_handling_error');
+
+                    if (!libraryHandlingSelect || !libraryHandlingError) {
+                        return;
+                    }
+
+                    libraryHandlingSelect.addEventListener('change', function () {
+                        if (this.value === '') {
+                            libraryHandlingSelect.classList.add('is-invalid');
+                            libraryHandlingError.style.display = 'block';
+                        } else {
+                            libraryHandlingSelect.classList.remove('is-invalid');
+                            libraryHandlingError.style.display = 'none';
+                        }
                     });
-                    
+                });
+                </script>
+
                 <!-- Loan Handling (conditional) - shown only for "without Pay" -->
                 <div class="col-md-6" id="loan_handling_section">
                     <label for="loan_handling_details" class="form-label fw-semibold">
                         Paying of Loans taken from University of UPF? <span class="text-danger">*</span>
                        
                     </label>
+                    @php
+                        $currentLoanHandling = old('loan_handling', $draft_study_leave->loan_handling ?? '');
+                    @endphp
                     <select class="form-select" id="loan_handling_details" name="loan_handling" {{ $readonly ?? true ? 'disabled' : '' }}>
-                        <option value="" {{ empty(old('loan_handling', $draft_study_leave->loan_handling ?? '')) ? 'selected' : '' }} disabled>Select an option</option>
-                        <option value="Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
-                        <option value="Not Make Arrangements" {{ old('loan_handling', $draft_study_leave->loan_handling ?? '') === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
+                        <option value="" {{ $currentLoanHandling === '' || $currentLoanHandling === null ? 'selected' : '' }} disabled>Select an option</option>
+                        <option value="1" {{ (string)$currentLoanHandling === '1' || $currentLoanHandling === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
+                        <option value="0" {{ (string)$currentLoanHandling === '0' || $currentLoanHandling === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
                     </select>
                     @if(!($readonly ?? true))
                     <div class="invalid-feedback" id="loan_handling_error" style="display: none;">
@@ -1132,37 +1134,6 @@
                             countryInput: countryInput
                         });
                         
-                        // Leave payment type elements
-                        const leavePaymentType = document.getElementById('leave_payment_type');
-                        const loanHandlingSection = document.getElementById('loan_handling_section');
-                        const loanHandlingDetails = document.getElementById('loan_handling_details');
-                        
-                        // Handle leave payment type change
-                        function updateLoanHandlingVisibility() {
-                            if (!leavePaymentType || !loanHandlingSection || !loanHandlingDetails) {
-                                console.log('Loan handling elements not found, skipping');
-                                return;
-                            }
-                            
-                            if (leavePaymentType.value === '2') {
-                                // Show loan handling field for "Without Pay" (2)
-                                loanHandlingSection.style.display = 'block';
-                                loanHandlingDetails.setAttribute('required', 'required');
-                            } else {
-                                // Hide loan handling field for "With Pay" (1) or empty
-                                loanHandlingSection.style.display = 'none';
-                                loanHandlingDetails.removeAttribute('required');
-                                loanHandlingDetails.value = ''; // Clear value when hidden
-                            }
-                        }
-                        
-                        // Add event listener to leave payment type
-                        if (leavePaymentType && loanHandlingSection && loanHandlingDetails) {
-                            leavePaymentType.addEventListener('change', updateLoanHandlingVisibility);
-                            // Initialize on page load
-                            updateLoanHandlingVisibility();
-                        }
-                        
                         // Handle study location change
                         function updateCountryField() {
                             const selectedLocation = document.querySelector('input[name="study_location"]:checked');
@@ -1331,8 +1302,6 @@
                             const airPassageError = document.getElementById('air_passage_error');
                             const warmClothError = document.getElementById('warm_cloth_error');
                             const studyLocationError = document.getElementById('study_location_errors');
-                            const leavePaymentType = document.getElementById('leave_payment_type');
-                            const loanHandlingDetails = document.getElementById('loan_handling_details');
                             const fundingType = document.querySelector('select[name="funding_type"]');
                             
                             // Check study location
@@ -1343,16 +1312,6 @@
                                     isValid = false;
                                 } else {
                                     studyLocationError.style.display = 'none';
-                                }
-                            }
-                            
-                            // Check loan handling if required (for "Without Pay" = 2)
-                            if (leavePaymentType && loanHandlingDetails) {
-                                if (leavePaymentType.value === '2' && !loanHandlingDetails.value) {
-                                    loanHandlingDetails.setCustomValidity('Please select an option');
-                                    isValid = false;
-                                } else {
-                                    loanHandlingDetails.setCustomValidity('');
                                 }
                             }
                             

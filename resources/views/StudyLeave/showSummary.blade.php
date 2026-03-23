@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Check library and property handling
-            if (libraryHandling && !libraryHandling.value) {
+            if (libraryHandling && !libraryHandling.disabled && !libraryHandling.value) {
                 libraryHandling.setCustomValidity('Please select an option');
                 isValid = false;
             } else if (libraryHandling) {
@@ -271,15 +271,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Check loan handling
-            if (loanHandling && !loanHandling.value) {
+            if (loanHandling && !loanHandling.disabled && !loanHandling.value) {
                 loanHandling.setCustomValidity('Please select an option');
                 isValid = false;
             } else if (loanHandling) {
                 loanHandling.setCustomValidity('');
             }
             
-            // Validate form
-            if (!form.checkValidity() || !isValid) {
+            // Validate only submission-critical checks on summary page.
+            if (!isValid) {
                 event.preventDefault();
                 event.stopPropagation();
                 

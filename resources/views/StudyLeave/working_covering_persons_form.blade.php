@@ -140,7 +140,7 @@
                                 @if(!($readonly ?? true))
                                 <div class="row g-2">
                                     <div class="col-md-8">
-                                        <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
+                                        <label class="form-label fw-semibold">Search Employee</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
                                             <input type="text" class="form-control search-employee @error('nominee_admin_empno') is-invalid @enderror" 
@@ -148,8 +148,7 @@
                                                    name="nominee_admin_empno" 
                                                    value="{{ old('nominee_admin_empno', $draft_study_leave->nominee_admin_empno ?? '') }}" 
                                                    placeholder="Search by Employee Number or Name..." 
-                                                   title="Search by employee number or name"
-                                                   required>
+                                                   title="Search by employee number or name">
                                         </div>
                                         @error('nominee_admin_empno')
                                             <div class="invalid-feedback d-block">
@@ -256,7 +255,7 @@
                                 @if(!($readonly ?? true))
                                 <div class="row g-2">
                                     <div class="col-md-8">
-                                        <label class="form-label fw-semibold">Search Employee <span class="text-danger">*</span></label>
+                                        <label class="form-label fw-semibold">Search Employee</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
                                             <input type="text" class="form-control search-employee @error('nominee_other_empno') is-invalid @enderror" 
@@ -264,8 +263,7 @@
                                                    name="nominee_other_empno" 
                                                    value="{{ old('nominee_other_empno', $draft_study_leave->nominee_other_empno ?? '') }}" 
                                                    placeholder="Search by Employee Number or Name..." 
-                                                   title="Search by employee number or name"
-                                                   required>
+                                                   title="Search by employee number or name">
                                         </div>
                                         @error('nominee_other_empno')
                                             <div class="invalid-feedback d-block">

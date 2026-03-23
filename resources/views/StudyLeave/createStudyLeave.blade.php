@@ -363,6 +363,14 @@
         @endif
 
         <!-- Flash Messages -->
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         @if (session('info'))
             <div class="alert alert-info alert-dismissible fade show" role="alert">
                 <i class="fas fa-info-circle me-2"></i>
@@ -1171,13 +1179,17 @@
     <!-- JavaScript for Success Modal -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            @if(session('show_success_modal'))
+            @php
+                $shouldShowSuccessModal = session('show_success_modal') || (session('success') && str_contains(session('success'), 'submitted successfully'));
+            @endphp
+
+            @if($shouldShowSuccessModal)
                 const successModal = new bootstrap.Modal(document.getElementById('successModal'));
                 successModal.show();
             @endif
             
             // Show returned application modal if user has a returned application
-            @if($hasReturnedApplication && $returnedApplication)
+            @if($hasReturnedApplication && $returnedApplication && !$shouldShowSuccessModal)
                 const returnedAppModal = new bootstrap.Modal(document.getElementById('returnedAppModal'));
                 returnedAppModal.show();
             @endif
