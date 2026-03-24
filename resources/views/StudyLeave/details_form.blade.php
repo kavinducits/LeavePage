@@ -776,12 +776,12 @@
                             <div class="col-md-6" id="self-funding-extra" style="display: none;">
                                 <label class="form-label fw-semibold d-block">Requesting Air Passage from this University? <span class="text-danger">*</span></label>
                                 <div class="d-inline-block">
-                                    <div class="form-check form-check-inline">
+                                    <div class="form-check">
                                         <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="1"
                                             @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '1') {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="air_passage_yes">YES</label>
                                     </div>
-                                    <div class="form-check form-check-inline">
+                                    <div class="form-check">
                                         <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="0" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '0' && old('air_passage_request', $draft_study_leave->air_passage_request ?? '') !== '') {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="air_passage_no">NO</label>
                                     </div>
@@ -795,12 +795,12 @@
                             <div class="col-md-6" id="self-funding-extra2" style="display: none;">
                                 <label class="form-label fw-semibold d-block">Requesting Warm Cloth Allowance from this University? <span class="text-danger">*</span></label>
                                 <div class="d-inline-block">
-                                    <div class="form-check form-check-inline">
+                                    <div class="form-check">
                                         <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="1"
                                             @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '1')  {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="warm_cloth_yes">YES</label>
                                     </div>
-                                    <div class="form-check form-check-inline">
+                                    <div class="form-check">
                                         <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="0"
                                             @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '0' && old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') !== '') {{ $readonly ?? true ? 'readonly' : '' }}>
                                         <label class="form-check-label" for="warm_cloth_no">NO</label>
