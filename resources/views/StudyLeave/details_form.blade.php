@@ -778,11 +778,11 @@
                                 <div class="d-inline-block">
                                     <div class="form-check">
                                         <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_yes" value="1"
-                                            @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '1') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                            @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '1') {{ $readonly ?? true ? 'disabled' : '' }}>
                                         <label class="form-check-label" for="air_passage_yes">YES</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="0" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '0' && old('air_passage_request', $draft_study_leave->air_passage_request ?? '') !== '') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                        <input class="form-check-input custom-radio" type="radio" name="air_passage_request" id="air_passage_no" value="0" @checked(old('air_passage_request', $draft_study_leave->air_passage_request ?? '') == '0' && old('air_passage_request', $draft_study_leave->air_passage_request ?? '') !== '') {{ $readonly ?? true ? 'disabled' : '' }}>
                                         <label class="form-check-label" for="air_passage_no">NO</label>
                                     </div>
                                 </div>
@@ -797,12 +797,12 @@
                                 <div class="d-inline-block">
                                     <div class="form-check">
                                         <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_yes" value="1"
-                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '1')  {{ $readonly ?? true ? 'readonly' : '' }}>
+                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '1')  {{ $readonly ?? true ? 'disabled' : '' }}>
                                         <label class="form-check-label" for="warm_cloth_yes">YES</label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input custom-radio" type="radio" name="warm_cloth_allowance_request" id="warm_cloth_no" value="0"
-                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '0' && old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') !== '') {{ $readonly ?? true ? 'readonly' : '' }}>
+                                            @checked(old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') == '0' && old('warm_cloth_allowance_request', $draft_study_leave->warm_cloth_allowance_request ?? '') !== '') {{ $readonly ?? true ? 'disabled' : '' }}>
                                         <label class="form-check-label" for="warm_cloth_no">NO</label>
                                     </div>
                                 </div>
