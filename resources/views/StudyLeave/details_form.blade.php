@@ -501,6 +501,26 @@
                 });
                 </script>
 
+                @php
+                    $placementDocuments = collect();
+                    $selfFundingDocuments = collect();
+
+                    if (!empty($draft_study_leave->id)) {
+                        $placementDocuments = \App\Models\StudyLeaveDocument::where('study_leave_id', $draft_study_leave->id)
+                            ->where('document_type', \App\Models\StudyLeaveDocument::TYPE_PLACEMENT_LETTER)
+                            ->orderByDesc('id')
+                            ->get();
+
+                        $selfFundingDocuments = \App\Models\StudyLeaveDocument::where('study_leave_id', $draft_study_leave->id)
+                            ->where('document_type', \App\Models\StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION)
+                            ->orderByDesc('id')
+                            ->get();
+                    }
+
+                    $hasPlacementDocs = $placementDocuments->isNotEmpty() || !empty($draft_study_leave->placement_letter);
+                    $hasSelfFundingDocs = $selfFundingDocuments->isNotEmpty() || !empty($draft_study_leave->self_funding_declaration);
+                @endphp
+
                  <!-- Attachment Instructions -->
                 <div class="col-md-12">
                     @if(!($readonly ?? true))
@@ -509,14 +529,18 @@
                         </div>
                     @endif
                     <label class="form-label fw-semibold mt-2">Attach PDF Documents <span class="text-danger">*</span></label>
-                    <input type="file" name="placement_letter" id="attachments-input" class="form-control @if(!($readonly ?? true)) @error('placement_letter') is-invalid @enderror @endif" 
+                    <input type="file" name="placement_letter[]" id="attachments-input" class="form-control @if(!($readonly ?? true)) @error('placement_letter') is-invalid @enderror @endif" 
                            accept="application/pdf" 
                            multiple 
-                           {{ !empty($draft_study_leave->placement_letter) ? 'disabled' : 'required' }}
+                           {{ $hasPlacementDocs ? '' : 'required' }}
                            {{ $readonly ?? true ? 'disabled' : '' }}>
+                          <small class="text-muted d-block mt-1">You can select files multiple times to add more documents before submitting.</small>
                     @if(!($readonly ?? true))
-                        @if(empty($draft_study_leave->placement_letter))
+                        @if(!$hasPlacementDocs)
                             @error('placement_letter')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            @error('placement_letter.*')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                             <div class="invalid-feedback" id="attachments_error" >
@@ -525,18 +549,28 @@
                         @endif
                     @endif
 
-                    <!-- Show previously uploaded file (when editing) -->
-                    @if(!empty($draft_study_leave->placement_letter))
-                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-placement-letter">
-                            <div>
-                                <strong>File uploaded:</strong>
-                                <span class="ms-2">{{ pathinfo($draft_study_leave->placement_letter, PATHINFO_FILENAME) }}</span>
-                            </div>
-                            <div>
-                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                <button type="button" id="preview-existing-btn" class="btn btn-sm btn-outline-primary me-2">Preview</button>
-                                <button type="button" id="remove-placement-letter-btn" class="btn btn-sm btn-outline-danger" {{ $readonly ?? true ? 'disabled' : '' }}>Remove</button>
-                            </div>
+                    @if($placementDocuments->isNotEmpty())
+                        <div class="mt-2">
+                            <strong>All uploaded files:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach($placementDocuments as $document)
+                                    <li id="document-item-{{ $document->id }}" class="d-flex align-items-center gap-2">
+                                        <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($document->document_path)]) }}" target="_blank" class="me-2">
+                                            {{ basename($document->document_path) }}
+                                        </a>
+                                        @if(!($readonly ?? true))
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-danger remove-document-btn"
+                                                data-document-id="{{ $document->id }}"
+                                                data-document-type="{{ \App\Models\StudyLeaveDocument::TYPE_PLACEMENT_LETTER }}"
+                                            >
+                                                Remove
+                                            </button>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     @endif
 
@@ -549,6 +583,56 @@
                         </div>
                     </div>
                 </div>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const removeButtons = document.querySelectorAll('.remove-document-btn');
+
+                    removeButtons.forEach(function (button) {
+                        button.addEventListener('click', function () {
+                            const documentId = this.dataset.documentId;
+                            const documentType = this.dataset.documentType;
+                            const studyLeaveId = {{ $draft_study_leave->id ?? 'null' }};
+
+                            if (!documentId || !documentType || !studyLeaveId) {
+                                alert('Unable to remove this file right now.');
+                                return;
+                            }
+
+                            if (!confirm('Are you sure you want to remove this file?')) {
+                                return;
+                            }
+
+                            fetch('{{ route("StudyLeave.deleteFile") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    type: documentType,
+                                    study_leave_id: studyLeaveId,
+                                    document_id: documentId
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const item = document.getElementById('document-item-' + documentId);
+                                    if (item) {
+                                        item.remove();
+                                    }
+                                } else {
+                                    alert(data.message || 'Failed to remove file.');
+                                }
+                            })
+                            .catch(() => {
+                                alert('Failed to remove file. Please try again.');
+                            });
+                        });
+                    });
+                });
+                </script>
               
                 <!-- Library and Property Handling -->
                 <div class="col-md-6">
@@ -831,124 +915,47 @@
                                                     @endif
 
                                                     <label class="form-label fw-semibold">Self-Funding Declaration <span class="text-danger" id="self-declaration-required">*</span></label>
-                                                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf" {{ !empty($draft_study_leave->self_funding_declaration) ? 'disabled' : 'required' }} {{ $readonly ?? true ? 'disabled' : '' }}>
-                                                    @if(empty($draft_study_leave->self_funding_declaration))
+                                                    <input type="file" name="self_funding_declaration[]" id="self-funding-declaration-input" class="form-control" accept="application/pdf" multiple {{ $hasSelfFundingDocs ? '' : 'required' }} {{ $readonly ?? true ? 'disabled' : '' }}>
+                                                    <small class="text-muted d-block mt-1">You can select files multiple times to add more documents before submitting.</small>
+                                                    @if(!$hasSelfFundingDocs)
                                                         <div class="invalid-feedback">
                                                             Please upload a self-funding declaration PDF document.
                                                         </div>
                                                     @endif
+                                                    @error('self_funding_declaration')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                    @error('self_funding_declaration.*')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
 
-                                                    <!-- Show previously uploaded file (when editing) -->
-                                                    @if(!empty($draft_study_leave->self_funding_declaration))
-                                                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
-                                                            <div>
-                                                                <strong>File uploaded:</strong>
-                                                                <span class="ms-2">{{ pathinfo($draft_study_leave->self_funding_declaration, PATHINFO_FILENAME) }}</span>
-                                                            </div>
-                                                            <div>
-                                                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                                                <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary me-2">Preview</button>
-                                                                <button type="button" id="remove-self-declaration-btn" class="btn btn-sm btn-outline-danger" {{ $readonly ?? true ? 'disabled' : '' }}>Remove</button>
-                                                            </div>
+                                                    <div id="self-funding-selected-files" class="mt-2"></div>
+
+                                                    @if($selfFundingDocuments->isNotEmpty())
+                                                        <div class="mt-2">
+                                                            <strong>All uploaded files:</strong>
+                                                            <ul class="mb-0 mt-2">
+                                                                @foreach($selfFundingDocuments as $document)
+                                                                    <li id="document-item-{{ $document->id }}" class="d-flex align-items-center gap-2">
+                                                                        <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($document->document_path)]) }}" target="_blank" class="me-2">
+                                                                            {{ basename($document->document_path) }}
+                                                                        </a>
+                                                                        @if(!($readonly ?? true))
+                                                                            <button
+                                                                                type="button"
+                                                                                class="btn btn-sm btn-outline-danger remove-document-btn"
+                                                                                data-document-id="{{ $document->id }}"
+                                                                                data-document-type="{{ \App\Models\StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION }}"
+                                                                            >
+                                                                                Remove
+                                                                            </button>
+                                                                        @endif
+                                                                    </li>
+                                                                @endforeach
+                                                            </ul>
                                                         </div>
                                                     @endif
 
-                                                    <div id="self-declaration-preview-embed" class="mt-3" style="display:none;">
-                                                        <label class="form-label fw-semibold">Preview</label>
-                                                        <div style="border:1px solid #dee2e6;">
-                                                            <embed id="self-declaration-embed" src="" type="application/pdf" width="100%" height="600px">
-                                                        </div>
-                                                    </div>
-
-
-
-                    <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('self-funding-declaration-input');
-                        const previewWrap = document.getElementById('self-declaration-preview-embed');
-                        const embed = document.getElementById('self-declaration-embed');
-                        const previewBtn = document.getElementById('preview-self-declaration-btn');
-                        const removeBtn = document.getElementById('remove-self-declaration-btn');
-                        const existingSelfDeclaration = document.getElementById('existing-self-declaration');
-                        let currentUrl = null;
-
-                        // Preview existing stored file on page load (if present)
-                        @if(!empty($draft_study_leave->self_funding_declaration))
-                            const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}";
-                            embed.src = existingFileUrl;
-                            previewWrap.style.display = 'block';
-                        @endif
-
-                        // Preview newly selected file
-                        input.addEventListener('change', function () {
-                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                            const file = this.files && this.files[0];
-                            if (!file) {
-                                previewWrap.style.display = 'none';
-                                embed.src = '';
-                                return;
-                            }
-                            currentUrl = URL.createObjectURL(file);
-                            embed.src = currentUrl;
-                            previewWrap.style.display = 'block';
-                        });
-
-                        // Preview existing stored file when clicking Preview button
-                        if (previewBtn) {
-                            previewBtn.addEventListener('click', function () {
-                                if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                                const openLink = document.querySelector('#existing-self-declaration a[target="_blank"]');
-                                if (openLink) {
-                                    embed.src = openLink.href;
-                                    previewWrap.style.display = 'block';
-                                    previewWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }
-                            });
-                        }
-
-                        // Remove existing file
-                        if (removeBtn) {
-                            removeBtn.addEventListener('click', function () {
-                                if (confirm('Are you sure you want to remove this file? You can upload a new one.')) {
-                                    // Call the backend to delete the file
-                                    fetch('{{ route("StudyLeave.deleteFile") }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                        },
-                                        body: JSON.stringify({ type: 'self_funding_declaration',study_leave_id: {{ $draft_study_leave->id ?? '' }} })
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            existingSelfDeclaration.style.display = 'none';
-                                            input.removeAttribute('disabled');
-                                            input.setAttribute('required', 'required');
-                                            previewWrap.style.display = 'none';
-                                            embed.src = '';
-                                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                                        } else {
-                                            alert('Failed to delete file: ' + (data.message || 'Unknown error'));
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error deleting file:', error);
-                                        alert('Failed to delete file. Please try again.');
-                                    });
-                                }
-                            });
-                        }
-
-                        // cleanup on form submit/navigation
-                        const form = document.getElementById('leave-form');
-                        if (form) {
-                            form.addEventListener('submit', () => {
-                                if (currentUrl) URL.revokeObjectURL(currentUrl);
-                            });
-                        }
-                    });
-                    </script>
                 </div>
                 </div>
 
@@ -962,15 +969,19 @@
                         function updateSelfFundingDeclarationVisibility() {
                             if (fundingType.value === '1') {
                                 selfFundingDeclaration.style.display = 'block';
-                                // Only make required if no existing file
-                                @if(empty($draft_study_leave->self_funding_declaration))
+                                // Only make required if no existing files are stored
+                                @if(!$hasSelfFundingDocs)
                                     selfFundingInput.setAttribute('required', 'required');
                                 @endif
                                 if (selfDeclarationRequired) selfDeclarationRequired.style.display = 'inline';
                             } else {
                                 selfFundingDeclaration.style.display = 'none';
                                 selfFundingInput.removeAttribute('required');
-                                selfFundingInput.value = '';
+                                if (typeof selfFundingInput._clearPendingFiles === 'function') {
+                                    selfFundingInput._clearPendingFiles();
+                                } else {
+                                    selfFundingInput.value = '';
+                                }
                                 if (selfDeclarationRequired) selfDeclarationRequired.style.display = 'none';
                             }
                         }
@@ -985,115 +996,101 @@
 
                 <!-- Attachment Instructions -->
               
-
-                    <!-- Show previously uploaded file (when editing) -->
-                   
-
                     <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const input = document.getElementById('attachments-input');
                         const list = document.getElementById('pdf-preview-list');
                         const embedWrap = document.getElementById('pdf-preview-embed');
                         const embed = document.getElementById('pdf-embed');
-                        const previewExistingBtn = document.getElementById('preview-existing-btn');
-                        const removePlacementBtn = document.getElementById('remove-placement-letter-btn');
-                        const existingPlacementDiv = document.getElementById('existing-placement-letter');
-                        const placement_letter_error = document.getElementById('attachments_error');
-                        let currentUrl = null;                    // Preview existing stored file on page load (if present)
-                    @if(!empty($draft_study_leave->placement_letter))
-                        const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}";
-                        embed.src = existingFileUrl;
-                        embedWrap.style.display = 'block';
-                    @endif
+                        let currentUrl = null;
 
-                        // Preview existing file when clicking Preview button
-                        if (previewExistingBtn) {
-                            previewExistingBtn.addEventListener('click', function () {
-                                if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                                const openLink = document.querySelector('#existing-placement-letter a[target="_blank"]');
-                                if (openLink) {
-                                    embed.src = openLink.href;
+                        if (!input || !list || !embedWrap || !embed) {
+                            return;
+                        }
+
+                        const fileKey = (file) => `${file.name}::${file.size}::${file.lastModified}`;
+                        let selectedFiles = [];
+
+                        function syncInputFiles(files) {
+                            try {
+                                const dt = new DataTransfer();
+                                files.forEach(file => dt.items.add(file));
+                                input.files = dt.files;
+                            } catch (error) {
+                                // Keep native behavior if DataTransfer assignment is not supported.
+                            }
+                        }
+
+                        function renderSelectedPlacementFiles() {
+                            list.innerHTML = '';
+                            embed.src = '';
+                            embedWrap.style.display = 'none';
+
+                            if (selectedFiles.length === 0) {
+                                return;
+                            }
+
+                            selectedFiles.forEach((file, idx) => {
+                                const item = document.createElement('div');
+                                item.className = 'd-flex justify-content-between align-items-center py-1 border-bottom gap-2';
+
+                                const name = document.createElement('div');
+                                name.textContent = file.name;
+                                name.className = 'flex-grow-1';
+                                name.style.cursor = 'pointer';
+                                name.title = 'Click Preview';
+
+                                const actionWrap = document.createElement('div');
+                                actionWrap.className = 'd-flex gap-1';
+
+                                const previewBtn = document.createElement('button');
+                                previewBtn.type = 'button';
+                                previewBtn.className = 'btn btn-sm btn-outline-secondary';
+                                previewBtn.textContent = 'Preview';
+                                previewBtn.addEventListener('click', () => {
+                                    if (currentUrl) URL.revokeObjectURL(currentUrl);
+                                    currentUrl = URL.createObjectURL(file);
+                                    embed.src = currentUrl;
                                     embedWrap.style.display = 'block';
-                                    embedWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                });
+
+                                const removeBtn = document.createElement('button');
+                                removeBtn.type = 'button';
+                                removeBtn.className = 'btn btn-sm btn-outline-danger';
+                                removeBtn.textContent = 'Remove';
+                                removeBtn.addEventListener('click', () => {
+                                    selectedFiles.splice(idx, 1);
+                                    syncInputFiles(selectedFiles);
+                                    renderSelectedPlacementFiles();
+                                });
+
+                                name.addEventListener('click', () => previewBtn.click());
+
+                                actionWrap.appendChild(previewBtn);
+                                actionWrap.appendChild(removeBtn);
+                                item.appendChild(name);
+                                item.appendChild(actionWrap);
+                                list.appendChild(item);
+
+                                if (idx === 0) {
+                                    previewBtn.click();
                                 }
                             });
                         }
 
-                        // Remove existing file
-                        if (removePlacementBtn) {
-                            removePlacementBtn.addEventListener('click', function () {
-                                if (confirm('Are you sure you want to remove this file? You can upload a new one.')) {
-                                    // Call the backend to delete the file
-                                    fetch('{{ route("StudyLeave.deleteFile") }}', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                        },
-                                        body: JSON.stringify({ type: 'placement_letter',study_leave_id: {{ $draft_study_leave->id ?? '' }} })
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            existingPlacementDiv.style.display = 'none';
-                                            input.removeAttribute('disabled');
-                                            input.setAttribute('required', 'required');
-                                            embedWrap.style.display = 'none';
-                                            embed.src = '';
-                                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                                        } else {
-                                            alert('Failed to delete file: ' + (data.message || 'Unknown error'));
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error deleting file:', error);
-                                        alert('Failed to delete file. Please try again.');
-                                    });
-                                }
-                            });
-                        }                    input.addEventListener('change', function () {
-                        // cleanup previous
-                        if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                        list.innerHTML = '';
-                        embed.src = '';
-                        embedWrap.style.display = 'none';
-
-                        const files = Array.from(this.files || []);
-                        if (files.length === 0) return;
-
-                        files.forEach((file, idx) => {
-                            const item = document.createElement('div');
-                            item.className = 'd-flex justify-content-between align-items-center py-1 border-bottom';
-
-                            const name = document.createElement('div');
-                            name.textContent = file.name;
-                            name.style.cursor = 'pointer';
-                            name.title = 'Click Preview';
-
-                            const btn = document.createElement('button');
-                            btn.type = 'button';
-                            btn.className = 'btn btn-sm btn-outline-secondary';
-                            btn.textContent = 'Preview';
-
-                            btn.addEventListener('click', () => {
-                                if (currentUrl) URL.revokeObjectURL(currentUrl);
-                                currentUrl = URL.createObjectURL(file);
-                                embed.src = currentUrl;
-                                embedWrap.style.display = 'block';
-                            });
-
-                            name.addEventListener('click', () => btn.click());
-
-                            item.appendChild(name);
-                            item.appendChild(btn);
-                            list.appendChild(item);
-
-                            // auto-preview first file
-                            if (idx === 0) {
-                                btn.click();
+                        input.addEventListener('change', function () {
+                            const newFiles = Array.from(this.files || []);
+                            if (newFiles.length === 0) {
+                                return;
                             }
+
+                            const filesMap = new Map(selectedFiles.map(file => [fileKey(file), file]));
+                            newFiles.forEach(file => filesMap.set(fileKey(file), file));
+                            selectedFiles = Array.from(filesMap.values());
+
+                            syncInputFiles(selectedFiles);
+                            renderSelectedPlacementFiles();
                         });
-                    });
 
                     // revoke object URL on form submit/navigation to free memory
                     const form = document.getElementById('leave-form');
@@ -1102,6 +1099,90 @@
                             if (currentUrl) URL.revokeObjectURL(currentUrl);
                         });
                     }
+                });
+                </script>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const input = document.getElementById('self-funding-declaration-input');
+                    const selectedFilesWrap = document.getElementById('self-funding-selected-files');
+
+                    if (!input || !selectedFilesWrap) {
+                        return;
+                    }
+
+                    const fileKey = (file) => `${file.name}::${file.size}::${file.lastModified}`;
+                    let selectedFiles = [];
+
+                    function syncInputFiles(files) {
+                        try {
+                            const dt = new DataTransfer();
+                            files.forEach(file => dt.items.add(file));
+                            input.files = dt.files;
+                        } catch (error) {
+                            // Keep native behavior if DataTransfer assignment is not supported.
+                        }
+                    }
+
+                    function renderSelectedSelfFundingFiles() {
+                        selectedFilesWrap.innerHTML = '';
+
+                        if (selectedFiles.length === 0) {
+                            return;
+                        }
+
+                        const title = document.createElement('strong');
+                        title.textContent = 'New files selected (not yet submitted):';
+                        selectedFilesWrap.appendChild(title);
+
+                        const list = document.createElement('ul');
+                        list.className = 'mb-0 mt-2';
+
+                        selectedFiles.forEach((file, idx) => {
+                            const item = document.createElement('li');
+                            item.className = 'd-flex align-items-center gap-2';
+
+                            const name = document.createElement('span');
+                            name.className = 'flex-grow-1';
+                            name.textContent = file.name;
+
+                            const removeBtn = document.createElement('button');
+                            removeBtn.type = 'button';
+                            removeBtn.className = 'btn btn-sm btn-outline-danger';
+                            removeBtn.textContent = 'Remove';
+                            removeBtn.addEventListener('click', () => {
+                                selectedFiles.splice(idx, 1);
+                                syncInputFiles(selectedFiles);
+                                renderSelectedSelfFundingFiles();
+                            });
+
+                            item.appendChild(name);
+                            item.appendChild(removeBtn);
+                            list.appendChild(item);
+                        });
+
+                        selectedFilesWrap.appendChild(list);
+                    }
+
+                    input._clearPendingFiles = function () {
+                        selectedFiles = [];
+                        syncInputFiles(selectedFiles);
+                        renderSelectedSelfFundingFiles();
+                    };
+
+                    input.addEventListener('change', function () {
+                        const newFiles = Array.from(this.files || []);
+                        if (newFiles.length === 0) {
+                            return;
+                        }
+
+                        const filesMap = new Map(selectedFiles.map(file => [fileKey(file), file]));
+                        newFiles.forEach(file => filesMap.set(fileKey(file), file));
+                        selectedFiles = Array.from(filesMap.values());
+
+                        syncInputFiles(selectedFiles);
+                        renderSelectedSelfFundingFiles();
+                    });
                 });
                 </script>
 

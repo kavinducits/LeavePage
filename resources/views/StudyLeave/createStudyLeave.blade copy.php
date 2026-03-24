@@ -835,8 +835,7 @@
                 
                 // Get the last approved extension to determine start date
                 $lastApprovedExtension = \App\Models\StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave->id)
-                    ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-                    ->where('study_leave_extensions_approvals.status_id', 1)
+                    ->where('study_leave_extensions.status_id', 1)
                     ->orderBy('study_leave_extensions.created_at', 'desc')
                     ->select('study_leave_extensions.*')
                     ->first();
@@ -847,14 +846,12 @@
                 
                 // Check for pending extension
                 $hasPendingExtension = \App\Models\StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave->id)
-                    ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-                    ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2])
+                    ->whereNotIn('study_leave_extensions.status_id', [1, 2])
                     ->exists();
                 
                 // Check for returned extension
                 $returnedExtension = \App\Models\StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave->id)
-                    ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-                    ->where('study_leave_extensions_approvals.status_id', 3)
+                    ->where('study_leave_extensions.status_id', 3)
                     ->select('study_leave_extensions.*')
                     ->first();
                 

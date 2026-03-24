@@ -156,8 +156,6 @@
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('hodReviewForm');
-            const recommendNo = document.getElementById('recommendNo');
-            const notRecommendReasonTextarea = document.getElementById('hod_not_recommend_reason');
             let forwardConfirmed = false;
 
             if (!form) {
@@ -165,6 +163,9 @@
             }
 
             form.addEventListener('submit', function(e) {
+                const recommendNo = form.querySelector('#hodRecommendNo');
+                const notRecommendReasonTextarea = form.querySelector('#hod_not_recommend_reason');
+
                 if (recommendNo && recommendNo.checked) {
                     const reasonValue = notRecommendReasonTextarea ? notRecommendReasonTextarea.value.trim() : '';
                     if (!reasonValue) {
@@ -194,6 +195,7 @@
                 $('#forwardConfirmModal').modal('hide');
             });
 
+            const notRecommendReasonTextarea = form.querySelector('#hod_not_recommend_reason');
             if (notRecommendReasonTextarea) {
                 notRecommendReasonTextarea.addEventListener('input', function() {
                     if (this.value.trim()) {

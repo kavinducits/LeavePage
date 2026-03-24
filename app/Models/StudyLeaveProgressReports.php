@@ -13,6 +13,30 @@ class StudyLeaveProgressReports extends Model
         'remark',
         'document_path',
         'status_id',
+        'approval_status_id',
+        'ma_empno',
+        'registrar_empno',
+        'registrar_approval_status',
+        'registrar_not_approve_reason',
+        'registrar_remarks',
+        'hod_empno',
+        'hod_approval_status',
+        'hod_not_approve_reason',
+        'hod_remarks',
+        'dean_empno',
+        'dean_approval_status',
+        'dean_not_approve_reason',
+        'dean_remarks',
+        'vc_empno',
+        'vc_approval_status',
+        'vc_not_approve_reason',
+        'vc_remarks',
+        'ma_reviewed_date',
+        'ma_finalized_date',
+        'registrar_reviewed_date',
+        'hod_reviewed_date',
+        'dean_reviewed_date',
+        'vc_reviewed_date',
     ];
 
     /**
@@ -21,13 +45,5 @@ class StudyLeaveProgressReports extends Model
     public function studyLeave()
     {
         return $this->belongsTo(StudyLeave::class, 'study_leave_id');
-    }
-
-    /**
-     * Get the approval for this progress report
-     */
-    public function approval()
-    {
-        return $this->hasOne(StudyLeaveProgressReportsApproval::class, 'study_leave_progress_report_id');
     }
 }

@@ -20,7 +20,7 @@
                             ['id' => 1, 'name' => 'Approved', 'icon' => 'fa-check-circle', 'empno_field' => null]
                         ];
                         
-                        // Get current status from study_leave_approvals table
+                        // Get current status from merged study_leaves workflow fields
                         $currentStatusId = $processStatus['current_status_id'] ?? 4;
                         $isReturned = $currentStatusId == 2; // Returned status
                         $isEditing = $currentStatusId == 3;  // Editing status

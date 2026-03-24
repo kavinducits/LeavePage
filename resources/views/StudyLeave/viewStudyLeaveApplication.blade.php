@@ -197,6 +197,70 @@
 
 
                 
+                @php
+                    $placementDocuments = collect();
+                    $selfFundingDocuments = collect();
+
+                    if (!empty($application->id)) {
+                        $placementDocuments = \App\Models\StudyLeaveDocument::where('study_leave_id', $application->id)
+                            ->where('document_type', \App\Models\StudyLeaveDocument::TYPE_PLACEMENT_LETTER)
+                            ->orderByDesc('id')
+                            ->get();
+
+                        $selfFundingDocuments = \App\Models\StudyLeaveDocument::where('study_leave_id', $application->id)
+                            ->where('document_type', \App\Models\StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION)
+                            ->orderByDesc('id')
+                            ->get();
+                    }
+
+                    $hasPlacementDocs = $placementDocuments->isNotEmpty() || !empty($application->placement_letter);
+                    $hasSelfFundingDocs = $selfFundingDocuments->isNotEmpty() || !empty($application->self_funding_declaration);
+                @endphp
+
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold mt-2">Attach Placement Letter PDF Documents <span class="text-danger">*</span></label>
+                    <input
+                        type="file"
+                        name="placement_letter[]"
+                        id="attachments-input"
+                        class="form-control"
+                        accept="application/pdf"
+                        multiple
+                        {{ $hasPlacementDocs ? '' : 'required' }}
+                    >
+
+                    @if($placementDocuments->isNotEmpty())
+                        <div class="mt-2">
+                            <strong>All uploaded files:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach($placementDocuments as $document)
+                                    <li id="document-item-{{ $document->id }}" class="d-flex align-items-center gap-2">
+                                        <a href="{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($document->document_path)]) }}" target="_blank" class="me-2">
+                                            {{ basename($document->document_path) }}
+                                        </a>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger remove-document-btn"
+                                            data-document-id="{{ $document->id }}"
+                                            data-document-type="{{ \App\Models\StudyLeaveDocument::TYPE_PLACEMENT_LETTER }}"
+                                        >
+                                            Remove
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div id="pdf-preview-list" class="mt-3"></div>
+                    <div id="pdf-preview-embed" class="mt-3" style="display:none;">
+                        <label class="form-label fw-semibold">Preview</label>
+                        <div style="border:1px solid #dee2e6;">
+                            <embed id="pdf-embed" src="" type="application/pdf" width="100%" height="600px">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Self-Funding Declaration (conditional) -->
                 <div class="col-md-12" id="self-funding-declaration" style="display: none;">
                     <div class="alert alert-warning mt-3">
@@ -204,28 +268,38 @@
                     </div>
 
                     <label class="form-label fw-semibold mt-2">Attach Declaration PDF</label>
-                    <input type="file" name="self_funding_declaration" id="self-funding-declaration-input" class="form-control" accept="application/pdf">
+                    <input
+                        type="file"
+                        name="self_funding_declaration[]"
+                        id="self-funding-declaration-input"
+                        class="form-control"
+                        accept="application/pdf"
+                        multiple
+                        {{ $hasSelfFundingDocs ? '' : 'required' }}
+                    >
 
-                    <!-- Show previously uploaded file (when editing) -->
-                    @if(!empty($application->self_funding_declaration))
-                        <div class="mt-2 d-flex justify-content-between align-items-center" id="existing-self-declaration">
-                            <div>
-                                <strong>Existing file:</strong>
-                                <span class="ms-2">{{ basename($application->self_funding_declaration) }}</span>
-                            </div>
-                            <div>
-                                <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($application->self_funding_declaration)]) }}" target="_blank" class="btn btn-sm btn-outline-secondary me-2">Open</a>
-                                <button type="button" id="preview-self-declaration-btn" class="btn btn-sm btn-outline-primary">Preview</button>
-                            </div>
+                    @if($selfFundingDocuments->isNotEmpty())
+                        <div class="mt-2">
+                            <strong>All uploaded files:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach($selfFundingDocuments as $document)
+                                    <li id="document-item-{{ $document->id }}" class="d-flex align-items-center gap-2">
+                                        <a href="{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($document->document_path)]) }}" target="_blank" class="me-2">
+                                            {{ basename($document->document_path) }}
+                                        </a>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger remove-document-btn"
+                                            data-document-id="{{ $document->id }}"
+                                            data-document-type="{{ \App\Models\StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION }}"
+                                        >
+                                            Remove
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     @endif
-
-                    <div id="self-declaration-preview-embed" class="mt-3" style="display:none;">
-                        <label class="form-label fw-semibold">Preview</label>
-                        <div style="border:1px solid #dee2e6;">
-                            <embed id="self-declaration-embed" src="" type="application/pdf" width="100%" height="600px">
-                        </div>
-                    </div>
 
                     
                        
@@ -353,71 +427,22 @@
    
 
 </div>
-<script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const input = document.getElementById('self-funding-declaration-input');
-                        const previewWrap = document.getElementById('self-declaration-preview-embed');
-                        const embed = document.getElementById('self-declaration-embed');
-                        const previewBtn = document.getElementById('preview-self-declaration-btn');
-                        let currentUrl = null;
-
-                        // Preview existing stored file on page load (if present)
-                        @if(!empty($draft_study_leave->self_funding_declaration))
-                            const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'self_funding_declaration', 'filename' => basename($draft_study_leave->self_funding_declaration)]) }}";
-                            embed.src = existingFileUrl;
-                            previewWrap.style.display = 'block';
-                        @endif
-
-                        // Preview newly selected file
-                        input.addEventListener('change', function () {
-                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                            const file = this.files && this.files[0];
-                            if (!file) {
-                                previewWrap.style.display = 'none';
-                                embed.src = '';
-                                return;
-                            }
-                            currentUrl = URL.createObjectURL(file);
-                            embed.src = currentUrl;
-                            previewWrap.style.display = 'block';
-                        });
-
-                        // Preview existing stored file when clicking Preview button
-                        if (previewBtn) {
-                            previewBtn.addEventListener('click', function () {
-                                if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                                const openLink = document.querySelector('#existing-self-declaration a[target="_blank"]');
-                                if (openLink) {
-                                    embed.src = openLink.href;
-                                    previewWrap.style.display = 'block';
-                                    previewWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }
-                            });
-                        }
-
-                        // cleanup on form submit/navigation
-                        const form = document.getElementById('leave-form');
-                        if (form) {
-                            form.addEventListener('submit', () => {
-                                if (currentUrl) URL.revokeObjectURL(currentUrl);
-                            });
-                        }
-                    });
-                    </script>
-                </div>
-                </div>
-
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const fundingType = document.querySelector('select[name="funding_type"]');
                         const selfFundingDeclaration = document.getElementById('self-funding-declaration');
+                        const selfFundingInput = document.getElementById('self-funding-declaration-input');
                         
                         function updateSelfFundingDeclarationVisibility() {
                             if (fundingType.value === '1') {
                                 selfFundingDeclaration.style.display = 'block';
+                                @if(!$hasSelfFundingDocs)
+                                    selfFundingInput.setAttribute('required', 'required');
+                                @endif
                             } else {
                                 selfFundingDeclaration.style.display = 'none';
-                                selfFundingDeclaration.querySelector('input[type="file"]').value = '';
+                                selfFundingInput.removeAttribute('required');
+                                selfFundingInput.value = '';
                             }
                         }
                         
@@ -437,31 +462,59 @@
 
                 <script>
                 document.addEventListener('DOMContentLoaded', function () {
+                    const removeButtons = document.querySelectorAll('.remove-document-btn');
+                    removeButtons.forEach(function (button) {
+                        button.addEventListener('click', function () {
+                            const documentId = this.dataset.documentId;
+                            const documentType = this.dataset.documentType;
+                            const studyLeaveId = {{ $application->id ?? 'null' }};
+
+                            if (!documentId || !documentType || !studyLeaveId) {
+                                alert('Unable to remove this file right now.');
+                                return;
+                            }
+
+                            if (!confirm('Are you sure you want to remove this file?')) {
+                                return;
+                            }
+
+                            fetch('{{ route("StudyLeave.deleteFile") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    type: documentType,
+                                    study_leave_id: studyLeaveId,
+                                    document_id: documentId
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const item = document.getElementById('document-item-' + documentId);
+                                    if (item) {
+                                        item.remove();
+                                    }
+                                } else {
+                                    alert(data.message || 'Failed to remove file.');
+                                }
+                            })
+                            .catch(() => {
+                                alert('Failed to remove file. Please try again.');
+                            });
+                        });
+                    });
+
                     const input = document.getElementById('attachments-input');
                     const list = document.getElementById('pdf-preview-list');
                     const embedWrap = document.getElementById('pdf-preview-embed');
                     const embed = document.getElementById('pdf-embed');
-                    const previewExistingBtn = document.getElementById('preview-existing-btn');
                     let currentUrl = null;
 
-                    // Preview existing stored file on page load (if present)
-                    @if(!empty($draft_study_leave->placement_letter))
-                        const existingFileUrl = "{{ route('StudyLeave.serveFile', ['type' => 'placement_letter', 'filename' => basename($draft_study_leave->placement_letter)]) }}";
-                        embed.src = existingFileUrl;
-                        embedWrap.style.display = 'block';
-                    @endif
-
-                    // Preview existing file when clicking Preview button
-                    if (previewExistingBtn) {
-                        previewExistingBtn.addEventListener('click', function () {
-                            if (currentUrl) { URL.revokeObjectURL(currentUrl); currentUrl = null; }
-                            const openLink = document.querySelector('#existing-placement-letter a[target="_blank"]');
-                            if (openLink) {
-                                embed.src = openLink.href;
-                                embedWrap.style.display = 'block';
-                                embedWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }
-                        });
+                    if (!input || !list || !embedWrap || !embed) {
+                        return;
                     }
 
                     input.addEventListener('change', function () {
@@ -597,21 +650,6 @@
 
                             // Update when user changes scholarship source
                             scholarshipSource.addEventListener('change', updateScholarshipSourceVisibility);
-                        });
-                    </script>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            const fundingType = document.querySelector('select[name="funding_type"]');
-                            const scholarshipDetails = document.getElementById('scholarship-details');
-
-                            fundingType.addEventListener('change', function () {
-                                if (this.value === '2') {
-                                    scholarshipDetails.style.display = 'block';
-                                } else {
-                                    scholarshipDetails.style.display = 'none';
-                                    scholarshipDetails.querySelector('select').value = '';
-                                }
-                            });
                         });
                     </script>
 

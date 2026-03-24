@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\OtherLeavesDetail;
 use App\Models\LeaveRequestDetail;
 use App\Models\StudyLeave;
-use App\Models\StudyLeaveApproval;
+use App\Models\StudyLeaveDocument;
 use App\Models\StudyLeaveExtension;
 use PHPUnit\Framework\Constraint\Count;
 
@@ -52,8 +52,7 @@ class StudyLeaveController extends Controller
         }
 
         $approvedLeavesCount = StudyLeave::where('empno', session('empno'))
-            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
-            ->where('study_leave_approvals.status_id', 1)
+            ->where('study_leaves.status_id', 1)
             ->where('study_leaves.is_draft', false)
             ->select(
                 DB::raw('COUNT("study_leaves.id") as approved_count')
@@ -62,8 +61,7 @@ class StudyLeaveController extends Controller
             ->first();
         //dd($approvedLeavesCount);
         $approvedLeavesInProgress = StudyLeave::where('empno', session('empno'))
-            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
-            ->where('study_leave_approvals.status_id', 1)
+            ->where('study_leaves.status_id', 1)
             ->where('study_leaves.is_draft', false)
 
             ->whereDate('study_leaves.study_leave_to', '>=', $currentDate)
@@ -108,9 +106,9 @@ class StudyLeaveController extends Controller
         // Check for returned extensions from MA
         $hasReturnedExtensions = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
+            
             ->where('study_leaves.empno', session('empno'))
-            ->where('study_leave_extensions_approvals.status_id', 3) // Returned status
+            ->where('study_leave_extensions.status_id', 3) // Returned status
             ->exists();
 
         // Check for returned progress reports from MA
@@ -130,8 +128,7 @@ class StudyLeaveController extends Controller
     {
         $totalDays = 0;
         $previousLeaves = StudyLeave::where('empno', $emp_no)
-             ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
-            ->where('study_leave_approvals.status_id', 1)
+            ->where('study_leaves.status_id', 1)
             ->where('study_leaves.is_draft', false)
             ->select('study_leaves.study_leave_from as study_leave_from', 'study_leaves.study_leave_to as study_leave_to');
 
@@ -139,8 +136,8 @@ class StudyLeaveController extends Controller
             foreach ($previousLeaves->get() as $leave) {
                 $leave_id = $leave->id;
                 $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave_id)
-                    ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-                    ->where('study_leave_extensions_approvals.status_id', 1)
+                    
+                    ->where('study_leave_extensions.status_id', 1)
                     ->select('study_leave_extensions.new_end_date')
                     ->OrderBy('study_leave_extensions.id', 'desc')
                     ->first();
@@ -366,41 +363,46 @@ class StudyLeaveController extends Controller
         // Get or create draft to get the study leave ID
         $draft = $this->getStudyLeaveDraft($empno);
 
-        if ($draft->placement_letter == null) {
+        // Accept both legacy single-file fields and new multi-file arrays.
+        $this->normalizeRequestFileArray($request, 'placement_letter');
+        $this->normalizeRequestFileArray($request, 'self_funding_declaration');
 
-            $rules['placement_letter'] = 'required|file|mimes:pdf|max:10240';
+        $hasPlacementDocuments = $this->hasStudyLeaveDocuments($draft->id, StudyLeaveDocument::TYPE_PLACEMENT_LETTER, $draft->placement_letter);
+        $hasSelfFundingDocuments = $this->hasStudyLeaveDocuments($draft->id, StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION, $draft->self_funding_declaration);
+
+        if (!$hasPlacementDocuments) {
+            $rules['placement_letter'] = 'required|array|min:1';
+        } else {
+            $rules['placement_letter'] = 'nullable|array';
         }
-        if ($draft->self_funding_declaration == null) {
-            $rules['self_funding_declaration'] = 'required_if:funding_type,1|file|mimes:pdf|max:10240';
+        $rules['placement_letter.*'] = 'file|mimes:pdf|max:10240';
+
+        if (!$hasSelfFundingDocuments) {
+            $rules['self_funding_declaration'] = 'required_if:funding_type,1|array|min:1';
+        } else {
+            $rules['self_funding_declaration'] = 'nullable|array';
         }
+        $rules['self_funding_declaration.*'] = 'file|mimes:pdf|max:10240';
 
 
 
-        try {
-            $validatedData = $request->validate($rules);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-
-            // Optionally dump to see immediately during development
-            dd([
-                'validation_errors' => $e->errors(),
-                'request_data' => $request->all()
-            ]);
-        }
+        $validatedData = $request->validate($rules);
 
 
         // Handle file upload BEFORE storing in session
         if ($request->hasFile('self_funding_declaration')) {
-
-            $file = $request->file('self_funding_declaration');
+            $files = $this->normalizeUploadedFiles($request->file('self_funding_declaration'));
             $empno = session('study_leave.employee_no') ?? session('empno');
-            // Store the path directly for database storage
-            $validatedData['self_funding_declaration'] = $this->saveUplodedPdfAttachment($file, $empno, $draft, 'self_funding_declaration');
 
+            $latestPath = null;
+            foreach ($files as $index => $file) {
+                $latestPath = $this->saveUplodedPdfAttachment($file, $empno, $draft, 'self_funding_declaration', $index);
+                $this->storeStudyLeaveDocument($draft->id, StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION, $latestPath);
+            }
 
-            // Update the existing draft with the file path
-            if ($draft) {
+            if ($draft && $latestPath) {
                 $draft->update([
-                    'self_funding_declaration' => $validatedData['self_funding_declaration'],
+                    'self_funding_declaration' => $latestPath,
                     'is_draft' => true
                 ]);
             }
@@ -409,16 +411,18 @@ class StudyLeaveController extends Controller
             unset($validatedData['self_funding_declaration']);
         }
         if ($request->hasFile('placement_letter')) {
-
-            $file = $request->file('placement_letter');
+            $files = $this->normalizeUploadedFiles($request->file('placement_letter'));
             $empno = session('study_leave.employee_no') ?? session('empno');
 
-            // Store the path directly for database storage
-            $validatedData['placement_letter'] = $this->saveUplodedPdfAttachment($file, $empno, $draft, 'placement_letter');
+            $latestPath = null;
+            foreach ($files as $index => $file) {
+                $latestPath = $this->saveUplodedPdfAttachment($file, $empno, $draft, 'placement_letter', $index);
+                $this->storeStudyLeaveDocument($draft->id, StudyLeaveDocument::TYPE_PLACEMENT_LETTER, $latestPath);
+            }
 
-            if ($draft) {
+            if ($draft && $latestPath) {
                 $draft->update([
-                    'placement_letter' => $validatedData['placement_letter'],
+                    'placement_letter' => $latestPath,
                     'is_draft' => true,
                     'current_step' => 2,
                 ]);
@@ -473,18 +477,11 @@ class StudyLeaveController extends Controller
     /**
      * Save uploaded PDF attachment to private storage and return the path.
      */
-    private function saveUplodedPdfAttachment($file, $empno, $draft, $type)
+    private function saveUplodedPdfAttachment($file, $empno, $draft, $type, $index = null)
     {
         $studyLeaveId = $draft->id;
 
-        // Delete existing file if it exists
-        if (!empty($draft->$type)) {
-            if (Storage::exists($draft->$type)) {
-                Storage::delete($draft->$type);
-            }
-        }
-
-        $filename = $this->generateFilename($empno, $studyLeaveId, $type);
+        $filename = $this->generateFilename($empno, $studyLeaveId, $type, $index);
         $directory = 'study_leave_documents/' . $type;
         $path = $this->savePdfToStorage($file, $directory, $filename);
         return $path;
@@ -492,9 +489,49 @@ class StudyLeaveController extends Controller
     /**
      * Generate a unique filename for the uploaded PDF.
      */
-    private function generateFilename($empno, $studyLeaveId, $type)
+    private function generateFilename($empno, $studyLeaveId, $type, $index = null)
     {
-        return $empno . '_' . $studyLeaveId . '_' . $type . '.pdf';
+        $suffix = now()->format('YmdHis');
+        if ($index !== null) {
+            $suffix .= '_' . $index;
+        }
+
+        return $empno . '_' . $studyLeaveId . '_' . $type . '_' . $suffix . '.pdf';
+    }
+
+    private function normalizeUploadedFiles($files)
+    {
+        if (is_array($files)) {
+            return $files;
+        }
+
+        return $files ? [$files] : [];
+    }
+
+    private function normalizeRequestFileArray(Request $request, $field)
+    {
+        $files = $request->file($field);
+        if ($files && !is_array($files)) {
+            $request->files->set($field, [$files]);
+        }
+    }
+
+    private function storeStudyLeaveDocument($studyLeaveId, int $documentType, $documentPath)
+    {
+        StudyLeaveDocument::create([
+            'study_leave_id' => $studyLeaveId,
+            'document_type' => $documentType,
+            'document_path' => $documentPath,
+        ]);
+    }
+
+    private function hasStudyLeaveDocuments($studyLeaveId, int $documentType, $legacyPath = null)
+    {
+        $hasDocuments = StudyLeaveDocument::where('study_leave_id', $studyLeaveId)
+            ->where('document_type', $documentType)
+            ->exists();
+
+        return $hasDocuments || !empty($legacyPath);
     }
     /**
      * Save uploaded PDF to private storage.
@@ -725,19 +762,10 @@ class StudyLeaveController extends Controller
             ->where('is_draft', true)
             ->first();
 
-        // Create approval record with MA as first approver
-        StudyLeaveApproval::create([
-            'study_leave_id' => $draft->id,
-            'status_id' => 4, // Pending
-
-        ]);
-
-
-
         if ($draft) {
             $draft->update([
                 'is_draft' => false,
-              // 'status_id' => 4, // Assuming '4' is the status ID for 'Submitted'
+                'status_id' => 4,
                 'reference_no' => $this->generateReferenceNumber(),
 
             ]);
@@ -835,7 +863,6 @@ class StudyLeaveController extends Controller
 
         // Fetch employee info from the database with latest extension status and total duration
         $previousLeaves = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
             ->where('empno', $emp_no)
             ->select(
                 'study_leaves.id',
@@ -845,15 +872,15 @@ class StudyLeaveController extends Controller
                 'study_leave_to',
                 'leave_payment_type',
                 'study_leaves.created_at',
-                'study_leave_approvals.status_id as status_id',
+                'study_leaves.status_id as status_id',
                 'statuses.status',
                 'reference_no',
                 'latest_extensions.extension_status_id',
                 DB::raw('COALESCE(extension_durations.total_extension_days, 0) as total_extension_days')
             )
-            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
-            ->leftJoin(DB::raw('(SELECT study_leave_id, study_leave_extensions_approvals.status_id as extension_status_id FROM study_leave_extensions Join study_leave_extensions_approvals ON study_leave_extensions.id = study_leave_extensions_approvals.study_leave_extension_id WHERE study_leave_extensions.id IN (SELECT MAX(id) FROM study_leave_extensions GROUP BY study_leave_id)) as latest_extensions'), 'study_leaves.id', '=', 'latest_extensions.study_leave_id')
-            ->leftJoin(DB::raw('(SELECT study_leave_id, SUM(DATEDIFF(new_end_date, old_end_date)) as total_extension_days FROM study_leave_extensions Join study_leave_extensions_approvals ON study_leave_extensions.id = study_leave_extensions_approvals.study_leave_extension_id WHERE study_leave_extensions_approvals.status_id = 1 GROUP BY study_leave_id) as extension_durations'), 'study_leaves.id', '=', 'extension_durations.study_leave_id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, status_id as extension_status_id FROM study_leave_extensions WHERE id IN (SELECT MAX(id) FROM study_leave_extensions GROUP BY study_leave_id)) as latest_extensions'), 'study_leaves.id', '=', 'latest_extensions.study_leave_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, SUM(DATEDIFF(new_end_date, old_end_date)) as total_extension_days FROM study_leave_extensions WHERE study_leave_extensions.status_id = 1 GROUP BY study_leave_id) as extension_durations'), 'study_leaves.id', '=', 'extension_durations.study_leave_id')
             ->get();
 
         return $previousLeaves;
@@ -865,10 +892,9 @@ class StudyLeaveController extends Controller
      */
     public function serveFile($type, $filename)
     {
-
-        // Validate file type
-        $allowedTypes = ['self_funding_declaration', 'placement_letter'];
-        if (!in_array($type, $allowedTypes)) {
+        // Validate file type key and resolve to known mapping.
+        $documentTypeCode = StudyLeaveDocument::codeFromKey((string) $type);
+        if ($documentTypeCode === null) {
             abort(404, 'Invalid file type');
         }
 
@@ -947,12 +973,11 @@ class StudyLeaveController extends Controller
         // Get the specific study leave application with all details
         // Only show if the employee is assigned to this specific MA
         $draft_study_leave = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
             ->where('study_leaves.id', $id)
             ->select(
                 'study_leaves.*',
@@ -973,7 +998,7 @@ class StudyLeaveController extends Controller
                 'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
                 'study_leaves.nominee_admin_empno as nominee_admin_empno',
                 'study_leaves.nominee_other_empno as nominee_other_empno',
-                'study_leave_approvals.ma_remarks as ma_remarks',
+                'study_leaves.ma_remarks as ma_remarks',
 
             )
             ->first();
@@ -1054,22 +1079,30 @@ class StudyLeaveController extends Controller
             return redirect()->route('StudyLeave.create')->with('error', 'Study leave application not found.');
         }
 
+        // Accept both legacy single-file fields and new multi-file arrays.
+        $this->normalizeRequestFileArray($request, 'placement_letter');
+        $this->normalizeRequestFileArray($request, 'self_funding_declaration');
+
         $rules['consent_letter_teaching'] = (($studyLeave->consent_letter_teaching_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
         $rules['consent_letter_admin'] = (($studyLeave->consent_letter_admin_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
         $rules['consent_letter_other'] = (($studyLeave->consent_letter_other_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
 
-        // Check if files already exist
-        if ($studyLeave->placement_letter == null) {
-            $rules['placement_letter'] = 'required|file|mimes:pdf|max:10240';
-        } else {
-            $rules['placement_letter'] = 'nullable|file|mimes:pdf|max:10240';
-        }
+        $hasPlacementDocuments = $this->hasStudyLeaveDocuments($studyLeave->id, StudyLeaveDocument::TYPE_PLACEMENT_LETTER, $studyLeave->placement_letter);
+        $hasSelfFundingDocuments = $this->hasStudyLeaveDocuments($studyLeave->id, StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION, $studyLeave->self_funding_declaration);
 
-        if ($studyLeave->self_funding_declaration == null) {
-            $rules['self_funding_declaration'] = 'required_if:funding_type,1|file|mimes:pdf|max:10240';
+        if (!$hasPlacementDocuments) {
+            $rules['placement_letter'] = 'required|array|min:1';
         } else {
-            $rules['self_funding_declaration'] = 'nullable|file|mimes:pdf|max:10240';
+            $rules['placement_letter'] = 'nullable|array';
         }
+        $rules['placement_letter.*'] = 'file|mimes:pdf|max:10240';
+
+        if (!$hasSelfFundingDocuments) {
+            $rules['self_funding_declaration'] = 'required_if:funding_type,1|array|min:1';
+        } else {
+            $rules['self_funding_declaration'] = 'nullable|array';
+        }
+        $rules['self_funding_declaration.*'] = 'file|mimes:pdf|max:10240';
 
         $validatedData = $request->validate($rules);
         if ($validatedData['study_location'] == 'Sri Lanka') {
@@ -1081,18 +1114,18 @@ class StudyLeaveController extends Controller
 
         // Handle placement_letter file upload
         if ($request->hasFile('placement_letter')) {
-            $file = $request->file('placement_letter');
+            $files = $this->normalizeUploadedFiles($request->file('placement_letter'));
             $empno = $studyLeave->empno;
-            $studyLeaveId = $studyLeave->id;
 
-            // Delete old file if exists
-            if ($studyLeave->placement_letter && Storage::exists($studyLeave->placement_letter)) {
-                Storage::delete($studyLeave->placement_letter);
+            $latestPath = null;
+            foreach ($files as $index => $file) {
+                $latestPath = $this->saveUplodedPdfAttachment($file, $empno, $studyLeave, 'placement_letter', $index);
+                $this->storeStudyLeaveDocument($studyLeave->id, StudyLeaveDocument::TYPE_PLACEMENT_LETTER, $latestPath);
             }
 
-            // Generate filename: empno_studyleaveid_placement_letter.pdf
-
-            $validatedData['placement_letter'] = $this->saveUplodedPdfAttachment($file, $empno, $studyLeave, 'placement_letter');
+            if ($latestPath) {
+                $validatedData['placement_letter'] = $latestPath;
+            }
         } else {
             // Keep existing file path if no new file uploaded
             unset($validatedData['placement_letter']);
@@ -1100,18 +1133,18 @@ class StudyLeaveController extends Controller
 
         // Handle self_funding_declaration file upload
         if ($request->hasFile('self_funding_declaration')) {
-            $file = $request->file('self_funding_declaration');
+            $files = $this->normalizeUploadedFiles($request->file('self_funding_declaration'));
             $empno = $studyLeave->empno;
-            $studyLeaveId = $studyLeave->id;
 
-            // Delete old file if exists
-            if ($studyLeave->self_funding_declaration && Storage::exists($studyLeave->self_funding_declaration)) {
-                Storage::delete($studyLeave->self_funding_declaration);
+            $latestPath = null;
+            foreach ($files as $index => $file) {
+                $latestPath = $this->saveUplodedPdfAttachment($file, $empno, $studyLeave, 'self_funding_declaration', $index);
+                $this->storeStudyLeaveDocument($studyLeave->id, StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION, $latestPath);
             }
 
-            // Generate filename: empno_studyleaveid_self_funding_declaration.pdf
-
-            $validatedData['self_funding_declaration'] = $this->saveUplodedPdfAttachment($file, $empno, $studyLeave, 'self_funding_declaration');
+            if ($latestPath) {
+                $validatedData['self_funding_declaration'] = $latestPath;
+            }
         } else {
             // Keep existing file path if no new file uploaded
             unset($validatedData['self_funding_declaration']);
@@ -1156,8 +1189,8 @@ class StudyLeaveController extends Controller
         ]));
         $studyLeave->update($updateData);
 
-        // Update the study_leave_approvals table
-        StudyLeaveApproval::where('study_leave_id', $id)
+        // Update merged workflow fields in study_leaves
+        StudyLeave::where('id', $id)
             ->update(['status_id' => 4, 'is_draft' => false]);
 
         return redirect()->route('StudyLeave.show.editeForm', ['id' => $id])->with('success', 'Study leave application submitted successfully! Your application is now under review.');
@@ -1207,8 +1240,7 @@ class StudyLeaveController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
-            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
             ->where('study_leaves.id', $id)
             ->select(
                 'study_leaves.*',
@@ -1229,7 +1261,7 @@ class StudyLeaveController extends Controller
                 'study_leaves.nominee_teaching_empno as nominee_teaching_empno',
                 'study_leaves.nominee_admin_empno as nominee_admin_empno',
                 'study_leaves.nominee_other_empno as nominee_other_empno',
-                'study_leave_approvals.ma_remarks as ma_remarks',
+                'study_leaves.ma_remarks as ma_remarks',
 
             )
             ->first();
@@ -1262,11 +1294,11 @@ class StudyLeaveController extends Controller
 
         // Get extensions for this study leave with status information
         $extensions = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->join('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            
+            ->join('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->select(
                 'study_leave_extensions.*',
-                'study_leave_extensions_approvals.status_id',
+                'study_leave_extensions.status_id',
                 'statuses.status'
             )
             ->orderBy('study_leave_extensions.created_at', 'desc')
@@ -1294,8 +1326,8 @@ class StudyLeaveController extends Controller
 
         // Check for pending extension requests (status not approved or rejected)
         $hasPendingExtension = \App\Models\StudyLeaveExtension::where('study_leave_id', $id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2]) // Not approved (1) or rejected (2)
+            
+            ->whereNotIn('study_leave_extensions.status_id', [1, 2]) // Not approved (1) or rejected (2)
             ->exists();
 
         $extensionController = new StudyLeaveExtensionController();
@@ -1306,8 +1338,8 @@ class StudyLeaveController extends Controller
 
         // Get the last approved extension to determine the new start date
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
+            
+            ->where('study_leave_extensions.status_id', 1) // Only approved extensions
             ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
 
@@ -1315,11 +1347,9 @@ class StudyLeaveController extends Controller
             ? $lastApprovedExtension->new_end_date
             : $study_leave->study_leave_to;
 
-        // Prepare process status information for stages display with approval tracking
-        // Fetch the approval details from study_leave_approvals table
-        $approvalDetails = StudyLeaveApproval::where('study_leave_id', $id)->first();
+        // Prepare process status information for stages display with merged workflow tracking
+        $approvalDetails = StudyLeave::where('id', $id)->first();
 
-        // Use status_id from study_leave_approvals table for accurate tracking
         $currentStatusId = $approvalDetails->status_id ?? $draft_study_leave->status_id ?? 4;
 
         $processStatus = [
@@ -1403,11 +1433,19 @@ class StudyLeaveController extends Controller
 
     public function deleteFile(Request $request)
     {
-        $fileType = $request->input('type'); // 'placement_letter' or 'self_funding_declaration'
+        $fileTypeInput = $request->input('type'); // 0/1 or legacy string keys
+        $documentId = $request->input('document_id');
         $empno = session('study_leave.employee_no') ?? session('empno');
 
+        $fileTypeCode = $this->resolveDocumentTypeCode($fileTypeInput);
+
         // Validate file type
-        if (!in_array($fileType, ['placement_letter', 'self_funding_declaration'])) {
+        if ($fileTypeCode === null) {
+            return response()->json(['success' => false, 'message' => 'Invalid file type'], 400);
+        }
+
+        $fileTypeKey = StudyLeaveDocument::keyFromCode($fileTypeCode);
+        if ($fileTypeKey === null) {
             return response()->json(['success' => false, 'message' => 'Invalid file type'], 400);
         }
 
@@ -1420,8 +1458,20 @@ class StudyLeaveController extends Controller
             return response()->json(['success' => false, 'message' => 'Draft not found'], 404);
         }
 
-        // Get the file path
-        $filePath = $draft->$fileType;
+        if (!empty($documentId)) {
+            $document = StudyLeaveDocument::where('id', $documentId)
+                ->where('study_leave_id', $draft->id)
+                ->where('document_type', $fileTypeCode)
+                ->first();
+        } else {
+            $document = StudyLeaveDocument::where('study_leave_id', $draft->id)
+                ->where('document_type', $fileTypeCode)
+                ->orderByDesc('id')
+                ->first();
+        }
+
+        // Fall back to legacy column if no typed document exists.
+        $filePath = $document?->document_path ?? $draft->{$fileTypeKey};
 
         if (empty($filePath)) {
             return response()->json(['success' => false, 'message' => 'No file to delete'], 404);
@@ -1432,13 +1482,22 @@ class StudyLeaveController extends Controller
             Storage::delete($filePath);
         }
 
-        // Update the database to remove the file path
-        $draft->update([$fileType => null]);
+        if ($document) {
+            $document->delete();
+        }
 
-        // Update the session to remove the file path
+        $remainingPath = StudyLeaveDocument::where('study_leave_id', $draft->id)
+            ->where('document_type', $fileTypeCode)
+            ->orderByDesc('id')
+            ->value('document_path');
+
+        // Keep legacy column synchronized to latest remaining file for compatibility.
+        $draft->update([$fileTypeKey => $remainingPath]);
+
+        // Keep session compatibility field aligned with remaining path.
         $sessionData = session('study_leave', []);
-        if (isset($sessionData[$fileType])) {
-            $sessionData[$fileType] = null;
+        if (isset($sessionData[$fileTypeKey])) {
+            $sessionData[$fileTypeKey] = $remainingPath;
             session(['study_leave' => $sessionData]);
         }
 
@@ -1459,6 +1518,25 @@ class StudyLeaveController extends Controller
         return $years;
     }
 
+    private function resolveDocumentTypeCode($documentTypeInput): ?int
+    {
+        if (is_numeric($documentTypeInput)) {
+            $documentTypeCode = (int) $documentTypeInput;
+            if (in_array($documentTypeCode, [
+                StudyLeaveDocument::TYPE_PLACEMENT_LETTER,
+                StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION,
+            ], true)) {
+                return $documentTypeCode;
+            }
+        }
+
+        if (is_string($documentTypeInput)) {
+            return StudyLeaveDocument::codeFromKey($documentTypeInput);
+        }
+
+        return null;
+    }
+
     /**
      * Check if user can upload next progress report
      */
@@ -1469,8 +1547,8 @@ class StudyLeaveController extends Controller
 
         // Get the actual end date (considering extensions)
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $study_leave->id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions_approvals.status_id', 1)
+            
+            ->where('study_leave_extensions.status_id', 1)
             ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
 
@@ -1530,8 +1608,8 @@ class StudyLeaveController extends Controller
 
         // Get the actual end date (considering extensions)
         $lastApprovedExtension = StudyLeaveExtension::where('study_leave_id', $study_leave->id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions_approvals.status_id', 1)
+            
+            ->where('study_leave_extensions.status_id', 1)
             ->orderBy('study_leave_extensions.created_at', 'desc')
             ->first();
 

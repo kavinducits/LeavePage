@@ -158,8 +158,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('deanReviewForm');
-    const recommendNo = document.getElementById('recommendNo');
-    const notRecommendReasonTextarea = document.getElementById('dean_not_recommend_reason');
     let forwardConfirmed = false;
 
     if (!form) {
@@ -167,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     form.addEventListener('submit', function(e) {
+        const recommendNo = form.querySelector('#dean_recommendNo');
+        const notRecommendReasonTextarea = form.querySelector('#dean_not_recommend_reason');
+
         if (recommendNo && recommendNo.checked) {
             const reasonValue = notRecommendReasonTextarea ? notRecommendReasonTextarea.value.trim() : '';
             if (!reasonValue) {
@@ -196,6 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#forwardConfirmModal').modal('hide');
     });
 
+    const notRecommendReasonTextarea = form.querySelector('#dean_not_recommend_reason');
     if (notRecommendReasonTextarea) {
         notRecommendReasonTextarea.addEventListener('input', function() {
             if (this.value.trim()) {

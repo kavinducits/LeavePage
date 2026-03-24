@@ -68,12 +68,12 @@ class DeanController extends Controller
 
         // Get all study leave applications for Dean review (status_id = 6) from assigned faculties
         $studyLeaveApplications = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_approvals.status_id', 6) // Processing Dean
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.status_id', 6) // Processing Dean
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -94,9 +94,8 @@ class DeanController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions_approvals.status_id', 6) // Processing Dean (status_id = 6)
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.status_id', 6) // Processing Dean (status_id = 6)
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -158,12 +157,12 @@ class DeanController extends Controller
 
         // Get all study leave applications for Dean review (status_id = 6) from assigned faculties
         $studyLeaveApplications = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_approvals.status_id', 6) // Processing Dean
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->where('study_leaves.status_id', 6) // Processing Dean
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -184,9 +183,8 @@ class DeanController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions_approvals.status_id', 6) // Processing Dean (status_id = 6)
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.status_id', 6) // Processing Dean (status_id = 6)
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -214,15 +212,15 @@ class DeanController extends Controller
 
         // Get all study leave applications already forwarded by Dean (dean_empno set, past status 6)
         $studyLeaveApplications = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
-            ->whereNotNull('study_leave_approvals.dean_empno') // Dean has already acted
-            ->where('study_leave_approvals.status_id', '!=', 6) // No longer at Dean stage
+            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leaves.dean_empno') // Dean has already acted
+            ->where('study_leaves.status_id', '!=', 6) // No longer at Dean stage
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
-            ->orderByDesc('study_leave_approvals.dean_reviewed_date')
+            ->orderByDesc('study_leaves.dean_reviewed_date')
             ->select(
                 'study_leaves.id',
                 'study_leaves.reference_no',
@@ -247,12 +245,11 @@ class DeanController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
-            ->whereNotNull('study_leave_extensions_approvals.dean_empno')
-            ->where('study_leave_extensions_approvals.status_id', '!=', 6)
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->whereNotNull('study_leave_extensions.dean_empno')
+            ->where('study_leave_extensions.status_id', '!=', 6)
             ->whereIn('employees.faculty_id', $facultyIds)
-            ->orderByDesc('study_leave_extensions_approvals.dean_reviewed_date')
+            ->orderByDesc('study_leave_extensions.dean_reviewed_date')
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leaves.id as study_leave_id',
@@ -285,9 +282,8 @@ class DeanController extends Controller
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_extensions_approvals.status_id', 6) // Processing Dean (status_id = 6)
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_extensions.status_id', 6) // Processing Dean (status_id = 6)
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->orderByDesc('study_leave_extensions.created_at')
             ->select(
@@ -320,12 +316,11 @@ class DeanController extends Controller
         // Get study leave progress report applications for Dean review from assigned faculties
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+                        ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
-            ->where('study_leave_progress_reports_approval.approval_status_id', 6) // Processing Dean (status_id = 6)
+            ->where('study_leave_progress_reports.approval_status_id', 6) // Processing Dean (status_id = 6)
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
             ->orderByDesc('study_leave_progress_reports.submitted_date')
             ->select(
@@ -351,15 +346,14 @@ class DeanController extends Controller
 
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+                        ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
-            ->whereNotNull('study_leave_progress_reports_approval.dean_empno')
-            ->where('study_leave_progress_reports_approval.approval_status_id', '!=', 6)
+            ->whereNotNull('study_leave_progress_reports.dean_empno')
+            ->where('study_leave_progress_reports.approval_status_id', '!=', 6)
             ->whereIn('employees.faculty_id', $facultyIds)
-            ->orderByDesc('study_leave_progress_reports_approval.dean_reviewed_date')
+            ->orderByDesc('study_leave_progress_reports.dean_reviewed_date')
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leaves.id as study_leave_id',
@@ -511,22 +505,22 @@ class DeanController extends Controller
        
         // Fetch study leave application with faculty filtering
         $draft_study_leave = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->leftJoin('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->leftJoin('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
             ->leftJoin('employees as teaching_nominee_t', 'teaching_nominee_t.employee_no', '=', 'study_leaves.nominee_teaching_empno')
             ->leftJoin('employees as admin_nominee_t', 'admin_nominee_t.employee_no', '=', 'study_leaves.nominee_admin_empno')
             ->leftJoin('employees as other_nominee_t', 'other_nominee_t.employee_no', '=', 'study_leaves.nominee_other_empno')
             ->where('study_leaves.id', $id)
             ->where(function($q) use ($from, $facultyIds) {
                 if ($from === 'accepted') {
-                    $q->whereNotNull('study_leave_approvals.dean_empno')
+                    $q->whereNotNull('study_leaves.dean_empno')
                       ->whereIn('employees.faculty_id', $facultyIds);
                 } else {
-                    $q->where('study_leave_approvals.status_id', 6) // Processing Dean
+                    $q->where('study_leaves.status_id', 6) // Processing Dean
                       ->whereIn('employees.faculty_id', $facultyIds);
                 }
             })
@@ -546,17 +540,17 @@ class DeanController extends Controller
                 DB::raw("CONCAT(admin_nominee_t.initials, ' ', admin_nominee_t.last_name) as admin_nominee_name"),
                 'study_leaves.nominee_other_empno as other_nominee_emp_no',
                 DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
-                // Deputy Registrar Review data from study_leave_approvals
-                'study_leave_approvals.registrar_recommendation',
-                'study_leave_approvals.registrar_not_recommend_reason',
-                'study_leave_approvals.registrar_remarks',
-                // HOD Review data from study_leave_approvals
-                'study_leave_approvals.hod_adequate_staff_available',
-                'study_leave_approvals.hod_teaching_covered',
-                'study_leave_approvals.hod_service_period',
-                'study_leave_approvals.hod_recommend',
-                'study_leave_approvals.hod_not_recommend_reason',
-                'study_leave_approvals.hod_remarks'
+                // Deputy Registrar review data from merged study_leaves workflow fields
+                'study_leaves.registrar_recommendation',
+                'study_leaves.registrar_not_recommend_reason',
+                'study_leaves.registrar_remarks',
+                // HOD review data from merged study_leaves workflow fields
+                'study_leaves.hod_adequate_staff_available',
+                'study_leaves.hod_teaching_covered',
+                'study_leaves.hod_service_period',
+                'study_leaves.hod_recommend',
+                'study_leaves.hod_not_recommend_reason',
+                'study_leaves.hod_remarks'
             )
             ->first();
 
@@ -593,21 +587,21 @@ class DeanController extends Controller
 
         // Verify the application belongs to this Dean's faculties
         $application = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leave_approvals.status_id', 6) // Processing Dean
+            ->where('study_leaves.status_id', 6) // Processing Dean
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
-            ->select('study_leaves.*', 'study_leave_approvals.id as approval_id')
+            ->select('study_leaves.*', 'study_leaves.id as approval_id')
             ->first();
 
         if (!$application) {
             return redirect()->route('dean.index')->with('error', 'Application not found or not accessible.');
         }
 
-        // Update the study_leave_approvals table with Dean review
-        DB::table('study_leave_approvals')
-            ->where('study_leave_id', $id)
+        // Update merged workflow fields in study_leaves with Dean review
+        DB::table('study_leaves')
+            ->where('id', $id)
             ->update([
                 'status_id' => 7, // Processing VC (forward to VC)
                 'dean_empno' => self::DEAN_EMP_NO,
@@ -637,14 +631,13 @@ class DeanController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
             ->where(function ($q) use ($from) {
                 if ($from === 'accepted') {
-                    $q->whereNotNull('study_leave_extensions_approvals.dean_empno');
+                    $q->whereNotNull('study_leave_extensions.dean_empno');
                 } else {
-                    $q->where('study_leave_extensions_approvals.status_id', 6); // Processing Dean
+                    $q->where('study_leave_extensions.status_id', 6); // Processing Dean
                 }
             })
             ->whereIn('employees.faculty_id', $facultyIds) // Filter by Dean's faculties
@@ -655,22 +648,22 @@ class DeanController extends Controller
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.extension_payment_type',
                 'study_leave_extensions.reason_for_extension',
-                'study_leave_extensions_approvals.status_id as extension_status_id',
-                'study_leave_extensions_approvals.ma_empno',
-                'study_leave_extensions_approvals.ma_recommend',
-                'study_leave_extensions_approvals.ma_not_recommend_reason',
-                'study_leave_extensions_approvals.ma_remarks',
-                'study_leave_extensions_approvals.acad_est_head_empno',
-                'study_leave_extensions_approvals.acad_est_head_recommend',
-                'study_leave_extensions_approvals.acad_est_head_not_recommend_reason',
-                'study_leave_extensions_approvals.acad_est_head_remarks',
-                'study_leave_extensions_approvals.hod_remarks as extension_hod_remarks',
-                'study_leave_extensions_approvals.hod_recommend as extension_hod_recommend',
-                'study_leave_extensions_approvals.hod_not_recommend_reason as extension_hod_not_recommend_reason',
-                'study_leave_extensions_approvals.dean_recommend as extension_dean_recommend',
-                'study_leave_extensions_approvals.dean_not_recommended_reason as extension_dean_not_recommend_reason',
-                'study_leave_extensions_approvals.dean_remark as extension_dean_remarks',
-                'study_leave_extensions_approvals.dean_remark',
+                'study_leave_extensions.status_id as extension_status_id',
+                'study_leave_extensions.ma_empno',
+                'study_leave_extensions.ma_recommend',
+                'study_leave_extensions.ma_not_recommend_reason',
+                'study_leave_extensions.ma_remarks',
+                'study_leave_extensions.acad_est_head_empno',
+                'study_leave_extensions.acad_est_head_recommend',
+                'study_leave_extensions.acad_est_head_not_recommend_reason',
+                'study_leave_extensions.acad_est_head_remarks',
+                'study_leave_extensions.hod_remarks as extension_hod_remarks',
+                'study_leave_extensions.hod_recommend as extension_hod_recommend',
+                'study_leave_extensions.hod_not_recommend_reason as extension_hod_not_recommend_reason',
+                'study_leave_extensions.dean_recommend as extension_dean_recommend',
+                'study_leave_extensions.dean_not_recommended_reason as extension_dean_not_recommend_reason',
+                'study_leave_extensions.dean_remark as extension_dean_remarks',
+                'study_leave_extensions.dean_remark',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -741,9 +734,8 @@ class DeanController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions_approvals.status_id', 6)
+            ->where('study_leave_extensions.status_id', 6)
             ->whereIn('employees.faculty_id', $facultyIds)
             ->select('study_leave_extensions.*')
             ->first();
@@ -756,8 +748,8 @@ class DeanController extends Controller
         $deanRemarks = $request->dean_remarks ?? '';
 
         // Update extension status to Processing VC (status_id = 7)
-        DB::table('study_leave_extensions_approvals')
-            ->where('study_leave_extension_id', $extension_id)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
             ->update([
                 'status_id' => 7, // Processing VC
                 'dean_empno' => self::DEAN_EMP_NO,
@@ -786,9 +778,8 @@ class DeanController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
             ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions_approvals.status_id', 6)
+            ->where('study_leave_extensions.status_id', 6)
             ->whereIn('employees.faculty_id', $facultyIds)
             ->select('study_leave_extensions.*')
             ->first();
@@ -800,8 +791,8 @@ class DeanController extends Controller
         $returnRemark = $request->dean_remarks ?? '';
 
         // Update extension status to Returned (status_id = 3)
-        DB::table('study_leave_extensions_approvals')
-            ->where('study_leave_extension_id', $extension_id)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
             ->update([
                 'status_id' => 3, // Returned
                 'dean_empno' => self::DEAN_EMP_NO,
@@ -824,18 +815,17 @@ class DeanController extends Controller
         // Fetch the progress report with related study leave and employee details
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+                        ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_progress_reports.id', $progress_report_id)
             ->when($from === 'accepted', function ($query) use ($facultyIds) {
-                $query->whereNotNull('study_leave_progress_reports_approval.dean_empno')
+                $query->whereNotNull('study_leave_progress_reports.dean_empno')
                       ->whereIn('employees.faculty_id', $facultyIds);
             }, function ($query) use ($facultyIds) {
-                $query->where('study_leave_progress_reports_approval.approval_status_id', 6)
+                $query->where('study_leave_progress_reports.approval_status_id', 6)
                       ->whereIn('employees.faculty_id', $facultyIds);
             })
             ->select(
@@ -859,20 +849,20 @@ class DeanController extends Controller
                 'faculties.id as faculty_id',
                 'designations.designation_name as designation',
                 'statuses.status',
-                // Registrar review data from study_leave_progress_reports_approval
-                'study_leave_progress_reports_approval.registrar_empno',
-                'study_leave_progress_reports_approval.registrar_approval_status',
-                'study_leave_progress_reports_approval.registrar_not_approve_reason',
-                'study_leave_progress_reports_approval.registrar_remarks',
-                // HOD review data from study_leave_progress_reports_approval
-                'study_leave_progress_reports_approval.hod_empno',
-                'study_leave_progress_reports_approval.hod_approval_status',
-                'study_leave_progress_reports_approval.hod_not_approve_reason',
-                'study_leave_progress_reports_approval.hod_remarks',
-                // Dean review data from study_leave_progress_reports_approval
-                'study_leave_progress_reports_approval.dean_approval_status',
-                'study_leave_progress_reports_approval.dean_not_approve_reason',
-                'study_leave_progress_reports_approval.dean_remarks'
+                // Registrar review data from study_leave_progress_reports
+                'study_leave_progress_reports.registrar_empno',
+                'study_leave_progress_reports.registrar_approval_status',
+                'study_leave_progress_reports.registrar_not_approve_reason',
+                'study_leave_progress_reports.registrar_remarks',
+                // HOD review data from study_leave_progress_reports
+                'study_leave_progress_reports.hod_empno',
+                'study_leave_progress_reports.hod_approval_status',
+                'study_leave_progress_reports.hod_not_approve_reason',
+                'study_leave_progress_reports.hod_remarks',
+                // Dean review data from study_leave_progress_reports
+                'study_leave_progress_reports.dean_approval_status',
+                'study_leave_progress_reports.dean_not_approve_reason',
+                'study_leave_progress_reports.dean_remarks'
             )
             ->first();
 
@@ -946,10 +936,9 @@ class DeanController extends Controller
         // Verify the progress report
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+                        ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leave_progress_reports.id', $progress_report_id)
-            ->where('study_leave_progress_reports_approval.approval_status_id', 6) // Processing Dean
+            ->where('study_leave_progress_reports.approval_status_id', 6) // Processing Dean
             ->whereIn('employees.faculty_id', $facultyIds)
             ->select('study_leave_progress_reports.*')
             ->first();
@@ -960,8 +949,8 @@ class DeanController extends Controller
 
         if ($request->approval_decision === 'approved') {
             // Approve and forward to VC
-            DB::table('study_leave_progress_reports_approval')
-                ->where('study_leave_progress_report_id', $progress_report_id)
+            DB::table('study_leave_progress_reports')
+                ->where('id', $progress_report_id)
                 ->update([
                     'dean_empno' => $deanEmpNo,
                     'dean_approval_status' => 1, // Approved
@@ -982,8 +971,8 @@ class DeanController extends Controller
             return redirect()->route('dean.study.leave.progress')->with('success', 'Progress report approved and forwarded to VC successfully.');
         } else {
             // Return to HOD (not approved)
-            DB::table('study_leave_progress_reports_approval')
-                ->where('study_leave_progress_report_id', $progress_report_id)
+            DB::table('study_leave_progress_reports')
+                ->where('id', $progress_report_id)
                 ->update([
                     'dean_empno' => $deanEmpNo,
                     'dean_approval_status' => 2, // Not Approved / Returned

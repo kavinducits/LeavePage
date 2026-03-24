@@ -14,7 +14,7 @@
                 <input class="form-check-input" type="radio" name="dean_recommend" id="dean_recommendYes" value="1" 
                        {{ optional($draft_study_leave)->dean_leave_recommendation_status == 1 ? 'checked' : '' }}
                        {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
-                <label class="form-check-label" for="recommendYes">
+                <label class="form-check-label" for="dean_recommendYes">
                     Yes
                 </label>
             </div>
@@ -22,7 +22,7 @@
                 <input class="form-check-input" type="radio" name="dean_recommend" id="dean_recommendNo" value="0" 
                        {{ optional($draft_study_leave)->dean_leave_recommendation_status !== null && optional($draft_study_leave)->dean_leave_recommendation_status == 0 ? 'checked' : '' }}
                        {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
-                <label class="form-check-label" for="recommendNo">
+                <label class="form-check-label" for="dean_recommendNo">
                     No
                 </label>
             </div>

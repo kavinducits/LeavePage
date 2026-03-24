@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Models\StudyLeave;
 use App\Models\StudyLeaveExtension;
-use App\Models\StudyLeaveProgressReportsApproval;
+use App\Models\StudyLeaveProgressReports;
 
 class MAController extends Controller
 {
@@ -497,9 +497,9 @@ class MAController extends Controller
         
         // Build base query - only newly submitted applications (status_id = 4 or null)
         $query = DB::table('study_leaves')
-            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
-            ->leftJoin('statuses', 'statuses.stat_id', '=', 'study_leave_approvals.status_id')
+            ->leftJoin('statuses', 'statuses.stat_id', '=', 'study_leaves.status_id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
@@ -507,8 +507,8 @@ class MAController extends Controller
             ->where('study_leaves.is_draft', false) // Only non-draft applications
             ->where(function($q) {
                 // Only newly submitted: status_id = 4 (Processing MA) or no approval record yet (null)
-                $q->where('study_leave_approvals.status_id', 4)
-                  ->orWhereNull('study_leave_approvals.id');
+                $q->where('study_leaves.status_id', 4)
+                  ->orWhereNull('study_leaves.id');
             });
         
         // Apply search filter if provided
@@ -527,7 +527,7 @@ class MAController extends Controller
         // Apply sorting
         $validSortColumns = [
             'applied_date' => 'study_leaves.created_at',
-            'finalized_date' => 'study_leave_approvals.ma_finalized_date',
+            'finalized_date' => 'study_leaves.ma_finalized_date',
             'reference_no' => 'study_leaves.reference_no',
             'empno' => 'employees.employee_no',
             'name' => 'employees.last_name',
@@ -539,7 +539,7 @@ class MAController extends Controller
         if (array_key_exists($sortBy, $validSortColumns)) {
             $query->orderBy($validSortColumns[$sortBy], 'desc');
         } else {
-            $query->orderByDesc('study_leave_approvals.ma_finalized_date');
+            $query->orderByDesc('study_leaves.ma_finalized_date');
         }
         
         $submittedApplications = $query->select(
@@ -550,18 +550,18 @@ class MAController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'study_leaves.created_at as applied_date',
-                'study_leave_approvals.status_id as approval_status_id',
+                'study_leaves.status_id as approval_status_id',
                 DB::raw("COALESCE(statuses.status, 'Pending') as status")
             )
             ->get();
 
         // Calculate statistics
         $allApplications = DB::table('study_leaves')
-            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
             ->where('employees.assign_ma_user_id', $maUserId)
             ->where('study_leaves.is_draft', false)
-            ->select('study_leave_approvals.status_id', 'study_leaves.created_at')
+            ->select('study_leaves.status_id', 'study_leaves.created_at')
             ->get();
 
         $statistics = [
@@ -587,22 +587,22 @@ class MAController extends Controller
         
         // Build base query
         $query = DB::table('study_leaves')
-            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
-            ->leftJoin('statuses', 'statuses.stat_id', '=', 'study_leave_approvals.status_id')
+            ->leftJoin('statuses', 'statuses.stat_id', '=', 'study_leaves.status_id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->where('study_leaves.is_draft', false) // Only non-draft applications
             ->where(function($q) {
-                $q->where('study_leave_approvals.status_id', '>=', 5) // Status 5-9 (HOD, Dean, VC, Registrar, etc)
+                $q->where('study_leaves.status_id', '>=', 5) // Status 5-9 (HOD, Dean, VC, Registrar, etc)
                   ->orWhere(function($q2) {
-                      $q2->whereNotNull('study_leave_approvals.ma_empno')
-                        ->where('study_leave_approvals.status_id', '!=', 4);
+                      $q2->whereNotNull('study_leaves.ma_empno')
+                        ->where('study_leaves.status_id', '!=', 4);
                   });
             })
-            ->whereNotIn('study_leave_approvals.status_id', [1, 2]); // Exclude final applications: approved and rejected
+            ->whereNotIn('study_leaves.status_id', [1, 2]); // Exclude final applications: approved and rejected
         
         // Apply search filter if provided
         if ($search) {
@@ -620,7 +620,7 @@ class MAController extends Controller
         // Apply sorting
         $validSortColumns = [
             'applied_date' => 'study_leaves.created_at',
-            'finalized_date' => 'study_leave_approvals.ma_finalized_date',
+            'finalized_date' => 'study_leaves.ma_finalized_date',
             'reference_no' => 'study_leaves.reference_no',
             'empno' => 'employees.employee_no',
             'name' => 'employees.last_name',
@@ -632,7 +632,7 @@ class MAController extends Controller
         if (array_key_exists($sortBy, $validSortColumns)) {
             $query->orderBy($validSortColumns[$sortBy], 'desc');
         } else {
-            $query->orderByDesc('study_leave_approvals.ma_finalized_date');
+            $query->orderByDesc('study_leaves.ma_finalized_date');
         }
         
         $studyLeaveApplications = $query->select(
@@ -643,18 +643,18 @@ class MAController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'study_leaves.created_at as applied_date',
-                'study_leave_approvals.status_id as approval_status_id',
+                'study_leaves.status_id as approval_status_id',
                 DB::raw("COALESCE(statuses.status, 'Pending') as status")
             )
             ->get();
 
         // Calculate statistics
         $allApplications = DB::table('study_leaves')
-            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
             ->where('employees.assign_ma_user_id', $maUserId)
             ->where('study_leaves.is_draft', false)
-            ->select('study_leave_approvals.status_id', 'study_leaves.created_at')
+            ->select('study_leaves.status_id', 'study_leaves.created_at')
             ->get();
 
         // Separate submitted applications from all applications
@@ -680,11 +680,10 @@ class MAController extends Controller
         $extensionApplications = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->leftJoin('study_leave_extensions_approvals', 'study_leave_extensions_approvals.study_leave_extension_id', '=', 'study_leave_extensions.id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
-            ->whereNotIn('study_leave_extensions_approvals.status_id', [1, 2, 4]) // Exclude finalized and submitted states
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
+            ->whereNotIn('study_leave_extensions.status_id', [1, 2, 4]) // Exclude finalized and submitted states
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -698,7 +697,7 @@ class MAController extends Controller
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions.created_at as extension_applied_date',
-                'study_leave_extensions_approvals.status_id as approval_status_id',
+                'study_leave_extensions.status_id as approval_status_id',
                 'statuses.status as status'
             )
             ->get();
@@ -713,14 +712,13 @@ class MAController extends Controller
         $extensionApplications = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->leftJoin('study_leave_extensions_approvals', 'study_leave_extensions_approvals.study_leave_extension_id', '=', 'study_leave_extensions.id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->where(function ($query) {
-                $query->where('study_leave_extensions_approvals.status_id', 4)
-                      ->orWhereNull('study_leave_extensions_approvals.status_id');
+                $query->where('study_leave_extensions.status_id', 4)
+                      ->orWhereNull('study_leave_extensions.status_id');
             })
             ->select(
                 'study_leave_extensions.id as extension_id',
@@ -734,7 +732,7 @@ class MAController extends Controller
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.reason_for_extension',
                 'study_leave_extensions.created_at as extension_applied_date',
-                'study_leave_extensions_approvals.status_id as approval_status_id',
+                'study_leave_extensions.status_id as approval_status_id',
                 DB::raw("COALESCE(statuses.status, 'Pending') as status")
             )
             ->get();
@@ -749,8 +747,7 @@ class MAController extends Controller
 
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->leftJoin('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+                        ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
@@ -780,8 +777,7 @@ class MAController extends Controller
 
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->leftJoin('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+                        ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
@@ -812,13 +808,13 @@ class MAController extends Controller
          $maUserId = self::MA_USER_ID;
 
          $statusApplications = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
-            ->join('statuses', 'statuses.stat_id', '=', 'study_leave_approvals.status_id') // adjusted to status_id
+            ->join('statuses', 'statuses.stat_id', '=', 'study_leaves.status_id') // adjusted to status_id
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->whereBetween('study_leave_approvals.status_id', [4, 8])
+            ->whereBetween('study_leaves.status_id', [4, 8])
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->orderByDesc('study_leaves.created_at')
             ->select(
@@ -828,7 +824,7 @@ class MAController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'employees.created_at as applied_date',
-                'study_leave_approvals.status_id as status_id'
+                'study_leaves.status_id as status_id'
             )
             ->get();
 
@@ -845,12 +841,12 @@ class MAController extends Controller
         // Get the specific study leave application with all details
         // Only show if the employee is assigned to this specific MA
        $draft_study_leave = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('statuses', 'study_leave_approvals.status_id', '=', 'statuses.stat_id')
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
             ->where('study_leaves.id', $id)
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
@@ -865,7 +861,7 @@ class MAController extends Controller
                 'employees.mobile_no as mobile',
                 'employees.nic',
                 'statuses.status',
-                'study_leave_approvals.status_id as approval_status_id',
+                'study_leaves.status_id as approval_status_id',
                 'employees.email as email',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
@@ -876,25 +872,25 @@ class MAController extends Controller
                 'study_leaves.self_funding_declaration as self_funding_declaration',
                 'study_leaves.placement_letter as placement_letter',
                 // Deputy Registrar (HOD Academic Establishment) Review data
-                'study_leave_approvals.registrar_recommendation',
-                'study_leave_approvals.registrar_not_recommend_reason',
-                'study_leave_approvals.registrar_remarks',
+                'study_leaves.registrar_recommendation',
+                'study_leaves.registrar_not_recommend_reason',
+                'study_leaves.registrar_remarks',
                 // HOD Review data
-                'study_leave_approvals.hod_adequate_staff_available',
-                'study_leave_approvals.hod_teaching_covered',
-                'study_leave_approvals.hod_service_period',
-                'study_leave_approvals.hod_recommend',
-                'study_leave_approvals.hod_not_recommend_reason',
-                'study_leave_approvals.hod_remarks',
+                'study_leaves.hod_adequate_staff_available',
+                'study_leaves.hod_teaching_covered',
+                'study_leaves.hod_service_period',
+                'study_leaves.hod_recommend',
+                'study_leaves.hod_not_recommend_reason',
+                'study_leaves.hod_remarks',
                 // Dean Review data
-                'study_leave_approvals.dean_leave_recommendation_status',
-                'study_leave_approvals.dean_not_recommended_reason',
-                'study_leave_approvals.dean_remarks',
+                'study_leaves.dean_leave_recommendation_status',
+                'study_leaves.dean_not_recommended_reason',
+                'study_leaves.dean_remarks',
                 // VC Review data
-                'study_leave_approvals.vc_recommend_submit_to_committee',
-                'study_leave_approvals.vc_council_covering_approval_status',
-                'study_leave_approvals.vc_not_approve_reason',
-                'study_leave_approvals.vc_remarks'
+                'study_leaves.vc_recommend_submit_to_committee',
+                'study_leaves.vc_council_covering_approval_status',
+                'study_leaves.vc_not_approve_reason',
+                'study_leaves.vc_remarks'
             )
             ->first();
            
@@ -989,17 +985,16 @@ class MAController extends Controller
     {
         $totalDays = 0;
         $previousLeaves=StudyLeave::where('empno', $emp_no)
-        ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
-        ->where('study_leave_approvals.is_draft', false)
-        ->where('study_leave_approvals.status_id', 1)
+        
+        ->where('study_leaves.is_draft', false)
+        ->where('study_leaves.status_id', 1)
         ->select('study_leaves.study_leave_from as study_leave_from','study_leaves.study_leave_to as study_leave_to');
 
         if($previousLeaves->count() > 0){
             foreach($previousLeaves->get() as $leave){
                 $leave_id = $leave->id;
                 $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave_id)
-                ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-                ->where('study_leave_extensions_approvals.status_id', 1)
+                                ->where('study_leave_extensions.status_id', 1)
                 ->select('study_leave_extensions.new_end_date')
                 ->OrderBy('study_leave_extensions.id', 'desc')
                 ->first();
@@ -1031,16 +1026,15 @@ class MAController extends Controller
         $totalMonths = 0;
         $totalDays = 0;
         $previousLeaves = StudyLeave::where('empno', $emp_no)
-            ->join('study_leave_approvals', 'study_leaves.id', '=', 'study_leave_approvals.study_leave_id')
-            ->where('study_leave_approvals.is_draft', false)
-            ->where('study_leave_approvals.status_id', 1)
+            
+            ->where('study_leaves.is_draft', false)
+            ->where('study_leaves.status_id', 1)
             ->select('study_leaves.id', 'study_leaves.study_leave_from as study_leave_from', 'study_leaves.study_leave_to as study_leave_to')
             ->get();
 
         foreach ($previousLeaves as $leave) {
             $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $leave->id)
-                ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-                ->where('study_leave_extensions_approvals.status_id', 1)
+                                ->where('study_leave_extensions.status_id', 1)
                 ->select('study_leave_extensions.new_end_date')
                 ->orderBy('study_leave_extensions.id', 'desc')
                 ->first();
@@ -1072,10 +1066,10 @@ class MAController extends Controller
 
         // Allow MA forward action only while the application is in Processing MA state
         $application = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leave_approvals.status_id', 4) // Processing MA
+            ->where('study_leaves.status_id', 4) // Processing MA
             ->where('employees.assign_ma_user_id', $maUserId) // Assigned MA only
             ->select('study_leaves.id')
             ->first();
@@ -1105,8 +1099,8 @@ class MAController extends Controller
                 'updated_at' => now()
             ]);
             */
-            DB::table('study_leave_approvals')
-            ->where('study_leave_id', $id)
+            DB::table('study_leaves')
+            ->where('id', $id)
             ->update([
                 'status_id' => 9, // Processing HOD
                 'ma_empno' => self::MA_USER_ID, // Record which MA processed this
@@ -1133,10 +1127,9 @@ class MAController extends Controller
         $maUserId = self::MA_USER_ID;
 
         $application = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id' )
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leave_approvals.status_id', 4) // Processing MA
+            ->where('study_leaves.status_id', 4) // Processing MA
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select('study_leaves.*')
             ->first();
@@ -1162,8 +1155,8 @@ class MAController extends Controller
             ]);
             */
 
-             DB::table('study_leave_approvals')
-            ->where('study_leave_id', $id)
+             DB::table('study_leaves')
+            ->where('id', $id)
             ->update([
                 'status_id' => 3, // Edited to Returned
                'ma_empno' => self::MA_USER_ID, // Record which MA processed this
@@ -1191,8 +1184,7 @@ class MAController extends Controller
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->where('study_leave_extensions.id', $extension_id)
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->select(
@@ -1202,26 +1194,26 @@ class MAController extends Controller
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.extension_payment_type',
                 'study_leave_extensions.reason_for_extension',
-                'study_leave_extensions_approvals.status_id as extension_status_id',
-                'study_leave_extensions_approvals.ma_remarks',
-                'study_leave_extensions_approvals.ma_recommend',
-                'study_leave_extensions_approvals.ma_not_recommend_reason',
+                'study_leave_extensions.status_id as extension_status_id',
+                'study_leave_extensions.ma_remarks',
+                'study_leave_extensions.ma_recommend',
+                'study_leave_extensions.ma_not_recommend_reason',
                 // Registrar (HOD Academic Establishment) review
-                'study_leave_extensions_approvals.acad_est_head_recommend',
-                'study_leave_extensions_approvals.acad_est_head_not_recommend_reason',
-                'study_leave_extensions_approvals.acad_est_head_remarks',
+                'study_leave_extensions.acad_est_head_recommend',
+                'study_leave_extensions.acad_est_head_not_recommend_reason',
+                'study_leave_extensions.acad_est_head_remarks',
                 // HOD review
-                'study_leave_extensions_approvals.hod_recommend',
-                'study_leave_extensions_approvals.hod_not_recommend_reason',
-                'study_leave_extensions_approvals.hod_remarks',
+                'study_leave_extensions.hod_recommend',
+                'study_leave_extensions.hod_not_recommend_reason',
+                'study_leave_extensions.hod_remarks',
                 // Dean review
-                'study_leave_extensions_approvals.dean_recommend',
-                'study_leave_extensions_approvals.dean_not_recommended_reason',
-                'study_leave_extensions_approvals.dean_remark',
+                'study_leave_extensions.dean_recommend',
+                'study_leave_extensions.dean_not_recommended_reason',
+                'study_leave_extensions.dean_remark',
                 // VC review
-                'study_leave_extensions_approvals.vc_recommend',
-                'study_leave_extensions_approvals.vc_not_recommend_reason',
-                'study_leave_extensions_approvals.vc_remarks',
+                'study_leave_extensions.vc_recommend',
+                'study_leave_extensions.vc_not_recommend_reason',
+                'study_leave_extensions.vc_remarks',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -1325,8 +1317,8 @@ class MAController extends Controller
                 'updated_at' => now(),
             ]);
 
-        DB::table('study_leave_extensions_approvals')
-            ->where('study_leave_extension_id', $extension_id)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
             ->update([
                 'status_id' => 9, // Processing HOD Academic Establishment/Registrar
                 'ma_empno' => self::MA_USER_ID,
@@ -1370,8 +1362,8 @@ class MAController extends Controller
         $newRemark = $request->remark ?? '';
 
         // Update status to Returned (status_id = 3)
-        DB::table('study_leave_extensions_approvals')
-            ->where('study_leave_extension_id', $extension_id)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
             ->update([
                 'status_id' => 3, // Returned
                 'ma_empno' => self::MA_USER_ID,
@@ -1393,9 +1385,8 @@ class MAController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions_approvals.status_id', 8) // VC Checked
+                        ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 8) // VC Checked
             ->where('employees.assign_ma_user_id', $maUserId)
             ->select('study_leave_extensions.id')
             ->first();
@@ -1404,8 +1395,8 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave.extensions')->with('error', 'Extension is not available for finalization.');
         }
 
-        DB::table('study_leave_extensions_approvals')
-            ->where('study_leave_extension_id', $extension_id)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
             ->update([
                 'status_id' => 1, // Approved
                 'ma_finalized_date' => now()->toDateString(),
@@ -1425,9 +1416,8 @@ class MAController extends Controller
         $extension = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions.id', $extension_id)
-            ->where('study_leave_extensions_approvals.status_id', 8) // VC Checked
+                        ->where('study_leave_extensions.id', $extension_id)
+            ->where('study_leave_extensions.status_id', 8) // VC Checked
             ->where('employees.assign_ma_user_id', $maUserId)
             ->select('study_leave_extensions.id')
             ->first();
@@ -1436,8 +1426,8 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave.extensions')->with('error', 'Extension is not available for rejection.');
         }
 
-        DB::table('study_leave_extensions_approvals')
-            ->where('study_leave_extension_id', $extension_id)
+        DB::table('study_leave_extensions')
+            ->where('id', $extension_id)
             ->update([
                 'status_id' => 2, // Rejected
                 'ma_finalized_date' => now()->toDateString(),
@@ -1458,8 +1448,7 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->leftJoin('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
-            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+                        ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
@@ -1468,20 +1457,20 @@ class MAController extends Controller
             ->select(
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
-                'study_leave_progress_reports_approval.approval_status_id',
-                'study_leave_progress_reports_approval.ma_empno',
-                'study_leave_progress_reports_approval.registrar_approval_status',
-                'study_leave_progress_reports_approval.registrar_not_approve_reason',
-                'study_leave_progress_reports_approval.registrar_remarks',
-                'study_leave_progress_reports_approval.hod_approval_status',
-                'study_leave_progress_reports_approval.hod_not_approve_reason',
-                'study_leave_progress_reports_approval.hod_remarks',
-                'study_leave_progress_reports_approval.dean_approval_status',
-                'study_leave_progress_reports_approval.dean_not_approve_reason',
-                'study_leave_progress_reports_approval.dean_remarks',
-                'study_leave_progress_reports_approval.vc_approval_status',
-                'study_leave_progress_reports_approval.vc_not_approve_reason',
-                'study_leave_progress_reports_approval.vc_remarks',
+                'study_leave_progress_reports.approval_status_id',
+                'study_leave_progress_reports.ma_empno',
+                'study_leave_progress_reports.registrar_approval_status',
+                'study_leave_progress_reports.registrar_not_approve_reason',
+                'study_leave_progress_reports.registrar_remarks',
+                'study_leave_progress_reports.hod_approval_status',
+                'study_leave_progress_reports.hod_not_approve_reason',
+                'study_leave_progress_reports.hod_remarks',
+                'study_leave_progress_reports.dean_approval_status',
+                'study_leave_progress_reports.dean_not_approve_reason',
+                'study_leave_progress_reports.dean_remarks',
+                'study_leave_progress_reports.vc_approval_status',
+                'study_leave_progress_reports.vc_not_approve_reason',
+                'study_leave_progress_reports.vc_remarks',
                 'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
@@ -1574,10 +1563,9 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
-            ->where('study_leave_progress_reports.id', $progress_report_id)
+                        ->where('study_leave_progress_reports.id', $progress_report_id)
             ->where('employees.assign_ma_user_id', $maUserId)
-            ->where('study_leave_progress_reports_approval.approval_status_id', 4) // Processing MA only
+            ->where('study_leave_progress_reports.approval_status_id', 4) // Processing MA only
             ->select('study_leave_progress_reports.*')
             ->first();
           
@@ -1598,7 +1586,7 @@ class MAController extends Controller
             ]);
 
         // Update approval record - forward to HOD Academic Establishment
-        StudyLeaveProgressReportsApproval::where('study_leave_progress_report_id', $progress_report_id)
+        StudyLeaveProgressReports::where('id', $progress_report_id)
             ->update([
                 'ma_empno' => self::MA_USER_ID,
                 'approval_status_id' => 9, // Processing HOD Academic Establishment
@@ -1626,10 +1614,9 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
-            ->where('study_leave_progress_reports.id', $progress_report_id)
+                        ->where('study_leave_progress_reports.id', $progress_report_id)
             ->where('employees.assign_ma_user_id', $maUserId)
-            ->where('study_leave_progress_reports_approval.approval_status_id', 4) // Processing MA only
+            ->where('study_leave_progress_reports.approval_status_id', 4) // Processing MA only
             ->select('study_leave_progress_reports.*')
             ->first();
 
@@ -1650,7 +1637,7 @@ class MAController extends Controller
             ]);
 
         // Update ma_empno in approval record
-        StudyLeaveProgressReportsApproval::where('study_leave_progress_report_id', $progress_report_id)
+        StudyLeaveProgressReports::where('id', $progress_report_id)
             ->update([
                 'ma_empno' => self::MA_USER_ID,
                 'ma_reviewed_date' => now()->toDateString(),
@@ -1670,9 +1657,8 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
-            ->where('study_leave_progress_reports.id', $progress_report_id)
-            ->where('study_leave_progress_reports_approval.approval_status_id', 8) // VC Checked
+                        ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports.approval_status_id', 8) // VC Checked
             ->where('employees.assign_ma_user_id', $maUserId)
             ->select('study_leave_progress_reports.id')
             ->first();
@@ -1681,8 +1667,8 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave.progress')->with('error', 'Progress report is not available for finalization.');
         }
 
-        DB::table('study_leave_progress_reports_approval')
-            ->where('study_leave_progress_report_id', $progress_report_id)
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
             ->update([
                 'approval_status_id' => 1, // Approved
                 'ma_empno' => self::MA_USER_ID,
@@ -1710,9 +1696,8 @@ class MAController extends Controller
         $progressReport = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports.id', '=', 'study_leave_progress_reports_approval.study_leave_progress_report_id')
-            ->where('study_leave_progress_reports.id', $progress_report_id)
-            ->where('study_leave_progress_reports_approval.approval_status_id', 8) // VC Checked
+                        ->where('study_leave_progress_reports.id', $progress_report_id)
+            ->where('study_leave_progress_reports.approval_status_id', 8) // VC Checked
             ->where('employees.assign_ma_user_id', $maUserId)
             ->select('study_leave_progress_reports.id')
             ->first();
@@ -1721,8 +1706,8 @@ class MAController extends Controller
             return redirect()->route('ma.studyleave.progress')->with('error', 'Progress report is not available for rejection.');
         }
 
-        DB::table('study_leave_progress_reports_approval')
-            ->where('study_leave_progress_report_id', $progress_report_id)
+        DB::table('study_leave_progress_reports')
+            ->where('id', $progress_report_id)
             ->update([
                 'approval_status_id' => 2, // Rejected
                 'ma_empno' => self::MA_USER_ID,
@@ -1806,12 +1791,12 @@ class MAController extends Controller
 
         // Verify the application is in VC checked status (status_id = 8)
         $application = DB::table('study_leaves')
-            ->join('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->where('study_leaves.id', $id)
-            ->where('study_leave_approvals.status_id', 8) // VC Checked
+            ->where('study_leaves.status_id', 8) // VC Checked
             ->where('employees.assign_ma_user_id', $maUserId)
-            ->select('study_leaves.*', 'study_leave_approvals.id as approval_id')
+            ->select('study_leaves.*', 'study_leaves.id as approval_id')
             ->first();
 
         if (!$application) {
@@ -1836,7 +1821,7 @@ class MAController extends Controller
             $updateData['ma_council_date'] = $request->ma_council_date;
         }
 
-        DB::table('study_leave_approvals')
+        DB::table('study_leaves')
             ->where('id', $application->approval_id)
             ->update($updateData);
 
@@ -1858,16 +1843,16 @@ class MAController extends Controller
         
         // Build base query
         $query = DB::table('study_leaves')
-            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
-            ->leftJoin('statuses', 'statuses.stat_id', '=', 'study_leave_approvals.status_id')
+            ->leftJoin('statuses', 'statuses.stat_id', '=', 'study_leaves.status_id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
             ->where('study_leaves.is_draft', false) // Only non-draft applications
             ->where(function($q) {
-                $q->whereIn('study_leave_approvals.status_id', [1, 2]); // Final applications: approved and rejected
+                $q->whereIn('study_leaves.status_id', [1, 2]); // Final applications: approved and rejected
                  
                  
             });
@@ -1910,18 +1895,18 @@ class MAController extends Controller
                 'departments.department_name as department',
                 'faculties.faculty_name as faculty',
                 'study_leaves.created_at as applied_date',
-                'study_leave_approvals.status_id as approval_status_id',
+                'study_leaves.status_id as approval_status_id',
                 DB::raw("COALESCE(statuses.status, 'Pending') as status")
             )
             ->get();
 
         // Calculate statistics
         $allApplications = DB::table('study_leaves')
-            ->leftJoin('study_leave_approvals', 'study_leave_approvals.study_leave_id', '=', 'study_leaves.id')
+            
             ->join('employees', 'employees.employee_no', '=', 'study_leaves.empno')
             ->where('employees.assign_ma_user_id', $maUserId)
             ->where('study_leaves.is_draft', false)
-            ->select('study_leave_approvals.status_id', 'study_leaves.created_at')
+            ->select('study_leaves.status_id', 'study_leaves.created_at')
             ->get();
 
         $statistics = [
@@ -1941,16 +1926,15 @@ class MAController extends Controller
          $extensionApplications = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions_approvals.study_leave_extension_id', '=', 'study_leave_extensions.id')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
-            ->leftJoin('statuses', 'study_leave_extensions_approvals.status_id', '=', 'statuses.stat_id')
+            ->leftJoin('statuses', 'study_leave_extensions.status_id', '=', 'statuses.stat_id')
             ->where(function($query) {
                 $query->whereIn('statuses.stat_id', [1, 2]);
-                     // ->orWhereNotNull('study_leave_extensions_approvals.ma_empno');
+                     // ->orWhereNotNull('study_leave_extensions.ma_empno');
             })
             ->where('employees.assign_ma_user_id', $maUserId) // Filter by assigned MA
-            ->orderByDesc('study_leave_extensions_approvals.ma_reviewed_date')
+            ->orderByDesc('study_leave_extensions.ma_reviewed_date')
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leaves.id as study_leave_id',
@@ -1978,8 +1962,7 @@ class MAController extends Controller
 
          $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
-            ->join('study_leave_progress_reports_approval', 'study_leave_progress_reports_approval.study_leave_progress_report_id', '=', 'study_leave_progress_reports.id')
-            ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
+                        ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
             ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
@@ -1989,9 +1972,9 @@ class MAController extends Controller
             ->where(function($query) {
                 $query->whereIn('statuses.stat_id', [1, 2]);
                      
-                      //->orWhereNotNull('study_leave_progress_reports_approval.ma_empno');
+                      //->orWhereNotNull('study_leave_progress_reports.ma_empno');
             })
-            ->orderByDesc('study_leave_progress_reports_approval.ma_reviewed_date')
+            ->orderByDesc('study_leave_progress_reports.ma_reviewed_date')
             ->select(
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leaves.id as study_leave_id',

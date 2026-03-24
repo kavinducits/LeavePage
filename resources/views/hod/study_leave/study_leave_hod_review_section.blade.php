@@ -93,25 +93,25 @@
                  <span class="text-danger">*</span>
              </label>
              <div class="form-check">
-                 <input class="form-check-input" type="radio" name="hod_recommend" id="recommendYes" value="1"
+                 <input class="form-check-input" type="radio" name="hod_recommend" id="hodRecommendYes" value="1"
                      {{ isset($draft_study_leave->hod_recommend) && $draft_study_leave->hod_recommend == 1 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
-                 <label class="form-check-label" for="recommendYes">
+                 <label class="form-check-label" for="hodRecommendYes">
                      Yes
                  </label>
              </div>
              <div class="form-check">
-                 <input class="form-check-input" type="radio" name="hod_recommend" id="recommendNo" value="0"
+                 <input class="form-check-input" type="radio" name="hod_recommend" id="hodRecommendNo" value="0"
                      {{ isset($draft_study_leave->hod_recommend) && $draft_study_leave->hod_recommend !== null && $draft_study_leave->hod_recommend == 0 ? 'checked' : '' }}
                      {{ $readonly ?? false ? 'disabled' : 'required' }}>
-                 <label class="form-check-label" for="recommendNo">
+                 <label class="form-check-label" for="hodRecommendNo">
                      No
                  </label>
              </div>
          </div>
 
          <!-- Conditional: If not recommended -->
-         <div class="mb-4" id="notRecommendReasonDiv"
+         <div class="mb-4" id="hodNotRecommendReasonDiv"
              style="display: {{ (optional($draft_study_leave)->hod_recommend !== null && optional($draft_study_leave)->hod_recommend == 0) || optional($draft_study_leave)->hod_not_recommend_reason ? 'block' : 'none' }};">
              <label for="hod_not_recommend_reason" class="form-label fw-semibold">
                  If not recommended, please give reasons
@@ -138,10 +138,14 @@
  </div>
  <script>
      document.addEventListener('DOMContentLoaded', function() {
-         const recommendYes = document.getElementById('recommendYes');
-         const recommendNo = document.getElementById('recommendNo');
-         const notRecommendReasonDiv = document.getElementById('notRecommendReasonDiv');
+         const recommendYes = document.getElementById('hodRecommendYes');
+         const recommendNo = document.getElementById('hodRecommendNo');
+         const notRecommendReasonDiv = document.getElementById('hodNotRecommendReasonDiv');
          const notRecommendReasonTextarea = document.getElementById('hod_not_recommend_reason');
+
+         if (!recommendYes || !recommendNo || !notRecommendReasonDiv || !notRecommendReasonTextarea) {
+             return;
+         }
 
          // Show/hide reason textarea based on recommendation
          function toggleReasonField() {

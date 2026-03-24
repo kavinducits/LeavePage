@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\StudyLeaveProgressReports;
-use App\Models\StudyLeaveProgressReportsApproval;
 use App\Models\StudyLeave;
 use App\Models\StudyLeaveExtension;
 use Illuminate\Http\Request;
@@ -61,8 +60,8 @@ class StudyLeaveProgressReportsController extends Controller
     private function isExtended($study_leave_id)
     {   
         $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $study_leave_id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
+            
+            ->where('study_leave_extensions.status_id', 1) // Only approved extensions
             ->count();
 
         return $extensions > 0;
@@ -74,8 +73,8 @@ class StudyLeaveProgressReportsController extends Controller
     private function getLastExtendedEndDate($study_leave_id)
     {
         $extensions = StudyLeaveExtension::where('study_leave_extensions.study_leave_id', $study_leave_id)
-            ->join('study_leave_extensions_approvals', 'study_leave_extensions.id', '=', 'study_leave_extensions_approvals.study_leave_extension_id')
-            ->where('study_leave_extensions_approvals.status_id', 1) // Only approved extensions
+            
+            ->where('study_leave_extensions.status_id', 1) // Only approved extensions
             ->orderBy('study_leave_extensions.new_end_date', 'desc')
             ->first();
 
@@ -142,11 +141,6 @@ class StudyLeaveProgressReportsController extends Controller
                 'document_path' => $path,
                 'remark' => $request->input('remark'),
                 'status_id' => 4, // Status 4 as per requirement
-            ]);
-
-            // Create approval record and forward to MA (status_id = 4: Processing MA)
-            StudyLeaveProgressReportsApproval::create([
-                'study_leave_progress_report_id' => $progressReport->id,
                 'approval_status_id' => 4, // Processing MA
             ]);
 
@@ -325,8 +319,8 @@ class StudyLeaveProgressReportsController extends Controller
                 $progressReport->updated_at = now();
                 $progressReport->save();
 
-                // Update approval record to forward back to MA
-                StudyLeaveProgressReportsApproval::where('study_leave_progress_report_id', $progressReport->id)
+                // Update merged workflow fields to forward back to MA
+                StudyLeaveProgressReports::where('id', $progressReport->id)
                     ->update([
                         'approval_status_id' => 4, // Processing MA
                         'updated_at' => now()
