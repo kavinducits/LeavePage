@@ -181,8 +181,7 @@ class HODAcademicEstablishmentController extends Controller
         //dd($request->all());
         $request->validate([
             'registrar_recommendation' => 'nullable|integer|in:0,1',
-            'registrar_not_recommend_reason' => 'required_if:registrar_recommendation,0|string|nullable',
-            'registrar_remarks' => 'nullable|string|max:1000',
+            'registrar_remarks' => 'required_if:registrar_recommendation,0|nullable|string|max:1000',
         ]);
 
         $hodEmpNo = self::HOD_EMP_NO;
@@ -206,7 +205,6 @@ class HODAcademicEstablishmentController extends Controller
                 'status_id' => 5, // Processing Department HOD (forward to applicant's department HOD)
                 'registrar_empno' => $hodEmpNo,
                 'registrar_recommendation' => $request->registrar_recommendation,
-                'registrar_not_recommend_reason' => $request->registrar_not_recommend_reason,
                 'registrar_remarks' => $request->registrar_remarks,
                 'registrar_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()

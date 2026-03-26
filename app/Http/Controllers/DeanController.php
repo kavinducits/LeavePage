@@ -542,14 +542,12 @@ class DeanController extends Controller
                 DB::raw("CONCAT(other_nominee_t.initials, ' ', other_nominee_t.last_name) as other_nominee_name"),
                 // Deputy Registrar review data from merged study_leaves workflow fields
                 'study_leaves.registrar_recommendation',
-                'study_leaves.registrar_not_recommend_reason',
                 'study_leaves.registrar_remarks',
                 // HOD review data from merged study_leaves workflow fields
                 'study_leaves.hod_adequate_staff_available',
                 'study_leaves.hod_teaching_covered',
                 'study_leaves.hod_service_period',
                 'study_leaves.hod_recommend',
-                'study_leaves.hod_not_recommend_reason',
                 'study_leaves.hod_remarks'
             )
             ->first();
@@ -578,8 +576,7 @@ class DeanController extends Controller
         // Validate the Dean review inputs
         $request->validate([
             'dean_recommend' => 'required|integer|in:0,1',
-            'dean_not_recommend_reason' => 'required_if:dean_recommend,0|string|nullable',
-            'dean_remarks' => 'nullable|string',
+            'dean_remarks' => 'required_if:dean_recommend,0|nullable|string',
         ]);
 
         // Get faculty IDs for this Dean
@@ -606,7 +603,6 @@ class DeanController extends Controller
                 'status_id' => 7, // Processing VC (forward to VC)
                 'dean_empno' => self::DEAN_EMP_NO,
                 'dean_leave_recommendation_status' => $request->dean_recommend,
-                'dean_not_recommended_reason' => $request->dean_not_recommend_reason,
                 'dean_remarks' => $request->dean_remarks,
                 'dean_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()

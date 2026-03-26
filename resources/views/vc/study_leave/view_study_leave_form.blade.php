@@ -108,26 +108,16 @@
                         </div>
                     </div>
 
-                    <!-- Conditional: If not approved -->
-                    <div class="mb-4" id="notApproveReasonDiv" style="display: none;">
-                        <label for="vc_not_approve_reason" class="form-label fw-semibold">
-                            If not recommended, please give reasons
-                            <span class="text-danger">*</span>
-                        </label>
-                        <textarea class="form-control" id="vc_not_approve_reason" name="vc_not_approve_reason" rows="4"
-                            placeholder="Please provide detailed reasons for not recommending this leave"></textarea>
-                        <div class="invalid-feedback">
-                            Please provide reasons for not approving.
-                        </div>
-                    </div>
-
                     <!-- Any other remarks -->
                     <div class="mb-4">
                         <label for="vc_remarks" class="form-label fw-semibold">
                             Any other remarks
                         </label>
                         <textarea class="form-control" id="vc_remarks" name="vc_remarks" rows="3"
-                            placeholder="Add any additional comments or remarks (optional)"></textarea>
+                            placeholder="Add comments. Required when recommendation is No."></textarea>
+                        <div class="invalid-feedback">
+                            Please provide remarks when leave is not recommended.
+                        </div>
                     </div>
 
                 </div>
@@ -231,40 +221,36 @@
         document.addEventListener('DOMContentLoaded', function() {
             const recommendCommitteeYes = document.getElementById('recommendCommitteeYes');
             const recommendCommitteeNo = document.getElementById('recommendCommitteeNo');
-            const notApproveReasonDiv = document.getElementById('notApproveReasonDiv');
-            const notApproveReasonTextarea = document.getElementById('vc_not_approve_reason');
+            const remarksTextarea = document.getElementById('vc_remarks');
             const form = document.getElementById('vcReviewForm');
             let forwardConfirmed = false;
 
-            // Show/hide reason textarea based on recommendation
-            function toggleReasonField() {
+            function toggleRemarksRequirement() {
                 if (recommendCommitteeNo.checked) {
-                    notApproveReasonDiv.style.display = 'block';
-                    notApproveReasonTextarea.setAttribute('required', 'required');
+                    remarksTextarea.setAttribute('required', 'required');
                 } else {
-                    notApproveReasonDiv.style.display = 'none';
-                    notApproveReasonTextarea.removeAttribute('required');
-                    notApproveReasonTextarea.value = '';
-                    notApproveReasonTextarea.classList.remove('is-invalid');
+                    remarksTextarea.removeAttribute('required');
+                    remarksTextarea.classList.remove('is-invalid');
                 }
             }
 
-            recommendCommitteeYes.addEventListener('change', toggleReasonField);
-            recommendCommitteeNo.addEventListener('change', toggleReasonField);
+            recommendCommitteeYes.addEventListener('change', toggleRemarksRequirement);
+            recommendCommitteeNo.addEventListener('change', toggleRemarksRequirement);
+            toggleRemarksRequirement();
 
             // Form validation
             form.addEventListener('submit', function(e) {
                 let isValid = true;
 
-                // Check if "No" is selected and reason is empty
+                // Check if "No" is selected and remarks are empty
                 if (recommendCommitteeNo.checked) {
-                    const reasonValue = notApproveReasonTextarea.value.trim();
-                    if (!reasonValue) {
+                    const remarksValue = remarksTextarea.value.trim();
+                    if (!remarksValue) {
                         e.preventDefault();
-                        notApproveReasonTextarea.classList.add('is-invalid');
-                        notApproveReasonTextarea.focus();
+                        remarksTextarea.classList.add('is-invalid');
+                        remarksTextarea.focus();
                         isValid = false;
-                        alert('Please provide reasons for not recommending this leave.');
+                        alert('Please provide remarks when not recommending this leave.');
                         return;
                     }
                 }
@@ -279,7 +265,7 @@
             });
 
             // Clear invalid state when user starts typing
-            notApproveReasonTextarea.addEventListener('input', function() {
+            remarksTextarea.addEventListener('input', function() {
                 if (this.value.trim()) {
                     this.classList.remove('is-invalid');
                 }

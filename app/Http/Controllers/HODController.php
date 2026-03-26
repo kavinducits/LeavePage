@@ -661,7 +661,6 @@ class HODController extends Controller
                 'departments.id as department_id',
                 // Deputy Registrar review data from merged study_leaves workflow fields
                 'study_leaves.registrar_recommendation',
-                'study_leaves.registrar_not_recommend_reason',
                 'study_leaves.registrar_remarks'
             )
             ->first();
@@ -914,8 +913,7 @@ class HODController extends Controller
             'hod_teaching_covered' => 'required|integer|in:0,1',
             'hod_service_period' => 'required|integer|in:0,1',
             'hod_recommend' => 'required|integer|in:0,1',
-            'hod_not_recommend_reason' => 'required_if:hod_recommend,0|string|nullable',
-            'hod_remarks' => 'nullable|string',
+            'hod_remarks' => 'required_if:hod_recommend,0|nullable|string',
         ]);
 
         // Get department IDs for this HOD
@@ -945,7 +943,6 @@ class HODController extends Controller
                 'hod_teaching_covered' => $request->hod_teaching_covered,
                 'hod_service_period' => $request->hod_service_period,
                 'hod_recommend' => $request->hod_recommend,
-                'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
                 'hod_remarks' => $request->hod_remarks,
                 'hod_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()

@@ -30,28 +30,16 @@
              </div>
          </div>
 
-         <!-- Conditional: If not recommended -->
-         <div class="mb-4" id="notRecommendReasonDiv"
-             style="display: {{ optional($draft_study_leave)->registrar_recommendation == '0' && optional($draft_study_leave)->registrar_recommendation !== null || optional($draft_study_leave)->registrar_not_recommend_reason ? 'block' : 'none' }};">
-             <label for="registrar_not_recommend_reason" class="form-label fw-semibold">
-                 If not recommended, please give reasons
-                 <span class="text-danger">*</span>
-             </label>
-             <textarea class="form-control" id="registrar_not_recommend_reason" name="registrar_not_recommend_reason" rows="4"
-                 placeholder="Please provide detailed reasons for not recommending this leave"
-                 {{ $readonly ?? false ? 'readonly' : '' }}>{{ optional($draft_study_leave)->registrar_not_recommend_reason ?? '' }}</textarea>
-             <div class="invalid-feedback">
-                 Please provide reasons for not recommending.
-             </div>
-         </div>
-
          <!-- Any other remarks -->
          <div class="mb-4">
              <label for="registrar_remarks" class="form-label fw-semibold">
                  Any other remarks
              </label>
              <textarea class="form-control" id="registrar_remarks" name="registrar_remarks" rows="3"
-                 placeholder="Add any additional comments or remarks (optional)" {{ $readonly ?? false ? 'readonly' : '' }}>{{ $draft_study_leave->registrar_remarks ?? '' }}</textarea>
+                placeholder="Add comments. Required when recommendation is No." {{ $readonly ?? false ? 'readonly' : '' }}>{{ $draft_study_leave->registrar_remarks ?? '' }}</textarea>
+            <div class="invalid-feedback">
+                Please provide remarks when leave is not recommended.
+            </div>
          </div>
 
      </div>
@@ -60,23 +48,23 @@
      document.addEventListener('DOMContentLoaded', function() {
          const recommendYes = document.getElementById('recommendYes');
          const recommendNo = document.getElementById('recommendNo');
-         const notRecommendReasonDiv = document.getElementById('notRecommendReasonDiv');
-         const notRecommendReasonTextarea = document.getElementById('registrar_not_recommend_reason');
+         const remarksTextarea = document.getElementById('registrar_remarks');
 
-         // Show/hide reason textarea based on recommendation
-         function toggleReasonField() {
+         if (!recommendYes || !recommendNo || !remarksTextarea) {
+             return;
+         }
+
+         function toggleRemarksRequirement() {
              if (recommendNo.checked) {
-                 notRecommendReasonDiv.style.display = 'block';
-                 notRecommendReasonTextarea.setAttribute('required', 'required');
+                 remarksTextarea.setAttribute('required', 'required');
              } else {
-                 notRecommendReasonDiv.style.display = 'none';
-                 notRecommendReasonTextarea.removeAttribute('required');
-                 notRecommendReasonTextarea.value = '';
-                 notRecommendReasonTextarea.classList.remove('is-invalid');
+                 remarksTextarea.removeAttribute('required');
+                 remarksTextarea.classList.remove('is-invalid');
              }
          }
 
-         recommendYes.addEventListener('change', toggleReasonField);
-         recommendNo.addEventListener('change', toggleReasonField);
+         recommendYes.addEventListener('change', toggleRemarksRequirement);
+         recommendNo.addEventListener('change', toggleRemarksRequirement);
+         toggleRemarksRequirement();
      });
  </script>

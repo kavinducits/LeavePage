@@ -48,26 +48,17 @@
             </div>
         </div>
 
-        <!-- Conditional: If not approved -->
-        <div class="mb-4" id="vcNotApproveReasonDiv"
-            style="display: {{ (optional($draft_study_leave)->vc_council_covering_approval_status !== null && optional($draft_study_leave)->vc_council_covering_approval_status == 0) || optional($draft_study_leave)->vc_not_approve_reason ? 'block' : 'none' }};">
-            <label for="vc_not_approve_reason" class="form-label fw-semibold">
-                If not recommended, please give reasons
-                <span class="text-danger">*</span>
-            </label>
-            <textarea class="form-control" id="vc_not_approve_reason" name="vc_not_approve_reason" rows="4"
-                placeholder="Please provide detailed reasons for not recommending this leave"
-                {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->vc_not_approve_reason ?? '' }}</textarea>
-        </div>
-
         <!-- Any other remarks -->
         <div class="mb-4">
             <label for="vc_remarks" class="form-label fw-semibold">
                 Any other remarks
             </label>
             <textarea class="form-control" id="vc_remarks" name="vc_remarks" rows="3"
-                placeholder="Add any additional comments or remarks (optional)"
+                placeholder="Add comments. Required when recommendation is No."
                 {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->vc_remarks ?? '' }}</textarea>
+            <div class="invalid-feedback">
+                Please provide remarks when leave is not recommended.
+            </div>
         </div>
 
     </div>

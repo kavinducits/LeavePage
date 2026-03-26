@@ -471,18 +471,15 @@ class VCController extends Controller
                 'study_leaves.*',
                 'study_leaves.registrar_empno',
                 'study_leaves.registrar_recommendation',
-                'study_leaves.registrar_not_recommend_reason',
                 'study_leaves.registrar_remarks',
                 'study_leaves.hod_empno',
                 'study_leaves.hod_adequate_staff_available',
                 'study_leaves.hod_teaching_covered',
                 'study_leaves.hod_service_period',
                 'study_leaves.hod_recommend',
-                'study_leaves.hod_not_recommend_reason',
                 'study_leaves.hod_remarks',
                 'study_leaves.dean_empno',
                 'study_leaves.dean_leave_recommendation_status',
-                'study_leaves.dean_not_recommended_reason',
                 'study_leaves.dean_remarks',
                 'employees.employee_no as employee_no',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
@@ -525,8 +522,7 @@ class VCController extends Controller
         $request->validate([
             'vc_recommend_committee' => 'required|integer|in:0,1',
             'vc_approved_council' => 'required|integer|in:0,1',
-            'vc_not_approve_reason' => 'required_if:vc_recommend_committee,0|string|nullable',
-            'vc_remarks' => 'nullable|string',
+            'vc_remarks' => 'required_if:vc_recommend_committee,0|nullable|string',
         ]);
 
         // Verify the application belongs to employees with main_branch_id = 52
@@ -557,7 +553,6 @@ class VCController extends Controller
                 'vc_empno' => self::VC_EMP_NO,
                 'vc_recommend_submit_to_committee' => $request->vc_recommend_committee,
                 'vc_council_covering_approval_status' => $request->vc_approved_council,
-                'vc_not_approve_reason' => $request->vc_not_approve_reason,
                 'vc_remarks' => $request->vc_remarks,
                 'vc_reviewed_date' => now()->toDateString(),
                 'updated_at' => Carbon::now()

@@ -873,23 +873,19 @@ class MAController extends Controller
                 'study_leaves.placement_letter as placement_letter',
                 // Deputy Registrar (HOD Academic Establishment) Review data
                 'study_leaves.registrar_recommendation',
-                'study_leaves.registrar_not_recommend_reason',
                 'study_leaves.registrar_remarks',
                 // HOD Review data
                 'study_leaves.hod_adequate_staff_available',
                 'study_leaves.hod_teaching_covered',
                 'study_leaves.hod_service_period',
                 'study_leaves.hod_recommend',
-                'study_leaves.hod_not_recommend_reason',
                 'study_leaves.hod_remarks',
                 // Dean Review data
                 'study_leaves.dean_leave_recommendation_status',
-                'study_leaves.dean_not_recommended_reason',
                 'study_leaves.dean_remarks',
                 // VC Review data
                 'study_leaves.vc_recommend_submit_to_committee',
                 'study_leaves.vc_council_covering_approval_status',
-                'study_leaves.vc_not_approve_reason',
                 'study_leaves.vc_remarks'
             )
             ->first();

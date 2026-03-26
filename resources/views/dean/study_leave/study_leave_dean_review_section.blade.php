@@ -28,26 +28,16 @@
             </div>
         </div>
 
-        <!-- Conditional: If not recommended -->
-        <div class="mb-4" id="dean_notRecommendReasonDiv" style="display: {{ (optional($draft_study_leave)->dean_leave_recommendation_status !== null && optional($draft_study_leave)->dean_leave_recommendation_status == 0) ? 'block' : 'none' }};">
-            <label for="dean_not_recommend_reason" class="form-label fw-semibold">
-                If not recommended, please give reasons
-                <span class="text-danger">*</span>
-            </label>
-            <textarea class="form-control" id="dean_not_recommend_reason" name="dean_not_recommend_reason" rows="4" 
-                      placeholder="Please provide detailed reasons for not recommending this leave" {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->dean_not_recommended_reason ?? '' }}</textarea>
-            <div class="invalid-feedback">
-                Please provide reasons for not recommending.
-            </div>
-        </div>
-
         <!-- Any other remarks -->
         <div class="mb-4">
             <label for="dean_remarks" class="form-label fw-semibold">
                 Any other remarks
             </label>
             <textarea class="form-control" id="dean_remarks" name="dean_remarks" rows="3" 
-                      placeholder="Add any additional comments or remarks (optional)" {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->dean_remarks ?? '' }}</textarea>
+                      placeholder="Add comments. Required when recommendation is No." {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->dean_remarks ?? '' }}</textarea>
+            <div class="invalid-feedback">
+                Please provide remarks when leave is not recommended.
+            </div>
         </div>
 
     </div>
@@ -57,24 +47,24 @@
 document.addEventListener('DOMContentLoaded', function() {
     const recommendYes = document.getElementById('dean_recommendYes');
     const recommendNo = document.getElementById('dean_recommendNo');
-    const notRecommendReasonDiv = document.getElementById('dean_notRecommendReasonDiv');
-    const notRecommendReasonTextarea = document.getElementById('dean_not_recommend_reason');
+    const remarksTextarea = document.getElementById('dean_remarks');
 
-     // Show/hide reason textarea based on recommendation
-                function toggleReasonField() {
-                    if (recommendNo.checked) {
-                        notRecommendReasonDiv.style.display = 'block';
-                        notRecommendReasonTextarea.setAttribute('required', 'required');
-                    } else {
-                        notRecommendReasonDiv.style.display = 'none';
-                        notRecommendReasonTextarea.removeAttribute('required');
-                        notRecommendReasonTextarea.value = '';
-                        notRecommendReasonTextarea.classList.remove('is-invalid');
-                    }
-                }
+    if (!recommendYes || !recommendNo || !remarksTextarea) {
+        return;
+    }
 
-                recommendYes.addEventListener('change', toggleReasonField);
-                recommendNo.addEventListener('change', toggleReasonField);
+    function toggleRemarksRequirement() {
+        if (recommendNo.checked) {
+            remarksTextarea.setAttribute('required', 'required');
+        } else {
+            remarksTextarea.removeAttribute('required');
+            remarksTextarea.classList.remove('is-invalid');
+        }
+    }
+
+    recommendYes.addEventListener('change', toggleRemarksRequirement);
+    recommendNo.addEventListener('change', toggleRemarksRequirement);
+    toggleRemarksRequirement();
 });
 </script>
         

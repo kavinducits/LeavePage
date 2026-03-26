@@ -164,15 +164,15 @@
 
             form.addEventListener('submit', function(e) {
                 const recommendNo = form.querySelector('#hodRecommendNo');
-                const notRecommendReasonTextarea = form.querySelector('#hod_not_recommend_reason');
+                const remarksTextarea = form.querySelector('#hod_remarks');
 
                 if (recommendNo && recommendNo.checked) {
-                    const reasonValue = notRecommendReasonTextarea ? notRecommendReasonTextarea.value.trim() : '';
-                    if (!reasonValue) {
+                    const remarksValue = remarksTextarea ? remarksTextarea.value.trim() : '';
+                    if (!remarksValue) {
                         e.preventDefault();
-                        if (notRecommendReasonTextarea) {
-                            notRecommendReasonTextarea.classList.add('is-invalid');
-                            notRecommendReasonTextarea.focus();
+                        if (remarksTextarea) {
+                            remarksTextarea.classList.add('is-invalid');
+                            remarksTextarea.focus();
                         }
                         return;
                     }
@@ -195,9 +195,9 @@
                 $('#forwardConfirmModal').modal('hide');
             });
 
-            const notRecommendReasonTextarea = form.querySelector('#hod_not_recommend_reason');
-            if (notRecommendReasonTextarea) {
-                notRecommendReasonTextarea.addEventListener('input', function() {
+            const remarksTextarea = form.querySelector('#hod_remarks');
+            if (remarksTextarea) {
+                remarksTextarea.addEventListener('input', function() {
                     if (this.value.trim()) {
                         this.classList.remove('is-invalid');
                     }
