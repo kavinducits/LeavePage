@@ -130,12 +130,6 @@
                     <div class="text-muted small mt-2">Not specified</div>
                 @endif
             </div>
-            @if(isset($extension->acad_est_head_recommend) && $extension->acad_est_head_recommend == 0 && !empty($extension->acad_est_head_not_recommend_reason))
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                    <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->acad_est_head_not_recommend_reason }}</p></div></div>
-                </div>
-            @endif
             @if(!empty($extension->acad_est_head_remarks))
                 <div class="mb-0">
                     <label class="form-label fw-semibold">Remarks</label>
@@ -169,12 +163,6 @@
                     <div class="text-muted small mt-2">Not specified</div>
                 @endif
             </div>
-            @if(isset($extension->extension_hod_recommend) && $extension->extension_hod_recommend == 0 && !empty($extension->extension_hod_not_recommend_reason))
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                    <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->extension_hod_not_recommend_reason }}</p></div></div>
-                </div>
-            @endif
             @if(!empty($extension->extension_hod_remarks))
                 <div class="mb-0">
                     <label class="form-label fw-semibold">HOD Remarks</label>
@@ -205,12 +193,6 @@
                     </div>
                 </div>
             </div>
-            @if($extension->extension_dean_recommend == 0 && !empty($extension->extension_dean_not_recommend_reason))
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->extension_dean_not_recommend_reason }}</p></div></div>
-            </div>
-            @endif
             @if(!empty($extension->extension_dean_remarks))
             <div class="mb-0">
                 <label class="form-label fw-semibold">Dean Remarks</label>
@@ -249,19 +231,6 @@
                         <label class="form-check-label" for="recommendNo">
                             No
                         </label>
-                    </div>
-                </div>
-
-                <!-- Conditional: If not recommended -->
-                <div class="mb-4" id="notRecommendReasonDiv" style="display: none;">
-                    <label for="dean_not_recommend_reason" class="form-label fw-semibold">
-                        If not recommended, please give reasons
-                        <span class="text-danger">*</span>
-                    </label>
-                    <textarea class="form-control" id="dean_not_recommend_reason" name="dean_not_recommend_reason" rows="4" 
-                              placeholder="Please provide detailed reasons for not recommending this extension"></textarea>
-                    <div class="invalid-feedback">
-                        Please provide reasons for not recommending.
                     </div>
                 </div>
 
@@ -388,29 +357,20 @@
     color: white;
 }
 
-#notRecommendReasonDiv.show {
-    display: block !important;
-}
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Show/hide not recommend reason field
     const recommendRadios = document.querySelectorAll('input[name="dean_recommend"]');
-    const notRecommendDiv = document.getElementById('notRecommendReasonDiv');
-    const notRecommendTextarea = document.getElementById('dean_not_recommend_reason');
+    const remarksTextarea = document.getElementById('dean_remarks');
 
     recommendRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.value === '0') {
-                notRecommendDiv.style.display = 'block';
-                notRecommendDiv.classList.add('show');
-                notRecommendTextarea.required = true;
+                remarksTextarea.required = true;
             } else {
-                notRecommendDiv.style.display = 'none';
-                notRecommendDiv.classList.remove('show');
-                notRecommendTextarea.required = false;
-                notRecommendTextarea.value = '';
+                remarksTextarea.required = false;
+                remarksTextarea.classList.remove('is-invalid');
             }
         });
     });
@@ -426,11 +386,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const recommendValue = document.querySelector('input[name="dean_recommend"]:checked')?.value;
         
         if (recommendValue === '0') {
-            const reason = notRecommendTextarea.value.trim();
-            if (reason === '') {
+            const remarks = remarksTextarea.value.trim();
+            if (remarks === '') {
                 e.preventDefault();
-                notRecommendTextarea.classList.add('is-invalid');
-                notRecommendTextarea.focus();
+                remarksTextarea.classList.add('is-invalid');
+                remarksTextarea.focus();
                 return false;
             }
         }
@@ -446,7 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Clear invalid state on input
-    notRecommendTextarea.addEventListener('input', function() {
+    remarksTextarea.addEventListener('input', function() {
         this.classList.remove('is-invalid');
     });
 

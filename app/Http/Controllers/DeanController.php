@@ -651,13 +651,10 @@ class DeanController extends Controller
                 'study_leave_extensions.ma_remarks',
                 'study_leave_extensions.acad_est_head_empno',
                 'study_leave_extensions.acad_est_head_recommend',
-                'study_leave_extensions.acad_est_head_not_recommend_reason',
                 'study_leave_extensions.acad_est_head_remarks',
                 'study_leave_extensions.hod_remarks as extension_hod_remarks',
                 'study_leave_extensions.hod_recommend as extension_hod_recommend',
-                'study_leave_extensions.hod_not_recommend_reason as extension_hod_not_recommend_reason',
                 'study_leave_extensions.dean_recommend as extension_dean_recommend',
-                'study_leave_extensions.dean_not_recommended_reason as extension_dean_not_recommend_reason',
                 'study_leave_extensions.dean_remark as extension_dean_remarks',
                 'study_leave_extensions.dean_remark',
                 'study_leaves.*', // Get all study leave fields
@@ -720,8 +717,7 @@ class DeanController extends Controller
     {
         $request->validate([
             'dean_recommend' => 'required|integer|in:0,1',
-            'dean_not_recommend_reason' => 'required_if:dean_recommend,0|string|nullable',
-            'dean_remarks' => 'nullable|string',
+            'dean_remarks' => 'required_if:dean_recommend,0|nullable|string',
         ]);
 
         // Get faculty IDs for this Dean
@@ -750,7 +746,6 @@ class DeanController extends Controller
                 'status_id' => 7, // Processing VC
                 'dean_empno' => self::DEAN_EMP_NO,
                 'dean_recommend' => $request->dean_recommend,
-                'dean_not_recommended_reason' => $request->dean_not_recommend_reason,
                 'dean_remark' => DB::raw("CONCAT(COALESCE(dean_remark, ''), '" . addslashes($deanRemarks) . "')"),
                 'dean_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()

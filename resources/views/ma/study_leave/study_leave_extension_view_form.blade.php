@@ -151,16 +151,6 @@
                                 <div class="text-muted small mt-2">Not specified</div>
                                 @endif
                             </div>
-                            @if($extension->acad_est_head_recommend == 0 && !empty($extension->acad_est_head_not_recommend_reason))
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <p class="mb-0" style="white-space:pre-wrap">{{ $extension->acad_est_head_not_recommend_reason }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
                             @if(!empty($extension->acad_est_head_remarks))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
@@ -193,12 +183,6 @@
                                 <div class="text-muted small mt-2">Not specified</div>
                                 @endif
                             </div>
-                            @if($extension->hod_recommend == 0 && !empty($extension->hod_not_recommend_reason))
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space:pre-wrap">{{ $extension->hod_not_recommend_reason }}</p></div></div>
-                            </div>
-                            @endif
                             @if(!empty($extension->hod_remarks))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
@@ -231,12 +215,6 @@
                                 <div class="text-muted small mt-2">Not specified</div>
                                 @endif
                             </div>
-                            @if($extension->dean_recommend == 0 && !empty($extension->dean_not_recommended_reason))
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space:pre-wrap">{{ $extension->dean_not_recommended_reason }}</p></div></div>
-                            </div>
-                            @endif
                             @if(!empty($extension->dean_remark))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
@@ -269,12 +247,6 @@
                                 <div class="text-muted small mt-2">Not specified</div>
                                 @endif
                             </div>
-                            @if($extension->vc_recommend == 0 && !empty($extension->vc_not_recommend_reason))
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space:pre-wrap">{{ $extension->vc_not_recommend_reason }}</p></div></div>
-                            </div>
-                            @endif
                             @if(!empty($extension->vc_remarks))
                             <div class="mb-0">
                                 <label class="form-label fw-semibold">Any other remarks</label>
@@ -407,7 +379,6 @@
                                         @csrf
                                         <input type="hidden" id="approveRemarkInput" name="remark" value="">
                                         <input type="hidden" id="approveRecommendInput" name="ma_recommend" value="">
-                                        <input type="hidden" id="approveNotRecommendReasonInput" name="ma_not_recommend_reason" value="">
                                         <input type="hidden" id="approveExtensionPaymentTypeInput" name="extension_payment_type" value="">
                                         <button type="submit" class="btn btn-success btn-lg w-100"
                                             {{ empty($departmentHead) ? 'disabled' : '' }}>
@@ -553,7 +524,6 @@
         const finalizeForm = document.getElementById('finalizeForm');
         const rejectForm = document.getElementById('rejectForm');
         const actionRemarkInput = document.getElementById('actionRemark');
-        const notRecommendReasonInput = document.getElementById('ma_not_recommend_reason');
         const extensionPaymentTypeInput = document.getElementById('ma_extension_payment_type');
 
         // Forward form
@@ -578,7 +548,6 @@
 
                 document.getElementById('approveRemarkInput').value = remarkValue;
                 document.getElementById('approveRecommendInput').value = '1';
-                document.getElementById('approveNotRecommendReasonInput').value = '';
                 document.getElementById('approveExtensionPaymentTypeInput').value = extensionPaymentTypeValue;
 
                 e.preventDefault();
@@ -711,18 +680,12 @@
             if (reasonError) {
                 reasonError.style.display = 'block';
             }
-            if (notRecommendReasonInput) {
-                notRecommendReasonInput.classList.add('is-invalid');
-            }
         }
 
         function clearNotRecommendReasonError() {
             const reasonError = document.getElementById('notRecommendReasonError');
             if (reasonError) {
                 reasonError.style.display = 'none';
-            }
-            if (notRecommendReasonInput) {
-                notRecommendReasonInput.classList.remove('is-invalid');
             }
         }
 
@@ -755,10 +718,6 @@
 
         if (actionRemarkInput) {
             actionRemarkInput.addEventListener('input', clearRemarkError);
-        }
-
-        if (notRecommendReasonInput) {
-            notRecommendReasonInput.addEventListener('input', clearNotRecommendReasonError);
         }
 
         if (extensionPaymentTypeInput) {

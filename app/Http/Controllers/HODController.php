@@ -744,11 +744,9 @@ class HODController extends Controller
                 'study_leave_extensions.ma_remarks',
                 'study_leave_extensions.acad_est_head_empno',
                 'study_leave_extensions.acad_est_head_recommend',
-                'study_leave_extensions.acad_est_head_not_recommend_reason',
                 'study_leave_extensions.acad_est_head_remarks',
                 'study_leave_extensions.hod_remarks',
                 'study_leave_extensions.hod_recommend as extension_hod_recommend',
-                'study_leave_extensions.hod_not_recommend_reason as extension_hod_not_recommend_reason',
                 'study_leave_extensions.hod_remarks as extension_hod_remarks',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
@@ -826,8 +824,7 @@ class HODController extends Controller
     {
         $request->validate([
             'hod_recommend' => 'required|integer|in:0,1',
-            'hod_not_recommend_reason' => 'required_if:hod_recommend,0|string|nullable',
-            'hod_remarks' => 'nullable|string',
+            'hod_remarks' => 'required_if:hod_recommend,0|nullable|string',
         ]);
 
         // Get department IDs for this HOD
@@ -845,9 +842,6 @@ class HODController extends Controller
         if (!$extension) {
             return redirect()->route('hod.index')->with('error', 'Extension application not found.');
         }
-
-     //  dd($request->hod_not_recommend_reason);
-
         // Update extension status to Processing Dean (status_id = 6)
         DB::table('study_leave_extensions')
             ->where('id', $extension_id)
@@ -855,7 +849,6 @@ class HODController extends Controller
                 'status_id' => 6, // Processing Dean
                 'hod_empno' => self::HOD_EMP_NO,
                 'hod_recommend' => $request->hod_recommend,
-                'hod_not_recommend_reason' => $request->hod_not_recommend_reason,
                 'hod_remarks' => $request->hod_remarks,
                 'hod_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()

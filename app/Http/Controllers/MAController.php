@@ -1196,19 +1196,15 @@ class MAController extends Controller
                 'study_leave_extensions.ma_not_recommend_reason',
                 // Registrar (HOD Academic Establishment) review
                 'study_leave_extensions.acad_est_head_recommend',
-                'study_leave_extensions.acad_est_head_not_recommend_reason',
                 'study_leave_extensions.acad_est_head_remarks',
                 // HOD review
                 'study_leave_extensions.hod_recommend',
-                'study_leave_extensions.hod_not_recommend_reason',
                 'study_leave_extensions.hod_remarks',
                 // Dean review
                 'study_leave_extensions.dean_recommend',
-                'study_leave_extensions.dean_not_recommended_reason',
                 'study_leave_extensions.dean_remark',
                 // VC review
                 'study_leave_extensions.vc_recommend',
-                'study_leave_extensions.vc_not_recommend_reason',
                 'study_leave_extensions.vc_remarks',
                 'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',

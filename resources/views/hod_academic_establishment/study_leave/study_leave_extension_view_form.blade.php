@@ -148,16 +148,6 @@
                         </div>
                     </div>
                 </div>
-                @if($extension->acad_est_head_recommend == 0 && !empty($extension->acad_est_head_not_recommend_reason))
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Reason for Not Recommending</label>
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <p class="mb-0" style="white-space: pre-wrap;">{{ $extension->acad_est_head_not_recommend_reason }}</p>
-                        </div>
-                    </div>
-                </div>
-                @endif
                 @if(!empty($extension->acad_est_head_remarks))
                 <div class="mb-0">
                     <label class="form-label fw-semibold">Remarks</label>
@@ -201,19 +191,6 @@
                         </div>
                         <div id="recommendError" class="form-text text-danger" style="display: none;">
                             Please select a recommendation.
-                        </div>
-                    </div>
-
-                    <!-- Not Recommend Reason (shown when No is selected) -->
-                    <div class="mb-4" id="acadEstNotRecommendReasonDiv" style="display: none;">
-                        <label for="acad_est_head_not_recommend_reason" class="form-label fw-semibold">
-                            If not recommended, please give reasons
-                            <span class="text-danger">*</span>
-                        </label>
-                        <textarea class="form-control" id="acad_est_head_not_recommend_reason" name="acad_est_head_not_recommend_reason" rows="4"
-                            placeholder="Please provide detailed reasons for not recommending this extension"></textarea>
-                        <div id="notRecommendReasonError" class="form-text text-danger" style="display: none;">
-                            Please provide reasons for not recommending.
                         </div>
                     </div>
 
@@ -359,23 +336,17 @@
             color: white;
         }
 
-        #notRecommendReasonDiv.show {
-            display: block !important;
-        }
     </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Show/hide not recommend reason field based on radio selection
             document.querySelectorAll('input[name="acad_est_head_recommend"]').forEach(function(radio) {
                 radio.addEventListener('change', function() {
-                    const notRecommendDiv = document.getElementById('acadEstNotRecommendReasonDiv');
                     if (this.value === '0') {
-                        notRecommendDiv.style.display = 'block';
+                        document.getElementById('registrar_remarks').setAttribute('required', 'required');
                     } else {
-                        notRecommendDiv.style.display = 'none';
-                        document.getElementById('acad_est_head_not_recommend_reason').value = '';
-                        clearNotRecommendReasonError();
+                        document.getElementById('registrar_remarks').removeAttribute('required');
+                        clearRemarksError();
                     }
                     clearRecommendError();
                 });
@@ -400,12 +371,12 @@
                     return false;
                 }
 
-                // If not recommended, validate reason is provided
+                // If not recommended, validate remarks are provided
                 if (recommendRadio.value === '0') {
-                    const notRecommendReason = document.getElementById('acad_est_head_not_recommend_reason').value.trim();
-                    if (notRecommendReason === '') {
+                    const remarks = document.getElementById('registrar_remarks').value.trim();
+                    if (remarks === '') {
                         e.preventDefault();
-                        showNotRecommendReasonError();
+                        showRemarksError();
                         return false;
                     }
                 }
@@ -421,8 +392,8 @@
             });
 
             // Clear invalid state on input
-            document.getElementById('acad_est_head_not_recommend_reason').addEventListener('input', function() {
-                clearNotRecommendReasonError();
+            document.getElementById('registrar_remarks').addEventListener('input', function() {
+                clearRemarksError();
             });
 
             const collapseDetails = document.getElementById('collapseDetails');
@@ -453,19 +424,17 @@
             document.getElementById('recommendError').style.display = 'none';
         }
 
-        function showNotRecommendReasonError() {
-            document.getElementById('notRecommendReasonError').style.display = 'block';
-            document.getElementById('acad_est_head_not_recommend_reason').classList.add('is-invalid');
+        function showRemarksError() {
+            document.getElementById('registrar_remarks').classList.add('is-invalid');
         }
 
-        function clearNotRecommendReasonError() {
-            document.getElementById('notRecommendReasonError').style.display = 'none';
-            document.getElementById('acad_est_head_not_recommend_reason').classList.remove('is-invalid');
+        function clearRemarksError() {
+            document.getElementById('registrar_remarks').classList.remove('is-invalid');
         }
 
         function clearAllErrors() {
             clearRecommendError();
-            clearNotRecommendReasonError();
+            clearRemarksError();
         }
     </script>
             </section>

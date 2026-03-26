@@ -34,7 +34,6 @@ class StudyLeaveExtension extends Model
         // Academic Establishment Head Fields
         'acad_est_head_empno',
         'acad_est_head_recommend',
-        'acad_est_head_not_recommend_reason',
         'acad_est_head_remarks',
         // HOD Fields
         'hod_empno',
@@ -42,20 +41,17 @@ class StudyLeaveExtension extends Model
         'hod_teaching_covered',
         'hod_service_period',
         'hod_recommend',
-        'hod_not_recommend_reason',
         'hod_remarks',
         'hod_reviewed_date',
         // Dean Fields
         'dean_leave_recommendation_status',
         'dean_empno',
         'dean_recommend',
-        'dean_not_recommended_reason',
         'dean_remark',
         'dean_reviewed_date',
         // VC Fields
         'vc_empno',
         'vc_recommend',
-        'vc_not_recommend_reason',
         'vc_remarks',
         'vc_reviewed_date',
         // Status

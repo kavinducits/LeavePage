@@ -349,7 +349,6 @@ class HODAcademicEstablishmentController extends Controller
                 'study_leave_extensions.ma_not_recommend_reason',
                 'study_leave_extensions.ma_remarks',
                 'study_leave_extensions.acad_est_head_recommend',
-                'study_leave_extensions.acad_est_head_not_recommend_reason',
                 'study_leave_extensions.acad_est_head_remarks'
             )
             ->first();
@@ -419,9 +418,8 @@ class HODAcademicEstablishmentController extends Controller
     public function forwardExtension(Request $request, $extension_id)
     {
         $request->validate([
-            'registrar_remarks' => 'nullable|string|max:1000',
+            'registrar_remarks' => 'required_if:acad_est_head_recommend,0|nullable|string|max:1000',
             'acad_est_head_recommend' => 'required|in:0,1',
-            'acad_est_head_not_recommend_reason' => 'nullable|required_if:acad_est_head_recommend,0|string|max:1000',
         ]);
 
         $hodEmpNo = self::HOD_EMP_NO;
@@ -451,7 +449,6 @@ class HODAcademicEstablishmentController extends Controller
                 'status_id' => 5, // Processing Department HOD
                 'acad_est_head_empno' => $hodEmpNo,
                 'acad_est_head_recommend' => $request->acad_est_head_recommend,
-                'acad_est_head_not_recommend_reason' => $request->acad_est_head_recommend == 0 ? $request->acad_est_head_not_recommend_reason : null,
                 'acad_est_head_remarks' => $request->registrar_remarks,
                 'registrar_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
