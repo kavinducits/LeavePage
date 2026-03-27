@@ -843,16 +843,13 @@ class DeanController extends Controller
                 // Registrar review data from study_leave_progress_reports
                 'study_leave_progress_reports.registrar_empno',
                 'study_leave_progress_reports.registrar_approval_status',
-                'study_leave_progress_reports.registrar_not_approve_reason',
                 'study_leave_progress_reports.registrar_remarks',
                 // HOD review data from study_leave_progress_reports
                 'study_leave_progress_reports.hod_empno',
                 'study_leave_progress_reports.hod_approval_status',
-                'study_leave_progress_reports.hod_not_approve_reason',
                 'study_leave_progress_reports.hod_remarks',
                 // Dean review data from study_leave_progress_reports
                 'study_leave_progress_reports.dean_approval_status',
-                'study_leave_progress_reports.dean_not_approve_reason',
                 'study_leave_progress_reports.dean_remarks'
             )
             ->first();
@@ -913,13 +910,8 @@ class DeanController extends Controller
     {
         $request->validate([
             'approval_decision' => 'required|in:approved,not_approved',
-            'remark' => 'nullable|string|max:1000',
+            'dean_remarks' => 'required_if:approval_decision,not_approved|nullable|string|max:1000',
         ]);
-
-        // If not approved, remarks are required
-        if ($request->approval_decision === 'not_approved' && empty(trim($request->remark))) {
-            return redirect()->back()->with('error', 'Remarks are required when returning a progress report.');
-        }
 
         $deanEmpNo = self::DEAN_EMP_NO;
         $facultyIds = $this->getDeanFaculties();
@@ -945,7 +937,7 @@ class DeanController extends Controller
                 ->update([
                     'dean_empno' => $deanEmpNo,
                     'dean_approval_status' => 1, // Approved
-                    'dean_remarks' => $request->remark,
+                    'dean_remarks' => $request->dean_remarks,
                     'approval_status_id' => 7, // Processing VC
                     'dean_reviewed_date' => now()->toDateString(),
                     'updated_at' => now()
@@ -961,27 +953,27 @@ class DeanController extends Controller
 
             return redirect()->route('dean.study.leave.progress')->with('success', 'Progress report approved and forwarded to VC successfully.');
         } else {
-            // Return to HOD (not approved)
+            // Not approved, but still forward to VC
             DB::table('study_leave_progress_reports')
                 ->where('id', $progress_report_id)
                 ->update([
                     'dean_empno' => $deanEmpNo,
                     'dean_approval_status' => 2, // Not Approved / Returned
-                    'dean_not_approve_reason' => $request->remark,
-                    'dean_remarks' => $request->remark,
-                    'approval_status_id' => 5, // Return to HOD
+                    'dean_remarks' => $request->dean_remarks,
+                    'approval_status_id' => 7, // Processing VC
+                    'dean_reviewed_date' => now()->toDateString(),
                     'updated_at' => now()
                 ]);
 
-            // Update progress report status to Processing HOD
+            // Update progress report status to Processing VC
             DB::table('study_leave_progress_reports')
                 ->where('id', $progress_report_id)
                 ->update([
-                    'status_id' => 5, // Processing HOD
+                    'status_id' => 7, // Processing VC
                     'updated_at' => now()
                 ]);
 
-            return redirect()->route('dean.index')->with('success', 'Progress report returned to HOD successfully.');
+            return redirect()->route('dean.study.leave.progress')->with('success', 'Progress report marked as not approved and forwarded to VC successfully.');
         }
     }
 } 

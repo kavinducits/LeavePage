@@ -785,21 +785,17 @@ class VCController extends Controller
                 // Registrar review data from study_leave_progress_reports
                 'study_leave_progress_reports.registrar_empno',
                 'study_leave_progress_reports.registrar_approval_status',
-                'study_leave_progress_reports.registrar_not_approve_reason',
                 'study_leave_progress_reports.registrar_remarks',
                 // HOD review data from study_leave_progress_reports
                 'study_leave_progress_reports.hod_empno',
                 'study_leave_progress_reports.hod_approval_status',
-                'study_leave_progress_reports.hod_not_approve_reason',
                 'study_leave_progress_reports.hod_remarks',
                 // Dean review data from study_leave_progress_reports
                 'study_leave_progress_reports.dean_empno',
                 'study_leave_progress_reports.dean_approval_status',
-                'study_leave_progress_reports.dean_not_approve_reason',
                 'study_leave_progress_reports.dean_remarks',
                 // VC review data from study_leave_progress_reports
                 'study_leave_progress_reports.vc_approval_status',
-                'study_leave_progress_reports.vc_not_approve_reason',
                 'study_leave_progress_reports.vc_remarks'
             )
             ->first();
@@ -860,13 +856,8 @@ class VCController extends Controller
     {
         $request->validate([
             'approval_decision' => 'required|in:approved,not_approved',
-            'remark' => 'nullable|string|max:1000',
+            'vc_remarks' => 'required_if:approval_decision,not_approved|nullable|string|max:1000',
         ]);
-
-        // If not approved, remarks are required
-        if ($request->approval_decision === 'not_approved' && empty(trim($request->remark))) {
-            return redirect()->back()->with('error', 'Remarks are required when returning a progress report.');
-        }
 
         $vcEmpNo = self::VC_EMP_NO;
 
@@ -891,7 +882,7 @@ class VCController extends Controller
                 ->update([
                     'vc_empno' => $vcEmpNo,
                     'vc_approval_status' => 1, // Approved
-                    'vc_remarks' => $request->remark,
+                    'vc_remarks' => $request->vc_remarks,
                     'approval_status_id' => 8, // VC Checked
                     'vc_reviewed_date' => now()->toDateString(),
                     'updated_at' => Carbon::now()
@@ -907,27 +898,27 @@ class VCController extends Controller
 
             return redirect()->route('vc.study.leave.progress')->with('success', 'Progress report reviewed by VC and sent to MA for finalization.');
         } else {
-            // Return to Dean (not approved)
+            // Not approved, but mark as VC checked for MA handling
             DB::table('study_leave_progress_reports')
                 ->where('id', $progress_report_id)
                 ->update([
                     'vc_empno' => $vcEmpNo,
                     'vc_approval_status' => 2, // Not Approved / Returned
-                    'vc_not_approve_reason' => $request->remark,
-                    'vc_remarks' => $request->remark,
-                    'approval_status_id' => 6, // Return to Dean
+                    'vc_remarks' => $request->vc_remarks,
+                    'approval_status_id' => 8, // VC Checked
+                    'vc_reviewed_date' => now()->toDateString(),
                     'updated_at' => Carbon::now()
                 ]);
 
-            // Update progress report status to Processing Dean
+            // Update progress report status to VC Checked
             DB::table('study_leave_progress_reports')
                 ->where('id', $progress_report_id)
                 ->update([
-                    'status_id' => 6, // Processing Dean
+                    'status_id' => 8, // VC Checked
                     'updated_at' => Carbon::now()
                 ]);
 
-            return redirect()->route('vc.study.leave.progress')->with('success', 'Progress report returned to Dean successfully.');
+            return redirect()->route('vc.study.leave.progress')->with('success', 'Progress report marked as not approved and VC checked successfully.');
         }
     }
 } 

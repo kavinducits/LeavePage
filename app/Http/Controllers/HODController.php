@@ -993,11 +993,9 @@ class HODController extends Controller
                 // Registrar review data from study_leave_progress_reports
                 'study_leave_progress_reports.registrar_empno',
                 'study_leave_progress_reports.registrar_approval_status',
-                'study_leave_progress_reports.registrar_not_approve_reason',
                 'study_leave_progress_reports.registrar_remarks',
                 // HOD review data from study_leave_progress_reports
                 'study_leave_progress_reports.hod_approval_status',
-                'study_leave_progress_reports.hod_not_approve_reason',
                 'study_leave_progress_reports.hod_remarks'
             )
             ->first();
@@ -1067,13 +1065,8 @@ class HODController extends Controller
     {
         $request->validate([
             'approval_decision' => 'required|in:approved,not_approved',
-            'remark' => 'nullable|string|max:1000',
+            'hod_remarks' => 'required_if:approval_decision,not_approved|nullable|string|max:1000',
         ]);
-
-        // If not approved, remarks are required
-        if ($request->approval_decision === 'not_approved' && empty(trim($request->remark))) {
-            return redirect()->back()->with('error', 'Remarks are required when returning a progress report.');
-        }
 
         $hodEmpNo = self::HOD_EMP_NO;
         $departmentIds = $this->getHodDepartments();
@@ -1099,7 +1092,7 @@ class HODController extends Controller
                 ->update([
                     'hod_empno' => $hodEmpNo,
                     'hod_approval_status' => 1, // Approved
-                    'hod_remarks' => $request->remark,
+                    'hod_remarks' => $request->hod_remarks,
                     'approval_status_id' => 6, // Processing Dean
                     'hod_reviewed_date' => now()->toDateString(),
                     'updated_at' => now()
@@ -1115,27 +1108,27 @@ class HODController extends Controller
 
             return redirect()->route('hod.study.leave.progress')->with('success', 'Progress report approved and forwarded to Dean successfully.');
         } else {
-            // Return to Registrar (not approved)
+            // Not recommend but still forward to Dean
             DB::table('study_leave_progress_reports')
                 ->where('id', $progress_report_id)
                 ->update([
                     'hod_empno' => $hodEmpNo,
                     'hod_approval_status' => 2, // Not Approved / Returned
-                    'hod_not_approve_reason' => $request->remark,
-                    'hod_remarks' => $request->remark,
-                    'approval_status_id' => 9, // Return to Registrar (HOD Academic Establishment)
+                    'hod_remarks' => $request->hod_remarks,
+                    'approval_status_id' => 6, // Processing Dean
+                    'hod_reviewed_date' => now()->toDateString(),
                     'updated_at' => now()
                 ]);
 
-            // Update progress report status to Processing HOD Academic Establishment
+            // Update progress report status to Processing Dean
             DB::table('study_leave_progress_reports')
                 ->where('id', $progress_report_id)
                 ->update([
-                    'status_id' => 5, // Processing HOD
+                    'status_id' => 6, // Processing Dean
                     'updated_at' => now()
                 ]);
 
-            return redirect()->route('hod.study.leave.progress')->with('success', 'Progress report returned to Registrar successfully.');
+            return redirect()->route('hod.study.leave.progress')->with('success', 'Progress report marked as not recommended and forwarded to Dean successfully.');
         }
     }
 }

@@ -160,20 +160,6 @@
                         </div>
                     </div>
 
-                    <!-- If not recommended -->
-                    @if ($progressReport->registrar_not_approve_reason)
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">
-                                Reason for not recommending
-                            </label>
-                            <div class="card bg-white">
-                                <div class="card-body">
-                                    <p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->registrar_not_approve_reason }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Any other remarks -->
                     @if ($progressReport->registrar_remarks)
                         <div class="mb-4">
@@ -336,12 +322,6 @@
                 <div class="text-muted small mt-2">Not specified</div>
                 @endif
             </div>
-            @if(!empty($progressReport->vc_not_approve_reason))
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Reason for Not Approving</label>
-                <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->vc_not_approve_reason }}</p></div></div>
-            </div>
-            @endif
             @if(!empty($progressReport->vc_remarks))
             <div class="mb-0">
                 <label class="form-label fw-semibold">VC Remarks</label>

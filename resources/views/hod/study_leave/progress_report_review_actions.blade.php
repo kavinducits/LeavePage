@@ -28,7 +28,7 @@
 
         <div class="mb-3">
             <label for="actionRemark" class="form-label fw-semibold">HOD Remarks</label>
-            <textarea class="form-control" id="actionRemark" name="remark" rows="4"
+            <textarea class="form-control" id="actionRemark" name="hod_remarks" rows="4"
                 placeholder="Add your comments or remarks about this progress report"></textarea>
             <div id="remarkError" class="form-text text-danger" style="display: none;">
                 Remarks are required when not recommending a progress report.
@@ -66,7 +66,7 @@
                     method="POST" class="d-inline">
                     @csrf
                     <input type="hidden" id="approvalDecisionInput" name="approval_decision" value="">
-                    <input type="hidden" id="remarkInput" name="remark" value="">
+                    <input type="hidden" id="remarkInput" name="hod_remarks" value="">
                     <button type="button" onclick="submitHODForm()" class="btn btn-success btn-lg w-100" {{ empty($deanInfo) ? 'disabled' : '' }}>
                         <i class="fas fa-forward me-2"></i>Forward to Dean
                     </button>
@@ -124,7 +124,7 @@
         document.getElementById('remarkInput').value = remarkValue;
 
         // Show confirm modal
-        const action = approvalDecision.value === 'approved' ? 'recommend and forward to Dean' : 'not recommend';
+        const action = approvalDecision.value === 'approved' ? 'recommend and forward to Dean' : 'not recommend and forward to Dean';
         document.getElementById('confirmSubmitMessage').textContent = `Are you sure you want to ${action} this progress report?`;
         const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
         confirmModal.show();

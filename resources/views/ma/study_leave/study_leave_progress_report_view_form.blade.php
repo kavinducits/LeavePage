@@ -300,12 +300,6 @@
                             <div class="text-muted small mt-2">Not specified</div>
                             @endif
                         </div>
-                        @if(!empty($progressReport->registrar_not_approve_reason))
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Reason for Not Approving</label>
-                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->registrar_not_approve_reason }}</p></div></div>
-                        </div>
-                        @endif
                         @if(!empty($progressReport->registrar_remarks))
                         <div class="mb-0">
                             <label class="form-label fw-semibold">Registrar Remarks</label>
@@ -338,12 +332,6 @@
                             <div class="text-muted small mt-2">Not specified</div>
                             @endif
                         </div>
-                        @if(!empty($progressReport->hod_not_approve_reason))
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Reason for Not Approving</label>
-                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->hod_not_approve_reason }}</p></div></div>
-                        </div>
-                        @endif
                         @if(!empty($progressReport->hod_remarks))
                         <div class="mb-0">
                             <label class="form-label fw-semibold">HOD Remarks</label>
@@ -376,12 +364,6 @@
                             <div class="text-muted small mt-2">Not specified</div>
                             @endif
                         </div>
-                        @if(!empty($progressReport->dean_not_approve_reason))
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Reason for Not Approving</label>
-                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->dean_not_approve_reason }}</p></div></div>
-                        </div>
-                        @endif
                         @if(!empty($progressReport->dean_remarks))
                         <div class="mb-0">
                             <label class="form-label fw-semibold">Dean Remarks</label>
@@ -414,12 +396,6 @@
                             <div class="text-muted small mt-2">Not specified</div>
                             @endif
                         </div>
-                        @if(!empty($progressReport->vc_not_approve_reason))
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Reason for Not Approving</label>
-                            <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $progressReport->vc_not_approve_reason }}</p></div></div>
-                        </div>
-                        @endif
                         @if(!empty($progressReport->vc_remarks))
                         <div class="mb-0">
                             <label class="form-label fw-semibold">VC Remarks</label>

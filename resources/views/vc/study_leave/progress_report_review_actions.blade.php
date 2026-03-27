@@ -28,7 +28,7 @@
 
         <div class="mb-3">
             <label for="actionRemark" class="form-label fw-semibold">VC Remarks</label>
-            <textarea class="form-control" id="actionRemark" name="remark" rows="4"
+            <textarea class="form-control" id="actionRemark" name="vc_remarks" rows="4"
                 placeholder="Add your comments or remarks about this progress report"></textarea>
             <div id="remarkError" class="form-text text-danger" style="display: none;">
                 Remarks are required when returning a progress report.
@@ -48,7 +48,7 @@
                 method="POST" class="d-inline">
                 @csrf
                 <input type="hidden" id="approvalDecisionInput" name="approval_decision" value="">
-                <input type="hidden" id="remarkInput" name="remark" value="">
+                <input type="hidden" id="remarkInput" name="vc_remarks" value="">
                 <button type="button" onclick="submitVCForm()" class="btn btn-primary btn-lg">
                     <i class="fas fa-paper-plane me-2"></i>Submit Review
                 </button>
@@ -106,7 +106,7 @@
         document.getElementById('remarkInput').value = remarkValue;
 
         // Show confirm modal
-        const action = approvalDecision.value === 'approved' ? 'mark as VC Checked' : 'return to Dean';
+        const action = approvalDecision.value === 'approved' ? 'mark as VC Checked' : 'mark as not approved and VC Checked';
         document.getElementById('confirmSubmitMessage').textContent = `Are you sure you want to ${action} this progress report?`;
         const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
         confirmModal.show();

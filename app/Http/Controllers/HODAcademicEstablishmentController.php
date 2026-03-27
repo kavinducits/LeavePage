@@ -538,7 +538,6 @@ class HODAcademicEstablishmentController extends Controller
                 'statuses.status',
                 'study_leave_progress_reports.registrar_empno',
                 'study_leave_progress_reports.registrar_approval_status',
-                'study_leave_progress_reports.registrar_not_approve_reason',
                 'study_leave_progress_reports.registrar_remarks'
             )
             ->first();
@@ -731,7 +730,6 @@ class HODAcademicEstablishmentController extends Controller
             ->update([
                 'registrar_empno' => $hodEmpNo,
                 'registrar_approval_status' => 2, // Not Approved / Returned
-                'registrar_not_approve_reason' => $request->remark,
                 'registrar_remarks' => $request->remark,
                 'approval_status_id' => 4, // Return to MA (Processing MA)
                 'updated_at' => now()
