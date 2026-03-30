@@ -286,20 +286,6 @@
                                                                     </div>
                                                                 </div>
 
-                                                                <div class="col-md-6">
-                                                                    <label class="form-label fw-semibold">
-                                                                        Extension Payment Type <span class="text-danger">*</span>
-                                                                    </label>
-                                                                    <select name="extension_payment_type" class="form-select" required>
-                                                                        <option value="" disabled>Select payment type</option>
-                                                                        <option value="1" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '1' ? 'selected' : '' }}>With Pay</option>
-                                                                        <option value="0" {{ (string) old('extension_payment_type', $extension->extension_payment_type) === '0' ? 'selected' : '' }}>Without Pay</option>
-                                                                    </select>
-                                                                    <div class="invalid-feedback">
-                                                                        Please select extension payment type.
-                                                                    </div>
-                                                                </div>
-
                                                                 <!-- Reason for Extension -->
                                                                 <div class="col-12">
                                                                     <label class="form-label fw-semibold">

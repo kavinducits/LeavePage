@@ -1814,6 +1814,28 @@ class MAController extends Controller
             ->where('id', $application->approval_id)
             ->update($updateData);
 
+        if ($statusId === 1) {
+            if (!empty($application->reference_no)) {
+                DB::table('leave_summary_table')->updateOrInsert(
+                    ['reference_no' => $application->reference_no],
+                    [
+                        'empno' => $application->empno,
+                        'leave_type' => 1,
+                        'start_date' => $application->study_leave_from,
+                        'end_date' => $application->study_leave_to,
+                    ]
+                );
+            } else {
+                DB::table('leave_summary_table')->insert([
+                    'empno' => $application->empno,
+                    'leave_type' => 1,
+                    'reference_no' => null,
+                    'start_date' => $application->study_leave_from,
+                    'end_date' => $application->study_leave_to,
+                ]);
+            }
+        }
+
         $message = $isApproved
             ? 'Study leave application has been approved and finalized successfully.'
             : 'Study leave application has been rejected.';
