@@ -588,6 +588,7 @@ class VCController extends Controller
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leave_extensions.study_leave_id',
+                'study_leaves.*', // Get all study leave fields
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.extension_payment_type',
@@ -606,7 +607,6 @@ class VCController extends Controller
                 'study_leave_extensions.dean_recommend as extension_dean_recommend',
                 'study_leave_extensions.vc_recommend',
                 'study_leave_extensions.vc_remarks',
-                'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'employees.name_denoted_by_initials',
@@ -762,9 +762,9 @@ class VCController extends Controller
                       ->where('employees.main_branch_id', 52);
             })
             ->select(
+                'study_leaves.*',
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
-                'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
                 'study_leaves.project_name as project_name',

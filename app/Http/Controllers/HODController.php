@@ -733,6 +733,7 @@ class HODController extends Controller
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leave_extensions.study_leave_id',
+                'study_leaves.*', // Get all study leave fields
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.extension_payment_type',
@@ -742,13 +743,13 @@ class HODController extends Controller
                 'study_leave_extensions.ma_recommend',
                 'study_leave_extensions.ma_not_recommend_reason',
                 'study_leave_extensions.ma_remarks',
+                'study_leave_extensions.ma_remarks as extension_ma_remarks',
                 'study_leave_extensions.acad_est_head_empno',
                 'study_leave_extensions.acad_est_head_recommend',
                 'study_leave_extensions.acad_est_head_remarks',
                 'study_leave_extensions.hod_remarks',
                 'study_leave_extensions.hod_recommend as extension_hod_recommend',
                 'study_leave_extensions.hod_remarks as extension_hod_remarks',
-                'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'employees.name_denoted_by_initials',
@@ -970,9 +971,9 @@ class HODController extends Controller
                       ->whereIn('employees.department_id', $departmentIds);
             })
             ->select(
+                'study_leaves.*',
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
-                'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
                 'study_leaves.project_name as project_name',

@@ -111,10 +111,10 @@
                         <div class="card bg-light"><div class="card-body"><p class="mb-0" style="white-space: pre-wrap;">{{ $extension->ma_not_recommend_reason }}</p></div></div>
                     </div>
                 @endif
-                @if(!empty($extension->ma_remarks))
+                @if(!empty($extension->extension_ma_remarks))
                     <div class="mb-0">
                         <label class="form-label fw-semibold">MA Remarks</label>
-                        <div class="remarks-display rounded p-3 mb-0" style="white-space: pre-wrap;">{{ $extension->ma_remarks }}</div>
+                        <div class="remarks-display rounded p-3 mb-0" style="white-space: pre-wrap;">{{ $extension->extension_ma_remarks }}</div>
                     </div>
                 @endif
             </div>

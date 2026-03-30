@@ -15,6 +15,7 @@ class StudyLeaveProgressReports extends Model
         'status_id',
         'approval_status_id',
         'ma_empno',
+        'ma_remark',
         'registrar_empno',
         'registrar_approval_status',
         'registrar_remarks',

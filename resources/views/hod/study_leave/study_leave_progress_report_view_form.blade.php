@@ -173,6 +173,20 @@
         </div>
     </div>
 
+    @if(!empty($progressReport->ma_remark))
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white fw-semibold">
+            <i class="fas fa-clipboard-check me-2"></i>MA Review
+        </div>
+        <div class="card-body">
+            <div class="mb-0">
+                <label class="form-label fw-semibold">MA Remarks</label>
+                <div class="remarks-display rounded p-3 mb-0" style="white-space: pre-wrap;">{{ $progressReport->ma_remark }}</div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Registrar Review Section (Disabled/Read-only for HOD) -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white fw-semibold">

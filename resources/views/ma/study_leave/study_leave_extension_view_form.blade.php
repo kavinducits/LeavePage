@@ -161,7 +161,7 @@
                     </div>
                     @endif
 
-                    @if(optional($extension)->hod_recommend !== null)
+                    @if(($from ?? null) === 'accepted' && optional($extension)->hod_recommend !== null)
                     <div class="card mt-4 mb-4">
                         <div class="card-header bg-primary text-white fw-semibold">
                             <i class="fas fa-clipboard-check me-2"></i>HOD Review & Recommendation

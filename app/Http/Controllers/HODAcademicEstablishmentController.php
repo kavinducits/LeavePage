@@ -517,9 +517,9 @@ class HODAcademicEstablishmentController extends Controller
                 $query->where('study_leave_progress_reports.approval_status_id', 9);
             })
             ->select(
+                'study_leaves.*',
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
-                'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
                 'study_leaves.project_name as project_name',

@@ -1169,9 +1169,10 @@ class MAController extends Controller
     /**
      * Show study leave extension details
      */
-    public function showExtension($extension_id)
+    public function showExtension(Request $request, $extension_id)
     {
         $maUserId = self::MA_USER_ID;
+        $from = $request->get('from');
 
         // Get the complete study leave data for the extension
         $extension = DB::table('study_leave_extensions')
@@ -1186,6 +1187,7 @@ class MAController extends Controller
             ->select(
                 'study_leave_extensions.id as extension_id',
                 'study_leave_extensions.study_leave_id',
+                'study_leaves.*', // Get all study leave fields
                 'study_leave_extensions.old_end_date',
                 'study_leave_extensions.new_end_date',
                 'study_leave_extensions.extension_payment_type',
@@ -1206,7 +1208,6 @@ class MAController extends Controller
                 // VC review
                 'study_leave_extensions.vc_recommend',
                 'study_leave_extensions.vc_remarks',
-                'study_leaves.*', // Get all study leave fields
                 'employees.employee_no as empno',
                 DB::raw("CONCAT(employees.initials, ' ', employees.last_name) as name_with_initials"),
                 'employees.name_denoted_by_initials',
@@ -1269,7 +1270,7 @@ class MAController extends Controller
 
         $readonly = false;
 
-        return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths'));
+        return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from'));
     }
 
     /**
@@ -1447,6 +1448,7 @@ class MAController extends Controller
             ->where('study_leave_progress_reports.id', $progress_report_id)
             ->where('employees.assign_ma_user_id', $maUserId) // Ensure MA has access
             ->select(
+                'study_leaves.*',
                 'study_leave_progress_reports.*',
                 'study_leave_progress_reports.id as progress_report_id',
                 'study_leave_progress_reports.approval_status_id',
@@ -1459,7 +1461,6 @@ class MAController extends Controller
                 'study_leave_progress_reports.dean_remarks',
                 'study_leave_progress_reports.vc_approval_status',
                 'study_leave_progress_reports.vc_remarks',
-                'study_leaves.*',
                 'study_leaves.scholarship_source as scholarship_source',
                 'study_leaves.scholarship_amount as scholarship_amount',
                 'study_leaves.project_name as project_name',
@@ -1569,7 +1570,6 @@ class MAController extends Controller
             ->where('id', $progress_report_id)
             ->update([
                 'status_id' => 5, // Processing HOD
-                'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()
             ]);
 
@@ -1577,6 +1577,7 @@ class MAController extends Controller
         StudyLeaveProgressReports::where('id', $progress_report_id)
             ->update([
                 'ma_empno' => self::MA_USER_ID,
+                'ma_remark' => DB::raw("CONCAT(COALESCE(ma_remark, ''), '" . addslashes($newRemark) . "')"),
                 'approval_status_id' => 9, // Processing HOD Academic Establishment
                 'ma_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
@@ -1620,7 +1621,6 @@ class MAController extends Controller
             ->where('id', $progress_report_id)
             ->update([
                 'status_id' => 3, // Returned
-                'remark' => DB::raw("CONCAT(COALESCE(remark, ''), '" . addslashes($newRemark) . "')"),
                 'updated_at' => now()
             ]);
 
@@ -1628,6 +1628,7 @@ class MAController extends Controller
         StudyLeaveProgressReports::where('id', $progress_report_id)
             ->update([
                 'ma_empno' => self::MA_USER_ID,
+                'ma_remark' => DB::raw("CONCAT(COALESCE(ma_remark, ''), '" . addslashes($newRemark) . "')"),
                 'ma_reviewed_date' => now()->toDateString(),
                 'updated_at' => now()
             ]);
