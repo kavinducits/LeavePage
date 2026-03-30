@@ -1381,7 +1381,7 @@ class MAController extends Controller
                         ->where('study_leave_extensions.id', $extension_id)
             ->where('study_leave_extensions.status_id', 8) // VC Checked
             ->where('employees.assign_ma_user_id', $maUserId)
-            ->select('study_leave_extensions.id')
+            ->select('study_leave_extensions.id', 'study_leaves.empno','study_leaves.reference_no','study_leave_extensions.new_end_date')
             ->first();
 
         if (!$extension) {
@@ -1394,6 +1394,14 @@ class MAController extends Controller
                 'status_id' => 1, // Approved
                 'ma_finalized_date' => now()->toDateString(),
                 'updated_at' => now()
+            ]);
+
+        DB::table('leave_summary_table')
+            ->where('empno', $extension->empno )
+            ->where('leave_type', 1)
+            ->where('reference_no', $extension->reference_no)
+            ->update([
+               'end_date' => $extension->new_end_date,
             ]);
 
         return redirect()->route('ma.studyleave.extensions')->with('success', 'Extension finalized successfully as Approved.');
