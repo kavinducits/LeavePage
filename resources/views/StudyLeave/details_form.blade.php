@@ -1,3 +1,7 @@
+@php
+    $degrees = $degrees ?? ['MA', 'MSc', 'MBA', 'MPhil', 'MD', 'PhD'];
+@endphp
+
  <!-- Form Card -->
     
         <div class="card mb-4">
@@ -305,12 +309,9 @@
                     <label class="form-label fw-semibold">Degree Title <span class="text-danger">*</span></label>
                     <select name="degree_title" class="form-select @if(!($readonly ?? true)) @error('degree_title') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
                         <option value="" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === '' ? 'selected' : '' }}>Select degree title</option>
-                        <option value="MA" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MA' ? 'selected' : '' }}>M.A.</option>
-                        <option value="MSc" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MSc' ? 'selected' : '' }}>M.Sc</option>
-                        <option value="MBA" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MBA' ? 'selected' : '' }}>MBA</option>
-                        <option value="MPhil" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MPhil' ? 'selected' : '' }}>M.Phil.</option>
-                        <option value="MD" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'MD' ? 'selected' : '' }}>M.D.</option>
-                        <option value="PhD" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'PhD' ? 'selected' : '' }}>PhD</option>
+                       @foreach ($degrees as $degree)
+                            <option value="{{ $degree }}" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === $degree ? 'selected' : '' }}>{{ $degree }}</option>
+                       @endforeach
                         <option value="Other" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'Other' ? 'selected' : '' }}>Other</option>
                     </select>
                     @if(!($readonly ?? true))

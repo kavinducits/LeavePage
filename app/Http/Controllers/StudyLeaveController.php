@@ -302,7 +302,9 @@ class StudyLeaveController extends Controller
 
         $totalDaysStydyLeave = $this->calculateTotalStudyLeaveDays($empno);
 
-        return view('StudyLeave.createDetails', compact('draft_study_leave', 'readonly', 'totalDaysStydyLeave'));
+        $degrees = ['MA', 'MSc', 'MBA', 'MPhil', 'MD', 'PhD'];
+
+        return view('StudyLeave.createDetails', compact('draft_study_leave', 'readonly', 'totalDaysStydyLeave', 'degrees'));
     }
 
     /**
