@@ -302,7 +302,12 @@ class StudyLeaveController extends Controller
 
         $totalDaysStydyLeave = $this->calculateTotalStudyLeaveDays($empno);
 
-        $degrees = ['MA', 'MSc', 'MBA', 'MPhil', 'MD', 'PhD'];
+        //$degrees = ['MA', 'MSc', 'MBA', 'MPhil', 'MD', 'PhD'];
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70,71,72,73,74,75,76,182,183,184,185])
+            ->pluck('category_name')
+            ->toArray();
 
         return view('StudyLeave.createDetails', compact('draft_study_leave', 'readonly', 'totalDaysStydyLeave', 'degrees'));
     }
