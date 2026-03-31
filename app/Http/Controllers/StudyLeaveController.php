@@ -303,11 +303,14 @@ class StudyLeaveController extends Controller
         $totalDaysStydyLeave = $this->calculateTotalStudyLeaveDays($empno);
 
         //$degrees = ['MA', 'MSc', 'MBA', 'MPhil', 'MD', 'PhD'];
+       
         $degrees = DB::table('categories')
             ->where('category_type_id', 16)
             ->whereNotIn('id', [70,71,72,73,74,75,76,182,183,184,185])
-            ->pluck('category_name')
+            ->select('id', 'category_name')
+            ->get()
             ->toArray();
+        
 
         return view('StudyLeave.createDetails', compact('draft_study_leave', 'readonly', 'totalDaysStydyLeave', 'degrees'));
     }
@@ -698,6 +701,13 @@ class StudyLeaveController extends Controller
         $readonly = true;
         $displayEditeBtn = true;
         $empno = session('study_leave.employee_no') ?? session('empno');
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+
         $user = DB::table('employees')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
             ->leftJoin('faculties', 'employees.faculty_id', '=', 'faculties.id')
@@ -755,7 +765,7 @@ class StudyLeaveController extends Controller
 
 
 
-        return view('StudyLeave.showSummary', compact('draft_study_leave', 'user', 'readonly', 'displayEditeBtn'));
+        return view('StudyLeave.showSummary', compact('draft_study_leave', 'user', 'readonly', 'displayEditeBtn', 'degrees'));
     }
     public function submitApplication(Request $request)
     {
@@ -1039,7 +1049,13 @@ class StudyLeaveController extends Controller
         $view = 'ma.showStudyLeave';
 
 
-        return view('StudyLeave.returnStudyLeaveForm', compact('user', 'draft_study_leave', 'departmentHead', 'readonly'));
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+        return view('StudyLeave.returnStudyLeaveForm', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'degrees'));
     }
 
     public function updateEditeStudyLeave(Request $request, $id)
@@ -1376,7 +1392,13 @@ class StudyLeaveController extends Controller
         // Decide which blade to use and readonly status
         $readonly = true;
 
-        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions', 'progressReports', 'processStatus', 'study_leave', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'hasPendingExtension', 'canUploadProgressReport', 'hasPendingProgressReport', 'nextProgressReportDueDate'));
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+        return view('StudyLeave.viewStudyLeave', compact('user', 'draft_study_leave', 'departmentHead', 'readonly', 'extensions', 'progressReports', 'processStatus', 'study_leave', 'canExtend', 'totalDurationDays', 'remainingDays', 'extensionStartDate', 'hasPendingExtension', 'canUploadProgressReport', 'hasPendingProgressReport', 'nextProgressReportDueDate', 'degrees'));
     }
 
     public function continueDraft($id)

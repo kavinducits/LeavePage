@@ -568,7 +568,13 @@ class DeanController extends Controller
         
         $readonly = true;
 
-        return view('dean.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'from'));
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+        return view('dean.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'from', 'degrees'));
     }
 
     public function approveStudyLeave(Request $request, $id)
@@ -707,7 +713,13 @@ class DeanController extends Controller
         $readonly = true;
        // dd( $extension);
 
-        return view('dean.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from'));
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+        return view('dean.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from', 'degrees'));
     }
 
     /**
@@ -900,7 +912,13 @@ class DeanController extends Controller
 
         $readonly = false;
 
-        return view('dean.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'vcInfo', 'draft_study_leave', 'from'));
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+        return view('dean.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'vcInfo', 'draft_study_leave', 'from', 'degrees'));
     }
 
     /**

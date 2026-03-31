@@ -171,8 +171,15 @@ class HODAcademicEstablishmentController extends Controller
         ];
         
         $readonly = true;
+        
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70,71,72,73,74,75,76,182,183,184,185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
 
-        return view('hod_academic_establishment.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'departmentHead', 'from'));
+        return view('hod_academic_establishment.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'departmentHead', 'from', 'degrees'));
     }
 
      public function approveStudyLeave(Request $request, $id)
@@ -408,8 +415,15 @@ class HODAcademicEstablishmentController extends Controller
         }
 
         $readonly = $from === 'accepted';
+        
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70,71,72,73,74,75,76,182,183,184,185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
 
-        return view('hod_academic_establishment.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'departmentHead', 'durationDays', 'durationMonths', 'from'));
+        return view('hod_academic_establishment.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'readonly', 'draft_study_leave', 'departmentHead', 'durationDays', 'durationMonths', 'from', 'degrees'));
     }
 
     /**
@@ -595,8 +609,15 @@ class HODAcademicEstablishmentController extends Controller
         }
 
         $readonly = false;
+        
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70,71,72,73,74,75,76,182,183,184,185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
 
-        return view('hod_academic_establishment.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave', 'departmentHead', 'from'));
+        return view('hod_academic_establishment.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'draft_study_leave', 'departmentHead', 'from', 'degrees'));
     }
 
     /**

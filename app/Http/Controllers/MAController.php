@@ -972,7 +972,17 @@ class MAController extends Controller
         $interval = $from->diff($to);
         $requistedStudyLeaveDays = $interval->days + 1; // +1 to include both start and end dates
 
-        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays', 'totalStudyLeaveDuration'));
+        
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70,71,72,73,74,75,76,182,183,184,185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+
+
+
+        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays', 'totalStudyLeaveDuration', 'degrees'));
     }
      /**
      * Calculate total study leave days taken by an employee.
@@ -1270,7 +1280,13 @@ class MAController extends Controller
 
         $readonly = false;
 
-        return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from'));
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+        return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from', 'degrees'));
     }
 
     /**
@@ -1541,7 +1557,13 @@ class MAController extends Controller
 
         $readonly = false;
 
-        return view('ma.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'departmentHead', 'draft_study_leave'));
+        $degrees = DB::table('categories')
+            ->where('category_type_id', 16)
+            ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
+            ->select('id', 'category_name')
+            ->get()
+            ->toArray();
+        return view('ma.study_leave.study_leave_progress_report_view_form', compact('progressReport', 'user', 'readonly', 'approvedReports', 'departmentHead', 'draft_study_leave', 'degrees'));
     }
 
     /**

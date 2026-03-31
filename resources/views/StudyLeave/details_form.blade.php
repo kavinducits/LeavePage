@@ -306,13 +306,20 @@
                 </script>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Degree Title <span class="text-danger">*</span></label>
+                    <label class="form-label fw-semibold">Degree Titles <span class="text-danger">*</span></label>
+                    @php
+                        $selectedDegree = (string) ($draft_study_leave->degree_title ?? old('degree_title', ''));
+                    @endphp
                     <select name="degree_title" class="form-select @if(!($readonly ?? true)) @error('degree_title') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
-                        <option value="" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === '' ? 'selected' : '' }}>Select degree title</option>
+                        <option value="" {{ $selectedDegree === '' ? 'selected' : '' }}>Select degree title</option>
                        @foreach ($degrees as $degree)
-                            <option value="{{ $degree }}" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === $degree ? 'selected' : '' }}>{{ $degree }}</option>
+                            @php
+                                $degreeValue = is_object($degree) ? (string) $degree->id : (string) $degree;
+                                $degreeLabel = is_object($degree) ? $degree->category_name : $degree;
+                            @endphp
+                            <option value="{{ $degreeValue }}" {{ $selectedDegree === $degreeValue ? 'selected' : '' }}>{{ $degreeLabel }}</option>
                        @endforeach
-                        <option value="Other" {{ ($draft_study_leave->degree_title ?? old('degree_title')) === 'Other' ? 'selected' : '' }}>Other</option>
+                        <option value="Other" {{ $selectedDegree === 'Other' ? 'selected' : '' }}>Other</option>
                     </select>
                     @if(!($readonly ?? true))
                     @error('degree_title')
