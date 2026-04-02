@@ -308,7 +308,12 @@
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Degree Titles <span class="text-danger">*</span></label>
                     @php
-                        $selectedDegree = (string) ($draft_study_leave->degree_title ?? old('degree_title', ''));
+                        $selectedOtherDegree = (string) old('other_degree_title', $draft_study_leave->other_degree_title ?? '');
+                        $selectedDegree = (string) old('degree_title', $draft_study_leave->degree_title ?? '');
+                        if ($selectedDegree === '' && $selectedOtherDegree !== '' && old('degree_title') === null) {
+                            $selectedDegree = 'Other';
+                        }
+                        $isOtherDegreeSelected = strtolower($selectedDegree) === 'other';
                     @endphp
                     <select name="degree_title" class="form-select @if(!($readonly ?? true)) @error('degree_title') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
                         <option value="" {{ $selectedDegree === '' ? 'selected' : '' }}>Select degree title</option>
@@ -329,6 +334,28 @@
                         Please select a degree title.
                     </div>
                     @endif
+
+                    <div id="other_degree_title_wrapper" class="mt-3" style="display: {{ $isOtherDegreeSelected ? 'block' : 'none' }};">
+                        <label class="form-label fw-semibold">Other Degree Title <span class="text-danger">*</span></label>
+                        <input
+                            type="text"
+                            name="other_degree_title"
+                            id="other_degree_title"
+                            class="form-control @if(!($readonly ?? true)) @error('other_degree_title') is-invalid @enderror @endif"
+                            value="{{ $selectedOtherDegree }}"
+                            @if(!($readonly ?? true) && $isOtherDegreeSelected) required @endif
+                            @if(!($readonly ?? true)) minlength="2" maxlength="255" @endif
+                            {{ $readonly ?? true ? 'readonly' : '' }}>
+
+                        @if(!($readonly ?? true))
+                        @error('other_degree_title')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                        <div class="invalid-feedback" id="other_degree_title_error" style="display: none;">
+                            Please enter the other degree title.
+                        </div>
+                        @endif
+                    </div>
                 </div>
             </div>
                 </div>
@@ -337,6 +364,57 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     const degreeSelect = document.querySelector('select[name="degree_title"]');
                     const degreeError = document.getElementById('degree_title_error');
+                    const otherDegreeWrapper = document.getElementById('other_degree_title_wrapper');
+                    const otherDegreeInput = document.getElementById('other_degree_title');
+                    const otherDegreeError = document.getElementById('other_degree_title_error');
+
+                    if (!degreeSelect) {
+                        return;
+                    }
+
+                    function updateOtherDegreeVisibility() {
+                        const isOtherSelected = (degreeSelect.value || '').toLowerCase() === 'other';
+
+                        if (otherDegreeWrapper) {
+                            otherDegreeWrapper.style.display = isOtherSelected ? 'block' : 'none';
+                        }
+
+                        if (otherDegreeInput) {
+                            if (isOtherSelected) {
+                                otherDegreeInput.setAttribute('required', 'required');
+                            } else {
+                                otherDegreeInput.removeAttribute('required');
+                                otherDegreeInput.classList.remove('is-invalid');
+                                if (otherDegreeError) {
+                                    otherDegreeError.style.display = 'none';
+                                }
+                                otherDegreeInput.value = '';
+                            }
+                        }
+                    }
+
+                    function validateOtherDegree() {
+                        if (!otherDegreeInput || !otherDegreeError) {
+                            return;
+                        }
+
+                        const isOtherSelected = (degreeSelect.value || '').toLowerCase() === 'other';
+                        if (!isOtherSelected) {
+                            otherDegreeInput.classList.remove('is-invalid');
+                            otherDegreeError.style.display = 'none';
+                            return;
+                        }
+
+                        const value = otherDegreeInput.value.trim();
+                        if (value.length < 2) {
+                            otherDegreeInput.classList.add('is-invalid');
+                            otherDegreeError.style.display = 'block';
+                        } else {
+                            otherDegreeInput.classList.remove('is-invalid');
+                            otherDegreeError.style.display = 'none';
+                        }
+                    }
+
                     degreeSelect.addEventListener('change', function () {
                         if (this.value === '') {
                             degreeSelect.classList.add('is-invalid');
@@ -345,7 +423,17 @@
                             degreeSelect.classList.remove('is-invalid');
                             degreeError.style.display = 'none';
                         }
+
+                        updateOtherDegreeVisibility();
+                        validateOtherDegree();
                     });
+
+                    if (otherDegreeInput) {
+                        otherDegreeInput.addEventListener('input', validateOtherDegree);
+                    }
+
+                    updateOtherDegreeVisibility();
+                    validateOtherDegree();
                 });
                 </script>
                    

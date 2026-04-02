@@ -18,6 +18,7 @@ class StudyLeave extends Model
         'study_leave_from',
         'study_leave_to',
         'degree_title',
+        'other_degree_title',
         'university_institute',
         'country',
         'field_of_study',

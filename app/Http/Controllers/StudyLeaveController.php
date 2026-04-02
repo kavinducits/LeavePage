@@ -354,6 +354,7 @@ class StudyLeaveController extends Controller
             'study_leave_from' => 'required|date',
             'study_leave_to' => 'required|date|after_or_equal:study_leave_from',
             'degree_title' => 'required|string|max:255',
+            'other_degree_title' => 'required_if:degree_title,Other|nullable|string|max:255',
             'university_institute' => 'required|string|max:255',
             'country' => 'required_if:study_location,Abroad|nullable|string|max:100',
             'field_of_study' => 'required|string|max:255',
@@ -454,6 +455,18 @@ class StudyLeaveController extends Controller
         // User-side field is fixed as Pending (2); MA sets the final value during review.
         $validatedData['leave_payment_type'] = 2;
 
+        $isOtherDegreeSelected = isset($validatedData['degree_title'])
+            && strcasecmp((string) $validatedData['degree_title'], 'Other') === 0;
+
+        if ($isOtherDegreeSelected) {
+            $validatedData['degree_title'] = null;
+            $validatedData['other_degree_title'] = isset($validatedData['other_degree_title'])
+                ? trim((string) $validatedData['other_degree_title'])
+                : null;
+        } else {
+            $validatedData['other_degree_title'] = null;
+        }
+
         if ($draft) {
             // Prepare update data
             $updateData = [
@@ -462,6 +475,7 @@ class StudyLeaveController extends Controller
                 'study_leave_from' => $validatedData['study_leave_from'],
                 'study_leave_to' => $validatedData['study_leave_to'],
                 'degree_title' => $validatedData['degree_title'],
+                'other_degree_title' => $validatedData['other_degree_title'],
                 'university_institute' => $validatedData['university_institute'],
                 'country' => $validatedData['country'],
                 'field_of_study' => $validatedData['field_of_study'],
