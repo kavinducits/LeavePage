@@ -118,7 +118,15 @@ class StudyLeaveController extends Controller
             ->where('study_leave_progress_reports.status_id', 3) // Returned status
             ->exists();
 
-        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate', 'academicYears', 'leaveProgressData', 'hasReturnedExtensions', 'hasReturnedProgressReports'));
+        $studyLeaveSummaryRows = DB::table('leave_summary_table')
+            ->where('empno', session('empno'))
+            ->where('leave_type', 1) // Study Leave
+            ->select('id', 'reference_no', 'start_date', 'end_date')
+            ->orderByDesc('start_date')
+            ->orderByDesc('id')
+            ->get();
+
+        return view('StudyLeave.createStudyLeave', compact('user', 'drafts', 'previousLeaves', 'hasActiveDraft', 'isEnableStudyLeaveRequiste', 'currentDate', 'academicYears', 'leaveProgressData', 'hasReturnedExtensions', 'hasReturnedProgressReports', 'studyLeaveSummaryRows'));
     }
 
     /**
