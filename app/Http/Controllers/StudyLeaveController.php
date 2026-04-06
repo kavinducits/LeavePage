@@ -42,7 +42,8 @@ class StudyLeaveController extends Controller
         $rejectLeaves = $this->getStudyLeaves(session('empno'))->where('status_id', 2);
 
         //$previousLeaves = $approvedLeaves->merge($returnLeaves)->merge($rejectLeaves);
-        $previousLeaves = $this->getStudyLeaves(session('empno'));
+       // $previousLeaves = $this->getStudyLeaves(session('empno'));
+        $previousLeaves=$this->getInProgressStudyLeave(session('empno'));
         $drafts = StudyLeave::where('empno', session('empno'))
             ->where('is_draft', true)
             ->first();
@@ -923,6 +924,40 @@ class StudyLeaveController extends Controller
             ->get();
 
         return $previousLeaves;
+    }
+    /**
+     * 
+     */
+    public function getInProgressStudyLeave($emp_no)
+    {
+
+        // Fetch employee info from the database with latest extension status and total duration
+        // Filter to get only the latest record per empno
+        $previousLeaves = DB::table('study_leaves')
+            ->where('empno', $emp_no)
+            ->select(
+                'study_leaves.id',
+                'degree_title',
+                'university_institute',
+                'study_leave_from',
+                'study_leave_to',
+                'leave_payment_type',
+                'study_leaves.created_at',
+                'study_leaves.status_id as status_id',
+                'statuses.status',
+                'reference_no',
+                'latest_extensions.extension_status_id',
+                DB::raw('COALESCE(extension_durations.total_extension_days, 0) as total_extension_days')
+            )
+            ->join('statuses', 'study_leaves.status_id', '=', 'statuses.stat_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, status_id as extension_status_id FROM study_leave_extensions WHERE id IN (SELECT MAX(id) FROM study_leave_extensions GROUP BY study_leave_id)) as latest_extensions'), 'study_leaves.id', '=', 'latest_extensions.study_leave_id')
+            ->leftJoin(DB::raw('(SELECT study_leave_id, SUM(DATEDIFF(new_end_date, old_end_date)) as total_extension_days FROM study_leave_extensions WHERE study_leave_extensions.status_id = 1 GROUP BY study_leave_id) as extension_durations'), 'study_leaves.id', '=', 'extension_durations.study_leave_id')
+            ->orderByDesc('study_leaves.id')
+            ->limit(1)
+            ->first();
+
+        // Return as collection for compatibility with existing code that calls ->where() on result
+        return collect($previousLeaves ? [$previousLeaves] : []);
     }
 
     /**
