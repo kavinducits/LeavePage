@@ -1280,13 +1280,29 @@ class MAController extends Controller
 
         $readonly = false;
 
+        $approvedProgressReports = DB::table('study_leave_progress_reports')
+            ->leftJoin('statuses', 'study_leave_progress_reports.status_id', '=', 'statuses.stat_id')
+            ->where('study_leave_progress_reports.study_leave_id', $extension->study_leave_id)
+            ->where('study_leave_progress_reports.status_id', 1)
+            ->select(
+                'study_leave_progress_reports.id as progress_report_id',
+                'study_leave_progress_reports.due_date',
+                'study_leave_progress_reports.submitted_date',
+                'study_leave_progress_reports.status_id',
+                'study_leave_progress_reports.document_path',
+                'statuses.status'
+            )
+            ->orderByDesc('study_leave_progress_reports.due_date')
+            ->orderByDesc('study_leave_progress_reports.id')
+            ->get();
+
         $degrees = DB::table('categories')
             ->where('category_type_id', 16)
             ->whereNotIn('id', [70, 71, 72, 73, 74, 75, 76, 182, 183, 184, 185])
             ->select('id', 'category_name')
             ->get()
             ->toArray();
-        return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from', 'degrees'));
+        return view('ma.study_leave.study_leave_extension_view_form', compact('extension', 'user', 'departmentHead', 'readonly', 'draft_study_leave', 'durationDays', 'durationMonths', 'from', 'degrees', 'approvedProgressReports'));
     }
 
     /**

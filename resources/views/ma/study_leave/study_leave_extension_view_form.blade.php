@@ -96,6 +96,53 @@
                         'showPaymentHelpText' => true,
                     ])
 
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white fw-semibold">
+                            <i class="fas fa-file-alt me-2"></i>Approved Progress Reports
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="px-3">Due Date</th>
+                                            <th>Submitted Date</th>
+                                            <th>Status</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse(($approvedProgressReports ?? collect()) as $report)
+                                            <tr>
+                                                <td class="px-3">
+                                                    {{ $report->due_date ? \Carbon\Carbon::parse($report->due_date)->format('M d, Y') : 'N/A' }}
+                                                </td>
+                                                <td>
+                                                    {{ $report->submitted_date ? \Carbon\Carbon::parse($report->submitted_date)->format('M d, Y') : 'N/A' }}
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-success">{{ $report->status ?? 'Approved' }}</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('ma.show.studyleave.progressreport', ['progress_report_id' => $report->progress_report_id]) }}?from={{ $from ?? 'submitted' }}"
+                                                        class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye me-1"></i>View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-4">
+                                                    No approved progress reports found for this study leave.
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Accordion for More Details -->
                     <div class="accordion mb-4" id="detailsAccordion">
                         <div class="accordion-item">
