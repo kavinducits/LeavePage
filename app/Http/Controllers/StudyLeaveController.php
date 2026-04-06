@@ -204,8 +204,15 @@ class StudyLeaveController extends Controller
             return redirect()->route('login')->with('error', 'Employee record not found. Please contact administrator.');
         }
 
+        $studyLeaveSummaryRows = DB::table('leave_summary_table')
+            ->where('empno', $empno)
+            ->where('leave_type', 1)
+            ->select('id', 'reference_no', 'start_date', 'end_date')
+            ->orderByDesc('start_date')
+            ->orderByDesc('id')
+            ->get();
 
-        return view('StudyLeave.createBasicInfo', compact('user',  'readonly'));
+        return view('StudyLeave.createBasicInfo', compact('user', 'readonly', 'studyLeaveSummaryRows'));
     }
 
     /**
