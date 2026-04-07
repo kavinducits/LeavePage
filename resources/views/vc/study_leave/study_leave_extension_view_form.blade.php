@@ -374,24 +374,6 @@
         @endif
     </div>
 
-    <!-- Confirm Approve Modal -->
-    <div class="modal fade" id="confirmApproveModal" tabindex="-1" aria-labelledby="confirmApproveModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="confirmApproveModalLabel"><i class="fas fa-check-circle me-2"></i>Confirm Approval</h5>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to approve this extension request? This is the final approval.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="confirmApproveBtn">Yes, Approve</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <style>
         .card-header-dark {
             background: linear-gradient(135deg, #212529 0%, #343a40 100%);
@@ -494,12 +476,8 @@
 
             // Form validation
             const vcReviewForm = document.getElementById('vcReviewForm');
-            const confirmApproveModal = new bootstrap.Modal(document.getElementById('confirmApproveModal'));
-            let approveConfirmed = false;
 
             vcReviewForm.addEventListener('submit', function(e) {
-                if (approveConfirmed) { return; }
-
                 const recommendValue = document.querySelector('input[name="vc_recommend"]:checked')?.value;
 
                 if (recommendValue === '0') {
@@ -513,13 +491,16 @@
                 }
 
                 e.preventDefault();
-                confirmApproveModal.show();
-            });
-
-            document.getElementById('confirmApproveBtn').addEventListener('click', function() {
-                approveConfirmed = true;
-                confirmApproveModal.hide();
-                vcReviewForm.submit();
+                AppPopup.confirm({
+                    title: 'Confirm Approval',
+                    text: 'Are you sure you want to approve this extension request? This is the final approval.',
+                    icon: 'question',
+                    confirmButtonText: 'Yes, Approve'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        vcReviewForm.submit();
+                    }
+                });
             });
 
             // Clear invalid state on input
@@ -559,6 +540,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.popup_helpers')
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 

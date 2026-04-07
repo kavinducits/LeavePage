@@ -326,29 +326,6 @@
     @endif
 </div>
 
-<!-- Confirm Forward Modal -->
-<div class="modal fade" id="confirmForwardModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#800020;color:white;">
-                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Forward</h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-forward fa-3x mb-3" style="color:#800020"></i>
-                <p class="mb-0 fs-6">Are you sure you want to submit this review and forward to VC?</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </button>
-                <button type="button" class="btn btn-success" id="confirmForwardYes">
-                    <i class="fas fa-check me-2"></i>Yes, Forward
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
 .card-header-dark {
     background: linear-gradient(135deg, #212529 0%, #343a40 100%);
@@ -450,13 +427,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Form validation
-    let forwardConfirmed = false;
-
     const deanReviewForm = document.getElementById('deanReviewForm');
-    const confirmForwardModal = new bootstrap.Modal(document.getElementById('confirmForwardModal'));
     deanReviewForm.addEventListener('submit', function(e) {
-        if (forwardConfirmed) { return; }
-
         const recommendValue = document.querySelector('input[name="dean_recommend"]:checked')?.value;
         
         if (recommendValue === '0') {
@@ -470,13 +442,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         e.preventDefault();
-        confirmForwardModal.show();
-    });
-
-    document.getElementById('confirmForwardYes').addEventListener('click', function () {
-        forwardConfirmed = true;
-        confirmForwardModal.hide();
-        deanReviewForm.submit();
+        AppPopup.confirm({
+            title: 'Confirm Forward',
+            text: 'Are you sure you want to submit this review and forward to VC?',
+            icon: 'question',
+            confirmButtonText: 'Yes, Forward'
+        }).then(function(result) {
+            if (result && result.isConfirmed) {
+                deanReviewForm.submit();
+            }
+        });
     });
 
     // Clear invalid state on input
@@ -516,6 +491,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.popup_helpers')
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 

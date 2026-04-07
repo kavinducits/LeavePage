@@ -448,124 +448,14 @@
         @include('ma.partials.footer')
     </div>
 
-<!-- Confirm Forward Modal -->
-<div class="modal fade" id="confirmForwardModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#800020;color:white;">
-                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Forward</h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-forward fa-3x mb-3" style="color:#800020"></i>
-                <p class="mb-0 fs-6">Are you sure you want to forward this extension request to Head of Academic Establishment?</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </button>
-                <button type="button" class="btn btn-success" id="confirmForwardYes">
-                    <i class="fas fa-check me-2"></i>Yes, Forward
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Confirm Return Modal -->
-<div class="modal fade" id="confirmReturnModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#800020;color:white;">
-                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Return</h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-undo fa-3x mb-3" style="color:#800020"></i>
-                <p class="mb-0 fs-6">Are you sure you want to return this extension request to the user?</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </button>
-                <button type="button" class="btn btn-warning" id="confirmReturnYes">
-                    <i class="fas fa-check me-2"></i>Yes, Return
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Confirm Finalize Modal -->
-<div class="modal fade" id="confirmFinalizeModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#800020;color:white;">
-                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Finalize</h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-check-circle fa-3x mb-3" style="color:#198754"></i>
-                <p class="mb-0 fs-6">Are you sure you want to finalize this extension as Approved?</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>No
-                </button>
-                <button type="button" class="btn btn-success" id="confirmFinalizeYes">
-                    <i class="fas fa-check me-2"></i>Yes
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Confirm Reject Modal -->
-<div class="modal fade" id="confirmRejectModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#800020;color:white;">
-                <h5 class="modal-title"><i class="fas fa-question-circle me-2"></i>Confirm Reject</h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-times-circle fa-3x mb-3" style="color:#dc3545"></i>
-                <p class="mb-0 fs-6">Are you sure you want to reject this extension request?</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>No
-                </button>
-                <button type="button" class="btn btn-danger" id="confirmRejectYes">
-                    <i class="fas fa-check me-2"></i>Yes
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Operation Success Modal -->
-<div class="modal fade" id="operationSuccessModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#198754;color:white;">
-                <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Success</h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-check-circle fa-3x mb-3" style="color:#198754"></i>
-                <p class="mb-0 fs-6">{{ session('success') }}</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-                    <i class="fas fa-check me-2"></i>OK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 5 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.popup_helpers')
     <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
@@ -607,14 +497,8 @@
         const extensionPaymentTypeInput = document.getElementById('ma_extension_payment_type');
 
         // Forward form
-        const forwardModalElement = document.getElementById('confirmForwardModal');
-        const confirmForwardModal = forwardModalElement ? new bootstrap.Modal(forwardModalElement) : null;
-        let forwardConfirmed = false;
-
-        if (approveForm && confirmForwardModal) {
+        if (approveForm) {
             approveForm.addEventListener('submit', function(e) {
-                if (forwardConfirmed) { return; }
-
                 const remarkValue = actionRemarkInput ? actionRemarkInput.value.trim() : '';
                 const extensionPaymentTypeValue = extensionPaymentTypeInput ? extensionPaymentTypeInput.value : '';
 
@@ -631,28 +515,22 @@
                 document.getElementById('approveExtensionPaymentTypeInput').value = extensionPaymentTypeValue;
 
                 e.preventDefault();
-                confirmForwardModal.show();
-            });
-
-            const confirmForwardYes = document.getElementById('confirmForwardYes');
-            if (confirmForwardYes) {
-                confirmForwardYes.addEventListener('click', function () {
-                    forwardConfirmed = true;
-                    confirmForwardModal.hide();
-                    approveForm.submit();
+                AppPopup.confirm({
+                    title: 'Confirm Forward',
+                    text: 'Are you sure you want to forward this extension request to Head of Academic Establishment?',
+                    icon: 'question',
+                    confirmButtonText: 'Yes, Forward'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        approveForm.submit();
+                    }
                 });
-            }
+            });
         }
 
         // Return form
-        const returnModalElement = document.getElementById('confirmReturnModal');
-        const returnConfirmModal = returnModalElement ? new bootstrap.Modal(returnModalElement) : null;
-        let returnConfirmed = false;
-
-        if (returnForm && returnConfirmModal) {
+        if (returnForm) {
             returnForm.addEventListener('submit', function(e) {
-                if (returnConfirmed) { return; }
-
                 const remarkValue = actionRemarkInput ? actionRemarkInput.value.trim() : '';
                 clearAllErrors();
 
@@ -664,61 +542,51 @@
 
                 document.getElementById('returnRemarkInput').value = remarkValue;
                 e.preventDefault();
-                returnConfirmModal.show();
-            });
-
-            const confirmReturnYes = document.getElementById('confirmReturnYes');
-            if (confirmReturnYes) {
-                confirmReturnYes.addEventListener('click', function () {
-                    returnConfirmed = true;
-                    returnConfirmModal.hide();
-                    returnForm.submit();
+                AppPopup.confirm({
+                    title: 'Confirm Return',
+                    text: 'Are you sure you want to return this extension request to the user?',
+                    icon: 'warning',
+                    confirmButtonText: 'Yes, Return'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        returnForm.submit();
+                    }
                 });
-            }
+            });
         }
 
         // Finalize extension form
-        const finalizeModalElement = document.getElementById('confirmFinalizeModal');
-        const confirmFinalizeModal = finalizeModalElement ? new bootstrap.Modal(finalizeModalElement) : null;
-        let finalizeConfirmed = false;
-
-        if (finalizeForm && confirmFinalizeModal) {
+        if (finalizeForm) {
             finalizeForm.addEventListener('submit', function (e) {
-                if (finalizeConfirmed) { return; }
                 e.preventDefault();
-                confirmFinalizeModal.show();
-            });
-
-            const confirmFinalizeYes = document.getElementById('confirmFinalizeYes');
-            if (confirmFinalizeYes) {
-                confirmFinalizeYes.addEventListener('click', function () {
-                    finalizeConfirmed = true;
-                    confirmFinalizeModal.hide();
-                    finalizeForm.submit();
+                AppPopup.confirm({
+                    title: 'Confirm Finalize',
+                    text: 'Are you sure you want to finalize this extension as Approved?',
+                    icon: 'question',
+                    confirmButtonText: 'Yes, Finalize'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        finalizeForm.submit();
+                    }
                 });
-            }
+            });
         }
 
         // Reject extension form
-        const rejectModalElement = document.getElementById('confirmRejectModal');
-        const confirmRejectModal = rejectModalElement ? new bootstrap.Modal(rejectModalElement) : null;
-        let rejectConfirmed = false;
-
-        if (rejectForm && confirmRejectModal) {
+        if (rejectForm) {
             rejectForm.addEventListener('submit', function (e) {
-                if (rejectConfirmed) { return; }
                 e.preventDefault();
-                confirmRejectModal.show();
-            });
-
-            const confirmRejectYes = document.getElementById('confirmRejectYes');
-            if (confirmRejectYes) {
-                confirmRejectYes.addEventListener('click', function () {
-                    rejectConfirmed = true;
-                    confirmRejectModal.hide();
-                    rejectForm.submit();
+                AppPopup.confirm({
+                    title: 'Confirm Rejection',
+                    text: 'Are you sure you want to reject this extension request?',
+                    icon: 'warning',
+                    confirmButtonText: 'Yes, Reject'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        rejectForm.submit();
+                    }
                 });
-            }
+            });
         }
 
         function showRemarkError() {
@@ -824,11 +692,7 @@
         }
 
         @if (session('success'))
-        const successModalElement = document.getElementById('operationSuccessModal');
-        if (successModalElement) {
-            const successModal = new bootstrap.Modal(successModalElement);
-            successModal.show();
-        }
+        AppPopup.success(@json(session('success')), 'Success', 1600);
         @endif
     </script>
 

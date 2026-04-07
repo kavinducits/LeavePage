@@ -529,173 +529,44 @@
         @include('ma.partials.footer')
     </div>
 
-    <!-- Return Confirmation Modal -->
-    <div class="modal fade" id="returnConfirmModal" tabindex="-1" aria-labelledby="returnConfirmModalLabel"
-        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="returnConfirmModalLabel">Confirm Return</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to return this progress report to the user?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="returnConfirmNo"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="returnConfirmYes">Yes, Return</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Forward Confirmation Modal -->
-    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" aria-labelledby="forwardConfirmModalLabel"
-        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Forward</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to forward this progress report to HOD Academic Establishment?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="forwardConfirmNo"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="forwardConfirmYes">Yes, Forward</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Finalize Confirmation Modal -->
-    <div class="modal fade" id="finalizeConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title">Confirm Finalize</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to finalize this progress report as Approved?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-success" id="finalizeConfirmYes">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reject Confirmation Modal -->
-    <div class="modal fade" id="rejectConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Confirm Rejection</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">Are you sure you want to finalize this progress report as Rejected?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-danger" id="rejectConfirmYes">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Operation Success Modal -->
-    <div class="modal fade" id="operationSuccessModal" tabindex="-1" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color:#198754;color:white;">
-                    <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Success</h5>
-                </div>
-                <div class="modal-body text-center py-4">
-                    <i class="fas fa-check-circle fa-3x mb-3" style="color:#198754"></i>
-                    <p class="mb-0 fs-6">{{ session('success') }}</p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-                        <i class="fas fa-check me-2"></i>OK
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 5 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.popup_helpers')
 
     <script>
-        // Form validation and submission handling
         const approveForm = document.getElementById('approveForm');
         const returnForm = document.getElementById('returnForm');
+        const finalizeForm = document.getElementById('finalizeForm');
+        const rejectForm = document.getElementById('rejectForm');
         const actionRemark = document.getElementById('actionRemark');
         const approveRemarkInput = document.getElementById('approveRemarkInput');
         const returnRemarkInput = document.getElementById('returnRemarkInput');
-        const returnConfirmModalEl = document.getElementById('returnConfirmModal');
-        const returnConfirmYesBtn = document.getElementById('returnConfirmYes');
-        const returnConfirmNoBtn = document.getElementById('returnConfirmNo');
-        const forwardConfirmModalEl = document.getElementById('forwardConfirmModal');
-        const forwardConfirmYesBtn = document.getElementById('forwardConfirmYes');
-        const forwardConfirmNoBtn = document.getElementById('forwardConfirmNo');
-        const finalizeForm = document.getElementById('finalizeForm');
-        const rejectForm = document.getElementById('rejectForm');
-        const finalizeConfirmYesBtn = document.getElementById('finalizeConfirmYes');
-        const rejectConfirmYesBtn = document.getElementById('rejectConfirmYes');
-        let forwardConfirmed = false;
 
         if (approveForm) {
             approveForm.addEventListener('submit', function(e) {
-            const remarkValue = document.getElementById('actionRemark').value.trim();
-            document.getElementById('approveRemarkInput').value = remarkValue;
-
-            clearRemarkError();
-
-            if (!forwardConfirmed) {
                 e.preventDefault();
-                const forwardModal = new bootstrap.Modal(document.getElementById('forwardConfirmModal'));
-                forwardModal.show();
-                return false;
-            }
-        });
-        }
+                const remarkValue = actionRemark ? actionRemark.value.trim() : '';
+                if (approveRemarkInput) {
+                    approveRemarkInput.value = remarkValue;
+                }
+                clearRemarkError();
 
-        if (forwardConfirmYesBtn) {
-            forwardConfirmYesBtn.addEventListener('click', function() {
-            forwardConfirmed = true;
-            const modal = bootstrap.Modal.getInstance(document.getElementById('forwardConfirmModal'));
-            if (modal) {
-                modal.hide();
-            }
-            if (approveForm) {
-                approveForm.submit();
-            }
-        });
-        }
-
-        if (forwardConfirmNoBtn) {
-            forwardConfirmNoBtn.addEventListener('click', function() {
-            forwardConfirmed = false;
-        });
-        }
-
-        if (forwardConfirmModalEl) {
-            forwardConfirmModalEl.addEventListener('hidden.bs.modal', function() {
-            forwardConfirmed = false;
-        });
+                AppPopup.confirm({
+                    title: 'Confirm Forward',
+                    text: 'Are you sure you want to forward this progress report to HOD Academic Establishment?',
+                    icon: 'question',
+                    confirmButtonText: 'Yes, Forward'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        approveForm.submit();
+                    }
+                });
+            });
         }
 
         const collapseDetails = document.getElementById('collapseDetails');
@@ -717,52 +588,33 @@
             collapseDetails.addEventListener('hidden.bs.collapse', updateDetailsChevron);
         }
 
-        let returnConfirmed = false;
-
         if (returnForm) {
             returnForm.addEventListener('submit', function(e) {
-            const remarkValue = document.getElementById('actionRemark').value.trim();
-
-            clearRemarkError();
-
-            if (remarkValue === '') {
                 e.preventDefault();
-                showRemarkError();
-                return false;
-            }
+                const remarkValue = actionRemark ? actionRemark.value.trim() : '';
 
-            document.getElementById('returnRemarkInput').value = remarkValue;
+                clearRemarkError();
 
-            if (!returnConfirmed) {
-                e.preventDefault();
-                const returnModal = new bootstrap.Modal(document.getElementById('returnConfirmModal'));
-                returnModal.show();
-                return false;
-            }
-        });
-        }
+                if (remarkValue === '') {
+                    showRemarkError();
+                    return false;
+                }
 
-        if (returnConfirmYesBtn) {
-            returnConfirmYesBtn.addEventListener('click', function() {
-            returnConfirmed = true;
-            const modal = bootstrap.Modal.getInstance(document.getElementById('returnConfirmModal'));
-            if (modal) {
-                modal.hide();
-            }
-            document.getElementById('returnForm').submit();
-        });
-        }
+                if (returnRemarkInput) {
+                    returnRemarkInput.value = remarkValue;
+                }
 
-        if (returnConfirmNoBtn) {
-            returnConfirmNoBtn.addEventListener('click', function() {
-            returnConfirmed = false;
-        });
-        }
-
-        if (returnConfirmModalEl) {
-            returnConfirmModalEl.addEventListener('hidden.bs.modal', function() {
-            returnConfirmed = false;
-        });
+                AppPopup.confirm({
+                    title: 'Confirm Return',
+                    text: 'Are you sure you want to return this progress report to the user?',
+                    icon: 'warning',
+                    confirmButtonText: 'Yes, Return'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        returnForm.submit();
+                    }
+                });
+            });
         }
 
         function showRemarkError() {
@@ -779,54 +631,40 @@
             actionRemark.addEventListener('input', clearRemarkError);
         }
 
-        let finalizeConfirmed = false;
         if (finalizeForm) {
             finalizeForm.addEventListener('submit', function (e) {
-                if (finalizeConfirmed) { return; }
                 e.preventDefault();
-                const modal = new bootstrap.Modal(document.getElementById('finalizeConfirmModal'));
-                modal.show();
+                AppPopup.confirm({
+                    title: 'Confirm Finalize',
+                    text: 'Are you sure you want to finalize this progress report as Approved?',
+                    icon: 'question',
+                    confirmButtonText: 'Yes, Finalize'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        finalizeForm.submit();
+                    }
+                });
             });
         }
 
-        if (finalizeConfirmYesBtn) {
-            finalizeConfirmYesBtn.addEventListener('click', function () {
-                finalizeConfirmed = true;
-                const modal = bootstrap.Modal.getInstance(document.getElementById('finalizeConfirmModal'));
-                if (modal) {
-                    modal.hide();
-                }
-                finalizeForm.submit();
-            });
-        }
-
-        let rejectConfirmed = false;
         if (rejectForm) {
             rejectForm.addEventListener('submit', function (e) {
-                if (rejectConfirmed) { return; }
                 e.preventDefault();
-                const modal = new bootstrap.Modal(document.getElementById('rejectConfirmModal'));
-                modal.show();
-            });
-        }
-
-        if (rejectConfirmYesBtn) {
-            rejectConfirmYesBtn.addEventListener('click', function () {
-                rejectConfirmed = true;
-                const modal = bootstrap.Modal.getInstance(document.getElementById('rejectConfirmModal'));
-                if (modal) {
-                    modal.hide();
-                }
-                rejectForm.submit();
+                AppPopup.confirm({
+                    title: 'Confirm Rejection',
+                    text: 'Are you sure you want to finalize this progress report as Rejected?',
+                    icon: 'warning',
+                    confirmButtonText: 'Yes, Reject'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        rejectForm.submit();
+                    }
+                });
             });
         }
 
         @if (session('success'))
-        const successModalElement = document.getElementById('operationSuccessModal');
-        if (successModalElement) {
-            const successModal = new bootstrap.Modal(successModalElement);
-            successModal.show();
-        }
+        AppPopup.success(@json(session('success')), 'Success', 1600);
         @endif
     </script>
 </body>
