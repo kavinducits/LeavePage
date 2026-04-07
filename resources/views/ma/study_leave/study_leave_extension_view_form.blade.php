@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- DataTables Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     @include('StudyLeave.study_leave_extension.partials.extension_summary_styles')
     <style>
         .accordion-details-text {
@@ -102,7 +104,7 @@
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover mb-0">
+                                <table id="approved-progress-reports-table" class="table table-hover mb-0">
                                     <thead class="table-light">
                                         <tr>
                                             <th class="px-3">Due Date</th>
@@ -564,8 +566,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
+        $(function() {
+            const hasApprovedProgressReports = @json(($approvedProgressReports ?? collect())->count() > 0);
+
+            if (hasApprovedProgressReports && $.fn.DataTable && $('#approved-progress-reports-table').length) {
+                $('#approved-progress-reports-table').DataTable({
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, -1], [5, 10, 25, 'All']],
+                    order: [[0, 'desc']],
+                    language: {
+                        search: 'Search:',
+                        lengthMenu: 'Show _MENU_ entries',
+                        info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                        infoEmpty: 'Showing 0 to 0 of 0 entries',
+                        infoFiltered: '(filtered from _MAX_ total entries)',
+                        paginate: {
+                            first: 'First',
+                            last: 'Last',
+                            next: 'Next',
+                            previous: 'Previous'
+                        }
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: -1 }
+                    ]
+                });
+            }
+        });
+
         const approveForm = document.getElementById('approveForm');
         const returnForm = document.getElementById('returnForm');
         const finalizeForm = document.getElementById('finalizeForm');

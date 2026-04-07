@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 <!-- Progress Bar - Step 1 -->
 @include('StudyLeave.partials.progress_bar', ['currentStep' => 1])
@@ -40,7 +41,7 @@
             </div>
             <div class="card-body pt-2 pb-0 px-3">
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered align-middle mb-0">
+                    <table id="basicinfo-study-leave-summary-table" class="table table-hover table-bordered align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center" style="width: 34%;">Reference No</th>
@@ -101,6 +102,37 @@
     </button>
 </div>
     </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+    $(function() {
+        const hasSummaryRows = @json(($studyLeaveSummaryRows ?? collect())->count() > 0);
+
+        if (hasSummaryRows && $.fn.DataTable && $('#basicinfo-study-leave-summary-table').length) {
+            $('#basicinfo-study-leave-summary-table').DataTable({
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, 'All']],
+                order: [[1, 'desc']],
+                language: {
+                    search: 'Search:',
+                    lengthMenu: 'Show _MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                    infoEmpty: 'Showing 0 to 0 of 0 entries',
+                    infoFiltered: '(filtered from _MAX_ total entries)',
+                    paginate: {
+                        first: 'First',
+                        last: 'Last',
+                        next: 'Next',
+                        previous: 'Previous'
+                    }
+                }
+            });
+        }
+    });
+    </script>
 
     <script>
     function saveAndExit() {

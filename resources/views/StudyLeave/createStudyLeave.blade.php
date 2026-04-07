@@ -3,6 +3,8 @@
 @extends('layouts.app')
 
 @section('content')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
     <style>
         .text-warning {
             --bs-text-opacity: 1;
@@ -500,7 +502,7 @@
                 </div>
                 <div class="card-body pt-2 pb-0 px-3">
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered align-middle mb-0">
+                        <table id="your-study-leaves-table" class="table table-hover table-bordered align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th class="text-center" style="width: 12%;">Applied Date</th>
@@ -726,7 +728,7 @@
                 </div>
                 <div class="card-body pt-2 pb-0 px-3">
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered align-middle mb-0">
+                        <table id="study-leave-summary-table" class="table table-hover table-bordered align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th class="text-center" style="width: 34%;">Reference No</th>
@@ -1334,8 +1336,36 @@
 
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
+    $(function() {
+        const hasSummaryRows = @json(($studyLeaveSummaryRows ?? collect())->count() > 0);
+
+        if (hasSummaryRows && $.fn.DataTable && $('#study-leave-summary-table').length) {
+            $('#study-leave-summary-table').DataTable({
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, 'All']],
+                order: [[1, 'desc']],
+                language: {
+                    search: 'Search:',
+                    lengthMenu: 'Show _MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                    infoEmpty: 'Showing 0 to 0 of 0 entries',
+                    infoFiltered: '(filtered from _MAX_ total entries)',
+                    paginate: {
+                        first: 'First',
+                        last: 'Last',
+                        next: 'Next',
+                        previous: 'Previous'
+                    }
+                }
+            });
+        }
+    });
+
     const toggleButton = document.querySelector('[data-bs-toggle="collapse"]');
     const toggleIcon = document.getElementById('toggleIcon');
     const draftsCollapse = document.getElementById('draftsCollapse');

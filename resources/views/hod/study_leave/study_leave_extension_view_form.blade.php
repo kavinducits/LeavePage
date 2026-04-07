@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     @include('StudyLeave.study_leave_extension.partials.extension_summary_styles')
 </head>
 
@@ -72,6 +73,53 @@
             'durationDays' => $durationDays,
             'durationMonths' => $durationMonths,
         ])
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white fw-semibold">
+                <i class="fas fa-file-alt me-2"></i>Approved Progress Reports
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table id="approved-progress-reports-table" class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="px-3">Due Date</th>
+                                <th>Submitted Date</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse(($approvedProgressReports ?? collect()) as $report)
+                                <tr>
+                                    <td class="px-3">
+                                        {{ $report->due_date ? \Carbon\Carbon::parse($report->due_date)->format('M d, Y') : 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $report->submitted_date ? \Carbon\Carbon::parse($report->submitted_date)->format('M d, Y') : 'N/A' }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">{{ $report->status ?? 'Approved' }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ route('hod.show.studyleave.progressreport', $report->progress_report_id) }}?from={{ $from ?? 'submitted' }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        No approved progress reports found for this study leave.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <!-- Accordion for More Details -->
         <div class="accordion mb-4" id="detailsAccordion">
@@ -363,6 +411,32 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const hasApprovedProgressReports = @json(($approvedProgressReports ?? collect())->count() > 0);
+
+            if (hasApprovedProgressReports && $.fn.DataTable && $('#approved-progress-reports-table').length) {
+                $('#approved-progress-reports-table').DataTable({
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, -1], [5, 10, 25, 'All']],
+                    order: [[0, 'desc']],
+                    language: {
+                        search: 'Search:',
+                        lengthMenu: 'Show _MENU_ entries',
+                        info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                        infoEmpty: 'Showing 0 to 0 of 0 entries',
+                        infoFiltered: '(filtered from _MAX_ total entries)',
+                        paginate: {
+                            first: 'First',
+                            last: 'Last',
+                            next: 'Next',
+                            previous: 'Previous'
+                        }
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: -1 }
+                    ]
+                });
+            }
+
             const recommendRadios = document.querySelectorAll('input[name="hod_recommend"]');
             const remarksTextarea = document.getElementById('hod_remarks');
 
@@ -444,6 +518,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 </body>
 
