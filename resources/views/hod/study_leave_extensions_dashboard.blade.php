@@ -14,3 +14,17 @@
 @section('main-content')
     @include('hod.study_leave.study_leave_extensions_index')
 @endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+        AppPopup.success(@json(session('success')), 'Success', 1600);
+        @endif
+
+        @if(session('error'))
+        AppPopup.error(@json(session('error')));
+        @endif
+    });
+</script>
+@endsection

@@ -48,28 +48,3 @@
         font-size: 0.875rem;
     }
 </style>
-<!-- SweetAlert2 CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    @if(session('success'))
-        AppPopup.success(@json(session('success')), 'Success', 1600);
-    @endif
-
-    // Show SweetAlert popup for error messages
-    @if(session('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: "{{ session('error') }}",
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#d33',
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            }
-        });
-    @endif
-</script>
