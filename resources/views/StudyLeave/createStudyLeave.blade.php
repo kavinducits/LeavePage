@@ -257,38 +257,6 @@
     </style>
     <div class="container py-4">
         
-        <!-- Success Modal for Application Submission -->
-        <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
-                    <div class="modal-body text-center p-5">
-                        <div class="mb-4">
-                            <div class="success-checkmark">
-                                <div class="check-icon">
-                                    <span class="icon-line line-tip"></span>
-                                    <span class="icon-line line-long"></span>
-                                    <div class="icon-circle"></div>
-                                    <div class="icon-fix"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <h3 class="fw-bold text-success mb-3">Submission Successful!</h3>
-                        <p class="text-muted mb-2">Your study leave application has been submitted successfully.</p>
-                        @if(session('reference_number'))
-                            <p class="mb-3">
-                                <strong>Reference Number:</strong> 
-                                <span class="badge bg-primary fs-6">{{ session('reference_number') }}</span>
-                            </p>
-                        @endif
-                        <p class="text-muted small mb-4">Your application is now under review and will be processed by the relevant authorities.</p>
-                        <button type="button" class="btn btn-success px-5 py-2 rounded-pill fw-semibold" data-bs-dismiss="modal">
-                            <i class="fas fa-check me-2"></i>OK
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Returned Application Alert Modal -->
         @php
             $hasReturnedApplication = false;
@@ -361,15 +329,6 @@
                         <p class="text-muted small mb-0">Your MA has provided feedback. Check the remarks and make necessary corrections before resubmitting.</p>
                     </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-
-        <!-- Flash Messages -->
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
@@ -1198,20 +1157,19 @@
         @endforeach
     @endif
 
-    <!-- JavaScript for Success Modal -->
+    <!-- JavaScript for Flash Success -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             @php
-                $shouldShowSuccessModal = session('show_success_modal') || (session('success') && str_contains(session('success'), 'submitted successfully'));
+                $hasSuccessFlash = session('success');
             @endphp
 
-            @if($shouldShowSuccessModal)
-                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                successModal.show();
+            @if(session('success'))
+                AppPopup.success(@json(session('success')), 'Success', 1600);
             @endif
             
             // Show returned application modal if user has a returned application
-            @if($hasReturnedApplication && $returnedApplication && !$shouldShowSuccessModal)
+            @if($hasReturnedApplication && $returnedApplication && !$hasSuccessFlash)
                 const returnedAppModal = new bootstrap.Modal(document.getElementById('returnedAppModal'));
                 returnedAppModal.show();
             @endif

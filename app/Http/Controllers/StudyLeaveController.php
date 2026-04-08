@@ -1151,8 +1151,8 @@ class StudyLeaveController extends Controller
             'library_and_property_handling' => 'required|integer|in:0,1',
             'loan_handling' => 'nullable|integer|in:0,1',
             'nominee_teaching_empno' => 'required|string|max:255',
-            'nominee_admin_empno' => 'required|string|max:255',
-            'nominee_other_empno' => 'required|string|max:255',
+            'nominee_admin_empno' => 'nullable|string|max:255',
+            'nominee_other_empno' => 'nullable|string|max:255',
             'consent_letter_teaching' => 'nullable|file|mimes:pdf|max:5120',
             'consent_letter_admin' => 'nullable|file|mimes:pdf|max:5120',
             'consent_letter_other' => 'nullable|file|mimes:pdf|max:5120',
@@ -1171,8 +1171,8 @@ class StudyLeaveController extends Controller
         $this->normalizeRequestFileArray($request, 'self_funding_declaration');
 
         $rules['consent_letter_teaching'] = (($studyLeave->consent_letter_teaching_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
-        $rules['consent_letter_admin'] = (($studyLeave->consent_letter_admin_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
-        $rules['consent_letter_other'] = (($studyLeave->consent_letter_other_path ?? null) ? 'nullable' : 'required') . '|file|mimes:pdf|max:5120';
+        $rules['consent_letter_admin'] = (($studyLeave->consent_letter_admin_path ?? null) ? 'nullable' : 'required_with:nominee_admin_empno') . '|file|mimes:pdf|max:5120';
+        $rules['consent_letter_other'] = (($studyLeave->consent_letter_other_path ?? null) ? 'nullable' : 'required_with:nominee_other_empno') . '|file|mimes:pdf|max:5120';
 
         $hasPlacementDocuments = $this->hasStudyLeaveDocuments($studyLeave->id, StudyLeaveDocument::TYPE_PLACEMENT_LETTER, $studyLeave->placement_letter);
         $hasSelfFundingDocuments = $this->hasStudyLeaveDocuments($studyLeave->id, StudyLeaveDocument::TYPE_SELF_FUNDING_DECLARATION, $studyLeave->self_funding_declaration);
@@ -1280,7 +1280,7 @@ class StudyLeaveController extends Controller
         StudyLeave::where('id', $id)
             ->update(['status_id' => 4, 'is_draft' => false]);
 
-        return redirect()->route('StudyLeave.show.editeForm', ['id' => $id])->with('success', 'Study leave application submitted successfully! Your application is now under review.');
+        return redirect()->route('StudyLeave.create')->with('success', 'Study leave application submitted successfully! Your application is now under review.');
     }
 
     /**
