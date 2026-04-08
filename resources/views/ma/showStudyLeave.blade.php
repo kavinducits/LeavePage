@@ -267,25 +267,6 @@
                             </div>
                         </div>
 
-                        <!-- Confirmation Modal -->
-                        <div class="modal fade" id="finalizeConfirmModal" tabindex="-1" role="dialog" aria-labelledby="finalizeConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header" id="finalizeModalHeader">
-                                        <h5 class="modal-title" id="finalizeConfirmModalLabel"></h5>
-                                    </div>
-                                    <div class="modal-body" id="finalizeModalBody"></div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" id="finalizeConfirmNo">
-                                            <i class="fas fa-times me-1"></i>No
-                                        </button>
-                                        <button type="button" class="btn" id="finalizeConfirmYes">
-                                            <i class="fas fa-check me-1"></i>Yes
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     @elseif($statusId == 1)
                         <!-- Accepted - all review sections shown above -->
                         <div class="alert alert-success mt-3">
@@ -297,44 +278,7 @@
                             <i class="fas fa-eye"></i> This application is in a different workflow stage. You have read-only access.
                         </div>
                     @endif
-
-                    <!-- Return Confirmation Modal -->
                     @if($statusId == 4)
-                    <div class="modal fade" id="returnConfirmModal" tabindex="-1" role="dialog" aria-labelledby="returnConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title" id="returnConfirmModalLabel">Confirm Return</h5>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Are you sure you want to <strong>return</strong> this study leave application to the user?</p>
-                                    <p class="text-muted mb-0">The user will be notified and can make changes before resubmitting.</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" id="returnConfirmNo">No</button>
-                                    <button type="button" class="btn btn-danger" id="returnConfirmYes">Yes, Return</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Forward Confirmation Modal -->
-                    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header bg-success text-white">
-                                    <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Forward</h5>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Are you sure you want to <strong>forward</strong> this study leave application to the <strong>Head of Academic Establishment</strong>?</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" id="forwardConfirmNo">Cancel</button>
-                                    <button type="button" class="btn btn-success" id="forwardConfirmYes">OK</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     @endif
                 </div>
             </section>
@@ -350,78 +294,63 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.popup_helpers')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+            AppPopup.success(@json(session('success')), 'Success', 1600);
+            @endif
+
+            @if(session('error'))
+            AppPopup.error(@json(session('error')));
+            @endif
+        });
+    </script>
 
     @if($statusId == 4)
     <script>
-        var forwardConfirmed = false;
-
-        // Form validation and submission handling
         document.getElementById('approveForm').addEventListener('submit', function(e) {
-            // Get the remark value and set it to the hidden input
             const remarkValue = document.getElementById('actionRemark').value.trim();
             document.getElementById('approveRemarkInput').value = remarkValue;
-
-            // Clear any previous error highlighting
             clearRemarkError();
 
-            // If not yet confirmed, show modal instead of submitting
-            if (!forwardConfirmed) {
-                e.preventDefault();
-                $('#forwardConfirmModal').modal('show');
-                return;
-            }
+            e.preventDefault();
+            AppPopup.confirm({
+                title: 'Confirm Forward',
+                text: 'Are you sure you want to forward this study leave application to the Head of Academic Establishment?',
+                icon: 'question',
+                confirmButtonText: 'Yes, Forward'
+            }).then(function(result) {
+                if (result && result.isConfirmed) {
+                    e.target.submit();
+                }
+            });
         });
-
-        var returnConfirmed = false;
 
         document.getElementById('returnForm').addEventListener('submit', function(e) {
             const remarkValue = document.getElementById('actionRemark').value.trim();
 
-            // Validate that remarks are provided for return action
             if (!remarkValue) {
                 e.preventDefault();
                 showRemarkError();
                 return;
             }
-
-            // Set the remark value to the hidden input
             document.getElementById('returnRemarkInput').value = remarkValue;
-
-            // Clear any previous error highlighting
             clearRemarkError();
 
-            // If not yet confirmed, show modal instead of submitting
-            if (!returnConfirmed) {
-                e.preventDefault();
-                $('#returnConfirmModal').modal('show');
-                return;
-            }
-        });
-
-        // Yes button - set flag and submit form
-        $('#returnConfirmYes').on('click', function() {
-            returnConfirmed = true;
-            $('#returnConfirmModal').modal('hide');
-            document.getElementById('returnForm').submit();
-        });
-
-        // No button - just close modal
-        $('#returnConfirmNo').on('click', function() {
-            returnConfirmed = false;
-            $('#returnConfirmModal').modal('hide');
-        });
-
-        // Forward modal Yes - set flag and submit form
-        $('#forwardConfirmYes').on('click', function() {
-            forwardConfirmed = true;
-            $('#forwardConfirmModal').modal('hide');
-            document.getElementById('approveForm').submit();
-        });
-
-        // Forward modal No - cancel forwarding
-        $('#forwardConfirmNo').on('click', function() {
-            forwardConfirmed = false;
-            $('#forwardConfirmModal').modal('hide');
+            e.preventDefault();
+            AppPopup.confirm({
+                title: 'Confirm Return',
+                text: 'Are you sure you want to return this study leave application to the user? The user will be notified and can make changes before resubmitting.',
+                icon: 'warning',
+                confirmButtonText: 'Yes, Return'
+            }).then(function(result) {
+                if (result && result.isConfirmed) {
+                    e.target.submit();
+                }
+            });
         });
 
         // Helper functions for error handling
@@ -473,50 +402,50 @@
 
     @if($statusId == 8)
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
             var approvedRadio = document.getElementById('decisionApproved');
             var notApprovedRadio = document.getElementById('decisionNotApproved');
             var approvedFields = document.getElementById('approvedFields');
             var finalizeBtn = document.getElementById('finalizeBtn');
             var form = document.getElementById('councilApprovalForm');
-            var confirmed = false;
-
-            // Block all form submissions unless confirmed via modal Yes
-            $(form).on('submit', function(e) {
-                if (!confirmed) {
-                    e.preventDefault();
-                    return false;
-                }
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
             });
 
             // Toggle approved fields and finalize button based on radio selection
-            $(approvedRadio).on('change', function() {
+            approvedRadio.addEventListener('change', function() {
                 if (this.checked) {
-                    $(approvedFields).show();
-                    $(finalizeBtn).prop('disabled', false).removeClass('btn-danger').addClass('btn-primary');
+                    approvedFields.style.display = 'block';
+                    finalizeBtn.disabled = false;
+                    finalizeBtn.classList.remove('btn-danger');
+                    finalizeBtn.classList.add('btn-primary');
                 }
             });
 
-            $(notApprovedRadio).on('change', function() {
+            notApprovedRadio.addEventListener('change', function() {
                 if (this.checked) {
-                    $(approvedFields).hide();
-                    // Clear approved fields
-                    $('input[name="ma_approve_leave_committee"]').prop('checked', false);
-                    $('#ma_leave_committee_number').val('');
-                    $('#ma_leave_committee_date').val('');
-                    $('input[name="ma_approve_council"]').prop('checked', false);
-                    $('#ma_council_number').val('');
-                    $('#ma_council_date').val('');
-                    $(finalizeBtn).prop('disabled', false).removeClass('btn-primary').addClass('btn-danger');
+                    approvedFields.style.display = 'none';
+                    document.querySelectorAll('input[name="ma_approve_leave_committee"]').forEach(function(input) {
+                        input.checked = false;
+                    });
+                    document.getElementById('ma_leave_committee_number').value = '';
+                    document.getElementById('ma_leave_committee_date').value = '';
+                    document.querySelectorAll('input[name="ma_approve_council"]').forEach(function(input) {
+                        input.checked = false;
+                    });
+                    document.getElementById('ma_council_number').value = '';
+                    document.getElementById('ma_council_date').value = '';
+                    finalizeBtn.disabled = false;
+                    finalizeBtn.classList.remove('btn-primary');
+                    finalizeBtn.classList.add('btn-danger');
                 }
             });
 
-            // Finalize button click - validate then show confirmation modal
-            $(finalizeBtn).on('click', function(e) {
+            finalizeBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 var isApproved = approvedRadio.checked;
 
-                // If approved, validate required fields
                 if (isApproved) {
                     var missing = [];
 
@@ -552,38 +481,63 @@
                     }
 
                     if (missing.length > 0) {
-                        alert('Please fill in all required fields: ' + missing.join(', '));
+                        AppPopup.error('Please fill in all required fields: ' + missing.join(', '), 'Validation Error');
                         return;
                     }
                 }
 
-                // Set modal content based on decision
-                if (isApproved) {
-                    $('#finalizeModalHeader').attr('class', 'modal-header bg-success text-white');
-                    $('#finalizeConfirmModalLabel').text('Confirm Approval');
-                    $('#finalizeModalBody').html('<p>Are you sure you want to <strong>approve</strong> this study leave application?</p><p class="text-muted mb-0">This action will finalize the application as approved.</p>');
-                    $('#finalizeConfirmYes').attr('class', 'btn btn-success');
-                } else {
-                    $('#finalizeModalHeader').attr('class', 'modal-header bg-danger text-white');
-                    $('#finalizeConfirmModalLabel').text('Confirm Rejection');
-                    $('#finalizeModalBody').html('<p>Are you sure you want to <strong>reject</strong> this study leave application?</p><p class="text-muted mb-0">This action will finalize the application as not approved.</p>');
-                    $('#finalizeConfirmYes').attr('class', 'btn btn-danger');
+                var title = isApproved ? 'Confirm Approval' : 'Confirm Rejection';
+                var text = isApproved
+                    ? 'Are you sure you want to approve this study leave application? This action will finalize the application as approved.'
+                    : 'Are you sure you want to reject this study leave application? This action will finalize the application as not approved.';
+
+                AppPopup.confirm({
+                    title: title,
+                    text: text,
+                    icon: isApproved ? 'success' : 'warning',
+                    confirmButtonText: isApproved ? 'Yes, Approve' : 'Yes, Reject'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+            approvedRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    approvedFields.style.display = 'block';
+                    finalizeBtn.disabled = false;
+                    finalizeBtn.classList.remove('btn-danger');
+                    finalizeBtn.classList.add('btn-primary');
                 }
-
-                $('#finalizeConfirmModal').modal('show');
             });
 
-            // Yes button - set flag and submit form
-            $('#finalizeConfirmYes').on('click', function() {
-                confirmed = true;
-                $('#finalizeConfirmModal').modal('hide');
-                form.submit();
+            notApprovedRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    approvedFields.style.display = 'none';
+                    document.querySelectorAll('input[name="ma_approve_leave_committee"]').forEach(function(input) {
+                        input.checked = false;
+                    });
+                    document.getElementById('ma_leave_committee_number').value = '';
+                    document.getElementById('ma_leave_committee_date').value = '';
+                    document.querySelectorAll('input[name="ma_approve_council"]').forEach(function(input) {
+                        input.checked = false;
+                    });
+                    document.getElementById('ma_council_number').value = '';
+                    document.getElementById('ma_council_date').value = '';
+                    finalizeBtn.disabled = false;
+                    finalizeBtn.classList.remove('btn-primary');
+                    finalizeBtn.classList.add('btn-danger');
+                }
             });
 
-            // No button - just close modal, do nothing
-            $('#finalizeConfirmNo').on('click', function() {
-                confirmed = false;
-                $('#finalizeConfirmModal').modal('hide');
+            function clearInvalidFields() {
+                $('#ma_leave_committee_number, #ma_leave_committee_date, #ma_council_number, #ma_council_date').removeClass('is-invalid');
+            }
+
+            document.querySelectorAll('input[name="ma_approve_leave_committee"], input[name="ma_approve_council"], #ma_leave_committee_number, #ma_leave_committee_date, #ma_council_number, #ma_council_date').forEach(function(element) {
+                element.addEventListener('input', clearInvalidFields);
+                element.addEventListener('change', clearInvalidFields);
             });
         });
     </script>

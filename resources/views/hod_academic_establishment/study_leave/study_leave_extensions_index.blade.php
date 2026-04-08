@@ -52,21 +52,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Show SweetAlert popup for success messages
     @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: "{{ session('success') }}",
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#28a745',
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            }
-        });
+        AppPopup.success(@json(session('success')), 'Success', 1600);
     @endif
 
     // Show SweetAlert popup for error messages

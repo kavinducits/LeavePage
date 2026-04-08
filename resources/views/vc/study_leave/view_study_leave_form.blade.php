@@ -151,23 +151,6 @@
         </form>
         @endif
     </div>
-    <!-- Forward Confirmation Modal -->
-    <div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Submit</h5>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">is that ok to foward it to MA for finlize</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="forwardConfirmCancel">Cancel</button>
-                    <button type="button" class="btn btn-success" id="forwardConfirmOk">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <style>
         .card-header-dark {
@@ -223,7 +206,6 @@
             const recommendCommitteeNo = document.getElementById('recommendCommitteeNo');
             const remarksTextarea = document.getElementById('vc_remarks');
             const form = document.getElementById('vcReviewForm');
-            let forwardConfirmed = false;
 
             function toggleRemarksRequirement() {
                 if (recommendCommitteeNo.checked) {
@@ -240,8 +222,6 @@
 
             // Form validation
             form.addEventListener('submit', function(e) {
-                let isValid = true;
-
                 // Check if "No" is selected and remarks are empty
                 if (recommendCommitteeNo.checked) {
                     const remarksValue = remarksTextarea.value.trim();
@@ -249,19 +229,22 @@
                         e.preventDefault();
                         remarksTextarea.classList.add('is-invalid');
                         remarksTextarea.focus();
-                        isValid = false;
-                        alert('Please provide remarks when not recommending this leave.');
+                        AppPopup.error('Please provide remarks when not recommending this leave.', 'Validation Error');
                         return;
                     }
                 }
 
-                // Confirm submission using modal
-                if (isValid) {
-                    if (!forwardConfirmed) {
-                        e.preventDefault();
-                        $('#forwardConfirmModal').modal('show');
+                e.preventDefault();
+                AppPopup.confirm({
+                    title: 'Confirm Submit',
+                    text: 'Are you sure you want to submit the final decision and send it to MA for finalization?',
+                    icon: 'question',
+                    confirmButtonText: 'Yes, Submit'
+                }).then(function(result) {
+                    if (result && result.isConfirmed) {
+                        form.submit();
                     }
-                }
+                });
             });
 
             // Clear invalid state when user starts typing
@@ -269,17 +252,6 @@
                 if (this.value.trim()) {
                     this.classList.remove('is-invalid');
                 }
-            });
-
-            $('#forwardConfirmOk').on('click', function() {
-                forwardConfirmed = true;
-                $('#forwardConfirmModal').modal('hide');
-                form.submit();
-            });
-
-            $('#forwardConfirmCancel').on('click', function() {
-                forwardConfirmed = false;
-                $('#forwardConfirmModal').modal('hide');
             });
         });
     </script>

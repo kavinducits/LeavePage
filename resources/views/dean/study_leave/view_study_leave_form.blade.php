@@ -92,23 +92,6 @@
 </div>
 
 
-<!-- Forward Confirmation Modal -->
-<div class="modal fade" id="forwardConfirmModal" tabindex="-1" role="dialog" aria-labelledby="forwardConfirmModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="forwardConfirmModalLabel">Confirm Forward</h5>
-            </div>
-            <div class="modal-body">
-                <p class="mb-0">is that ok to foward it to VC</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="forwardConfirmCancel">Cancel</button>
-                <button type="button" class="btn btn-success" id="forwardConfirmOk">OK</button>
-            </div>
-        </div>
-    </div>
-</div>
 <style>
 .card-header-dark {
     background: linear-gradient(135deg, #212529 0%, #343a40 100%);
@@ -158,7 +141,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('deanReviewForm');
-    let forwardConfirmed = false;
 
     if (!form) {
         return;
@@ -180,21 +162,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        if (!forwardConfirmed) {
-            e.preventDefault();
-            $('#forwardConfirmModal').modal('show');
-        }
-    });
-
-    $('#forwardConfirmOk').on('click', function() {
-        forwardConfirmed = true;
-        $('#forwardConfirmModal').modal('hide');
-        form.submit();
-    });
-
-    $('#forwardConfirmCancel').on('click', function() {
-        forwardConfirmed = false;
-        $('#forwardConfirmModal').modal('hide');
+        e.preventDefault();
+        AppPopup.confirm({
+            title: 'Confirm Forward',
+            text: 'Are you sure you want to submit this review and forward to VC?',
+            icon: 'question',
+            confirmButtonText: 'Yes, Forward'
+        }).then(function(result) {
+            if (result && result.isConfirmed) {
+                form.submit();
+            }
+        });
     });
 
     const remarksTextarea = form.querySelector('#dean_remarks');

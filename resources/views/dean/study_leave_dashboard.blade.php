@@ -21,7 +21,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         @if(session('success'))
-            $('#successModal').modal('show');
+            AppPopup.success(@json(session('success')), 'Success', 1600);
         @endif
         @if(session('error'))
             $('#errorModal').modal('show');

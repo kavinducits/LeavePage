@@ -386,6 +386,14 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    @if (session('success'))
+    AppPopup.success(@json(session('success')), 'Success', 1600);
+    @endif
+
+    @if (session('error'))
+    AppPopup.error(@json(session('error')));
+    @endif
+
     const hasApprovedProgressReports = @json(($approvedProgressReports ?? collect())->count() > 0);
 
     if (hasApprovedProgressReports && $.fn.DataTable && $('#approved-progress-reports-table').length) {

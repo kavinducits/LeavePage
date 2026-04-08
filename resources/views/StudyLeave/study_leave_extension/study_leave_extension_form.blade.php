@@ -286,90 +286,37 @@
     </div>
 </div>
 
-<!-- Confirmation Modal -->
-<div class="modal fade" id="confirmExtensionModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-maroon text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-question-circle me-2"></i>Confirm Submission
-                </h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-calendar-plus fa-3x mb-3" style="color:#800020"></i>
-                <p class="mb-0 fs-6">Are you sure you want to submit this extension request?</p>
-                <small class="text-muted">It will be forwarded to MA for review.</small>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" id="cancelExtensionConfirm">
-                    <i class="fas fa-times me-2"></i>Cancel
-                </button>
-                <button type="button" class="btn btn-primary" id="confirmExtensionYes" style="background-color:#800020;border-color:#800020;">
-                    <i class="fas fa-check me-2"></i>Yes, Submit
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 @endif
-
-<!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#28a745;color:white;">
-                <h5 class="modal-title">
-                    <i class="fas fa-check-circle me-2"></i>Submitted Successfully
-                </h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
-                <p class="mb-0 fs-6">Your extension request has been submitted successfully!</p>
-                <small class="text-muted">It has been forwarded to MA for review.</small>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-                    <i class="fas fa-check me-2"></i>OK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     @if($canExtend)
     const submitBtn     = document.getElementById('submitExtensionBtn');
     const newExtModal   = new bootstrap.Modal(document.getElementById('newExtensionModal'));
-    const confirmModal  = new bootstrap.Modal(document.getElementById('confirmExtensionModal'));
-    const cancelConfirm = document.getElementById('cancelExtensionConfirm');
-    const yesConfirm    = document.getElementById('confirmExtensionYes');
 
     submitBtn.addEventListener('click', function () {
         const form = document.getElementById('extensionForm');
         if (!form.checkValidity()) { form.reportValidity(); return; }
-        newExtModal.hide();
-        document.getElementById('newExtensionModal').addEventListener('hidden.bs.modal', function showConfirm() {
-            confirmModal.show();
-        }, { once: true });
-    });
-
-    cancelConfirm.addEventListener('click', function () {
-        confirmModal.hide();
-        document.getElementById('confirmExtensionModal').addEventListener('hidden.bs.modal', function reopenNew() {
-            newExtModal.show();
-        }, { once: true });
-    });
-
-    yesConfirm.addEventListener('click', function () {
-        confirmModal.hide();
-        document.getElementById('extensionForm').submit();
+        AppPopup.confirm({
+            title: 'Confirm Submission',
+            text: 'Are you sure you want to submit this extension request? It will be forwarded to MA for review.',
+            icon: 'question',
+            confirmButtonText: 'Yes, Submit'
+        }).then(function(result) {
+            if (result && result.isConfirmed) {
+                newExtModal.hide();
+                form.submit();
+            }
+        });
     });
     @endif
 
     @if(session('upload_success'))
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
+        AppPopup.success(@json(session('upload_success')), 'Submitted Successfully', 1600);
+    @endif
+
+    @if(session('error'))
+        AppPopup.error(@json(session('error')));
     @endif
 });
 </script>

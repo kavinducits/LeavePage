@@ -43,47 +43,6 @@
             <section class="content">
                 <div class="container-fluid">
 
-                    <!-- Success Modal -->
-                    @if(session('success'))
-                    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-0 shadow-lg">
-                                <div class="modal-body text-center p-5">
-                                    <div class="mb-4">
-                                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
-                                    </div>
-                                    <h3 class="fw-bold text-success mb-3">Success!</h3>
-                                    <p class="text-muted mb-4">{{ session('success') }}</p>
-                                    <button type="button" class="btn btn-success px-5 py-2 rounded-pill fw-semibold" data-dismiss="modal">
-                                        <i class="fas fa-check me-2"></i>OK
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
-                    <!-- Error Modal -->
-                    @if(session('error'))
-                    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content border-0 shadow-lg">
-                                <div class="modal-body text-center p-5">
-                                    <div class="mb-4">
-                                        <i class="fas fa-exclamation-circle text-danger" style="font-size: 4rem;"></i>
-                                    </div>
-                                    <h3 class="fw-bold text-danger mb-3">Error</h3>
-                                    <p class="text-muted mb-4">{{ session('error') }}</p>
-                                    <button type="button" class="btn btn-danger px-5 py-2 rounded-pill fw-semibold" data-dismiss="modal">
-                                        <i class="fas fa-times me-2"></i>Close
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
-
                     <div class="container py-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2 class="mb-0 fw-bold">Study Leave Applications</h2>
@@ -228,6 +187,8 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @include('partials.popup_helpers')
     
     <!-- Show return success modal if session flag is set -->
     <script>
@@ -256,13 +217,11 @@
             });
 
             @if(session('success'))
-                // Show success modal
-                $('#successModal').modal('show');
+                AppPopup.success(@json(session('success')), 'Success', 1600);
             @endif
-            
+
             @if(session('error'))
-                // Show error modal
-                $('#errorModal').modal('show');
+                AppPopup.error(@json(session('error')));
             @endif
         });
     </script>

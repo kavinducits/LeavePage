@@ -54,20 +54,6 @@
             </a>
         </div>
 
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
         @include('StudyLeave.study_leave_extension.partials.extension_summary_card', [
             'headerClass' => 'bg-primary text-white fw-semibold',
             'durationDays' => $durationDays,
@@ -365,6 +351,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+            AppPopup.success(@json(session('success')), 'Success', 1600);
+            @endif
+
+            @if (session('error'))
+            AppPopup.error(@json(session('error')));
+            @endif
+
             const hasApprovedProgressReports = @json(($approvedProgressReports ?? collect())->count() > 0);
 
             if (hasApprovedProgressReports && $.fn.DataTable && $('#approved-progress-reports-table').length) {
