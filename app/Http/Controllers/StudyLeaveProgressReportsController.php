@@ -144,8 +144,11 @@ class StudyLeaveProgressReportsController extends Controller
                 'approval_status_id' => 4, // Processing MA
             ]);
 
+            $successMessage = 'Progress report uploaded successfully. It has been forwarded to MA for review.';
+
             return redirect()->route('StudyLeave.progressReports.show', $studyLeave->id)
-                ->with('upload_success', true);
+                ->with('success', $successMessage)
+                ->with('upload_success', $successMessage);
         }
 
         return redirect()->back()->with('error', 'Failed to upload progress report. Please ensure you selected a valid PDF file.');

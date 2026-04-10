@@ -5,9 +5,13 @@
 <div class="container-fluid px-4 py-3">
 
     <!-- Success/Error Messages -->
-    @if(session('success'))
+    @php
+        $successMessage = session('success') ?? session('upload_success');
+    @endphp
+
+    @if($successMessage)
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <i class="fas fa-check-circle me-2"></i>{{ $successMessage }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
@@ -294,36 +298,18 @@
     </div>
 </div>
 
-<!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color:#28a745;color:white;">
-                <h5 class="modal-title">
-                    <i class="fas fa-check-circle me-2"></i>Submitted Successfully
-                </h5>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-check-circle fa-3x mb-3 text-success"></i>
-                <p class="mb-0 fs-6">Your progress report has been submitted successfully!</p>
-                <small class="text-muted">It has been forwarded to MA for review.</small>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-                    <i class="fas fa-check me-2"></i>OK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const submitBtn = document.getElementById('submitReportBtn');
         const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
-        const uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadNewModal'));
         const cancelBtn = document.getElementById('cancelConfirmBtn');
         const yesBtn = document.getElementById('confirmYesBtn');
+
+        @if($successMessage)
+            if (window.AppPopup && typeof window.AppPopup.success === 'function') {
+                window.AppPopup.success(@json($successMessage), 'Submitted Successfully', 1800);
+            }
+        @endif
 
         // Open confirmation when Submit is clicked
         submitBtn.addEventListener('click', function () {
@@ -352,15 +338,11 @@
             document.getElementById('uploadReportForm').submit();
         });
 
-        // Show success modal if redirected back with success flag
-        @if(session('upload_success'))
-            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-            successModal.show();
-        @endif
     });
 </script>
 
 <style>
+    .bg-maroon {
         background-color: #800020 !important;
     }
     
