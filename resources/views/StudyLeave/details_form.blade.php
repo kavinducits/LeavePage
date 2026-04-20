@@ -847,7 +847,7 @@
                     <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
                         <label class="form-label fw-semibold d-block study-leave-aligned-label">Scholarship Source <span class="text-danger">*</span></label>
-                        <select name="scholarship_source" id="scholarship_source" class="form-select @if(!($readonly ?? true)) @error('scholarship_source') is-invalid @enderror @endif" {{ $readonly ?? true ? 'disabled' : '' }} >
+                        <select name="scholarship_source" id="scholarship_source" class="form-select study-leave-select @if(!($readonly ?? true)) @error('scholarship_source') is-invalid @enderror @endif" {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ empty($draft_study_leave->scholarship_source ?? old('scholarship_source')) ? 'selected' : '' }} disabled>Select source</option>
                             <option value="1" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) == '1' ? 'selected' : '' }}>Scholarship offering agency</option>
                             <option value="2" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) == '2' ? 'selected' : '' }}>Funds from a project</option>
