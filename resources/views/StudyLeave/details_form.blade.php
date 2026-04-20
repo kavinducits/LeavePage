@@ -306,7 +306,7 @@
                 </script>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Degree Titles <span class="text-danger">*</span></label>
+                    <label class="form-label fw-semibold d-block">Degree Titles <span class="text-danger">*</span></label>
                     @php
                         $selectedOtherDegree = (string) old('other_degree_title', $draft_study_leave->other_degree_title ?? '');
                         $selectedDegree = (string) old('degree_title', $draft_study_leave->degree_title ?? '');
@@ -315,7 +315,7 @@
                         }
                         $isOtherDegreeSelected = strtolower($selectedDegree) === 'other';
                     @endphp
-                    <select name="degree_title" class="form-select @if(!($readonly ?? true)) @error('degree_title') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
+                    <select name="degree_title" class="form-select study-leave-select @if(!($readonly ?? true)) @error('degree_title') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
                         <option value="" {{ $selectedDegree === '' ? 'selected' : '' }}>Select degree title</option>
                        @foreach ($degrees as $degree)
                             @php
@@ -336,7 +336,7 @@
                     @endif
 
                     <div id="other_degree_title_wrapper" class="mt-3" style="display: {{ $isOtherDegreeSelected ? 'block' : 'none' }};">
-                        <label class="form-label fw-semibold">Other Degree Title <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold d-block study-leave-aligned-label">Other Degree Title <span class="text-danger">*</span></label>
                         <input
                             type="text"
                             name="other_degree_title"
@@ -732,13 +732,13 @@
               
                 <!-- Library and Property Handling -->
                 <div class="col-md-6">
-                    <label for="library_and_property_handling" class="form-label fw-semibold">
+                    <label for="library_and_property_handling" class="form-label fw-semibold d-block study-leave-aligned-label">
                         Handling of Library book, Computer or any other properties <span class="text-danger">*</span>
                     </label>
                     @php
                         $currentLibraryAndPropertyHandling = old('library_and_property_handling', $draft_study_leave->library_and_property_handling ?? '');
                     @endphp
-                    <select class="form-select @if(!($readonly ?? true)) @error('library_and_property_handling') is-invalid @enderror @endif" id="library_and_property_handling" name="library_and_property_handling" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
+                    <select class="form-select study-leave-select @if(!($readonly ?? true)) @error('library_and_property_handling') is-invalid @enderror @endif" id="library_and_property_handling" name="library_and_property_handling" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }}>
                         <option value="" {{ $currentLibraryAndPropertyHandling === '' || $currentLibraryAndPropertyHandling === null ? 'selected' : '' }} disabled>Select an option</option>
                         <option value="1" {{ (string)$currentLibraryAndPropertyHandling === '1' || $currentLibraryAndPropertyHandling === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
                         <option value="0" {{ (string)$currentLibraryAndPropertyHandling === '0' || $currentLibraryAndPropertyHandling === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
@@ -776,14 +776,13 @@
 
                 <!-- Loan Handling (conditional) - shown only for "without Pay" -->
                 <div class="col-md-6" id="loan_handling_section">
-                    <label for="loan_handling_details" class="form-label fw-semibold">
+                    <label for="loan_handling_details" class="form-label fw-semibold d-block study-leave-aligned-label">
                         Paying of Loans taken from University of UPF? <span class="text-danger">*</span>
-                       
                     </label>
                     @php
                         $currentLoanHandling = old('loan_handling', $draft_study_leave->loan_handling ?? '');
                     @endphp
-                    <select class="form-select" id="loan_handling_details" name="loan_handling" {{ $readonly ?? true ? 'disabled' : '' }}>
+                    <select class="form-select study-leave-select" id="loan_handling_details" name="loan_handling" {{ $readonly ?? true ? 'disabled' : '' }}>
                         <option value="" {{ $currentLoanHandling === '' || $currentLoanHandling === null ? 'selected' : '' }} disabled>Select an option</option>
                         <option value="1" {{ (string)$currentLoanHandling === '1' || $currentLoanHandling === 'Make Arrangements' ? 'selected' : '' }}>Make Arrangements</option>
                         <option value="0" {{ (string)$currentLoanHandling === '0' || $currentLoanHandling === 'Not Make Arrangements' ? 'selected' : '' }}>Not Make Arrangements</option>
@@ -813,8 +812,8 @@
 
                 <!-- Funding Type -->
                 <div class="col-md-6">
-                        <label class="form-label fw-semibold"> Funding type <span class="text-danger">*</span></label>
-                        <select name="funding_type" id="funding_type" class="form-select @if(!($readonly ?? true)) @error('funding_type') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }} >
+                        <label class="form-label fw-semibold d-block study-leave-aligned-label">Funding type <span class="text-danger">*</span></label>
+                        <select name="funding_type" id="funding_type" class="form-select study-leave-select @if(!($readonly ?? true)) @error('funding_type') is-invalid @enderror @endif" @if(!($readonly ?? true)) required @endif {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ ($draft_study_leave->funding_type ?? old('funding_type')) ? '' : 'selected' }} disabled>Select funding type</option>
                             <option value="1" {{ ($draft_study_leave->funding_type ?? old('funding_type')) == '1' ? 'selected' : '' }}>Self-Funding</option>
                             <option value="2" {{ ($draft_study_leave->funding_type ?? old('funding_type')) == '2' ? 'selected' : '' }}>Scholarship</option>
@@ -847,7 +846,7 @@
 
                     <!-- Scholarship Details (conditional)- If Scholarship is selected in Funding Type -->
                     <div class="col-md-6" id="scholarship-details" style="display: none;">
-                        <label class="form-label fw-semibold">Scholarship Source <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold d-block study-leave-aligned-label">Scholarship Source <span class="text-danger">*</span></label>
                         <select name="scholarship_source" id="scholarship_source" class="form-select @if(!($readonly ?? true)) @error('scholarship_source') is-invalid @enderror @endif" {{ $readonly ?? true ? 'disabled' : '' }} >
                             <option value="" {{ empty($draft_study_leave->scholarship_source ?? old('scholarship_source')) ? 'selected' : '' }} disabled>Select source</option>
                             <option value="1" {{ ($draft_study_leave->scholarship_source ?? old('scholarship_source')) == '1' ? 'selected' : '' }}>Scholarship offering agency</option>
@@ -1197,6 +1196,20 @@
                     }
                 });
                 </script>
+
+                <style>
+                    .study-leave-aligned-label {
+                        min-height: 3rem;
+                        line-height: 1.25;
+                        display: flex;
+                        align-items: flex-end;
+                    }
+
+                    .study-leave-select {
+                        min-height: calc(1.5em + 0.75rem + 2px);
+                        width: 100%;
+                    }
+                </style>
 
                 <script>
                 document.addEventListener('DOMContentLoaded', function () {

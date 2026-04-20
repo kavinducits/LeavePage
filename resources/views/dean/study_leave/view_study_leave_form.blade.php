@@ -28,6 +28,10 @@
     </div>
 
     @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
     @endif
 
     @if(session('error'))
@@ -41,8 +45,6 @@
     @include('StudyLeave.basic_info_form', ['readonly' => true])
     @include('StudyLeave.details_form', ['readonly' => true])
     @include('StudyLeave.working_covering_persons_form', ['readonly' => true])
-    @include('hod_academic_establishment.study_leave.study_leave_hod_academic_establishment_review_section', ['readonly' => true])
-    @include('hod.study_leave.study_leave_hod_review_section', ['readonly' => true])
 
     @if(isset($from) && $from == 'accepted')
         @include('dean.study_leave.study_leave_dean_review_section', ['readonly' => true])
@@ -181,9 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-@if(session('success'))
-AppPopup.success(@json(session('success')), 'Success', 1600);
-@endif
 </script>
         </div>
     </section>
