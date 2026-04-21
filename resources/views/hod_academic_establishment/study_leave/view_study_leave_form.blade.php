@@ -136,6 +136,7 @@
             const recommendYes = document.getElementById('recommendYes');
             const recommendNo = document.getElementById('recommendNo');
             const remarksTextarea = document.getElementById('registrar_remarks');
+            const remarksError = document.getElementById('registrarRemarksError');
 
             if (!form) {
                 return;
@@ -150,8 +151,19 @@
                             remarksTextarea.classList.add('is-invalid');
                             remarksTextarea.focus();
                         }
+                        if (remarksError) {
+                            remarksError.style.display = 'block';
+                        }
                         return;
                     }
+                }
+
+                if (remarksTextarea) {
+                    remarksTextarea.classList.remove('is-invalid');
+                }
+
+                if (remarksError) {
+                    remarksError.style.display = 'none';
                 }
 
                 e.preventDefault();
@@ -171,6 +183,9 @@
                 remarksTextarea.addEventListener('input', function() {
                     if (this.value.trim()) {
                         this.classList.remove('is-invalid');
+                        if (remarksError) {
+                            remarksError.style.display = 'none';
+                        }
                     }
                 });
             }

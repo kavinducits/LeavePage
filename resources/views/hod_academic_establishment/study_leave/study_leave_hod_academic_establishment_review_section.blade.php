@@ -37,8 +37,8 @@
              </label>
              <textarea class="form-control" id="registrar_remarks" name="registrar_remarks" rows="3"
                 placeholder="Add comments. Required when recommendation is No." {{ $readonly ?? false ? 'readonly' : '' }}>{{ $draft_study_leave->registrar_remarks ?? '' }}</textarea>
-            <div class="invalid-feedback">
-                Please provide remarks when leave is not recommended.
+            <div id="registrarRemarksError" class="text-danger small mt-1" style="display: none;">
+                This field is required.
             </div>
          </div>
 
@@ -49,6 +49,7 @@
          const recommendYes = document.getElementById('recommendYes');
          const recommendNo = document.getElementById('recommendNo');
          const remarksTextarea = document.getElementById('registrar_remarks');
+         const remarksError = document.getElementById('registrarRemarksError');
 
          if (!recommendYes || !recommendNo || !remarksTextarea) {
              return;
@@ -60,6 +61,9 @@
              } else {
                  remarksTextarea.removeAttribute('required');
                  remarksTextarea.classList.remove('is-invalid');
+                 if (remarksError) {
+                     remarksError.style.display = 'none';
+                 }
              }
          }
 
