@@ -76,9 +76,7 @@
                     @if(optional($draft_study_leave)->dean_leave_recommendation_status !== null)
                         @include('dean.study_leave.study_leave_dean_review_section', ['readonly' => true])
                     @endif
-                    @if(optional($draft_study_leave)->vc_recommend_submit_to_committee !== null)
-                        @include('vc.study_leave.study_leave_vc_review_section', ['readonly' => true])
-                    @endif
+                    @include('vc.study_leave.study_leave_vc_review_section', ['readonly' => true])
 
                     <!-- Review Section based on Status -->
                     @if($statusId == 3)

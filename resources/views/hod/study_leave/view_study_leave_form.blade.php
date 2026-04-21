@@ -144,21 +144,6 @@
             }
 
             form.addEventListener('submit', function(e) {
-                const recommendNo = form.querySelector('#hodRecommendNo');
-                const remarksTextarea = form.querySelector('#hod_remarks');
-
-                if (recommendNo && recommendNo.checked) {
-                    const remarksValue = remarksTextarea ? remarksTextarea.value.trim() : '';
-                    if (!remarksValue) {
-                        e.preventDefault();
-                        if (remarksTextarea) {
-                            remarksTextarea.classList.add('is-invalid');
-                            remarksTextarea.focus();
-                        }
-                        return;
-                    }
-                }
-
                 e.preventDefault();
                 AppPopup.confirm({
                     title: 'Confirm Forward',
@@ -171,15 +156,6 @@
                     }
                 });
             });
-
-            const remarksTextarea = form.querySelector('#hod_remarks');
-            if (remarksTextarea) {
-                remarksTextarea.addEventListener('input', function() {
-                    if (this.value.trim()) {
-                        this.classList.remove('is-invalid');
-                    }
-                });
-            }
         });
 
         @if (session('success'))

@@ -116,35 +116,19 @@
                  Any other remarks
              </label>
              <textarea class="form-control" id="hod_remarks" name="hod_remarks" rows="3"
-                placeholder="Add comments. Required when recommendation is No." {{ $readonly ?? false ? 'readonly' : '' }}>{{ $draft_study_leave->hod_remarks ?? '' }}</textarea>
-            <div class="invalid-feedback">
-                Please provide remarks when leave is not recommended.
-            </div>
+                placeholder="Add any other remarks (optional)" {{ $readonly ?? false ? 'readonly' : '' }}>{{ $draft_study_leave->hod_remarks ?? '' }}</textarea>
+             <div id="hod_remarksError" class="text-danger small mt-1" style="display: none;">
+                 This field is required.
+             </div>
          </div>
 
      </div>
  </div>
  <script>
      document.addEventListener('DOMContentLoaded', function() {
-         const recommendYes = document.getElementById('hodRecommendYes');
-         const recommendNo = document.getElementById('hodRecommendNo');
-         const remarksTextarea = document.getElementById('hod_remarks');
-
-         if (!recommendYes || !recommendNo || !remarksTextarea) {
-             return;
+         const remarksError = document.getElementById('hod_remarksError');
+         if (remarksError) {
+             remarksError.style.display = 'none';
          }
-
-         function toggleRemarksRequirement() {
-             if (recommendNo.checked) {
-                 remarksTextarea.setAttribute('required', 'required');
-             } else {
-                 remarksTextarea.removeAttribute('required');
-                 remarksTextarea.classList.remove('is-invalid');
-             }
-         }
-
-         recommendYes.addEventListener('change', toggleRemarksRequirement);
-         recommendNo.addEventListener('change', toggleRemarksRequirement);
-         toggleRemarksRequirement();
      });
  </script>

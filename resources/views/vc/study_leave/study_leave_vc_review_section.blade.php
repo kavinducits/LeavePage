@@ -14,14 +14,14 @@
                 <input class="form-check-input" type="radio" name="vc_recommend_submit_to_committee"
                     id="vcRecommendCommitteeYes" value="1"
                     {{ optional($draft_study_leave)->vc_recommend_submit_to_committee == 1 ? 'checked' : '' }}
-                    {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
+                    {{ ($readonly ?? false) ? 'disabled' : '' }}>
                 <label class="form-check-label" for="vcRecommendCommitteeYes">Yes</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="vc_recommend_submit_to_committee"
                     id="vcRecommendCommitteeNo" value="0"
                     {{ optional($draft_study_leave)->vc_recommend_submit_to_committee !== null && optional($draft_study_leave)->vc_recommend_submit_to_committee == 0 ? 'checked' : '' }}
-                    {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
+                    {{ ($readonly ?? false) ? 'disabled' : '' }}>
                 <label class="form-check-label" for="vcRecommendCommitteeNo">No</label>
             </div>
         </div>
@@ -36,14 +36,14 @@
                 <input class="form-check-input" type="radio" name="vc_council_covering_approval_status"
                     id="vcCouncilApprovalYes" value="1"
                     {{ optional($draft_study_leave)->vc_council_covering_approval_status == 1 ? 'checked' : '' }}
-                    {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
+                    {{ ($readonly ?? false) ? 'disabled' : '' }}>
                 <label class="form-check-label" for="vcCouncilApprovalYes">Yes</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" name="vc_council_covering_approval_status"
                     id="vcCouncilApprovalNo" value="0"
                     {{ optional($draft_study_leave)->vc_council_covering_approval_status !== null && optional($draft_study_leave)->vc_council_covering_approval_status == 0 ? 'checked' : '' }}
-                    {{ ($readonly ?? false) ? 'disabled' : 'required' }}>
+                    {{ ($readonly ?? false) ? 'disabled' : '' }}>
                 <label class="form-check-label" for="vcCouncilApprovalNo">No</label>
             </div>
         </div>
@@ -54,10 +54,10 @@
                 Any other remarks
             </label>
             <textarea class="form-control" id="vc_remarks" name="vc_remarks" rows="3"
-                placeholder="Add comments. Required when recommendation is No."
+                placeholder="Add any other remarks (optional)"
                 {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->vc_remarks ?? '' }}</textarea>
-            <div class="invalid-feedback">
-                Please provide remarks when leave is not recommended.
+            <div id="vc_remarksError" class="text-danger small mt-1" style="display: none;">
+                This field is required.
             </div>
         </div>
 

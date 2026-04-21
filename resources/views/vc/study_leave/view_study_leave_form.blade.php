@@ -113,10 +113,7 @@
                             Any other remarks
                         </label>
                         <textarea class="form-control" id="vc_remarks" name="vc_remarks" rows="3"
-                            placeholder="Add comments. Required when recommendation is No."></textarea>
-                        <div class="invalid-feedback">
-                            Please provide remarks when leave is not recommended.
-                        </div>
+                            placeholder="Add any other remarks (optional)"></textarea>
                     </div>
 
                 </div>
@@ -201,38 +198,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const recommendCommitteeYes = document.getElementById('recommendCommitteeYes');
-            const recommendCommitteeNo = document.getElementById('recommendCommitteeNo');
-            const remarksTextarea = document.getElementById('vc_remarks');
             const form = document.getElementById('vcReviewForm');
 
-            function toggleRemarksRequirement() {
-                if (recommendCommitteeNo.checked) {
-                    remarksTextarea.setAttribute('required', 'required');
-                } else {
-                    remarksTextarea.removeAttribute('required');
-                    remarksTextarea.classList.remove('is-invalid');
-                }
+            if (!form) {
+                return;
             }
 
-            recommendCommitteeYes.addEventListener('change', toggleRemarksRequirement);
-            recommendCommitteeNo.addEventListener('change', toggleRemarksRequirement);
-            toggleRemarksRequirement();
-
-            // Form validation
             form.addEventListener('submit', function(e) {
-                // Check if "No" is selected and remarks are empty
-                if (recommendCommitteeNo.checked) {
-                    const remarksValue = remarksTextarea.value.trim();
-                    if (!remarksValue) {
-                        e.preventDefault();
-                        remarksTextarea.classList.add('is-invalid');
-                        remarksTextarea.focus();
-                        AppPopup.error('Please provide remarks when not recommending this leave.', 'Validation Error');
-                        return;
-                    }
-                }
-
                 e.preventDefault();
                 AppPopup.confirm({
                     title: 'Confirm Submit',
@@ -244,13 +216,6 @@
                         form.submit();
                     }
                 });
-            });
-
-            // Clear invalid state when user starts typing
-            remarksTextarea.addEventListener('input', function() {
-                if (this.value.trim()) {
-                    this.classList.remove('is-invalid');
-                }
             });
         });
 

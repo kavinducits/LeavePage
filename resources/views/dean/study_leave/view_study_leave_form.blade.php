@@ -148,21 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     form.addEventListener('submit', function(e) {
-        const recommendNo = form.querySelector('#dean_recommendNo');
-        const remarksTextarea = form.querySelector('#dean_remarks');
-
-        if (recommendNo && recommendNo.checked) {
-            const remarksValue = remarksTextarea ? remarksTextarea.value.trim() : '';
-            if (!remarksValue) {
-                e.preventDefault();
-                if (remarksTextarea) {
-                    remarksTextarea.classList.add('is-invalid');
-                    remarksTextarea.focus();
-                }
-                return;
-            }
-        }
-
         e.preventDefault();
         AppPopup.confirm({
             title: 'Confirm Forward',
@@ -175,15 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    const remarksTextarea = form.querySelector('#dean_remarks');
-    if (remarksTextarea) {
-        remarksTextarea.addEventListener('input', function() {
-            if (this.value.trim()) {
-                this.classList.remove('is-invalid');
-            }
-        });
-    }
 });
 
 </script>
