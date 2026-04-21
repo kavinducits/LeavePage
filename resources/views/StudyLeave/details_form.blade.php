@@ -568,35 +568,13 @@
                 <div class="col-md-12">
                     <label class="form-label fw-semibold">Relevancy and Details of the Study Program</label>
                     <textarea name="study_program_details" class="form-control @if(!($readonly ?? true)) @error('study_program_details') is-invalid @enderror @endif" rows="4" 
-                              @if(!($readonly ?? true)) minlength="10" maxlength="1000" @endif
                               {{ $readonly ?? true ? 'readonly' : '' }}>{{ $draft_study_leave->study_program_details ?? old('study_program_details') }}</textarea>
                     @if(!($readonly ?? true))
                     @error('study_program_details')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
-                    <div class="invalid-feedback" id="study_program_details_error" style="display: none;">
-                        Please provide details of the study program (10-1000 characters).
-                    </div>
                     @endif
                 </div>
-                <script>
-                // Client-side validation for Study Program Details field
-                document.addEventListener('DOMContentLoaded', function () {
-                    const detailsTextarea = document.querySelector('textarea[name="study_program_details"]');
-                    const detailsError = document.getElementById('study_program_details_error');
-                    detailsTextarea.addEventListener('input', function () {
-                        const value = this.value.trim();
-                        if (value.length < 10 || value.length > 1000) {
-                            detailsTextarea.classList.add('is-invalid');
-                            detailsError.style.display = 'block';
-                        } else {
-                            detailsTextarea.classList.remove('is-invalid');
-                            detailsError.style.display = 'none';
-                        }
-                    });
-                });
-                </script>
-
                 @php
                     $placementDocuments = collect();
                     $selfFundingDocuments = collect();
