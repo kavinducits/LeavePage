@@ -32,7 +32,7 @@
                             @foreach ($studyLeaveApplications as $application)
                                 <tr class="hoverable-row">
                                     <td class="px-3">
-                                        <span class="fw-semibold text-maroon">{{ $application->reference_no }}</span>
+                                        <span class="fw-semibold text-primary">{{ $application->reference_no }}</span>
                                     </td>
                                     <td>
                                         <span class="badge bg-secondary">{{ $application->empno }}</span>
@@ -57,7 +57,7 @@
                                     </td>
                                     <td class="text-center">
                                         <a href="{{ route('vc.view.studyLeave', $application->id) }}?from=accepted"
-                                            class="btn btn-sm btn-outline-maroon" title="View Details">
+                                            class="btn btn-sm btn-outline-primary" title="View Details">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>

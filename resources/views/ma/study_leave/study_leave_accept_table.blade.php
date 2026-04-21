@@ -32,7 +32,7 @@
                             @foreach ($acceptedApplications as $application)
                                 <tr class="hoverable-row">
                                     <td class="px-3">
-                                        <span class="fw-semibold text-dark">{{ $application->reference_no }}</span>
+                                        <span class="fw-semibold text-primary">{{ $application->reference_no }}</span>
                                     </td>
                                     <td>
                                         <span class="badge bg-secondary">{{ $application->empno }}</span>
@@ -52,13 +52,13 @@
                                         </small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-warning text-dark">
-                                            <i class="fas fa-hourglass-half me-1"></i>{{ $application->status }}
+                                        <span class="badge bg-warning">
+                                            {{ $application->status }}
                                         </span>
                                     </td>
                                     <td class="text-center">
                                         <a href="{{ route('ma.show.studyleave', $application->id) }}?from=accepted"
-                                            class="btn btn-sm btn-outline-dark" title="View Details">
+                                            class="btn btn-sm btn-outline-primary" title="View Details">
                                             <i class="fas fa-eye me-1"></i>View
                                         </a>
                                     </td>
