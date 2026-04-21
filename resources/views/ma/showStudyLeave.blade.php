@@ -56,6 +56,9 @@
                     <!-- Study Leave Duration Card -->
                     @include('ma.study_leave.study_leave_duration_card')
 
+                    <!-- Study Leave Summary -->
+                    @include('ma.study_leave.study_leave_summary_table')
+
                     <!-- Personal Details (readonly) -->
                     @include('ma.partials.studyLeave', ['readonly' => true])
                   

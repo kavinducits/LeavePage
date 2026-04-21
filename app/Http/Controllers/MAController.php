@@ -967,6 +967,14 @@ class MAController extends Controller
         $totalStudyLeaveDays = $this->calculateTotalStudyLeaveDays($draft_study_leave->employee_no);
         $totalStudyLeaveDuration = $this->calculateTotalStudyLeaveMonths($draft_study_leave->employee_no);
 
+        $studyLeaveSummaryRows = DB::table('leave_summary_table')
+            ->where('empno', $draft_study_leave->employee_no)
+            ->where('leave_type', 1)
+            ->select('id', 'reference_no', 'start_date', 'end_date')
+            ->orderByDesc('start_date')
+            ->orderByDesc('id')
+            ->get();
+
         $from = new \DateTime($draft_study_leave->study_leave_from);
         $to = new \DateTime($draft_study_leave->study_leave_to);
         $interval = $from->diff($to);
@@ -982,7 +990,7 @@ class MAController extends Controller
 
 
 
-        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays', 'totalStudyLeaveDuration', 'degrees'));
+        return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays', 'totalStudyLeaveDuration', 'degrees', 'studyLeaveSummaryRows'));
     }
      /**
      * Calculate total study leave days taken by an employee.
