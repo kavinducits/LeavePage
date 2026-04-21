@@ -278,7 +278,7 @@
                         </div>
                     </div>
 
-                            @if(!empty($progressReport->ma_remark) || !empty($progressReport->remark))
+                            @if((!empty($progressReport->ma_remark) || !empty($progressReport->remark)) && request('from') !== 'submitted')
                             <div class="card mb-4">
                                 <div class="card-header bg-primary text-white fw-semibold">
                                     <i class="fas fa-clipboard-check me-2"></i>MA Review
