@@ -7,7 +7,7 @@
     </div>
     <div class="card-body pt-2 pb-0 px-3">
         <div class="table-responsive">
-            <table class="table table-hover table-bordered align-middle mb-0">
+            <table id="study-leave-summary-table" class="table table-hover table-bordered align-middle mb-0 js-study-leave-summary-table">
                 <thead class="table-light">
                     <tr>
                         <th class="text-center" style="width: 34%;">Reference No</th>
@@ -36,3 +36,45 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var hasSummaryRows = @json(($studyLeaveSummaryRows ?? collect())->count() > 0);
+
+    if (!hasSummaryRows) {
+        return;
+    }
+
+    if (typeof window.jQuery === 'undefined' || !jQuery.fn || !jQuery.fn.DataTable) {
+        return;
+    }
+
+    var $summaryTable = jQuery('#study-leave-summary-table');
+    if (!$summaryTable.length) {
+        return;
+    }
+
+    if (jQuery.fn.DataTable.isDataTable($summaryTable)) {
+        return;
+    }
+
+    $summaryTable.DataTable({
+        pageLength: 5,
+        lengthMenu: [[5, 10, 25, -1], [5, 10, 25, 'All']],
+        order: [[1, 'desc']],
+        language: {
+            search: 'Search:',
+            lengthMenu: 'Show _MENU_ entries',
+            info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+            infoEmpty: 'Showing 0 to 0 of 0 entries',
+            infoFiltered: '(filtered from _MAX_ total entries)',
+            paginate: {
+                first: 'First',
+                last: 'Last',
+                next: 'Next',
+                previous: 'Previous'
+            }
+        }
+    });
+});
+</script>

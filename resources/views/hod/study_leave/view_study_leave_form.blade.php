@@ -37,6 +37,9 @@
             </div>
         @endif
 
+        <!-- Study Leave Summary -->
+        @include('ma.study_leave.study_leave_summary_table')
+
         <!-- Study Leave Details (readonly) -->
         @include('StudyLeave.basic_info_form', ['readonly' => true])
         @include('StudyLeave.details_form', ['readonly' => true])

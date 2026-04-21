@@ -520,7 +520,15 @@ class VCController extends Controller
             ->get()
             ->toArray();
 
-        return view('vc.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'from', 'degrees'));
+        $studyLeaveSummaryRows = DB::table('leave_summary_table')
+            ->where('empno', $draft_study_leave->employee_no)
+            ->where('leave_type', 1)
+            ->select('id', 'reference_no', 'start_date', 'end_date')
+            ->orderByDesc('start_date')
+            ->orderByDesc('id')
+            ->get();
+
+        return view('vc.study_leave.view_study_leave_form', compact('draft_study_leave', 'user', 'readonly', 'from', 'degrees', 'studyLeaveSummaryRows'));
     }
 
     public function approveStudyLeave(Request $request, $id)
