@@ -48,18 +48,20 @@
             </div>
         </div>
 
-        <!-- Any other remarks -->
-        <div class="mb-4">
-            <label for="vc_remarks" class="form-label fw-semibold">
-                Any other remarks
-            </label>
-            <textarea class="form-control" id="vc_remarks" name="vc_remarks" rows="3"
-                placeholder="Add any other remarks (optional)"
-                {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->vc_remarks ?? '' }}</textarea>
-            <div id="vc_remarksError" class="text-danger small mt-1" style="display: none;">
-                This field is required.
+        @if(!($readonly ?? false) || trim((string) (optional($draft_study_leave)->vc_remarks ?? '')) !== '')
+            <!-- Any other remarks -->
+            <div class="mb-4">
+                <label for="vc_remarks" class="form-label fw-semibold">
+                    Any other remarks
+                </label>
+                <textarea class="form-control" id="vc_remarks" name="vc_remarks" rows="3"
+                    placeholder="Add any other remarks (optional)"
+                    {{ ($readonly ?? false) ? 'readonly' : '' }}>{{ optional($draft_study_leave)->vc_remarks ?? '' }}</textarea>
+                <div id="vc_remarksError" class="text-danger small mt-1" style="display: none;">
+                    This field is required.
+                </div>
             </div>
-        </div>
+        @endif
 
     </div>
 </div>
