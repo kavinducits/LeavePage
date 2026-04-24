@@ -13,6 +13,11 @@ use App\Http\Controllers\StudyLeaveProgressReportsController;
 use App\Http\Controllers\HODAcademicEstablishmentController;
 
 
+//New routes for Study Leave Application and related functionalities can be added here
+
+use App\Http\Controllers\Backend\LeaveApplication\StudyLeaveControllers;
+
+
 // Login routes
 // Set the default login page to MA page
 Route::get('/', [MAController::class, 'index'])->name('login');
@@ -276,4 +281,62 @@ Route::post('/HODAcademicEstablishment/study-leave/view/{id}/approve', [HODAcade
 Route::get('/HODAcademicEstablishment/extension/{extension_id}', [HODAcademicEstablishmentController::class, 'showExtension'])->name('hodacademicestablishment.show.extension');
 Route::post('/HODAcademicEstablishment/extension/{extension_id}/forward', [HODAcademicEstablishmentController::class, 'forwardExtension'])->name('hodacademicestablishment.extension.forward');
 Route::post('/HODAcademicEstablishment/extension/{extension_id}/return', [HODAcademicEstablishmentController::class, 'returnExtension'])->name('hodacademicestablishment.extension.return');
+
+
+
+
+//NEW Routes for Study Leave Application and related functionalities can be added here
+
+// Leave Application Routes - Other Leaves System (Admin/Approval side)
+    Route::prefix('study-leave')->name('study-leave.')->group(function () {
+        
+        // MA routes (Management Assistant approval)
+        Route::prefix('approval/MA')->name('ma.')->group(function () {
+            Route::get('/',[StudyLeaveControllers::class, 'indexStudyLeaveMA'])->name('indexStudyLeaveMA');
+            Route::get('/{id}', [StudyLeaveControllers::class, 'showStudyLeaveMA'])->name('show.studyLeave.ma');
+
+        
+            /*
+			Route::get('/', [ReviewController::class, 'index'])->name('index');
+			Route::get('/{id}', [ReviewController::class, 'show'])->name('show');
+			Route::post('/{id}/approve', [ReviewController::class, 'approve'])->name('approve');
+			Route::post('/{id}/return', [ReviewController::class, 'return'])->name('return');
+			Route::get('/dashboard/main', [ReviewController::class, 'dashboard'])->name('dashboard');
+			Route::get('/dashboard/vc-approved', [ReviewController::class, 'dashboardVcApproved'])->name('dashboard.vcapproved');
+			Route::get('/dashboard/status', [ReviewController::class, 'statusPage'])->name('status');
+			Route::get('/{id}/hod', [ReviewController::class, 'showHod'])->name('show.hod');
+			Route::get('/{id}/dean', [ReviewController::class, 'showDean'])->name('show.dean');
+			Route::get('/{id}/vc', [ReviewController::class, 'showVc'])->name('show.vc');
+            */
+        });
+/*
+        // HOD routes (Head of Department approval)
+        Route::prefix('approval/HOD')->name('hod.')->group(function () {
+			Route::get('/', [ReviewController::class, 'hodIndex'])->name('index');
+			Route::get('/reviewed', [ReviewController::class, 'hodReviewed'])->name('reviewed');
+			Route::get('/reviewed/{id}', [ReviewController::class, 'hodReviewedShow'])->name('reviewed.show');
+			Route::get('/{id}', [ReviewController::class, 'hodShow'])->name('show');
+			Route::post('/{id}/approve', [ReviewController::class, 'hodApprove'])->name('approve');
+			Route::post('/{id}/return', [ReviewController::class, 'hodReturn'])->name('return');
+        });
+
+        // Dean routes (Dean/Registrar approval)
+        Route::prefix('approval/DEAN')->name('dean.')->group(function () {
+			Route::get('/', [ReviewController::class, 'deanIndex'])->name('index');
+			Route::get('/reviewed', [ReviewController::class, 'deanReviewed'])->name('reviewed');
+			Route::get('/reviewed/{id}', [ReviewController::class, 'deanReviewedShow'])->name('reviewed.show');
+			Route::get('/{id}', [ReviewController::class, 'deanShow'])->name('show');
+			Route::post('/{id}/recommend', [ReviewController::class, 'deanRecommend'])->name('recommend');
+        });
+
+        // VC routes (Vice-Chancellor approval)
+        Route::prefix('approval/VC')->name('vc.')->group(function () {
+			Route::get('/', [ReviewController::class, 'vcIndex'])->name('index');
+			Route::get('/{id}', [ReviewController::class, 'vcShow'])->name('show');
+			Route::post('/{id}/recommend', [ReviewController::class, 'vcRecommend'])->name('recommend');
+        });
+*/
+        // Note: Employee leave application routes moved to public section above (no auth required)
+    });
+
 

@@ -1,25 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Backend\LeaveApplication;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use App\Models\StudyLeave;
 use App\Models\StudyLeaveExtension;
 use App\Models\StudyLeaveProgressReports;
-use Illuminate\Support\Traits\Dumpable;
 
-class MAController extends Controller
+class StudyLeaveControllers extends Controller
 {
     // Hardcoded MA user ID - change this to switch to a different MA
     private const MA_USER_ID = 10390; //15097 for testing 
     PRIVATE const ACADEMIC_ESTABLISHMENT_DEPARTMENT_ID = 5003;
 
-    public function index()
+    public function indexStudyLeaveMA()
     {
-        //dump("MAController@index called");
+        
         $maUserId = self::MA_USER_ID;
 
         // Get all submitted applications (form_status = 2) that are being processed by MA (status_id = 4)
@@ -59,9 +58,8 @@ class MAController extends Controller
         return view('ma.index', compact('applications'));
     }
 
-    public function show($id)
+    public function showStudyLeaveMA($id)
     {
-        Dump("MAController@show called with id: $id");
         $maUserId = self::MA_USER_ID;
 
         // Get the specific application with all details
@@ -187,7 +185,6 @@ class MAController extends Controller
 
     public function approve(Request $request, $id)
     {
-    dump("MAController@approve called with id: $id");
         $request->validate([
             'remark' => 'nullable|string|max:1000',
         ]);
@@ -231,7 +228,6 @@ class MAController extends Controller
 
     public function return(Request $request, $id)
     {
-        dump("MAController@return called with id: $id");
         
         $request->validate([
             'remark' => 'required|string|max:1000',
@@ -279,7 +275,6 @@ class MAController extends Controller
 
     public function dashboard(Request $request)
     {
-        dump("MAController@dashboard called");
         $maUserId = self::MA_USER_ID;
 
         // Get search and sort parameters
@@ -388,7 +383,6 @@ class MAController extends Controller
 
     public function dashboardVcApproved()
     {
-        dump("MAController@dashboardVcApproved called");
         $maUserId = self::MA_USER_ID;
 
         // Get all applications with status_id = 8 (VC Approved) assigned to this MA
@@ -439,7 +433,6 @@ class MAController extends Controller
 
     public function statusPage()
     {
-        dump("MAController@statusPage called");
         $maUserId = self::MA_USER_ID;
 
         $statusApplications = DB::table('leave_details')
@@ -481,25 +474,21 @@ class MAController extends Controller
 
     public function showHod($id)
     {
-        dump("MAController@showHod called with id: $id");
         return $this->show($id);
     }
 
     public function showDean($id)
     {
-        dump("MAController@showDean called with id: $id");
         return $this->show($id);
     }
 
     public function showVc($id)
     {
-        dump("MAController@showVc called with id: $id");
         return $this->show($id);
     }
 
     public function studyLeaveSubmittedPage(Request $request)
     {
-        dump("MAController@studyLeaveSubmittedPage called");
         $maUserId = self::MA_USER_ID;
         
         // Get search and sort parameters
@@ -590,7 +579,6 @@ class MAController extends Controller
     
     public function studyLeavePage(Request $request)
     {
-        dump("MAController@studyLeavePage called");
         $maUserId = self::MA_USER_ID;
         
         // Get search and sort parameters
@@ -688,7 +676,6 @@ class MAController extends Controller
     
     public function showStudyLeaveExtensionsPage()
     {
-        dump("MAController@showStudyLeaveExtensionsPage called");
         
         $maUserId = self::MA_USER_ID;
         $extensionApplications = DB::table('study_leave_extensions')
@@ -721,7 +708,6 @@ class MAController extends Controller
 
     public function showStudyLeaveExtensionsSubmittedPage()
     {
-        dump("MAController@showStudyLeaveExtensionsSubmittedPage called");
         $maUserId = self::MA_USER_ID;
 
         $extensionApplications = DB::table('study_leave_extensions')
@@ -757,7 +743,6 @@ class MAController extends Controller
     
     public function studyLeaveProgressReportsPage()
     {
-        dump("MAController@studyLeaveProgressReportsPage called");
      
         $maUserId = self::MA_USER_ID;
 
@@ -789,7 +774,6 @@ class MAController extends Controller
 
     public function studyLeaveProgressReportsSubmittedPage()
     {
-        dump("MAController@studyLeaveProgressReportsSubmittedPage called");
         $maUserId = self::MA_USER_ID;
 
         $progressReportApplications = DB::table('study_leave_progress_reports')
@@ -822,7 +806,6 @@ class MAController extends Controller
     }
     public function studyLeaveStatusPage()
     {
-        dump("MAController@studyLeaveStatusPage called");
          $maUserId = self::MA_USER_ID;
 
          $statusApplications = DB::table('study_leaves')
@@ -854,7 +837,6 @@ class MAController extends Controller
     }
     public function showStudyLeave($id)
     {
-        dump("MAController@showStudyLeave called with id: $id");
         $maUserId = self::MA_USER_ID;
 
         // Get the specific study leave application with all details
@@ -1016,7 +998,6 @@ class MAController extends Controller
      */
     public function calculateTotalStudyLeaveDays($emp_no)
     {
-        dump("Calculating total study leave days for emp_no: $emp_no");
         $totalDays = 0;
         $previousLeaves=StudyLeave::where('empno', $emp_no)
         
@@ -1057,7 +1038,6 @@ class MAController extends Controller
      */
     public function calculateTotalStudyLeaveMonths($emp_no)
     {
-        dump("Calculating total study leave months and days for emp_no: $emp_no");
         $totalMonths = 0;
         $totalDays = 0;
         $previousLeaves = StudyLeave::where('empno', $emp_no)
@@ -1091,7 +1071,7 @@ class MAController extends Controller
 
     public function approveStudyLeave(Request $request, $id)
     {
-       dump("MAController@approveStudyLeave called with id: $id");
+       
         $request->validate([
             'remark' => 'nullable|string|max:1000',
             'leave_payment_type' => 'required|integer|in:0,1',
@@ -1152,7 +1132,6 @@ class MAController extends Controller
     public function returnStudyLeave(Request $request, $id)
     {
        // dd('returnStudyLeave function called');
-        dump("MAController@returnStudyLeave called with id: $id");
         
         $request->validate([
             'remark' => 'required|string|max:1000',
@@ -1211,7 +1190,6 @@ class MAController extends Controller
      */
     public function showExtension(Request $request, $extension_id)
     {
-            dump("MAController@showExtension called with extension_id: $extension_id");
         $maUserId = self::MA_USER_ID;
         $from = $request->get('from');
 
@@ -1341,7 +1319,6 @@ class MAController extends Controller
      */
     public function forwardExtension(Request $request, $extension_id)
     {
-        dump("MAController@forwardExtension called with extension_id: $extension_id");
         $request->validate([
             'remark' => 'nullable|string|max:1000',
             'ma_recommend' => 'required|in:0,1',
@@ -1394,7 +1371,6 @@ class MAController extends Controller
      */
     public function returnExtension(Request $request, $extension_id)
     {
-        dump("MAController@returnExtension called with extension_id: $extension_id");
         $request->validate([
             'remark' => 'required|string|max:1000',
         ], [
@@ -1438,7 +1414,6 @@ class MAController extends Controller
      */
     public function finalizeExtension($extension_id)
     {
-        dump("MAController@finalizeExtension called with extension_id: $extension_id");
         $maUserId = self::MA_USER_ID;
 
         $extension = DB::table('study_leave_extensions')
@@ -1478,7 +1453,6 @@ class MAController extends Controller
      */
     public function rejectExtension($extension_id)
     {
-        dump("MAController@rejectExtension called with extension_id: $extension_id");
         $maUserId = self::MA_USER_ID;
 
         $extension = DB::table('study_leave_extensions')
@@ -1510,7 +1484,6 @@ class MAController extends Controller
      */
     public function showProgressReport($progress_report_id)
     {
-        dump("MAController@showProgressReport called with progress_report_id: $progress_report_id");
         $maUserId = self::MA_USER_ID;
 
         // Fetch the progress report with related study leave and employee details
@@ -1623,7 +1596,6 @@ class MAController extends Controller
      */
     public function approveProgressReport(Request $request, $progress_report_id)
     {
-        dump("MAController@approveProgressReport called with progress_report_id: $progress_report_id");
         $request->validate([
             'remark' => 'nullable|string|max:1000',
         ]);
@@ -1674,7 +1646,6 @@ class MAController extends Controller
      */
     public function returnProgressReport(Request $request, $progress_report_id)
     {
-        dump("MAController@returnProgressReport called with progress_report_id: $progress_report_id");
         $request->validate([
             'remark' => 'required|string|max:1000',
         ], [
@@ -1725,7 +1696,6 @@ class MAController extends Controller
      */
     public function finalizeProgressReport($progress_report_id)
     {
-        dump("MAController@finalizeProgressReport called with progress_report_id: $progress_report_id");
         $maUserId = self::MA_USER_ID;
 
         $progressReport = DB::table('study_leave_progress_reports')
@@ -1765,7 +1735,6 @@ class MAController extends Controller
      */
     public function rejectProgressReport($progress_report_id)
     {
-        dump("MAController@rejectProgressReport called with progress_report_id: $progress_report_id");
         $maUserId = self::MA_USER_ID;
 
         $progressReport = DB::table('study_leave_progress_reports')
@@ -1802,7 +1771,7 @@ class MAController extends Controller
 
      public function serveProgressReportFile($filename)
     {
-       dump("MAController@serveProgressReportFile called with filename: $filename");
+       
         // Construct the file path - storage/app/study_leave_documents/study_leave_progress_report/filename
         $relativePath = 'study_leave_documents/study_leave_progress_report/' . $filename;
         $filePath = storage_path('app/private/' . $relativePath);
@@ -1852,7 +1821,6 @@ class MAController extends Controller
      */
     public function approveWithCouncil(Request $request, $id)
     {
-        dump("MAController@approveWithCouncil called with id: $id");
         $request->validate([
             'study_leave_decision' => 'required|in:approved,not_approved',
             'ma_approve_leave_committee' => 'required_if:study_leave_decision,approved|nullable|in:0,1',
@@ -1932,7 +1900,6 @@ class MAController extends Controller
 
     public function studyLeaveAccepted(Request $request)
     {
-        dump("MAController@studyLeaveAccepted called with search: " . $request->get('search') . ", sort_by: " . $request->get('sort_by') . ", sort_order: " . $request->get('sort_order'));
           $maUserId = self::MA_USER_ID;
         
         // Get search and sort parameters
@@ -2020,7 +1987,6 @@ class MAController extends Controller
     }
     public function showStudyLeaveExtensionsAcceptedPage()
     {
-        dump("MAController@showStudyLeaveExtensionsAcceptedPage called");
        $maUserId = self::MA_USER_ID;
 
          $extensionApplications = DB::table('study_leave_extensions')
@@ -2057,7 +2023,6 @@ class MAController extends Controller
     }
     public function studyLeaveProgressReportsAcceptedPage()
     {
-        dump("MAController@studyLeaveProgressReportsAcceptedPage called");
         
         $maUserId = self::MA_USER_ID;
 
