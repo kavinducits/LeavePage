@@ -35,6 +35,7 @@ class HODAcademicEstablishmentController extends Controller
     //
     public function study_leave()
     {
+        dump("HODAcademicEstablishmentController@study_leave called");
        // dd('here');
         // Get department IDs for this HOD
        // $departmentIds = $this->getHodDepartments();
@@ -71,6 +72,7 @@ class HODAcademicEstablishmentController extends Controller
     }
     public function showStudyLeaveApplication(Request $request, $id)
     {
+        dump("HODAcademicEstablishmentController@showStudyLeaveApplication called");
         $from = $request->get('from');
        
         // Fetch the study leave application with all necessary details
@@ -192,6 +194,7 @@ class HODAcademicEstablishmentController extends Controller
 
      public function approveStudyLeave(Request $request, $id)
     {
+        dump("HODAcademicEstablishmentController@approveStudyLeave called");
         // Validate the Academic Establishment HOD review inputs
         //dd($request->all());
         $request->validate([
@@ -230,6 +233,7 @@ class HODAcademicEstablishmentController extends Controller
 
      public function study_leave_extenstions(Request $request)
     {
+        dump("HODAcademicEstablishmentController@study_leave_extenstions called");
         // Get department IDs for this HOD
         //$departmentIds = $this->getHodDepartments();
 
@@ -290,6 +294,7 @@ class HODAcademicEstablishmentController extends Controller
     }
      public function study_leave_progress_reports()
     {
+        dump("HODAcademicEstablishmentController@study_leave_progress_reports called");
        
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
@@ -328,6 +333,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function showExtension(Request $request, $extension_id)
     {
+        dump("HODAcademicEstablishmentController@showExtension called");
         $hodEmpNo = self::HOD_EMP_NO;
         $from = $request->get('from');
 
@@ -455,6 +461,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function forwardExtension(Request $request, $extension_id)
     {
+        dump("HODAcademicEstablishmentController@forwardExtension called");
         $request->validate([
             'registrar_remarks' => 'required_if:acad_est_head_recommend,0|nullable|string|max:1000',
             'acad_est_head_recommend' => 'required|in:0,1',
@@ -500,6 +507,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function returnExtension(Request $request, $extension_id)
     {
+        dump("HODAcademicEstablishmentController@returnExtension called");
         $request->validate([
             'registrar_remarks' => 'required|string|max:1000',
         ], [
@@ -536,6 +544,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function showProgressReport(Request $request, $progress_report_id)
     {
+        dump("HODAcademicEstablishmentController@showProgressReport called");
         $from = $request->get('from');
         $hodEmpNo = self::HOD_EMP_NO;
         $departmentIds = $this->getHodDepartments();
@@ -649,6 +658,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function submitProgressReportReview(Request $request, $progress_report_id)
     {
+        dump("HODAcademicEstablishmentController@submitProgressReportReview called");
         $request->validate([
             'approval_decision' => 'required|in:approved,not_approved',
             'remark' => 'nullable|string|max:1000',
@@ -698,6 +708,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function approveProgressReport(Request $request, $progress_report_id)
     {
+        dump("HODAcademicEstablishmentController@approveProgressReport called");
         $request->validate([
             'remark' => 'nullable|string|max:1000',
         ]);
@@ -746,6 +757,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function returnProgressReport(Request $request, $progress_report_id)
     {
+        dump("HODAcademicEstablishmentController@returnProgressReport called");
         $request->validate([
             'remark' => 'required|string|max:1000',
         ], [
@@ -796,6 +808,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function studyLeaveAccepted()
     {
+        dump("HODAcademicEstablishmentController@studyLeaveAccepted called");
         $studyLeaveApplications = DB::table('study_leaves')
             
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
@@ -826,6 +839,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function studyLeaveExtensionsAccepted()
     {
+        dump("HODAcademicEstablishmentController@studyLeaveExtensionsAccepted called");
         $extensionApplications = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
@@ -859,6 +873,7 @@ class HODAcademicEstablishmentController extends Controller
      */
     public function studyLeaveProgressReportsAccepted()
     {
+        dump("HODAcademicEstablishmentController@studyLeaveProgressReportsAccepted called");
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
                         ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')

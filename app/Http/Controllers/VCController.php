@@ -13,6 +13,7 @@ class VCController extends Controller
 
     public function index()
     {
+        dump("VCController@index called");
         // Get all applications for VC review (status_id = 7)
         $applications = DB::table('leave_details')
             ->join('employees', 'leave_details.nic', '=', 'employees.nic')
@@ -88,6 +89,7 @@ class VCController extends Controller
     }
      public function leave_index()
     {
+        dump("VCController@leave_index called");
         // Get all applications for VC review (status_id = 7)
         $applications = DB::table('leave_details')
             ->join('employees', 'leave_details.nic', '=', 'employees.nic')
@@ -117,6 +119,7 @@ class VCController extends Controller
     }
      public function study_leave_index()
     {
+        dump("VCController@study_leave_index called");
         
         // Get all study leave applications for VC review (status_id = 7)
         // Filter by employees.main_branch_id = 52
@@ -170,6 +173,7 @@ class VCController extends Controller
     }
     public function study_leave_index_accepted()
     {
+        dump("VCController@study_leave_index_accepted called");
         // Get all study leave applications already processed by VC (vc_empno set, past status 7)
         $studyLeaveApplications = DB::table('study_leaves')
             
@@ -198,6 +202,7 @@ class VCController extends Controller
 
     public function study_leave_extenstions_accepted()
     {
+        dump("VCController@study_leave_extenstions_accepted called");
         $extensionApplications = DB::table('study_leave_extensions')
             ->join('study_leaves', 'study_leave_extensions.study_leave_id', '=', 'study_leaves.id')
             ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
@@ -229,6 +234,7 @@ class VCController extends Controller
 
       public function study_leave_extenstions()
     {
+        dump("VCController@study_leave_extenstions called");
         
       
 
@@ -265,6 +271,7 @@ class VCController extends Controller
      */
     public function study_leave_progress_reports()
     {
+        dump("VCController@study_leave_progress_reports called");
         // Get study leave progress report applications for VC review
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
@@ -293,6 +300,7 @@ class VCController extends Controller
 
     public function study_leave_progress_reports_accepted()
     {
+        dump("VCController@study_leave_progress_reports_accepted called");
         $progressReportApplications = DB::table('study_leave_progress_reports')
             ->join('study_leaves', 'study_leave_progress_reports.study_leave_id', '=', 'study_leaves.id')
                         ->join('employees', 'study_leaves.empno', '=', 'employees.employee_no')
@@ -322,6 +330,7 @@ class VCController extends Controller
 
     public function show($id)
     {
+        dump("VCController@show called");
         $application = DB::table('leave_details')
             ->join('employees', 'leave_details.nic', '=', 'employees.nic')
             ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
@@ -397,6 +406,7 @@ class VCController extends Controller
 
     public function recommend(Request $request, $id)
     {
+        dump("VCController@recommend called");
         $request->validate([
             'vc_recommend_committee' => 'nullable|boolean',
             'vc_approved_council' => 'nullable|boolean',
@@ -445,6 +455,7 @@ class VCController extends Controller
 
     public function showStudyLeaveApplication(Request $request, $id)
     {
+        dump("VCController@showStudyLeaveApplication called");
         $from = $request->get('from');
         // Fetch study leave application with main_branch_id filtering
         $draft_study_leave = DB::table('study_leaves')
@@ -533,6 +544,7 @@ class VCController extends Controller
 
     public function approveStudyLeave(Request $request, $id)
     {
+        dump("VCController@approveStudyLeave called");
         // Validate the VC review inputs
         $request->validate([
             'vc_recommend_committee' => 'required|integer|in:0,1',
@@ -581,6 +593,7 @@ class VCController extends Controller
      */
     public function showExtension(Request $request, $extension_id)
     {
+        dump("VCController@showExtension called");
         $from = $request->get('from');
 
         // Get the complete study leave extension data
@@ -700,6 +713,7 @@ class VCController extends Controller
      */
     public function approveExtension(Request $request, $extension_id)
     {
+        dump("VCController@approveExtension called");
         $request->validate([
             'vc_recommend' => 'required|integer|in:0,1',
             'vc_remarks' => 'required_if:vc_recommend,0|nullable|string',
@@ -742,6 +756,7 @@ class VCController extends Controller
      */
     public function returnExtension(Request $request, $extension_id)
     {
+        dump("VCController@returnExtension called");
         $request->validate([
             'vc_remarks' => 'required|string|max:1000',
         ]);
@@ -783,6 +798,7 @@ class VCController extends Controller
      */
     public function showProgressReport(Request $request, $progress_report_id)
     {
+        dump("VCController@showProgressReport called");
         $from = $request->get('from');
         // Fetch the progress report with related study leave and employee details
         $progressReport = DB::table('study_leave_progress_reports')
@@ -899,6 +915,7 @@ class VCController extends Controller
      */
     public function submitProgressReportReview(Request $request, $progress_report_id)
     {
+        dump("VCController@submitProgressReportReview called");
         $request->validate([
             'approval_decision' => 'required|in:approved,not_approved',
             'vc_remarks' => 'required_if:approval_decision,not_approved|nullable|string|max:1000',
