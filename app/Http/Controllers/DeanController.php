@@ -39,6 +39,7 @@ class DeanController extends Controller
 
     public function index()
     {
+        dump("DeanController@index called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -118,6 +119,7 @@ class DeanController extends Controller
     }
      public function leave_index()
     {
+        dump("DeanController@leave_index called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -151,6 +153,7 @@ class DeanController extends Controller
     }
      public function study_leave_index()
     {
+        dump("DeanController@study_leave_index called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -207,6 +210,7 @@ class DeanController extends Controller
     }
     public function study_leave_index_accepted()
     {
+        dump("DeanController@study_leave_index_accepted called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -238,6 +242,7 @@ class DeanController extends Controller
 
     public function study_leave_extensions_accepted()
     {
+        dump("DeanController@study_leave_extensions_accepted called");
         $facultyIds = $this->getDeanFaculties();
 
         $extensionApplications = DB::table('study_leave_extensions')
@@ -271,6 +276,7 @@ class DeanController extends Controller
 
      public function study_leave_extensions()
     {
+        dump("DeanController@study_leave_extensions called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -310,6 +316,7 @@ class DeanController extends Controller
      */
     public function study_leave_progress_reports()
     {
+        dump("DeanController@study_leave_progress_reports called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -341,6 +348,7 @@ class DeanController extends Controller
 
     public function study_leave_progress_reports_accepted()
     {
+        dump("DeanController@study_leave_progress_reports_accepted called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -372,6 +380,7 @@ class DeanController extends Controller
 
     public function show($id)
     {
+        dump("DeanController@show called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
 
@@ -451,6 +460,7 @@ class DeanController extends Controller
 
     public function recommend(Request $request, $id)
     {
+        dump("DeanController@recommend called");
         $request->validate([
             'dean_recommend' => 'required|boolean',
             'dean_remarks' => 'required_if:dean_recommend,0',
@@ -499,6 +509,7 @@ class DeanController extends Controller
 
     public function showStudyLeaveApplication(Request $request, $id)
     {
+        dump("DeanController@showStudyLeaveApplication called");
         $from = $request->get('from');
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
@@ -588,6 +599,7 @@ class DeanController extends Controller
 
     public function approveStudyLeave(Request $request, $id)
     {
+        dump("DeanController@approveStudyLeave called");
         // Validate the Dean review inputs
         $request->validate([
             'dean_recommend' => 'required|integer|in:0,1',
@@ -631,6 +643,7 @@ class DeanController extends Controller
      */
     public function showExtension(Request $request, $extension_id)
     {
+        dump("DeanController@showExtension called");
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
         $from = $request->get('from');
@@ -752,6 +765,7 @@ class DeanController extends Controller
      */
     public function approveExtension(Request $request, $extension_id)
     {
+        dump("DeanController@approveExtension called");
         $request->validate([
             'dean_recommend' => 'required|integer|in:0,1',
             'dean_remarks' => 'required_if:dean_recommend,0|nullable|string',
@@ -796,6 +810,7 @@ class DeanController extends Controller
      */
     public function returnExtension(Request $request, $extension_id)
     {
+        dump("DeanController@returnExtension called");
         $request->validate([
             'dean_remarks' => 'required|string|max:1000',
         ]);
@@ -836,6 +851,7 @@ class DeanController extends Controller
      */
     public function showProgressReport(Request $request, $progress_report_id)
     {
+        dump("DeanController@showProgressReport called");
         $from = $request->get('from');
         // Get faculty IDs for this Dean
         $facultyIds = $this->getDeanFaculties();
@@ -951,6 +967,7 @@ class DeanController extends Controller
      */
     public function submitProgressReportReview(Request $request, $progress_report_id)
     {
+        dump("DeanController@submitProgressReportReview called");
         $request->validate([
             'approval_decision' => 'required|in:approved,not_approved',
             'dean_remarks' => 'required_if:approval_decision,not_approved|nullable|string|max:1000',

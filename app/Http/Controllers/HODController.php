@@ -38,6 +38,7 @@ class HODController extends Controller
 
     public function index()
     {
+        dump("HODController@index called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
@@ -142,6 +143,7 @@ class HODController extends Controller
     }
      public function leave_index()
     {
+        dump("HODController@leave_index called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
@@ -175,6 +177,7 @@ class HODController extends Controller
     }
      public function study_leave_index()
     {
+        dump("HODController@study_leave_index called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
@@ -257,6 +260,7 @@ class HODController extends Controller
 
      public function study_leave_index_accepted()
     {
+        dump("HODController@study_leave_index_accepted called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
@@ -289,6 +293,7 @@ class HODController extends Controller
 
      public function study_leave_extenstions_accepted()
     {
+        dump("HODController@study_leave_extenstions_accepted called");
         $departmentIds = $this->getHodDepartments();
 
         $extensionApplications = DB::table('study_leave_extensions')
@@ -322,6 +327,7 @@ class HODController extends Controller
 
      public function study_leave_extenstions()
     {
+        dump("HODController@study_leave_extenstions called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
@@ -356,6 +362,7 @@ class HODController extends Controller
     }
      public function study_leave_progress_reports()
     {
+        dump("HODController@study_leave_progress_reports called");
        
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
@@ -391,6 +398,7 @@ class HODController extends Controller
 
     public function study_leave_progress_reports_accepted()
     {
+        dump("HODController@study_leave_progress_reports_accepted called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
@@ -422,6 +430,7 @@ class HODController extends Controller
 
     public function show($id)
     {
+        dump("HODController@show called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
 
@@ -520,6 +529,7 @@ class HODController extends Controller
 
     public function approve(Request $request, $id)
     {
+        dump("HODController@approve called");
        
         $request->validate([
             'hod_adequate_staff' => 'required|boolean',
@@ -582,6 +592,7 @@ class HODController extends Controller
 
     public function showStudyLeaves()
     {
+        dump("HODController@showStudyLeaves called");
        
         
         // Get department IDs for this HOD
@@ -615,6 +626,7 @@ class HODController extends Controller
     }
    public function showStudyLeaveApplication(Request $request, $id)
     {
+        dump("HODController@showStudyLeaveApplication called");
         $from = $request->get('from');
         
         // Get department IDs for this HOD
@@ -724,6 +736,7 @@ class HODController extends Controller
      */
     public function showExtension(Request $request, $extension_id)
     {
+        dump("HODController@showExtension called");
         // Get department IDs for this HOD
         $departmentIds = $this->getHodDepartments();
         $from = $request->get('from');
@@ -862,6 +875,7 @@ class HODController extends Controller
      */
     public function approveExtension(Request $request, $extension_id)
     {
+        dump("HODController@approveExtension called");
         $request->validate([
             'hod_recommend' => 'required|integer|in:0,1',
             'hod_remarks' => 'required_if:hod_recommend,0|nullable|string',
@@ -903,6 +917,7 @@ class HODController extends Controller
      */
     public function returnExtension(Request $request, $extension_id)
     {
+        dump("HODController@returnExtension called");
         $request->validate([
             'hod_remarks' => 'required|string|max:1000',
         ]);
@@ -940,6 +955,7 @@ class HODController extends Controller
 
     public function approveStudyLeave(Request $request, $id)
     {
+        dump("HODController@approveStudyLeave called");
         // Validate the HOD review inputs
         $request->validate([
             'hod_adequate_staff_available' => 'required|integer|in:0,1',
@@ -986,6 +1002,7 @@ class HODController extends Controller
 
     public function showProgressReport(Request $request, $progress_report_id)
     {
+        dump("HODController@showProgressReport called");
         $from = $request->get('from');
        
         // Get department IDs for this HOD
@@ -1109,6 +1126,7 @@ class HODController extends Controller
      */
     public function submitProgressReportReview(Request $request, $progress_report_id)
     {
+        dump("HODController@submitProgressReportReview called");
         $request->validate([
             'approval_decision' => 'required|in:approved,not_approved',
             'hod_remarks' => 'required_if:approval_decision,not_approved|nullable|string|max:1000',

@@ -61,7 +61,7 @@ class MAController extends Controller
 
     public function show($id)
     {
-        Dump("MAController@show called with id: $id");
+        dump("MAController@show called");
         $maUserId = self::MA_USER_ID;
 
         // Get the specific application with all details
@@ -187,7 +187,7 @@ class MAController extends Controller
 
     public function approve(Request $request, $id)
     {
-    dump("MAController@approve called with id: $id");
+        dump("MAController@approve called");
         $request->validate([
             'remark' => 'nullable|string|max:1000',
         ]);
@@ -231,7 +231,7 @@ class MAController extends Controller
 
     public function return(Request $request, $id)
     {
-        dump("MAController@return called with id: $id");
+        dump("MAController@return called");
         
         $request->validate([
             'remark' => 'required|string|max:1000',
@@ -481,25 +481,26 @@ class MAController extends Controller
 
     public function showHod($id)
     {
-        dump("MAController@showHod called with id: $id");
+        dump("MAController@showHod called");
         return $this->show($id);
     }
 
     public function showDean($id)
     {
-        dump("MAController@showDean called with id: $id");
+        dump("MAController@showDean called");
         return $this->show($id);
     }
 
     public function showVc($id)
     {
-        dump("MAController@showVc called with id: $id");
+        dump("MAController@showVc called");
         return $this->show($id);
     }
 
+    //implment submmited
     public function studyLeaveSubmittedPage(Request $request)
     {
-        dump("MAController@studyLeaveSubmittedPage called");
+       // dump("MAController@studyLeaveSubmittedPage called");
         $maUserId = self::MA_USER_ID;
         
         // Get search and sort parameters
@@ -587,7 +588,9 @@ class MAController extends Controller
 
         return view('ma.studyLeave', compact('applications', 'search', 'sortBy', 'sortOrder', 'statistics'));
     }
-    
+
+
+    //implment in review
     public function studyLeavePage(Request $request)
     {
         dump("MAController@studyLeavePage called");
@@ -852,9 +855,11 @@ class MAController extends Controller
 
         return view('ma.studyleavestatus', compact('statusApplications'));
     }
+
+    //implmnet view StudyLeave MA
     public function showStudyLeave($id)
     {
-        dump("MAController@showStudyLeave called with id: $id");
+       // dump("MAController@showStudyLeave called with id: $id");
         $maUserId = self::MA_USER_ID;
 
         // Get the specific study leave application with all details
@@ -1011,12 +1016,13 @@ class MAController extends Controller
 
         return view("ma.showStudyLeave", compact('draft_study_leave', 'readonly','departmentHead','user', 'totalStudyLeaveDays', 'requistedStudyLeaveDays', 'totalStudyLeaveDuration', 'degrees', 'studyLeaveSummaryRows'));
     }
+    //implmnet show study leave MA
      /**
      * Calculate total study leave days taken by an employee.
      */
     public function calculateTotalStudyLeaveDays($emp_no)
     {
-        dump("Calculating total study leave days for emp_no: $emp_no");
+        // dump("Calculating total study leave days for emp_no: $emp_no");
         $totalDays = 0;
         $previousLeaves=StudyLeave::where('empno', $emp_no)
         
@@ -1051,13 +1057,15 @@ class MAController extends Controller
 
     }
 
+     //implmnet show study leave MA
+
     /**
      * Calculate total study leave months and days taken by an employee.
      * Returns ['months' => int, 'days' => int]
      */
     public function calculateTotalStudyLeaveMonths($emp_no)
     {
-        dump("Calculating total study leave months and days for emp_no: $emp_no");
+        // dump("Calculating total study leave months and days for emp_no: $emp_no");
         $totalMonths = 0;
         $totalDays = 0;
         $previousLeaves = StudyLeave::where('empno', $emp_no)
